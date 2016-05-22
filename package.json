@@ -1,0 +1,24 @@
+{
+
+	"name": "flux",
+	"version": "0.0.1",
+	"description": "flux",
+
+	"scripts": {
+		"start": "nodemon server.js",
+		"test": "export DEBUG=\"flux:*\"; nodemon server.js"
+	},
+
+	"dependencies": {
+
+		"ws": "*",
+		"debug": "*",
+		"webworker-threads": "*",
+		"express": "*",
+		"body-parser": "*"
+
+	},
+
+	"private": true
+
+}

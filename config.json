@@ -1,0 +1,15 @@
+{
+
+	"webSocketServer": {
+
+		"port": 9601
+
+	},
+
+	"webServer": {
+
+		"port": 9600
+
+	}
+
+}
