@@ -1,44 +1,43 @@
-var EventEmitter = require('events').EventEmitter;
-var ws = require('ws');
-var express = require('express');
-var bodyParser = require('body-parser');
+const EventEmitter = require('events').EventEmitter;
 
 
 //setup debug
-var debug = require('debug');
-var wsDebug = debug('flux:websocket');
+const debug = require('debug');
 
 
-var Flux = module.exports = function Flux(obj) {
+const Node = require('./node.js');
+const Flow = require('./flow.js');
+
+
+const Flux = module.exports = function Flux(obj) {
 
 	this.nodes = {};
 	this.flows = {};
 
 	//host the client nodes
-	if(obj.expressApp) {
+	if (obj.expressApp) {
 		this.initExpress(obj.expressApp);
 	}
 
-	if(obj.webSocketServer) {
+	if (obj.webSocketServer) {
 		this.initWebSocket(obj.webSocketServer);
 	}
 
 	//get all installed nodes
-	if(obj.nodesPath) {
-		this.initNodesFromPath(obj.nodesPath);
+	if (obj.nodesPath) {
+		Node.initFromPath(obj.nodesPath, this);
 	}
 
 	//get all installed flows
-	//this.initFlowsFromPath(obj.flowsPath);
+	if (obj.flowsPath) {
+		Flow.initFromPath(obj.flowsPath, this);
+	}
 
 };
 
 
-var Flow = require('./flow.js');
+//init requires
 Flow.init(Flux);
-
-
-var Node = require('./node.js');
 Node.init(Flux);
 
 
@@ -52,13 +51,15 @@ Flux.init = function() {
 };
 
 
-Flux.generateObjectId = function() {
+Flux.generateObjectId = Flux.prototype.generateObjectId = function() {
 
-	if (!this.uuid) {
-		this.uuid = 0;
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000)
+			.toString(16)
+			.substring(1);
 	}
-
-	return ++this.uuid;
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+		s4() + '-' + s4() + s4() + s4();
 
 };
 
@@ -86,45 +87,11 @@ Flux.prototype.initWebSocket = function(webSocketServer) {
 };
 
 
-//get all installed nodes
-var fs = require('fs');
-Flux.prototype.initNodesFromPath = function(path) {
+//register a node
+Flux.prototype.addNode = function(name, obj, constructorFunction) {
 
-	if (!path) {
-		return;
-	}
-
-	var files = fs.readdirSync(path);
-	files.forEach((file) => {
-
-		var filepath = path + '/' + file;
-		var node;
-		if (fs.statSync(filepath).isFile()) {
-
-			node = require(filepath);
-			if (typeof node === 'function') {
-				node(this);
-			}
-
-		} else {
-
-			node = require(filepath);
-			if (typeof node === 'function') {
-				node(this);
-			}
-
-		}
-
-	});
-
-};
-
-
-//allow a node to register itself
-Flux.prototype.addNode = function(name, fn) {
-
-	if (typeof name !== 'string' || typeof fn !== 'function') {
-		throw new Error('first arguments needs to be string, second a function');
+	if (!name || !obj || (!constructorFunction && !obj.constructorFunction)) {
+		throw new Error('first argument needs to be string, second object, third a function');
 	}
 
 	//check if a similar node with the same name doesn't already exist
@@ -132,13 +99,26 @@ Flux.prototype.addNode = function(name, fn) {
 		return this.nodes[name];
 	}
 
-	return (this.nodes[name] = fn);
+	if (!obj.name) {
+		obj.name = name;
+	}
+
+	if (!obj.constructorFunction) {
+		obj.constructorFunction = constructorFunction;
+	}
+
+	return (this.nodes[name] = obj);
 
 };
 
 
 Flux.prototype.getNodes = function() {
 	return this.nodes;
+};
+
+
+Flux.prototype.getNodeByName = function(name) {
+	return this.nodes[name];
 };
 
 
@@ -201,5 +181,5 @@ Flux.prototype.deleteFlowById = function(id, callback) {
 
 
 Flux.prototype.getNodeConstructorByName = function(name) {
-	return this.nodes[name];
+	return this.nodes[name].constructorFunction;
 };

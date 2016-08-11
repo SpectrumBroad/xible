@@ -1,65 +1,75 @@
 module.exports = function(flux) {
 
-	var expressApp = flux.expressApp;
+	let expressApp = flux.expressApp;
+
+
+	//TODO: refactor this nodeCopy crap
+
+
+	//copies inputs/outputs from node to nodecopy
+	function nodeIoCopy(ioName, nodeCopy, node) {
+
+		nodeCopy[ioName] = {};
+		for (let name in node[ioName]) {
+
+			nodeCopy[ioName][name] = Object.assign({}, node[ioName][name]);
+			delete nodeCopy[ioName][name].node;
+			delete nodeCopy[ioName][name]._events;
+			delete nodeCopy[ioName][name]._eventsCount;
+			delete nodeCopy[ioName][name].origin;
+			delete nodeCopy[ioName][name].destination;
+			delete nodeCopy[ioName][name].connectors;
+
+			nodeCopy[ioName][name].listeners = {
+				editorAttach: node[ioName][name].listeners('editorAttach').map(fn => fn.toString()),
+				editorDetach: node[ioName][name].listeners('editorDetach').map(fn => fn.toString())
+			};
+
+		}
+
+	}
+
+
+	function nodeCopy(node) {
+
+		//copy the node so we can mutate it where need be
+		//this does NOT make a deep clone, maybe we should change that
+		let nodeCopy = Object.assign({}, node);
+		delete nodeCopy.flow;
+		delete nodeCopy._events;
+		delete nodeCopy._eventsCount;
+		if (node.data) {
+			nodeCopy.data = JSON.parse(JSON.stringify(node.data));
+		}
+
+		//attach stringified listeners
+		nodeCopy.listeners = {
+			editorContentLoad: node.listeners('editorContentLoad').map(fn => fn.toString())
+		};
+
+		//attach stringified listeners to the io's
+		nodeIoCopy('inputs', nodeCopy, node);
+		nodeIoCopy('outputs', nodeCopy, node);
+
+		return nodeCopy;
+
+	}
 
 
 	//get all registered nodes
 	expressApp.get('/api/flux/nodes', (req, res) => {
 
-		var nodes = [];
-		for (let name in flux.nodes) {
+		let nodes = {};
+		for (const NODE_NAME in flux.nodes) {
 
-			let node = flux.nodes[name]();
+			let node = new flux.Node(flux.nodes[NODE_NAME]);
 
 			if (!node) {
-				throw new Error('constructor for node "' + name + '" is not returning actual node');
-			}
-
-			//copy the node so we can mutate it where need be
-			//this does NOT make a deep clone, maybe we should change that
-			var nodeCopy = Object.assign({}, node);
-			delete nodeCopy._events;
-			delete nodeCopy._eventsCount;
-
-			//attach stringified listeners
-			nodeCopy.listeners = {
-				editorContentLoad: node.listeners('editorContentLoad').map(fn => fn.toString())
-			};
-
-			//attach stringified listeners to the io's
-			nodeCopy.inputs = [];
-			for (let i = 0; i < node.inputs.length; i++) {
-
-				nodeCopy.inputs[i] = Object.assign({}, node.inputs[i]);
-				delete nodeCopy.inputs[i].node;
-				delete nodeCopy.inputs[i]._events;
-				delete nodeCopy.inputs[i]._eventsCount;
-
-				nodeCopy.inputs[i].listeners = {
-					editorAttach: node.inputs[i].listeners('editorAttach').map(fn => fn.toString()),
-					editorDetach: node.inputs[i].listeners('editorDetach').map(fn => fn.toString())
-				};
-
-			}
-
-			//attach stringified listeners to the io's
-			nodeCopy.outputs = [];
-			for (let i = 0; i < node.outputs.length; i++) {
-
-				nodeCopy.outputs[i] = Object.assign({}, node.outputs[i]);
-				delete nodeCopy.outputs[i].node;
-				delete nodeCopy.outputs[i]._events;
-				delete nodeCopy.outputs[i]._eventsCount;
-
-				nodeCopy.outputs[i].listeners = {
-					editorAttach: node.outputs[i].listeners('editorAttach').map(fn => fn.toString()),
-					editorDetach: node.outputs[i].listeners('editorDetach').map(fn => fn.toString())
-				};
-
+				throw new Error(`constructor for node "${NODE_NAME}" is not returning actual node`);
 			}
 
 			//add to result
-			nodes.push(nodeCopy);
+			nodes[NODE_NAME] = nodeCopy(node);
 
 		}
 
@@ -68,10 +78,36 @@ module.exports = function(flux) {
 	});
 
 
+	//retrieve all flows
+	expressApp.get('/api/flux/flows', (req, res) => {
+
+		let flows = flux.getFlows();
+		let returnFlows = {};
+
+		for (let id in flows) {
+
+			returnFlows[id] = {
+				_id: id,
+				nodes: [],
+				connectors: flows[id].json.connectors,
+				viewState: flows[id].json.viewState
+			};
+
+			flows[id].nodes.forEach((node) => {
+				returnFlows[id].nodes.push(nodeCopy(node));
+			});
+
+		}
+
+		res.json(returnFlows);
+
+	});
+
+
 	//create a new flow
 	expressApp.post('/api/flux/flows', (req, res) => {
 
-		if(!req.body) {
+		if (!req.body) {
 			res.status(400).end();
 		} else {
 
@@ -86,9 +122,9 @@ module.exports = function(flux) {
 
 
 	//get a flow by a given id
-	expressApp.param('flowId', function(req, res, next, id) {
+	expressApp.param('flowId', (req, res, next, id) => {
 
-		flux.getFlowById(id, function(flow) {
+		flux.getFlowById(id, (flow) => {
 
 			if (flow) {
 
@@ -116,9 +152,27 @@ module.exports = function(flux) {
 	//start an existing flow
 	expressApp.patch('/api/flux/flows/:flowId/start', (req, res) => {
 
-
 		req.locals.flow.start();
 		res.end();
+
+	});
+
+
+	//get an existing flow
+	expressApp.get('/api/flux/flows/:flowId', (req, res) => {
+
+		returnFlow = {
+			_id: req.locals.flow._id,
+			nodes: [],
+			connectors: req.locals.flow.json.connectors,
+			viewState: req.locals.flow.json.viewState
+		};
+
+		req.locals.flow.nodes.forEach((node) => {
+			returnFlow.nodes.push(nodeCopy(node));
+		});
+
+		res.json(returnFlow);
 
 	});
 
@@ -131,7 +185,14 @@ module.exports = function(flux) {
 
 		//init the newly provided json over the existing flow
 		req.locals.flow.initJson(req.body);
-		res.end();
+
+		//save it to file
+		req.locals.flow.save();
+
+		//output the flow id
+		res.json({
+			_id: req.locals.flow._id
+		});
 
 	});
 
@@ -141,6 +202,7 @@ module.exports = function(flux) {
 
 		req.locals.flow.stop();
 		req.locals.flow.delete();
+		res.end();
 
 	});
 

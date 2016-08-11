@@ -1,7 +1,8 @@
-var EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('events').EventEmitter;
+const nodeDebug = require('debug')('flux:node');
 
 
-var Node = module.exports = function Node(obj) {
+let Node = module.exports = function Node(obj) {
 
 	this.name = obj.name;
 	this.type = obj.type; //object, action, trigger (event)
@@ -12,19 +13,24 @@ var Node = module.exports = function Node(obj) {
 	this.editorContent = obj.editorContent;
 
 	//init inputs
-	this.inputs = [];
+	this.inputs = {};
 	if (obj.inputs) {
-		obj.inputs.forEach(input => {
-			this.addInput(input);
-		});
+		for (const name in obj.inputs) {
+			this.addInput(name, obj.inputs[name]);
+		}
 	}
 
 	//init outputs
-	this.outputs = [];
+	this.outputs = {};
 	if (obj.outputs) {
-		obj.outputs.forEach(output => {
-			this.addOutput(output);
-		});
+		for (const name in obj.outputs) {
+			this.addOutput(name, obj.outputs[name]);
+		}
+	}
+
+	//construct
+	if (obj.constructorFunction) {
+		obj.constructorFunction.call(this, this);
 	}
 
 };
@@ -38,34 +44,82 @@ Node.init = function(Flux) {
 };
 
 
+//get all installed nodes
+const fs = require('fs');
+Node.initFromPath = function(path, flux) {
+
+	nodeDebug(`init nodes from ${path}`);
+
+	if (!path || !flux) {
+		return;
+	}
+
+	var files = fs.readdirSync(path);
+	files.forEach((file) => {
+
+		var filepath = path + '/' + file;
+		var node;
+
+		if (fs.statSync(filepath).isDirectory()) {
+
+			try {
+
+				node = require(filepath);
+				if (typeof node === 'function') {
+					node(flux);
+				}
+
+			} catch (e) {
+				nodeDebug(`could not init ${file}: ${e.message}`);
+			}
+
+		}
+
+	});
+
+};
+
+
 Object.setPrototypeOf(Node.prototype, EventEmitter.prototype);
 
 
-Node.prototype.addInput = function(input) {
+Node.prototype.addInput = function(name, input) {
 
 	if (!(input instanceof NodeInput)) {
 		input = new NodeInput(input);
 	}
 
+	input.name = name;
 	input.node = this;
-	this.inputs.push(input);
+	this.inputs[name] = input;
 
 	return input;
 
 };
 
 
-Node.prototype.addOutput = function(output) {
+Node.prototype.addOutput = function(name, output) {
 
 	if (!(output instanceof NodeOutput)) {
 		output = new NodeOutput(output);
 	}
 
+	output.name = name;
 	output.node = this;
-	this.outputs.push(output);
+	this.outputs[name] = output;
 
 	return output;
 
+};
+
+
+Node.prototype.getInputByName = function(name) {
+	return this.inputs[name];
+};
+
+
+Node.prototype.getOutputByName = function(name) {
+	return this.outputs[name];
 };
 
 
@@ -176,6 +230,9 @@ Node.getValuesFromInput = function(input, callback) {
 
 		conn.origin.emit('trigger', value => {
 
+			//let everyone know that the trigger is done
+			conn.origin.emit('triggerdone');
+
 			//we only send arrays between nodes
 			//we don't add non existant values
 			//we concat everything
@@ -198,8 +255,11 @@ Node.getValuesFromInput = function(input, callback) {
 };
 
 
-function NodeIo() {
+function NodeIo(obj) {
+
+	this.type = obj.type;
 	this.connectors = [];
+
 }
 
 
@@ -207,31 +267,15 @@ Object.setPrototypeOf(NodeIo.prototype, EventEmitter.prototype);
 
 
 function NodeInput(obj) {
-
-	if (obj) {
-
-		Object.setPrototypeOf(obj, NodeInput.prototype);
-		NodeIo.call(obj);
-		return obj;
-
-	}
-
+	NodeIo.apply(this, arguments);
 }
 
 
 Object.setPrototypeOf(NodeInput.prototype, NodeIo.prototype);
 
 
-function NodeOutput(obj) {
-
-	if (obj) {
-
-		Object.setPrototypeOf(obj, NodeOutput.prototype);
-		NodeIo.call(obj);
-		return obj;
-
-	}
-
+function NodeOutput() {
+	NodeIo.apply(this, arguments);
 }
 
 

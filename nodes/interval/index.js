@@ -1,32 +1,31 @@
 module.exports = function(flux) {
 
-	var nodeConstructor = function() {
+	function constr(NODE) {
 
-		var node = new flux.Node({
-			name: "interval",
-			type: "action",
-			level: 0,
-			groups: ["basics", "datetime"],
-			editorContent: `<input type="number" placeholder="msecs" data-outputvalue="interval" data-hideifattached="input[name=msecs]"/>`
-		});
-
-		var triggerIn = node.addInput({
-			name: "trigger",
+		let triggerIn = NODE.addInput('trigger', {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', function() {
+		let msecIn = NODE.addInput('msecs', {
+			type: "number"
+		});
 
-			flux.Node.getValuesFromInput(this.node.inputs[1], intervals => {
+		let triggerOut = NODE.addOutput('complete', {
+			type: "trigger"
+		});
+
+		triggerIn.on('trigger', () => {
+
+			flux.Node.getValuesFromInput(msecIn, intervals => {
 
 				if (!intervals.length) {
-					intervals.push(this.node.data.interval || 0);
+					intervals.push(NODE.data.interval || 0);
 				}
 
 				intervals.forEach(interval => {
 
 					setInterval(() => {
-						flux.Node.triggerOutputs(this.node.outputs[0]);
+						flux.Node.triggerOutputs(triggerOut);
 					}, interval);
 
 				});
@@ -35,20 +34,13 @@ module.exports = function(flux) {
 
 		});
 
-		node.addInput({
-			name: "msecs",
-			type: "number"
-		});
+	}
 
-		node.addOutput({
-			name: "complete",
-			type: "trigger"
-		});
-
-		return node;
-
-	};
-
-	flux.addNode('interval', nodeConstructor);
+	flux.addNode('interval', {
+		type: "action",
+		level: 0,
+		groups: ["basics", "datetime"],
+		editorContent: `<input type="number" placeholder="msecs" data-outputvalue="interval" data-hideifattached="input[name=msecs]"/>`
+	}, constr);
 
 };

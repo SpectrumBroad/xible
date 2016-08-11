@@ -11,10 +11,13 @@ const Flux = require('./index.js');
 
 if (cluster.isMaster) {
 
-	//setup client requests over http
+	//setup client requests over https
+	const spdy = require('spdy');
 	const expressDebug = debug('flux:express');
 	const express = require('express');
 	const bodyParser = require('body-parser');
+	const fs = require('fs');
+
 	expressApp = express();
 	expressApp.use(bodyParser.json());
 
@@ -42,23 +45,41 @@ if (cluster.isMaster) {
 
 	//init the webserver
 	expressDebug(`starting on port: ${config.webServer.port}`);
-	const expressServer = expressApp.listen(config.webServer.port, function() {
 
-		expressDebug(`listening on: ${expressServer.address().address}:${expressServer.address().port}`);
+	const spdyServer = spdy.createServer({
+		key: fs.readFileSync('./ssl/ssl.key'),
+		cert: fs.readFileSync('./ssl/ssl.crt')
+	}, expressApp).listen(config.webServer.port, function() {
+
+		expressDebug(`listening on: ${spdyServer.address().address}:${spdyServer.address().port}`);
 
 		//websocket
 		const wsDebug = debug('flux:websocket');
 		const ws = require('ws');
-		const webSocketServer = new ws.Server({
-			port: config.webSocketServer.port
-		}, () => {
+
+		const spdyWebSocketServer = spdy.createServer({
+
+			key: fs.readFileSync('./ssl/ssl.key'),
+			cert: fs.readFileSync('./ssl/ssl.crt')
+
+		}, function(req, res) {
+
+			res.writeHead(200);
+			res.end('socket');
+
+		}).listen(config.webSocketServer.port, () => {
 
 			wsDebug(`listening on port: ${config.webSocketServer.port}`);
 
-			var flux = new Flux({
+			const webSocketServer = new ws.Server({
+				server: spdyWebSocketServer
+			});
+
+			new Flux({
 				expressApp: expressApp,
 				webSocketServer: webSocketServer,
-				nodesPath: './nodes'
+				nodesPath: './nodes',
+				flowsPath: './flows'
 			});
 
 		});
@@ -67,13 +88,13 @@ if (cluster.isMaster) {
 
 } else {
 
-	var flux = new Flux({
+	let flux = new Flux({
 		nodesPath: './nodes'
 	});
 
-	var flow;
+	let flow;
 
-  //init message handler
+	//init message handler
 	process.on('message', message => {
 
 		switch (message.method) {
@@ -97,7 +118,9 @@ if (cluster.isMaster) {
 
 	});
 
-  //inform the master we're done
-  process.send({method:'init'});
+	//inform the master we're done
+	process.send({
+		method: 'init'
+	});
 
 }

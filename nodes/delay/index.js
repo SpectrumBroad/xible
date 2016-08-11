@@ -1,43 +1,42 @@
 module.exports = function(flux) {
 
-	var nodeConstructor = function() {
+	function constr(NODE) {
 
-		var node = new flux.Node({
-			name: "delay",
-			type: "action",
-			level: 0,
-			groups: ["basics", "datetime"],
-			editorContent: `<input type="number" placeholder="msecs" data-outputvalue="delay" data-hideifattached="input[name=msecs]"/>`
-		});
-
-		var triggerIn = node.addInput({
-			name: "trigger",
+		let triggerIn = NODE.addInput('trigger', {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', function() {
+		let msecIn = NODE.addInput('msecs', {
+			type: "number"
+		});
 
-			var delayFunction = (statusId) => {
+		let triggerOut = NODE.addOutput('complete', {
+			type: "trigger"
+		});
 
-				this.node.removeStatusById(statusId);
-				flux.Node.triggerOutputs(this.node.outputs[0]);
+		triggerIn.on('trigger', () => {
+
+			let delayFunction = (statusId) => {
+
+				NODE.removeStatusById(statusId);
+				flux.Node.triggerOutputs(triggerOut);
 
 			};
 
-			flux.Node.getValuesFromInput(this.node.inputs[1], delays => {
+			flux.Node.getValuesFromInput(msecIn, delays => {
 
 				if (!delays.length) {
-					delays.push(this.node.data.delay || 0);
+					delays.push(NODE.data.delay || 0);
 				}
 
 				delays.forEach(delay => {
 
-					var statusId = this.node.addStatus({
+					var statusId = NODE.addStatus({
 						message: `waiting for ${delay} msec`,
 						color: 'blue'
 					});
 
-					setTimeout(delayFunction.bind(this, statusId), delay);
+					setTimeout(delayFunction.bind(NODE, statusId), delay);
 
 				});
 
@@ -45,20 +44,13 @@ module.exports = function(flux) {
 
 		});
 
-		node.addInput({
-			name: "msecs",
-			type: "number"
-		});
+	}
 
-		node.addOutput({
-			name: "complete",
-			type: "trigger"
-		});
-		
-		return node;
-
-	};
-
-	flux.addNode('delay', nodeConstructor);
+	flux.addNode('delay', {
+		type: "action",
+		level: 0,
+		groups: ["basics", "datetime"],
+		editorContent: `<input type="number" placeholder="msecs" data-outputvalue="delay" data-hideifattached="input[name=msecs]"/>`
+	}, constr);
 
 };

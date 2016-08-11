@@ -15,7 +15,8 @@
 		"debug": "*",
 		"webworker-threads": "*",
 		"express": "*",
-		"body-parser": "*"
+		"body-parser": "*",
+		"spdy": "*"
 
 	},
 
