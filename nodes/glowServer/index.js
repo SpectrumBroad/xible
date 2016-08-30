@@ -1,4 +1,7 @@
+'use strict';
+
 const ws = require('ws');
+const EventEmitter = require('events').EventEmitter;
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
@@ -6,17 +9,28 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		let socket;
+		let state;
+		let glowServer = {};
+		Object.setPrototypeOf(glowServer, EventEmitter.prototype);
 
-		let glowOut = NODE.addOutput('glowServer', {
+		let socket;
+		let connected = false;
+
+		let glowConnected = NODE.addOutput('connected', {
+			type: "trigger"
+		});
+
+		let glowDisconnected = NODE.addOutput('disconnected', {
+			type: "trigger"
+		});
+
+		let glowServerOut = NODE.addOutput('glowServer', {
 			type: "glowServer"
 		});
 
 		//return reference to this api
-		glowOut.on('trigger', (callback) => {
-
-
-
+		glowServerOut.on('trigger', (state, callback) => {
+			callback(glowServer);
 		});
 
 		//setup the websocket connection
@@ -30,6 +44,8 @@ module.exports = function(FLUX) {
 
 			socket.on('open', () => {
 
+				connected = true;
+
 				NODE.removeAllStatuses();
 
 				NODE.addStatus({
@@ -37,6 +53,12 @@ module.exports = function(FLUX) {
 					color: 'green'
 				});
 
+				FLUX.Node.triggerOutputs(glowConnected, state);
+
+			});
+
+			socket.on('message', (data) => {
+				console.log(data);
 			});
 
 			socket.on('error', (err) => {
@@ -56,19 +78,24 @@ module.exports = function(FLUX) {
 					color: 'red'
 				});
 
+				if (connected) {
+					FLUX.Node.triggerOutputs(glowDisconnected, state);
+				}
+
+				connected = false;
 				socket = null;
 
 				//reconnect
-				setTimeout(() => {
-					connect();
-				}, 10000);
+				setTimeout(() => connect(), 10000);
 
 			});
 
 		}
 
 		//we always init so we can visualise connection status
-		NODE.on('init', () => {
+		//and trigger connected/disconnected events
+		NODE.on('init', (initState) => {
+			state = initState;
 			connect();
 		});
 

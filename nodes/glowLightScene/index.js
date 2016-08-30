@@ -30,7 +30,7 @@ module.exports = function(flux) {
 		sceneOut.on('trigger', function(callback) {
 
 			if (stringInput.connectors.length) {
-				this.getValuesFromInput(sceneIn, strs => callback(strs.map(str => LightScene.getByName(str))));
+				this.getValuesFromInput(sceneIn).then(strs => callback(strs.map(str => LightScene.getByName(str))));
 			} else {
 				callback(LightScene.getByName(this.value));
 			}

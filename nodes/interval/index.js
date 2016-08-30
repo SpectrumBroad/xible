@@ -14,9 +14,9 @@ module.exports = function(flux) {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', () => {
+		triggerIn.on('trigger', (state) => {
 
-			flux.Node.getValuesFromInput(msecIn, intervals => {
+			flux.Node.getValuesFromInput(msecIn, state).then(intervals => {
 
 				if (!intervals.length) {
 					intervals.push(NODE.data.interval || 0);
@@ -25,7 +25,7 @@ module.exports = function(flux) {
 				intervals.forEach(interval => {
 
 					setInterval(() => {
-						flux.Node.triggerOutputs(triggerOut);
+						flux.Node.triggerOutputs(triggerOut, state);
 					}, interval);
 
 				});

@@ -23,10 +23,10 @@ module.exports = function(flux) {
 		});
 
 		var anyOutput = NODE.getOutputByName('result');
-		anyOutput.on('trigger', function(callback) {
+		anyOutput.on('trigger', function(state, callback) {
 
 			//get the input values
-			flux.Node.getValuesFromInput(anyInput, vals => {
+			flux.Node.getValuesFromInput(anyInput, state).then(vals => {
 
 				var values = [];
 				vals.forEach(val => {

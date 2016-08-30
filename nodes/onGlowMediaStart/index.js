@@ -1,22 +1,56 @@
+'use strict';
+
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		NODE.addInput('glowServer', {
+		let glowServerIn = NODE.addInput('glowServer', {
 			type: "glowServer"
 		});
 
-		NODE.addOutput('trigger', {
+		let triggerOut = NODE.addOutput('trigger', {
 			type: "trigger"
 		});
 
-		NODE.addOutput('media', {
-			type: "glowMedia"
+		let mediaOut = NODE.addOutput('media', {
+			type: "string"
 		});
 
-		NODE.on('trigger', function() {
+		mediaOut.on('trigger', function(state, callback) {
+			callback(state.get(this).value);
+		});
 
-			//setup a websocket to glow
+		NODE.on('trigger', (state) => {
+
+			//get the glow server
+			FLUX.Node.getValuesFromInput(glowServerIn, state).then((glowServers) => {
+
+				glowServers.forEach((glowServer) => {
+
+					glowServer.on('message', (ev) => {
+
+						console.log(ev);
+
+						let state = this.getState();
+						state.media=ev.file;
+
+						/*
+
+						state.getOutputByName('media').on('trigger', (callback) => {
+							callback(ev.file);
+						});
+
+						*/
+
+						FLUX.Node.triggerOutputs(triggerOut, state);
+
+						//FLUX.Node.triggerOutputs(triggerOut);
+
+					});
+
+				});
+
+			});
 
 		});
 

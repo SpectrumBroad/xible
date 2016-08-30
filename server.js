@@ -1,3 +1,5 @@
+'use strict';
+
 const debug = require('debug');
 
 //config
@@ -18,7 +20,7 @@ if (cluster.isMaster) {
 	const bodyParser = require('body-parser');
 	const fs = require('fs');
 
-	expressApp = express();
+	let expressApp = express();
 	expressApp.use(bodyParser.json());
 
 	//setup default express stuff
@@ -88,11 +90,31 @@ if (cluster.isMaster) {
 
 } else {
 
+/*
+	setInterval(function() {
+		console.log(process.memoryUsage());
+	}, 1000);
+*/
+
+	let flow;
+
+	process.on('unhandledRejection', (reason, p) => {
+
+		console.log('unhandled rejection:', reason);
+
+		if (flow) {
+
+			process.send({
+				method: 'stop'
+			});
+
+		}
+
+	});
+
 	let flux = new Flux({
 		nodesPath: './nodes'
 	});
-
-	let flow;
 
 	//init message handler
 	process.on('message', message => {
@@ -101,8 +123,25 @@ if (cluster.isMaster) {
 
 			case 'start':
 
-				flow = new flux.Flow(flux, message.flow);
-				flow.start();
+				try {
+
+					flow = new flux.Flow(flux);
+					flow.initJson(message.flow);
+					flow.start();
+
+				} catch (e) {
+
+					console.log('exception:', e);
+
+					if (flow) {
+
+						process.send({
+							method: 'stop'
+						});
+
+					}
+
+				}
 
 				break;
 

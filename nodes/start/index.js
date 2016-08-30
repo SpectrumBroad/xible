@@ -1,9 +1,11 @@
+'use strict';
+
 module.exports = function(flux) {
 
 	function constructorFunction(NODE) {
 
-		NODE.on('trigger', () => {
-			flux.Node.triggerOutputs(NODE.getOutputByName('trigger'));
+		NODE.on('trigger', (state) => {
+			flux.Node.triggerOutputs(NODE.getOutputByName('trigger'), state);
 		});
 
 	}

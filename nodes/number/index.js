@@ -6,7 +6,7 @@ module.exports = function(FLUX) {
 			type: "number"
 		});
 
-		numberOut.on('trigger', function(callback) {
+		numberOut.on('trigger', function(state, callback) {
 			callback(+(NODE.data.value || 0));
 		});
 

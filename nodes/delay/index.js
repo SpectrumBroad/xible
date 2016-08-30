@@ -14,16 +14,16 @@ module.exports = function(flux) {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', () => {
+		triggerIn.on('trigger', (state) => {
 
 			let delayFunction = (statusId) => {
 
 				NODE.removeStatusById(statusId);
-				flux.Node.triggerOutputs(triggerOut);
+				flux.Node.triggerOutputs(triggerOut, state);
 
 			};
 
-			flux.Node.getValuesFromInput(msecIn, delays => {
+			flux.Node.getValuesFromInput(msecIn, state).then(delays => {
 
 				if (!delays.length) {
 					delays.push(NODE.data.delay || 0);

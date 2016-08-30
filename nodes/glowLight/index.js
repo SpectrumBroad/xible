@@ -32,7 +32,7 @@ module.exports = function(flux) {
 		lightOut.on('trigger', callback => {
 
 			if (nameIn.connectors.length) {
-				flux.Node.getValuesFromInput(nameIn, strs => callback(strs.map(str => Light.getByName(str))));
+				flux.Node.getValuesFromInput(nameIn).then(strs => callback(strs.map(str => Light.getByName(str))));
 			} else {
 				callback(Light.getByName(this.value));
 			}

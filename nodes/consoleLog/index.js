@@ -1,11 +1,11 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 	function nodeConstructor(NODE) {
 
 		let triggerIn = NODE.getInputByName('trigger');
-		triggerIn.on('trigger', function() {
+		triggerIn.on('trigger', (state) => {
 
-			flux.Node.getValuesFromInput(NODE.getInputByName('any'), strs => {
+			FLUX.Node.getValuesFromInput(NODE.getInputByName('value'), state).then((strs) => {
 
 				if (!strs.length) {
 					strs.push(NODE.data.value || '');
@@ -28,7 +28,7 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('console log', {
+	FLUX.addNode('console log', {
 		type: "action",
 		level: 0,
 		groups: ["basics", "logging"],
@@ -37,7 +37,7 @@ module.exports = function(flux) {
 			"trigger": {
 				type: "trigger"
 			},
-			"any": {}
+			"value": {}
 		}
 	}, nodeConstructor);
 

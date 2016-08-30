@@ -1,4 +1,4 @@
-const EventEmitter = require('events').EventEmitter;
+'use strict';
 
 
 //setup debug
@@ -41,13 +41,20 @@ Flow.init(Flux);
 Node.init(Flux);
 
 
-Flux.init = function() {
+Flux.init = function() {};
 
-	var f = new Flux({
-		expressApp: expressApp,
-		path: "app/flux/nodes"
+
+Flux.getNativeModules = function() {
+
+	return Object.keys(process.binding('natives')).filter(function(el) {
+		return !/^_|^internal|\//.test(el);
 	});
 
+};
+
+
+Flux.checkUsedDeps=function() {
+	let depcheck=require('depcheck');
 };
 
 

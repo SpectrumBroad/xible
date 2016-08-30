@@ -1,6 +1,8 @@
+'use strict';
+
 const EventEmitter = require('events').EventEmitter;
 const nodeDebug = require('debug')('flux:node');
-
+const path = require('path');
 
 let Node = module.exports = function Node(obj) {
 
@@ -9,8 +11,9 @@ let Node = module.exports = function Node(obj) {
 	this.level = obj.level;
 	this.groups = obj.groups;
 	this.description = obj.description;
-
 	this.editorContent = obj.editorContent;
+
+	this._states = {};
 
 	//init inputs
 	this.inputs = {};
@@ -54,6 +57,8 @@ Node.initFromPath = function(path, flux) {
 		return;
 	}
 
+	Node.nodesPath = path;
+
 	var files = fs.readdirSync(path);
 	files.forEach((file) => {
 
@@ -70,7 +75,7 @@ Node.initFromPath = function(path, flux) {
 				}
 
 			} catch (e) {
-				nodeDebug(`could not init ${file}: ${e.message}`);
+				nodeDebug(`could not init '${file}': ${e.stack}`);
 			}
 
 		}
@@ -199,54 +204,81 @@ Node.prototype.hasConnectedInputsOfType = function(type) {
 };
 
 
-Node.triggerOutputs = function(output, msg) {
+Node.triggerOutputs = function(output, state) {
+
+	this.flowStateCheck(state);
 
 	output.node.emit('triggerout', output);
 
 	output.connectors.forEach(conn => {
 
-		conn.destination.node.emit('trigger', msg);
-		conn.destination.emit('trigger', msg);
+		conn.destination.node.emit('trigger');
+		conn.destination.emit('trigger', state.split());
 
 	});
 
 };
 
 
-Node.getValuesFromInput = function(input, callback) {
+Node.flowStateCheck=function(state) {
 
-	var values = [];
-	var i = 0;
-	var connLength = input.connectors.length;
+	if (!(state instanceof Node.Flux.FlowState)) {
 
-	if (!connLength) {
-
-		callback([]);
-		return;
+		let e = new Error(`state should be provided and instance of FlowState`);
+		/*
+		let resolvedPath=path.resolve(Node.nodesPath);
+		console.log(e.stack.split('\n').find((line) => line.indexOf(resolvedPath) > -1));
+		*/
+		throw e;
 
 	}
 
-	input.connectors.forEach(conn => {
+	return true;
 
-		conn.origin.emit('trigger', value => {
+};
 
-			//let everyone know that the trigger is done
-			conn.origin.emit('triggerdone');
 
-			//we only send arrays between nodes
-			//we don't add non existant values
-			//we concat everything
-			if (typeof value !== 'undefined' && !Array.isArray(value)) {
-				value = [value];
-			}
-			if (typeof value !== 'undefined') {
-				values = values.concat(value);
-			}
+Node.getValuesFromInput = function(input, state) {
 
-			//all done
-			if (++i === connLength) {
-				callback(values);
-			}
+	this.flowStateCheck(state);
+
+	return new Promise((resolve, reject) => {
+
+		let values = [];
+		let i = 0;
+		let connLength = input.connectors.length;
+
+		if (!connLength) {
+
+			resolve([]);
+			return;
+
+		}
+
+		input.connectors.forEach(conn => {
+
+			//trigger the input
+			conn.origin.emit('trigger', state, (value) => {
+
+				//let everyone know that the trigger is done
+				conn.origin.node.emit('triggerdone');
+
+				//we only send arrays between nodes
+				//we don't add non existant values
+				//we concat everything
+				if (typeof value !== 'undefined' && !Array.isArray(value)) {
+					value = [value];
+				}
+				if (typeof value !== 'undefined') {
+					values = values.concat(value);
+				}
+
+				//all done
+				if (++i === connLength) {
+					resolve(values);
+				}
+
+			});
 
 		});
 
@@ -257,7 +289,12 @@ Node.getValuesFromInput = function(input, callback) {
 
 function NodeIo(obj) {
 
-	this.type = obj.type;
+	this.type = null;
+
+	if (obj) {
+		this.type = obj.type;
+	}
+
 	this.connectors = [];
 
 }

@@ -1,6 +1,8 @@
-module.exports = function(flux) {
+'use strict';
 
-	let expressApp = flux.expressApp;
+module.exports = function(FLUX) {
+
+	let expressApp = FLUX.expressApp;
 
 
 	//TODO: refactor this nodeCopy crap
@@ -36,6 +38,7 @@ module.exports = function(flux) {
 		//this does NOT make a deep clone, maybe we should change that
 		let nodeCopy = Object.assign({}, node);
 		delete nodeCopy.flow;
+		delete nodeCopy._states;
 		delete nodeCopy._events;
 		delete nodeCopy._eventsCount;
 		if (node.data) {
@@ -60,9 +63,9 @@ module.exports = function(flux) {
 	expressApp.get('/api/flux/nodes', (req, res) => {
 
 		let nodes = {};
-		for (const NODE_NAME in flux.nodes) {
+		for (const NODE_NAME in FLUX.nodes) {
 
-			let node = new flux.Node(flux.nodes[NODE_NAME]);
+			let node = new FLUX.Node(FLUX.nodes[NODE_NAME]);
 
 			if (!node) {
 				throw new Error(`constructor for node "${NODE_NAME}" is not returning actual node`);
@@ -81,7 +84,7 @@ module.exports = function(flux) {
 	//retrieve all flows
 	expressApp.get('/api/flux/flows', (req, res) => {
 
-		let flows = flux.getFlows();
+		let flows = FLUX.getFlows();
 		let returnFlows = {};
 
 		for (let id in flows) {
@@ -111,7 +114,10 @@ module.exports = function(flux) {
 			res.status(400).end();
 		} else {
 
-			var flow = new flux.Flow(flux, req.body);
+			var flow = new FLUX.Flow(FLUX);
+			flow.initJson(req.body, true);
+			flow.save();
+
 			res.json({
 				_id: flow._id
 			});
@@ -124,7 +130,7 @@ module.exports = function(flux) {
 	//get a flow by a given id
 	expressApp.param('flowId', (req, res, next, id) => {
 
-		flux.getFlowById(id, (flow) => {
+		FLUX.getFlowById(id, (flow) => {
 
 			if (flow) {
 
@@ -161,7 +167,7 @@ module.exports = function(flux) {
 	//get an existing flow
 	expressApp.get('/api/flux/flows/:flowId', (req, res) => {
 
-		returnFlow = {
+		let returnFlow = {
 			_id: req.locals.flow._id,
 			nodes: [],
 			connectors: req.locals.flow.json.connectors,

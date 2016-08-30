@@ -20,9 +20,9 @@ module.exports = function(flux) {
 
 		triggerIn.on('trigger', function() {
 
-			flux.Node.getValuesFromInput(sceneIn, scenes => {
+			flux.Node.getValuesFromInput(sceneIn).then(scenes => {
 
-				flux.Node.getValuesFromInput(lightIn, lights => {
+				flux.Node.getValuesFromInput(lightIn).then(lights => {
 
 					var i = 0;
 

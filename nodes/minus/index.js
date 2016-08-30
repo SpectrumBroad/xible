@@ -5,11 +5,11 @@ module.exports = function(flux) {
 	function constructorFunction(NODE) {
 
 		let resultOut = NODE.getOutputByName('result');
-		resultOut.on('trigger', (callback) => {
+		resultOut.on('trigger', (state, callback) => {
 
-			flux.Node.getValuesFromInput(NODE.getInputByName('a'), aNumbers => {
+			flux.Node.getValuesFromInput(NODE.getInputByName('a'), state).then(aNumbers => {
 
-				flux.Node.getValuesFromInput(NODE.getInputByName('b'), bNumbers => {
+				flux.Node.getValuesFromInput(NODE.getInputByName('b'), state).then(bNumbers => {
 
 					//get the min (b) value
 					//if multiply b values given, we take the first one only
