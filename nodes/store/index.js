@@ -8,22 +8,28 @@ module.exports = function(FLUX) {
 		let refreshing = false;
 		let values;
 
+		let refreshIn = NODE.addInput('refresh', {
+			type: "trigger"
+		});
+
 		let valueIn = NODE.addInput('value');
 
-		let refreshIn = NODE.addInput('refresh', {
+		let refreshOut = NODE.addOutput('refreshed', {
 			type: "trigger"
 		});
 
 		let valueOut = NODE.addOutput('value');
 
-		let refreshOut = NODE.addOutput('refresh complete', {
-			type: "trigger"
-		});
-
 		refreshIn.on('trigger', (state) => {
 
 			//get the input values
+			refreshing = true;
 			FLUX.Node.getValuesFromInput(valueIn, state).then(vals => {
+
+				//
+				used = true;
+				refreshing = false;
+				values = vals;
 
 				//save the state
 				state.set(this, {
@@ -72,15 +78,7 @@ module.exports = function(FLUX) {
 			}
 
 			//perform a refresh of all inputs and return those values
-			/*
 			refreshing = true;
-			console.log('boe');
-			values = await FLUX.Node.getValuesFromInput(valueIn, state);
-			used = true;
-			refreshing = false;
-			console.log('boe');
-			callback(values);
-			*/
 			FLUX.Node.getValuesFromInput(valueIn, state).then((vals) => {
 
 				values = vals;

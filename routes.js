@@ -93,7 +93,8 @@ module.exports = function(FLUX) {
 				_id: id,
 				nodes: [],
 				connectors: flows[id].json.connectors,
-				viewState: flows[id].json.viewState
+				viewState: flows[id].json.viewState,
+				runnable: flows[id].runnable
 			};
 
 			flows[id].nodes.forEach((node) => {
@@ -171,7 +172,8 @@ module.exports = function(FLUX) {
 			_id: req.locals.flow._id,
 			nodes: [],
 			connectors: req.locals.flow.json.connectors,
-			viewState: req.locals.flow.json.viewState
+			viewState: req.locals.flow.json.viewState,
+			runnable: req.locals.flow.runnable
 		};
 
 		req.locals.flow.nodes.forEach((node) => {

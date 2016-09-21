@@ -1,4 +1,4 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 
 	//constructor for the node
@@ -7,9 +7,9 @@ module.exports = function(flux) {
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (state, callback) => {
 
-			flux.Node.getValuesFromInput(NODE.getInputByName('a'), state).then(aNumbers => {
+			FLUX.Node.getValuesFromInput(NODE.getInputByName('a'), state).then(aNumbers => {
 
-				flux.Node.getValuesFromInput(NODE.getInputByName('b'), state).then(bNumbers => {
+				FLUX.Node.getValuesFromInput(NODE.getInputByName('b'), state).then(bNumbers => {
 
 					//get the min (b) value
 					//if multiply b values given, we take the first one only
@@ -38,7 +38,7 @@ module.exports = function(flux) {
 
 
 	//setup the node definition
-	flux.addNode('minus', {
+	FLUX.addNode('math.minus', {
 
 		type: "object",
 		level: 0,
@@ -46,15 +46,15 @@ module.exports = function(flux) {
 		editorContent: '<input type="number" placeholder="value" value="0" data-outputvalue="value" data-hideifattached="input[name=b]"/>',
 		inputs: {
 			"a": {
-				type: "number"
+				type: "math.number"
 			},
 			"b": {
-				type: "number"
+				type: "math.number"
 			}
 		},
 		outputs: {
 			"result": {
-				type: "number"
+				type: "math.number"
 			}
 		}
 

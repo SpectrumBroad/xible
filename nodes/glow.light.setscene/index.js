@@ -7,31 +7,31 @@ module.exports = function(flux) {
 		});
 
 		let sceneIn = NODE.addInput('scene', {
-			type: "glowLightScene"
+			type: "glow.scene"
 		});
 
 		let lightIn = NODE.addInput('light', {
-			type: "glowLight"
+			type: "glow.light"
 		});
 
 		let triggerOut = NODE.addOutput('complete', {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', function() {
+		triggerIn.on('trigger', (state) => {
 
-			flux.Node.getValuesFromInput(sceneIn).then(scenes => {
+			flux.Node.getValuesFromInput(sceneIn, state).then(scenes => {
 
-				flux.Node.getValuesFromInput(lightIn).then(lights => {
+				flux.Node.getValuesFromInput(lightIn, state).then(lights => {
 
-					var i = 0;
+					let i = 0;
 
 					lights.forEach(light => {
 
 						light.selectScene(scenes[0], () => {
 
 							if (++i === lights.length) {
-								flux.Node.triggerOutputs(triggerOut);
+								flux.Node.triggerOutputs(triggerOut, state);
 							}
 
 						});
@@ -46,7 +46,7 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('select light scene', {
+	flux.addNode('glow.light.setscene', {
 		type: "action",
 		level: 0,
 		groups: ["glow"],

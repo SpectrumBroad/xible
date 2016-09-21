@@ -19,27 +19,27 @@ module.exports = function(flux) {
 			type: "glowServer"
 		});
 
-		let sceneIn = NODE.addInput('scene', {
+		let sceneIn = NODE.addInput('name', {
 			type: "string"
 		});
 
 		let sceneOut = NODE.addOutput('scene', {
-			type: "glowLightScene"
+			type: "glow.scene"
 		});
 
-		sceneOut.on('trigger', function(callback) {
+		sceneOut.on('trigger', (state, callback) => {
 
 			if (stringInput.connectors.length) {
-				this.getValuesFromInput(sceneIn).then(strs => callback(strs.map(str => LightScene.getByName(str))));
+				this.getValuesFromInput(sceneIn, state).then(strs => callback(strs.map(str => Scene.getByName(str))));
 			} else {
-				callback(LightScene.getByName(this.value));
+				callback(Scene.getByName(this.value));
 			}
 
 		});
 
 	}
 
-	flux.addNode('light scene', {
+	flux.addNode('glow.scene', {
 		type: "object",
 		level: 0,
 		groups: ["glow"],

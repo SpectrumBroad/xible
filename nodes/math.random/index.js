@@ -5,7 +5,7 @@ module.exports = function(FLUX) {
 	function constr(NODE) {
 
 		let numberOut = NODE.addOutput('number', {
-			type: "number"
+			type: "math.number"
 		});
 
 		numberOut.on('trigger', (state, callback) => {
@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('random number', {
+	FLUX.addNode('math.random', {
 		type: "object",
 		level: 0,
 		groups: ["math"]

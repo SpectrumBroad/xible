@@ -16,11 +16,13 @@ module.exports = function(FLUX) {
 					console.log(str);
 
 					NODE.addStatus({
-						message: str,
+						message: str + '',
 						timeout: 3000
 					});
 
 				});
+
+				FLUX.Node.triggerOutputs(NODE.getOutputByName('done'), state);
 
 			});
 
@@ -32,12 +34,17 @@ module.exports = function(FLUX) {
 		type: "action",
 		level: 0,
 		groups: ["basics", "logging"],
-		editorContent: `<input data-hideifattached="input[name=any]" data-outputvalue="value" type="text" placeholder="value"/>`,
+		editorContent: `<input data-hideifattached="input[name=value]" data-outputvalue="value" type="text" placeholder="value"/>`,
 		inputs: {
 			"trigger": {
 				type: "trigger"
 			},
 			"value": {}
+		},
+		outputs: {
+			"done": {
+				type: "trigger"
+			}
 		}
 	}, nodeConstructor);
 

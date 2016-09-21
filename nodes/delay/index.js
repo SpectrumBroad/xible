@@ -7,10 +7,10 @@ module.exports = function(flux) {
 		});
 
 		let msecIn = NODE.addInput('msecs', {
-			type: "number"
+			type: "math.number"
 		});
 
-		let triggerOut = NODE.addOutput('complete', {
+		let triggerOut = NODE.addOutput('done', {
 			type: "trigger"
 		});
 

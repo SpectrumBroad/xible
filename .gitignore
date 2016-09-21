@@ -2,5 +2,4 @@ node_modules/
 out.log
 flows/
 ssl/
-tnodes/
 docs/

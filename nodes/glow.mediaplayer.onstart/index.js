@@ -12,12 +12,20 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
-		let mediaOut = NODE.addOutput('media', {
+		let pathOut = NODE.addOutput('path', {
 			type: "string"
 		});
 
-		mediaOut.on('trigger', function(state, callback) {
-			callback(state.get(this).value);
+		pathOut.on('trigger', (state, callback) => {
+
+			let path = null;
+			let thisState = state.get(this);
+			if (thisState) {
+				path = thisState.path;
+			}
+
+			callback(path);
+
 		});
 
 		NODE.on('trigger', (state) => {
@@ -27,24 +35,13 @@ module.exports = function(FLUX) {
 
 				glowServers.forEach((glowServer) => {
 
-					glowServer.on('message', (ev) => {
+					glowServer.Player.on('play', (event) => {
 
-						console.log(ev);
-
-						let state = this.getState();
-						state.media=ev.file;
-
-						/*
-
-						state.getOutputByName('media').on('trigger', (callback) => {
-							callback(ev.file);
+						state.set(this, {
+							path: event.path
 						});
 
-						*/
-
 						FLUX.Node.triggerOutputs(triggerOut, state);
-
-						//FLUX.Node.triggerOutputs(triggerOut);
 
 					});
 
@@ -56,7 +53,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('onGlowMediaStart', {
+	FLUX.addNode('glow.mediaplayer.onstart', {
 		type: "event",
 		level: 0,
 		groups: ["glow"]

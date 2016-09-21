@@ -25,7 +25,7 @@ module.exports = function(flux) {
 		});
 
 		let lightOut = NODE.addOutput('light', {
-			type: "glowLight",
+			type: "glow.light",
 			description: "One or more lights to return."
 		});
 
@@ -41,7 +41,7 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('light', {
+	flux.addNode('glow.light', {
 		type: "object",
 		level: 0,
 		groups: ["glow"],

@@ -26,7 +26,7 @@ if (cluster.isMaster) {
 	//setup default express stuff
 	expressApp.use(function(req, res, next) {
 
-		res.removeHeader("X-Powered-By");
+		res.removeHeader('X-Powered-By');
 
 		//disable caching
 		res.header('cache-control', 'private, no-cache, no-store, must-revalidate');
@@ -89,12 +89,6 @@ if (cluster.isMaster) {
 	});
 
 } else {
-
-/*
-	setInterval(function() {
-		console.log(process.memoryUsage());
-	}, 1000);
-*/
 
 	let flow;
 
@@ -161,5 +155,37 @@ if (cluster.isMaster) {
 	process.send({
 		method: 'init'
 	});
+
+	//report memory usage back to master
+	let cpuUsageStart = process.cpuUsage();
+	let cpuStartTime = process.hrtime();
+
+	setInterval(() => {
+
+		//get values over passed time
+		let cpuUsage = process.cpuUsage(cpuUsageStart);
+		let cpuTime = process.hrtime(cpuStartTime);
+
+		//reset for next loop
+		cpuUsageStart = process.cpuUsage();
+		cpuStartTime = process.hrtime();
+
+		let cpuPercent = (100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1000000));
+
+		process.send({
+			method: 'usage',
+			usage: {
+				cpu: {
+					user: cpuUsage.user,
+					system: cpuUsage.system,
+					percentage: cpuPercent
+				},
+				memory: process.memoryUsage()
+			}
+		});
+
+
+
+	}, 1000);
 
 }

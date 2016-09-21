@@ -1,6 +1,7 @@
 'use strict';
 
-const flowDebug = require('debug')('flux:flow');
+const debug = require('debug');
+const flowDebug = debug('flux:flow');
 const cluster = require('cluster');
 const fs = require('fs');
 const path = require('path');
@@ -13,8 +14,11 @@ const path = require('path');
  */
 var Flow = module.exports = function Flow(FLUX) {
 
+	this.json = null;
 	this.nodes = [];
 	this.connectors = [];
+	this.usage = null;
+	this.runnable = true;
 
 	if (FLUX) {
 
@@ -187,19 +191,32 @@ Flow.prototype.initJson = function(json, newFlow) {
 	this.json = json;
 	this.nodes = [];
 	this.connectors = [];
+	this.runnable = true;
 
 	//get the nodes
 	json.nodes.forEach(node => {
 
 		let nodeConstr = this.flux.getNodeByName(node.name);
+		let fluxNode;
 
+		//init a dummy node directly based on the json and ensure the flow is set to unconstructable
 		if (!nodeConstr) {
-			throw (`Node '${node.name}' does not exist`);
-		}
 
-		let fluxNode = new this.flux.Node(nodeConstr);
-		if (!fluxNode) {
-			throw (`Could not construct node '${node.name}'`);
+			//throw new Error(`Node '${node.name}' does not exist`);
+			flowDebug(`Node '${node.name}' does not exist`);
+
+			fluxNode = new this.flux.Node(node);
+			fluxNode.nodeExists = false;
+			this.runnable = false;
+
+		} else {
+
+			//init a working node
+			fluxNode = new this.flux.Node(nodeConstr);
+			if (!fluxNode) {
+				throw new Error(`Could not construct node '${node.name}'`);
+			}
+
 		}
 
 		fluxNode._id = node._id;
@@ -212,7 +229,15 @@ Flow.prototype.initJson = function(json, newFlow) {
 		for (let name in node.inputs) {
 
 			if (!fluxNode.inputs[name]) {
-				throw (`Node '${node.name}' does not have input '${name}'`);
+
+				flowDebug(`Node '${node.name}' does not have input '${name}'`);
+				//throw new Error(`Node '${node.name}' does not have input '${name}'`);
+
+				fluxNode.addInput(name, node.inputs[name]);
+
+				fluxNode.nodeExists = false;
+				this.runnable = false;
+
 			}
 
 			fluxNode.inputs[name]._id = node.inputs[name]._id;
@@ -222,7 +247,15 @@ Flow.prototype.initJson = function(json, newFlow) {
 		for (let name in node.outputs) {
 
 			if (!fluxNode.outputs[name]) {
-				throw (`Node '${node.name}' does not have output '${name}'`);
+
+				flowDebug(`Node '${node.name}' does not have output '${name}'`);
+				//throw new Error(`Node '${node.name}' does not have output '${name}'`);
+
+				fluxNode.addOutput(name, node.outputs[name]);
+
+				fluxNode.nodeExists = false;
+				this.runnable = false;
+
 			}
 
 			fluxNode.outputs[name]._id = node.outputs[name]._id;
@@ -236,12 +269,12 @@ Flow.prototype.initJson = function(json, newFlow) {
 
 		var origin = this.getOutputById(connector.origin);
 		if (!origin) {
-			throw (`Cannot find output by id '${connector.origin}'`);
+			throw new Error(`Cannot find output by id '${connector.origin}'`);
 		}
 
 		var destination = this.getInputById(connector.destination);
 		if (!destination) {
-			throw (`Cannot find input by id '${connector.destination}'`);
+			throw new Error(`Cannot find input by id '${connector.destination}'`);
 		}
 
 		var fluxConnector = {
@@ -295,11 +328,12 @@ Flow.prototype.addNode = function(node) {
 	node.flow = this;
 
 	//track direct triggers of nodes
-	node.prependListener('trigger', function() {
+	node.prependListener('trigger', () => {
 
 		var d = new Date();
-		this._trackerTriggerTime = d.getTime();
-		this.setTracker({
+		node._trackerTriggerTime = d.getTime();
+
+		node.setTracker({
 			message: 'start @ ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ':' + d.getMilliseconds(),
 			timeout: 3000
 		});
@@ -309,11 +343,11 @@ Flow.prototype.addNode = function(node) {
 	//track incoming output triggers
 	for (let name in node.outputs) {
 
-		node.outputs[name].prependListener('trigger', function() {
+		node.outputs[name].prependListener('trigger', () => {
 
 			var d = new Date();
-			this._trackerTriggerTime = d.getTime();
-			this.node.setTracker({
+			node._trackerTriggerTime = d.getTime();
+			node.setTracker({
 				message: 'start @ ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ':' + d.getMilliseconds(),
 				timeout: 3000
 			});
@@ -324,21 +358,25 @@ Flow.prototype.addNode = function(node) {
 
 
 	//track output triggers
-	node.prependListener('triggerout', function(output) {
+	node.prependListener('triggerout', (output) => {
+
+		if (!output.connectors.length) {
+			return;
+		}
 
 		let d = new Date();
 		let msg;
 
-		if (this._trackerTriggerTime) {
+		if (node._trackerTriggerTime) {
 
-			let diff = d.getTime() - this._trackerTriggerTime;
+			let diff = d.getTime() - node._trackerTriggerTime;
 			msg = `triggered '${output.name}' in ${diff}ms`;
 
 		} else {
 			msg = `triggered '${output.name}' @ ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
 		}
 
-		this.setTracker({
+		node.setTracker({
 			message: msg,
 			timeout: 3500
 		});
@@ -428,6 +466,10 @@ Flow.prototype.saveStatus = function(running) {
  */
 Flow.prototype.start = function() {
 
+	if (!this.runnable) {
+		return;
+	}
+
 	if (cluster.isMaster) {
 
 		return new Promise((resolve, reject) => {
@@ -472,13 +514,19 @@ Flow.prototype.start = function() {
 
 						case 'broadcastWebSocket':
 
-							if (this.flux && this.flux.webSocketServer) {
+							this.flux.broadcastWebSocket(message.message);
+							break;
 
-								this.flux.webSocketServer.clients.forEach(client => {
-									client.send(JSON.stringify(message.message));
-								});
+						case 'usage':
 
-							}
+							this.usage = message.usage;
+
+							//broadcast the memory usage
+							this.flux.broadcastWebSocket({
+								method: 'flux.flow.usage',
+								flowId: this._id,
+								usage: this.usage
+							});
 
 							break;
 
@@ -549,9 +597,7 @@ Flow.prototype.stop = function() {
 					this.worker = null;
 
 					//cleanup all open statuses
-					this.flux.webSocketServer.clients.forEach(client => {
-						client.send('{\"method\":\"flux.removeAllStatuses\"}');
-					});
+					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
 
 					resolve();
 
@@ -570,9 +616,7 @@ Flow.prototype.stop = function() {
 					this.worker = null;
 
 					//cleanup all open statuses
-					this.flux.webSocketServer.clients.forEach(client => {
-						client.send('{\"method\":\"flux.removeAllStatuses\"}');
-					});
+					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
 
 					resolve();
 
@@ -614,6 +658,12 @@ function FlowState(states = {}) {
 	 */
 	this.set = function(node, obj) {
 
+		if (!(node instanceof Flow.Flux.Node)) {
+			throw new Error('node must be instanceof Node');
+		} else if (!(obj instanceof Object)) {
+			throw new Error('obj must be instanceof Object');
+		}
+
 		Object.freeze(obj);
 		states[node._id] = obj;
 
@@ -625,7 +675,13 @@ function FlowState(states = {}) {
 	 *	@return	{Object}
 	 */
 	this.get = function(node) {
+
+		if (!(node instanceof Flow.Flux.Node)) {
+			throw new Error('node must be instanceof Node');
+		}
+
 		return states[node._id];
+
 	};
 
 	/**
@@ -633,6 +689,7 @@ function FlowState(states = {}) {
 	 *	@return	{FlowState}	the new flowState
 	 */
 	this.split = function() {
+		//return new FlowState({...states});
 		return new FlowState(Object.assign({}, states));
 	};
 

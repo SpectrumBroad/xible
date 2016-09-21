@@ -3,6 +3,7 @@
 
 //setup debug
 const debug = require('debug');
+const webSocketDebug = debug('flux:webSocket');
 
 
 const Node = require('./node.js');
@@ -90,6 +91,28 @@ Flux.prototype.initWebSocket = function(webSocketServer) {
 	}
 
 	this.webSocketServer = webSocketServer;
+
+};
+
+
+Flux.prototype.broadcastWebSocket = function(message) {
+
+	if (!this.webSocketServer) {
+		return;
+	}
+
+	if (typeof message !== 'string') {
+		message = JSON.stringify(message);
+	}
+
+	this.webSocketServer.clients.forEach(client => {
+		client.send(message, (err) => {
+			if (err) {
+				webSocketDebug(`client websocket send failed: ${err}`);
+			}
+		});
+
+	});
 
 };
 

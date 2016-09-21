@@ -12,6 +12,7 @@ let Node = module.exports = function Node(obj) {
 	this.groups = obj.groups;
 	this.description = obj.description;
 	this.editorContent = obj.editorContent;
+	this.nodeExists = true;	//indicates whether this is an existing installed flux.Node
 
 	this._states = {};
 
@@ -49,21 +50,21 @@ Node.init = function(Flux) {
 
 //get all installed nodes
 const fs = require('fs');
-Node.initFromPath = function(path, flux) {
+Node.initFromPath = function(path, FLUX) {
 
 	nodeDebug(`init nodes from ${path}`);
 
-	if (!path || !flux) {
+	if (!path || !FLUX) {
 		return;
 	}
 
 	Node.nodesPath = path;
 
-	var files = fs.readdirSync(path);
+	let files = fs.readdirSync(path);
 	files.forEach((file) => {
 
-		var filepath = path + '/' + file;
-		var node;
+		let filepath = path + '/' + file;
+		let node;
 
 		if (fs.statSync(filepath).isDirectory()) {
 
@@ -71,7 +72,7 @@ Node.initFromPath = function(path, flux) {
 
 				node = require(filepath);
 				if (typeof node === 'function') {
-					node(flux);
+					node(FLUX);
 				}
 
 			} catch (e) {
@@ -220,7 +221,7 @@ Node.triggerOutputs = function(output, state) {
 };
 
 
-Node.flowStateCheck=function(state) {
+Node.flowStateCheck = function(state) {
 
 	if (!(state instanceof Node.Flux.FlowState)) {
 
