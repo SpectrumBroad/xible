@@ -3,7 +3,7 @@ module.exports = function(flux) {
 	function constructorFunction(NODE) {
 
 		var stringOut = NODE.getOutputByName('result');
-		stringOut.on('trigger', (state, callback) => {
+		stringOut.on('trigger', (conn, state, callback) => {
 
 			flux.Node.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {
 

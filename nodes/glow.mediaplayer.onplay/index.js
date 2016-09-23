@@ -16,7 +16,7 @@ module.exports = function(FLUX) {
 			type: "string"
 		});
 
-		pathOut.on('trigger', (state, callback) => {
+		pathOut.on('trigger', (conn, state, callback) => {
 
 			let path = null;
 			let thisState = state.get(this);
@@ -53,7 +53,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.mediaplayer.onstart', {
+	FLUX.addNode('glow.mediaplayer.onplay', {
 		type: "event",
 		level: 0,
 		groups: ["glow"]

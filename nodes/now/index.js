@@ -63,7 +63,7 @@ module.exports = function(FLUX) {
 			type: "date"
 		});
 
-		fullDateOut.on('trigger', (state, callback) => {
+		fullDateOut.on('trigger', (conn, state, callback) => {
 			callback(new Date());
 		});
 
@@ -71,7 +71,7 @@ module.exports = function(FLUX) {
 			type: "time"
 		});
 
-		timeOut.on('trigger', (state, callback) => {
+		timeOut.on('trigger', (conn, state, callback) => {
 
 			let d = new Date();
 			d.setFullYear(0, 0, 1);
@@ -103,7 +103,7 @@ module.exports = function(FLUX) {
 			type: "math.number"
 		});
 
-		let numberOutTrigger = function(state, callback) {
+		let numberOutTrigger = function(conn, state, callback) {
 
 			let name = this.name;
 

@@ -49,7 +49,7 @@ module.exports = function(FLUX) {
 			type: "math.number"
 		});
 
-		tempOut.on('trigger', (state, callback) => {
+		tempOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(locationIn, state).then((locations) => {
 

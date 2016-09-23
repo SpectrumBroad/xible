@@ -8,7 +8,7 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', (state) => {
+		triggerIn.on('trigger', (conn, state) => {
 
 			process.send({
 				method: "stop"

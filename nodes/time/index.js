@@ -52,7 +52,7 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', (state) => {
+		triggerIn.on('trigger', (conn, state) => {
 			triggerFunction(state);
 		});
 
@@ -68,7 +68,7 @@ module.exports = function(FLUX) {
 			type: "time"
 		});
 
-		timeOut.on('trigger', (state, callback) => {
+		timeOut.on('trigger', (conn, state, callback) => {
 			callback(getInputTime(NODE));
 		});
 

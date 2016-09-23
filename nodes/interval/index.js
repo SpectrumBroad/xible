@@ -14,7 +14,7 @@ module.exports = function(flux) {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', (state) => {
+		triggerIn.on('trigger', (conn, state) => {
 
 			flux.Node.getValuesFromInput(msecIn, state).then(intervals => {
 

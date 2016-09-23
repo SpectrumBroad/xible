@@ -27,7 +27,7 @@ module.exports = function(flux) {
 			type: "glow.scene"
 		});
 
-		sceneOut.on('trigger', (state, callback) => {
+		sceneOut.on('trigger', (conn, state, callback) => {
 
 			if (stringInput.connectors.length) {
 				this.getValuesFromInput(sceneIn, state).then(strs => callback(strs.map(str => Scene.getByName(str))));

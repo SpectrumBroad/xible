@@ -16,7 +16,7 @@ module.exports = function(FLUX) {
 			type: "math.number"
 		});
 
-		numberOut.on('trigger', (state, callback) => {
+		numberOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(multiplicandIn, state).then((multiplicands) => {
 

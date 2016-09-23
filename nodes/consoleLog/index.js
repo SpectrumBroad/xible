@@ -3,7 +3,7 @@ module.exports = function(FLUX) {
 	function nodeConstructor(NODE) {
 
 		let triggerIn = NODE.getInputByName('trigger');
-		triggerIn.on('trigger', (state) => {
+		triggerIn.on('trigger', (conn, state) => {
 
 			FLUX.Node.getValuesFromInput(NODE.getInputByName('value'), state).then((strs) => {
 

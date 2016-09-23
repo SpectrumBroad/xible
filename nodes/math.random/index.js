@@ -8,7 +8,7 @@ module.exports = function(FLUX) {
 			type: "math.number"
 		});
 
-		numberOut.on('trigger', (state, callback) => {
+		numberOut.on('trigger', (conn, state, callback) => {
 			callback(Math.random());
 		});
 

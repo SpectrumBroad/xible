@@ -20,7 +20,7 @@ module.exports = function(FLUX) {
 
 		let valueOut = NODE.addOutput('value');
 
-		refreshIn.on('trigger', (state) => {
+		refreshIn.on('trigger', (conn, state) => {
 
 			//get the input values
 			refreshing = true;
@@ -43,8 +43,9 @@ module.exports = function(FLUX) {
 
 		});
 
-		valueOut.on('trigger', (state, callback) => {
+		valueOut.on('trigger', (conn, state, callback) => {
 		//valueOut.on('trigger', async (state, callback) => {
+
 
 			//state handling (if refresh complete was used)
 			let thisState = state.get(this);

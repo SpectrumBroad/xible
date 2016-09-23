@@ -311,6 +311,35 @@ Flow.prototype.save = function(callback) {
 };
 
 
+/**
+ *	deletes a flow from the configured flows directory
+ *	only works if this is a the master thread
+ *	@param {Function}	callback
+ */
+Flow.prototype.delete = function(callback) {
+
+	this.stop();
+
+	if (cluster.isMaster && this._id && Flow.flowPath) {
+
+		flowDebug(`deleting ${this._id}`);
+		fs.unlink(`${Flow.flowPath}/${this._id}.json`, callback);
+
+		//update status file
+		let statuses = Flow.getStatuses();
+		delete statuses[this._id];
+		Flow.saveStatuses(statuses);
+
+		//remove from Flux instance
+		if(this.flux) {
+			delete this.flux.flows[this._id];
+		}
+
+	}
+
+};
+
+
 /*
 Flow.prototype.addConnector = function(conn) {
 	this.connectors.push(conn);

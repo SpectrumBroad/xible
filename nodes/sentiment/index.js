@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 			type: "math.number"
 		});
 
-		scoreOut.on('trigger', (state, callback) => {
+		scoreOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(stringIn, state).then((strs) => {
 

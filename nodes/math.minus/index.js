@@ -5,7 +5,7 @@ module.exports = function(FLUX) {
 	function constructorFunction(NODE) {
 
 		let resultOut = NODE.getOutputByName('result');
-		resultOut.on('trigger', (state, callback) => {
+		resultOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(NODE.getInputByName('a'), state).then(aNumbers => {
 

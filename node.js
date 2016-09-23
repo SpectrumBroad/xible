@@ -12,7 +12,7 @@ let Node = module.exports = function Node(obj) {
 	this.groups = obj.groups;
 	this.description = obj.description;
 	this.editorContent = obj.editorContent;
-	this.nodeExists = true;	//indicates whether this is an existing installed flux.Node
+	this.nodeExists = true; //indicates whether this is an existing installed flux.Node
 
 	this._states = {};
 
@@ -129,6 +129,48 @@ Node.prototype.getOutputByName = function(name) {
 };
 
 
+Node.prototype.addStatusBar = function(status) {
+
+	status._id = Node.Flux.generateObjectId();
+
+	process.send({
+		method: "broadcastWebSocket",
+		message: {
+
+			method: "flux.node.addStatusBar",
+			nodeId: this._id,
+			status: status
+
+		}
+
+	});
+
+	return status._id;
+
+};
+
+
+Node.prototype.updateStatusBarById = function(statusId, status) {
+
+	status._id = Node.Flux.generateObjectId();
+
+	process.send({
+		method: "broadcastWebSocket",
+		message: {
+
+			method: "flux.node.updateStatusBarById",
+			nodeId: this._id,
+			status: {
+				_id: statusId,
+				percentage: status.percentage
+			}
+
+		}
+	});
+
+};
+
+
 Node.prototype.addStatus = function(status) {
 
 	status._id = Node.Flux.generateObjectId();
@@ -150,7 +192,7 @@ Node.prototype.addStatus = function(status) {
 };
 
 
-Node.prototype.removeStatusById = function(statusId) {
+Node.prototype.removeStatusById = function(statusId, timeout) {
 
 	process.send({
 		method: "broadcastWebSocket",
@@ -159,7 +201,8 @@ Node.prototype.removeStatusById = function(statusId) {
 			method: "flux.node.removeStatusById",
 			nodeId: this._id,
 			status: {
-				_id: statusId
+				_id: statusId,
+				timeout: timeout
 			}
 
 		}
@@ -214,7 +257,7 @@ Node.triggerOutputs = function(output, state) {
 	output.connectors.forEach(conn => {
 
 		conn.destination.node.emit('trigger');
-		conn.destination.emit('trigger', state.split());
+		conn.destination.emit('trigger', conn, state.split());
 
 	});
 
@@ -259,10 +302,10 @@ Node.getValuesFromInput = function(input, state) {
 		input.connectors.forEach(conn => {
 
 			//trigger the input
-			conn.origin.emit('trigger', state, (value) => {
+			conn.origin.emit('trigger', conn, state, (value) => {
 
 				//let everyone know that the trigger is done
-				conn.origin.node.emit('triggerdone');
+				conn.origin.emit('triggerdone');
 
 				//we only send arrays between nodes
 				//we don't add non existant values

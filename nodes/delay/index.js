@@ -1,4 +1,4 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
@@ -14,29 +14,36 @@ module.exports = function(flux) {
 			type: "trigger"
 		});
 
-		triggerIn.on('trigger', (state) => {
+		triggerIn.on('trigger', (conn, state) => {
 
 			let delayFunction = (statusId) => {
 
-				NODE.removeStatusById(statusId);
-				flux.Node.triggerOutputs(triggerOut, state);
+				NODE.removeStatusById(statusId, 700);
+				FLUX.Node.triggerOutputs(triggerOut, state);
 
 			};
 
-			flux.Node.getValuesFromInput(msecIn, state).then(delays => {
+			FLUX.Node.getValuesFromInput(msecIn, state).then(delays => {
 
+				let fromData = false;
 				if (!delays.length) {
+
+					fromData = true;
 					delays.push(NODE.data.delay || 0);
+
 				}
 
-				delays.forEach(delay => {
+				delays.forEach((delay) => {
 
-					var statusId = NODE.addStatus({
-						message: `waiting for ${delay} msec`,
-						color: 'blue'
+					delay = Math.round(delay);
+
+					let statusId = NODE.addStatusBar({
+						message: (fromData ? null : `waiting for ${delay} msec`),
+						percentage: 0,
+						updateOverTime: delay
 					});
 
-					setTimeout(delayFunction.bind(NODE, statusId), delay);
+					setTimeout(() => delayFunction(statusId), delay);
 
 				});
 
@@ -46,7 +53,7 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('delay', {
+	FLUX.addNode('delay', {
 		type: "action",
 		level: 0,
 		groups: ["basics", "datetime"],

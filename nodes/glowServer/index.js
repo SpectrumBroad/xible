@@ -95,7 +95,7 @@ module.exports = function(FLUX) {
 		});
 
 		//return reference glow
-		glowServerOut.on('trigger', (state, callback) => {
+		glowServerOut.on('trigger', (conn, state, callback) => {
 			callback(glow);
 		});
 
@@ -122,7 +122,7 @@ module.exports = function(FLUX) {
 				});
 
 				//return reference to this api
-				glowServerOut.on('trigger', (state, callback) => {
+				glowServerOut.on('trigger', (conn, state, callback) => {
 					callback(glowServer);
 				});
 

@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 			type: "glow.light"
 		});
 
-		lightOut.on('trigger', (state, callback) => {
+		lightOut.on('trigger', (conn, state, callback) => {
 
 			let light = null;
 			let thisState = state.get(this);

@@ -13,7 +13,7 @@ module.exports = function(FLUX) {
 		let falseIn = NODE.addInput('if false');
 
 		let valueOut = NODE.addOutput('value');
-		valueOut.on('trigger', (state, callback) => {
+		valueOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(conditionIn, state).then((bools) => {
 

@@ -10,7 +10,7 @@ module.exports = function(FLUX) {
 			type: "boolean"
 		});
 
-		boolOut.on('trigger', (state, callback) => {
+		boolOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(valuesIn, state).then((vals) => {
 

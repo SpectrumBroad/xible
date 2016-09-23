@@ -25,7 +25,7 @@ module.exports = function(FLUX) {
 
 		var groupedOut = NODE.addOutput('grouped');
 
-		groupedOut.on('trigger', (state, callback) => {
+		groupedOut.on('trigger', (conn, state, callback) => {
 
 			FLUX.Node.getValuesFromInput(anyIn, state).then((vals) => {
 				callback(vals);
