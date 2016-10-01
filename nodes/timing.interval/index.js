@@ -36,10 +36,10 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('interval', {
+	flux.addNode('timing.interval', {
 		type: "action",
 		level: 0,
-		groups: ["basics", "datetime"],
+		groups: ["timing"],
 		editorContent: `<input type="number" placeholder="msecs" data-outputvalue="interval" data-hideifattached="input[name=msecs]"/>`
 	}, constr);
 

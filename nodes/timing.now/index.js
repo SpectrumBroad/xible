@@ -126,10 +126,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('now', {
+	FLUX.addNode('timing.now', {
 			type: "object",
 			level: 0,
-			groups: ["datetime"],
+			groups: ["timing"],
 			editorContent: `<div class="date"></div>
 	        <style type="text/css">
 	          .face {

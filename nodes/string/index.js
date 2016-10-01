@@ -1,25 +1,28 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 	function constructorFunction(NODE) {
 
 		var stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
-			flux.Node.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {
+			FLUX.Node.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {
 
-				var concatStr = '';
-				strs.forEach(str => {
-					concatStr += str;
-				});
+				let concatStr;
+				if(strs.length) {
 
-				callback(concatStr + (NODE.data.value || ''));
+					let concatStr = strs.reduce((prevVal, currentVal) => prevVal + currentVal);
+					callback(concatStr + (NODE.data.value || ''));
+
+				} else {
+					callback(NODE.data.value || '');
+				}
 
 			});
 		});
 
 	}
 
-	flux.addNode('string', {
+	FLUX.addNode('string', {
 		type: "object",
 		level: 0,
 		groups: ["basics"],

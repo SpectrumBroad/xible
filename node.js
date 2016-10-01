@@ -129,7 +129,7 @@ Node.prototype.getOutputByName = function(name) {
 };
 
 
-Node.prototype.addStatusBar = function(status) {
+Node.prototype.addProgressBar = function(status) {
 
 	status._id = Node.Flux.generateObjectId();
 
@@ -137,7 +137,7 @@ Node.prototype.addStatusBar = function(status) {
 		method: "broadcastWebSocket",
 		message: {
 
-			method: "flux.node.addStatusBar",
+			method: "flux.node.addProgressBar",
 			nodeId: this._id,
 			status: status
 
@@ -150,7 +150,7 @@ Node.prototype.addStatusBar = function(status) {
 };
 
 
-Node.prototype.updateStatusBarById = function(statusId, status) {
+Node.prototype.updateProgressBarById = function(statusId, status) {
 
 	status._id = Node.Flux.generateObjectId();
 
@@ -158,7 +158,7 @@ Node.prototype.updateStatusBarById = function(statusId, status) {
 		method: "broadcastWebSocket",
 		message: {
 
-			method: "flux.node.updateStatusBarById",
+			method: "flux.node.updateProgressBarById",
 			nodeId: this._id,
 			status: {
 				_id: statusId,
@@ -192,7 +192,7 @@ Node.prototype.addStatus = function(status) {
 };
 
 
-Node.prototype.removeStatusById = function(statusId, timeout) {
+Node.prototype.removeStatusById = Node.prototype.removeProgressBarById = function(statusId, timeout) {
 
 	process.send({
 		method: "broadcastWebSocket",

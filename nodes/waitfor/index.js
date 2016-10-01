@@ -32,13 +32,13 @@ module.exports = function(FLUX) {
 
 			if (!thisStack.length) {
 
-				thisStack.statusId = NODE.addStatusBar({
+				thisStack.statusId = NODE.addProgressBar({
 					percentage: 1 / triggerIn.connectors.length * 100
 				});
 
 			} else {
 
-				NODE.updateStatusBarById(thisStack.statusId, {
+				NODE.updateProgressBarById(thisStack.statusId, {
 					percentage: (thisStack.length + 1) / triggerIn.connectors.length * 100
 				});
 

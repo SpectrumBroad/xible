@@ -20,7 +20,7 @@ module.exports = function(FLUX) {
 
 				FLUX.Node.getValuesFromInput(bIn, state).then(strsb => {
 
-					var result = '';
+					let result = '';
 					if (strsa.length) {
 
 						strsa.forEach(str => {

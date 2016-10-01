@@ -10,11 +10,11 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('start', {
+	FLUX.addNode('flux.flow.onstart', {
 		type: "event",
 		level: 0,
 		groups: ["basics"],
-		description: "Triggered whenever the flow gets (re-)deployed or the flux server is restarted.",
+		description: "Triggered whenever this flow is started.",
 		outputs: {
 			"trigger": {
 				type: "trigger"

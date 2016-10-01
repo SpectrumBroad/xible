@@ -166,10 +166,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('time', {
+	FLUX.addNode('timing.time', {
 		type: "event",
 		level: 0,
-		groups: ["datetime"],
+		groups: ["timing"],
 		editorContent: `<input type="time" value="00:00:00" step="1" data-outputvalue="time" />
 					<style type="text/css">
 					.face {
