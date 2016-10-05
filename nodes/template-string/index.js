@@ -2,18 +2,20 @@ module.exports = function(FLUX) {
 
 	function constructorFunction(NODE) {
 
-		function templateStringParser(str, a) {
-			return str.replace(/(^|(?:\\\\)+|\\.|[^\\])\$\{variable\}/g, (match, first) => first+a).replace(/\\(.)/g, (match, first) => first);
+		function templateStringParser(str, vars) {
+			return str.replace(/(^|(?:\\\\)+|\\.|[^\\])\$\{(\w*?)\}/g, (match, pre, varName) => {
+
+				let foundVar = vars.find((v) => v.name === varName);
+				return pre + (foundVar && foundVar.values.length ? foundVar.values.reduce((prevVal, currentVal) => prevVal + currentVal) : `\${${varName}}`);
+
+			}).replace(/\\(.)/g, (match, first) => first);
 		}
 
 		var stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(NODE.getInputByName('variable'), state).then(a => {
-
-				let concatStr = a.reduce((prevVal, currentVal) => prevVal + currentVal);
-				callback(templateStringParser(NODE.data.value || '', concatStr));
-
+			FLUX.Node.getValuesFromInput(NODE.getInputByName('variable'), state).then((vars) => {
+				callback(templateStringParser(NODE.data.value || '', vars));
 			});
 		});
 
@@ -26,7 +28,7 @@ module.exports = function(FLUX) {
 		editorContent: `<input type="text" data-outputvalue="value" />`,
 		inputs: {
 			"variable": {
-				type: "string"
+				type: "variable"
 			}
 		},
 		outputs: {

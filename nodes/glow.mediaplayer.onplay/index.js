@@ -35,7 +35,7 @@ module.exports = function(FLUX) {
 
 				glowServers.forEach((glowServer) => {
 
-					glowServer.Player.on('play', (event) => {
+					glowServer.MediaPlayer.on('play', (event) => {
 
 						state.set(this, {
 							path: event.path

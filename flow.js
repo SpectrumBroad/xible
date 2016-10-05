@@ -202,7 +202,6 @@ Flow.prototype.initJson = function(json, newFlow) {
 		//init a dummy node directly based on the json and ensure the flow is set to unconstructable
 		if (!nodeConstr) {
 
-			//throw new Error(`Node '${node.name}' does not exist`);
 			flowDebug(`Node '${node.name}' does not exist`);
 
 			fluxNode = new this.flux.Node(node);
@@ -231,10 +230,8 @@ Flow.prototype.initJson = function(json, newFlow) {
 			if (!fluxNode.inputs[name]) {
 
 				flowDebug(`Node '${node.name}' does not have input '${name}'`);
-				//throw new Error(`Node '${node.name}' does not have input '${name}'`);
 
 				fluxNode.addInput(name, node.inputs[name]);
-
 				fluxNode.nodeExists = false;
 				this.runnable = false;
 
@@ -249,16 +246,24 @@ Flow.prototype.initJson = function(json, newFlow) {
 			if (!fluxNode.outputs[name]) {
 
 				flowDebug(`Node '${node.name}' does not have output '${name}'`);
-				//throw new Error(`Node '${node.name}' does not have output '${name}'`);
 
 				fluxNode.addOutput(name, node.outputs[name]);
-
 				fluxNode.nodeExists = false;
 				this.runnable = false;
 
 			}
 
 			fluxNode.outputs[name]._id = node.outputs[name]._id;
+
+		}
+
+		//construct a dummy editorContents
+		if(!fluxNode.nodeExists) {
+
+			fluxNode.editorContent='';
+			for(var key in fluxNode.data) {
+				fluxNode.editorContent+=`<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
+			}
 
 		}
 

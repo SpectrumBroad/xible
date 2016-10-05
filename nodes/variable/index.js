@@ -6,7 +6,7 @@ module.exports = function(FLUX) {
 
 		let used = false;
 		let refreshing = false;
-		let values;
+		let variable;
 
 		let refreshIn = NODE.addInput('refresh', {
 			type: "trigger"
@@ -18,7 +18,9 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
-		let valueOut = NODE.addOutput('value');
+		let variableOut = NODE.addOutput('variable', {
+			type: "variable"
+		});
 
 		refreshIn.on('trigger', (conn, state) => {
 
@@ -29,12 +31,13 @@ module.exports = function(FLUX) {
 				//
 				used = true;
 				refreshing = false;
-				values = vals;
+				variable = {
+					name: NODE.data.name,
+					values: vals
+				};
 
 				//save the state
-				state.set(this, {
-					values: vals
-				});
+				state.set(this, variable);
 
 				FLUX.Node.triggerOutputs(refreshOut, state);
 
@@ -42,13 +45,13 @@ module.exports = function(FLUX) {
 
 		});
 
-		valueOut.on('trigger', (conn, state, callback) => {
+		variableOut.on('trigger', (conn, state, callback) => {
 
 			//state handling (if refresh complete was used)
 			let thisState = state.get(this);
 			if (thisState) {
 
-				callback(thisState.values);
+				callback(thisState);
 				return;
 
 			}
@@ -56,7 +59,7 @@ module.exports = function(FLUX) {
 			//callback immeditialy if we already have this value(s) in store
 			if (used) {
 
-				callback(values);
+				callback(variable);
 				return;
 
 			}
@@ -64,8 +67,8 @@ module.exports = function(FLUX) {
 			//wait to callback when we're currently refreshing the value(s)
 			if (refreshing) {
 
-				valueOut.once('triggerdone', () => {
-					callback(values);
+				variableOut.once('triggerdone', () => {
+					callback(variable);
 				});
 
 				return;
@@ -76,10 +79,15 @@ module.exports = function(FLUX) {
 			refreshing = true;
 			FLUX.Node.getValuesFromInput(valueIn, state).then((vals) => {
 
-				values = vals;
+				variable = {
+					name: NODE.data.name,
+					values: vals
+				};
+
 				used = true;
 				refreshing = false;
-				callback(values);
+
+				callback(variable);
 
 			});
 
@@ -87,10 +95,11 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('store', {
+	FLUX.addNode('variable', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		groups: ["basics"],
+		editorContent: `<input type="text" placeholder="name" data-outputvalue="name" />`
 	}, constr);
 
 };

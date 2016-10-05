@@ -1,9 +1,9 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
 		NODE.on('editorContentLoad', function() {
-			let castTypeSelect=this.getElementsByTagName('selectcontainer')[0].firstChild;
+			let castTypeSelect = this.getElementsByTagName('selectcontainer')[0].firstChild;
 			castTypeSelect.onchange = () => {
 				this.getOutputByName('result').setType(castTypeSelect.value);
 			};
@@ -23,21 +23,21 @@ module.exports = function(flux) {
 		});
 
 		var anyOutput = NODE.getOutputByName('result');
-		anyOutput.on('trigger', function(state, callback) {
+		anyOutput.on('trigger', (conn, state, callback) => {
 
 			//get the input values
-			flux.Node.getValuesFromInput(anyInput, state).then(vals => {
+			FLUX.Node.getValuesFromInput(anyInput, state).then((vals) => {
 
-				var values = [];
+				let values = [];
 				vals.forEach(val => {
 
-					switch (this.node.data.castType) {
+					switch (NODE.data.castType) {
 
 						case 'string':
 							values.push('' + val);
 							break;
 
-						case 'number':
+						case 'math.number':
 							values.push(+val);
 							break;
 
@@ -66,11 +66,11 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('cast', {
+	FLUX.addNode('cast', {
 		type: "object",
 		level: 0,
 		groups: ["basics"],
-		editorContent: '<selectcontainer><select data-outputvalue="castType"><option selected>string</option><option>boolean</option><option>number</option><option>date</option><option>time</option></select></selectcontainer>',
+		editorContent: '<selectcontainer><select data-outputvalue="castType"><option selected>string</option><option>boolean</option><option>math.number</option><option>date</option><option>time</option></select></selectcontainer>',
 		inputs: {
 			"in": {}
 		},
@@ -79,6 +79,6 @@ module.exports = function(flux) {
 				type: "string"
 			}
 		}
-	}, constructorFunction);
+	}, constr);
 
 };

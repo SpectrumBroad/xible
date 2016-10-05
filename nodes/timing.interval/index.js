@@ -1,8 +1,12 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
 		let triggerIn = NODE.addInput('trigger', {
+			type: "trigger"
+		});
+
+		let clearIn = NODE.addInput('clear', {
 			type: "trigger"
 		});
 
@@ -14,9 +18,10 @@ module.exports = function(flux) {
 			type: "trigger"
 		});
 
+		let regIntervals = [];
 		triggerIn.on('trigger', (conn, state) => {
 
-			flux.Node.getValuesFromInput(msecIn, state).then(intervals => {
+			FLUX.Node.getValuesFromInput(msecIn, state).then((intervals) => {
 
 				if (!intervals.length) {
 					intervals.push(NODE.data.interval || 0);
@@ -24,9 +29,9 @@ module.exports = function(flux) {
 
 				intervals.forEach(interval => {
 
-					setInterval(() => {
-						flux.Node.triggerOutputs(triggerOut, state);
-					}, interval);
+					regIntervals.push(setInterval(() => {
+						FLUX.Node.triggerOutputs(triggerOut, state);
+					}, interval));
 
 				});
 
@@ -34,9 +39,18 @@ module.exports = function(flux) {
 
 		});
 
+		clearIn.on('trigger', (conn, state) => {
+
+			regIntervals.forEach((regInterval) => {
+				clearInterval(regInterval);
+			});
+			regIntervals = [];
+
+		});
+
 	}
 
-	flux.addNode('timing.interval', {
+	FLUX.addNode('timing.interval', {
 		type: "action",
 		level: 0,
 		groups: ["timing"],

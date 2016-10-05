@@ -23,7 +23,7 @@ module.exports = function(FLUX) {
 
 		});
 
-		var groupedOut = NODE.addOutput('grouped');
+		let groupedOut = NODE.addOutput('grouped');
 
 		groupedOut.on('trigger', (conn, state, callback) => {
 
@@ -31,6 +31,14 @@ module.exports = function(FLUX) {
 				callback(vals);
 			});
 
+		});
+
+		let countOut = NODE.addOutput('count', {
+			type: "math.number"
+		});
+
+		countOut.on('trigger', (conn, state, callback) => {
+			callback(anyIn.connectors.length);
 		});
 
 	}

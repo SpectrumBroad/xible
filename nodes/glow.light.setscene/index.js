@@ -20,15 +20,14 @@ module.exports = function(flux) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			flux.Node.getValuesFromInput(sceneIn, state).then(scenes => {
+			flux.Node.getValuesFromInput(sceneIn, state).then((scenes) => {
 
-				flux.Node.getValuesFromInput(lightIn, state).then(lights => {
+				flux.Node.getValuesFromInput(lightIn, state).then((lights) => {
 
 					let i = 0;
+					lights.forEach((light) => {
 
-					lights.forEach(light => {
-
-						light.selectScene(scenes[0], () => {
+						light.selectScene(scenes[0]).then(() => {
 
 							if (++i === lights.length) {
 								flux.Node.triggerOutputs(triggerOut, state);

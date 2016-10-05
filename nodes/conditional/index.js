@@ -19,7 +19,7 @@ module.exports = function(FLUX) {
 
 				if (bools.length) {
 
-					var input;
+					let input;
 					if (bools.some(bool => !bool)) {
 						input = falseIn;
 					} else {
@@ -37,7 +37,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('valued if', {
+	FLUX.addNode('conditional', {
 		type: "object",
 		level: 0,
 		groups: ["basics"]

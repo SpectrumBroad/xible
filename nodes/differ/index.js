@@ -17,7 +17,7 @@ module.exports = function(FLUX) {
 				if (vals.length) {
 
 					var firstVal = vals[0];
-					callback(vals.some(val => val !== firstVal));
+					callback(vals.some((val) => val !== firstVal));
 
 				} else {
 					callback(false);

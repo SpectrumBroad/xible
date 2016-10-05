@@ -1,6 +1,6 @@
 module.exports = function(FLUX) {
 
-	function nodeConstructor(NODE) {
+	function constr(NODE) {
 
 		let triggerIn = NODE.getInputByName('trigger');
 		triggerIn.on('trigger', (conn, state) => {
@@ -46,6 +46,6 @@ module.exports = function(FLUX) {
 				type: "trigger"
 			}
 		}
-	}, nodeConstructor);
+	}, constr);
 
 };

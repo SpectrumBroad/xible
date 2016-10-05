@@ -51,7 +51,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.onon', {
+	FLUX.addNode('glow.light.onpoweron', {
 		type: "event",
 		level: 0,
 		groups: ["glow"]

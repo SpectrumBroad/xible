@@ -19,7 +19,7 @@ module.exports = function(FLUX) {
 
 				glowServers.forEach((glowServer) => {
 
-					glowServer.Player.on('stop', (event) => {
+					glowServer.MediaPlayer.on('stop', (event) => {
 						FLUX.Node.triggerOutputs(triggerOut, state);
 					});
 
