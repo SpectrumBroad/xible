@@ -29,7 +29,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('equals', {
+	FLUX.addNode('compare.equal', {
 		type: "object",
 		level: 0,
 		groups: ["basics"]

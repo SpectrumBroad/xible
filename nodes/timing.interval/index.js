@@ -21,17 +21,40 @@ module.exports = function(FLUX) {
 		let regIntervals = [];
 		triggerIn.on('trigger', (conn, state) => {
 
+			let intervalFunction = (interval, fromData) => {
+
+				NODE.addProgressBar({
+					message: (fromData ? null : `waiting for ${interval} msec`),
+					percentage: 0,
+					updateOverTime: interval,
+					timeout: interval + 700
+				});
+				FLUX.Node.triggerOutputs(triggerOut, state);
+
+			};
+
 			FLUX.Node.getValuesFromInput(msecIn, state).then((intervals) => {
 
+				let fromData = false;
 				if (!intervals.length) {
+
+					fromData = true;
 					intervals.push(NODE.data.interval || 0);
+
 				}
 
-				intervals.forEach(interval => {
+				intervals.forEach((interval) => {
 
-					regIntervals.push(setInterval(() => {
-						FLUX.Node.triggerOutputs(triggerOut, state);
-					}, interval));
+					interval = Math.round(interval);
+
+					NODE.addProgressBar({
+						message: (fromData ? null : `waiting for ${interval} msec`),
+						percentage: 0,
+						updateOverTime: interval,
+						timeout: interval + 700
+					});
+
+					regIntervals.push(setInterval(() => intervalFunction(interval, fromData), interval));
 
 				});
 

@@ -29,7 +29,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('differ', {
+	FLUX.addNode('compare.differ', {
 		type: "object",
 		level: 0,
 		groups: ["basics"]

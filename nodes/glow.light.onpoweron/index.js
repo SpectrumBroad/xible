@@ -33,7 +33,7 @@ module.exports = function(FLUX) {
 
 				glowServers.forEach((glowServer) => {
 
-					glowServer.Light.on('on', (event) => {
+					glowServer.Light.on('powerOn', (event) => {
 
 						state.set(this, {
 							light: event.light

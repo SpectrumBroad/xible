@@ -23,7 +23,7 @@ module.exports = function(FLUX) {
 				let i = 0;
 				lights.forEach((light) => {
 
-					light.powerOn(NODE.data.duration).then(() => {
+					light.powerOff(NODE.data.duration).then(() => {
 
 						if (++i === lights.length) {
 							FLUX.Node.triggerOutputs(doneOut, state);
@@ -39,12 +39,12 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.poweron', {
+	FLUX.addNode('glow.light.poweroff', {
 		type: "action",
 		level: 0,
 		groups: ["glow"],
-		description: "Powers on a light registrered in Glow.",
-		editorContent: `<input data-outputvalue="duration" type="number" placeholder="duration"/>`
+		description: "Powers off a light registered in Glow.",
+    editorContent: `<input data-outputvalue="duration" type="number" placeholder="duration"/>`
 	}, constr);
 
 };

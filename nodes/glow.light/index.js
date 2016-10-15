@@ -1,27 +1,14 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
-		//makes this module only work with glow
-		//Light = app.Light;
-
-		let glowIn = NODE.addInput('glowServer', {
+		let glowServerIn = NODE.addInput('glowServer', {
 			type: "glowServer"
 		});
 
-		let nameIn = NODE.addInput('name', {
+		let labelIn = NODE.addInput('label', {
 			type: "string",
-			description: "The registered name of the light in Glow. If multiple names are given, multiple lights will be returned through the 'light' output."
-		});
-
-		nameIn.on('editorAttach', function() {
-			this.node.getElementsByTagName('input')[0].style.display = 'none';
-		});
-
-		nameIn.on('editorDetach', function() {
-			if (!this.connectors.length) {
-				this.node.getElementsByTagName('input')[0].style.display = '';
-			}
+			description: "The registered label of the light in Glow. If multiple labels are given, multiple lights will be returned through the 'light' output."
 		});
 
 		let lightOut = NODE.addOutput('light', {
@@ -29,23 +16,32 @@ module.exports = function(flux) {
 			description: "One or more lights to return."
 		});
 
-		lightOut.on('trigger', callback => {
+		lightOut.on('trigger', (conn, state, callback) => {
 
-			if (nameIn.connectors.length) {
-				flux.Node.getValuesFromInput(nameIn).then(strs => callback(strs.map(str => Light.getByName(str))));
-			} else {
-				callback(Light.getByName(this.value));
-			}
+			//get the glow server
+			FLUX.Node.getValuesFromInput(glowServerIn, state).then((glowServers) => {
+
+				glowServers.forEach((glowServer) => {
+
+					if (labelIn.connectors.length) {
+						FLUX.Node.getValuesFromInput(labelIn).then((labels) => callback(labels.map((label) => glowServer.Light.getByLabel(label))));
+					} else {
+						callback(glowServer.Light.getByLabel(NODE.data.label));
+					}
+
+				});
+
+			});
 
 		});
 
 	}
 
-	flux.addNode('glow.light', {
+	FLUX.addNode('glow.light', {
 		type: "object",
 		level: 0,
 		groups: ["glow"],
-		editorContent: `<input data-hideifattached="input[name=name]" data-outputvalue="value" type="text" placeholder="name"/>`
-	}, constructorFunction);
+		editorContent: `<input data-hideifattached="input[name=label]" data-outputvalue="label" type="text" placeholder="label"/>`
+	}, constr);
 
 };
