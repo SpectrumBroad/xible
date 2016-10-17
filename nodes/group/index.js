@@ -2,12 +2,13 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		let anyIn = NODE.addInput('any');
+		let anyIn = NODE.addInput('any', {
+			singleType: true
+		});
 
 		anyIn.on('editorAttach', function(connector) {
 
-			var type = connector.origin.type;
-			this.setType(type);
+			let type = connector.origin.type;
 			this.node.getOutputByName('grouped').setType(type);
 
 		});
@@ -15,10 +16,7 @@ module.exports = function(FLUX) {
 		anyIn.on('editorDetach', function(connector) {
 
 			if (!this.connectors.length) {
-
-				this.setType(null);
 				this.node.getOutputByName('grouped').setType(null);
-
 			}
 
 		});

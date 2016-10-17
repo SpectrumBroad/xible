@@ -334,9 +334,23 @@ Node.getValuesFromInput = function(input, state) {
 function NodeIo(obj) {
 
 	this.type = null;
+	this.singleType = false;
+	this.maxConnectors = null;
 
 	if (obj) {
-		this.type = obj.type;
+
+		if(typeof obj.type === 'string') {
+			this.type = obj.type;
+		}
+
+		if(typeof obj.singleType === 'boolean') {
+			this.singleType = obj.singleType;
+		}
+
+		if(typeof obj.maxConnectors === 'number') {
+			this.maxConnectors = obj.maxConnectors;
+		}
+
 	}
 
 	this.connectors = [];

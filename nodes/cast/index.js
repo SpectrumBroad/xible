@@ -9,24 +9,12 @@ module.exports = function(FLUX) {
 			};
 		});
 
-		var anyInput = NODE.getInputByName('in');
-		anyInput.on('editorAttach', function(connector) {
-			this.setType(connector.origin.type);
-		});
-
-		anyInput.on('editorDetach', function() {
-
-			if (!this.connectors.length) {
-				this.setType(null);
-			}
-
-		});
-
-		var anyOutput = NODE.getOutputByName('result');
-		anyOutput.on('trigger', (conn, state, callback) => {
+		var valuesIn = NODE.getInputByName('values');
+		var anyOut = NODE.getOutputByName('result');
+		anyOut.on('trigger', (conn, state, callback) => {
 
 			//get the input values
-			FLUX.Node.getValuesFromInput(anyInput, state).then((vals) => {
+			FLUX.Node.getValuesFromInput(valuesIn, state).then((vals) => {
 
 				let values = [];
 				vals.forEach(val => {
@@ -72,7 +60,7 @@ module.exports = function(FLUX) {
 		groups: ["basics"],
 		editorContent: '<selectcontainer><select data-outputvalue="castType"><option selected>string</option><option>boolean</option><option>math.number</option><option>date</option><option>time</option></select></selectcontainer>',
 		inputs: {
-			"in": {}
+			"values": {}
 		},
 		outputs: {
 			"result": {
