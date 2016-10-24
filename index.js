@@ -15,6 +15,8 @@ const Flux = module.exports = function Flux(obj) {
 	this.nodes = {};
 	this.flows = {};
 
+	this.express=obj.express;
+
 	//host the client nodes
 	if (obj.expressApp) {
 		this.initExpress(obj.expressApp);

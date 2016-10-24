@@ -3,6 +3,7 @@
 const EventEmitter = require('events').EventEmitter;
 const nodeDebug = require('debug')('flux:node');
 const path = require('path');
+const cluster = require('cluster');
 
 let Node = module.exports = function Node(obj) {
 
@@ -63,7 +64,7 @@ Node.initFromPath = function(path, FLUX) {
 	let files = fs.readdirSync(path);
 	files.forEach((file) => {
 
-		let filepath = path + '/' + file;
+		let filepath = `${path}/${file}`;
 		let node;
 
 		if (fs.statSync(filepath).isDirectory()) {
@@ -72,7 +73,31 @@ Node.initFromPath = function(path, FLUX) {
 
 				node = require(filepath);
 				if (typeof node === 'function') {
+
 					node(FLUX);
+
+					//find client content and host it
+					if(cluster.isMaster) {
+
+						let clientFilePath = `${filepath}/editor`;
+						try {
+
+							if (fs.statSync(clientFilePath).isDirectory()) {
+
+								nodeDebug(`hosting ${clientFilePath} on /api/nodes/${file}/editor`);
+
+								FLUX.expressApp.use(`/api/nodes/${file}/editor`, FLUX.express.static(clientFilePath, {
+									index: false
+								}));
+
+							}
+
+						} catch(e) {
+							console.log(e);
+						}
+
+					}
+
 				}
 
 			} catch (e) {
@@ -339,15 +364,15 @@ function NodeIo(obj) {
 
 	if (obj) {
 
-		if(typeof obj.type === 'string') {
+		if (typeof obj.type === 'string') {
 			this.type = obj.type;
 		}
 
-		if(typeof obj.singleType === 'boolean') {
+		if (typeof obj.singleType === 'boolean') {
 			this.singleType = obj.singleType;
 		}
 
-		if(typeof obj.maxConnectors === 'number') {
+		if (typeof obj.maxConnectors === 'number') {
 			this.maxConnectors = obj.maxConnectors;
 		}
 

@@ -38,6 +38,10 @@ if (cluster.isMaster) {
 		res.header('access-control-allow-headers', 'x-access-token, content-type');
 		res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
 
+		if ('OPTIONS' == req.method) {
+      return res.send(200);
+    }
+
 		//local vars for requests
 		req.locals = {};
 
@@ -78,6 +82,7 @@ if (cluster.isMaster) {
 			});
 
 			new Flux({
+				express: express,
 				expressApp: expressApp,
 				webSocketServer: webSocketServer,
 				nodesPath: './nodes',
@@ -183,8 +188,6 @@ if (cluster.isMaster) {
 				memory: process.memoryUsage()
 			}
 		});
-
-
 
 	}, 1000);
 

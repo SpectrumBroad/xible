@@ -56,8 +56,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('timing.delay', {
 		type: "action",
 		level: 0,
-		groups: ["timing"],
-		editorContent: `<input type="number" placeholder="msecs" data-outputvalue="delay" data-hideifattached="input[name=msecs]"/>`
+		groups: ["timing"]
 	}, constr);
 
 };

@@ -60,7 +60,7 @@ module.exports = function(FLUX) {
 
 
 	//get all registered nodes
-	expressApp.get('/api/flux/nodes', (req, res) => {
+	expressApp.get('/api/nodes', (req, res) => {
 
 		let nodes = {};
 		for (const NODE_NAME in FLUX.nodes) {
@@ -82,7 +82,7 @@ module.exports = function(FLUX) {
 
 
 	//retrieve all flows
-	expressApp.get('/api/flux/flows', (req, res) => {
+	expressApp.get('/api/flows', (req, res) => {
 
 		let flows = FLUX.getFlows();
 		let returnFlows = {};
@@ -109,7 +109,7 @@ module.exports = function(FLUX) {
 
 
 	//create a new flow
-	expressApp.post('/api/flux/flows', (req, res) => {
+	expressApp.post('/api/flows', (req, res) => {
 
 		if (!req.body) {
 			res.status(400).end();
@@ -148,7 +148,7 @@ module.exports = function(FLUX) {
 
 
 	//stop an existing flow
-	expressApp.patch('/api/flux/flows/:flowId/stop', (req, res) => {
+	expressApp.patch('/api/flows/:flowId/stop', (req, res) => {
 
 		req.locals.flow.stop();
 		res.end();
@@ -157,7 +157,7 @@ module.exports = function(FLUX) {
 
 
 	//start an existing flow
-	expressApp.patch('/api/flux/flows/:flowId/start', (req, res) => {
+	expressApp.patch('/api/flows/:flowId/start', (req, res) => {
 
 		req.locals.flow.start();
 		res.end();
@@ -166,7 +166,7 @@ module.exports = function(FLUX) {
 
 
 	//get an existing flow
-	expressApp.get('/api/flux/flows/:flowId', (req, res) => {
+	expressApp.get('/api/flows/:flowId', (req, res) => {
 
 		let returnFlow = {
 			_id: req.locals.flow._id,
@@ -186,7 +186,7 @@ module.exports = function(FLUX) {
 
 
 	//update an existing flow
-	expressApp.put('/api/flux/flows/:flowId', (req, res) => {
+	expressApp.put('/api/flows/:flowId', (req, res) => {
 
 		//stop it first
 		req.locals.flow.stop();
@@ -206,7 +206,7 @@ module.exports = function(FLUX) {
 
 
 	//delete an existing flow
-	expressApp.delete('/api/flux/flows/:flowId', (req, res) => {
+	expressApp.delete('/api/flows/:flowId', (req, res) => {
 
 		req.locals.flow.stop();
 		req.locals.flow.delete();
