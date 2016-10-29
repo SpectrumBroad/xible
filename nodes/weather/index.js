@@ -105,8 +105,7 @@ module.exports = function(FLUX) {
 		type: "object",
 		level: 0,
 		groups: ["basics"],
-		description: "Retrieve the weather for a specific location.",
-		editorContent: `<input data-hideifattached="input[name=location]" data-outputvalue="location" type="text" placeholder="location"/>`
+		description: "Retrieve the weather for a specific location."
 	}, constr);
 
 };

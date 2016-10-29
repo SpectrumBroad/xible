@@ -11,11 +11,10 @@ module.exports = function(FLUX) {
 		colorOut.on('trigger', (conn, state, callback) => {
 
 			let color = {
-				hex: 'ff0000',
-				red: 255,
-				green: 0,
-				blue: 0
+				hex: NODE.data.hex
 			};
+
+			color=NODE.data.hex;
 
 			callback(color);
 

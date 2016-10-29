@@ -13,5 +13,8 @@
     "body-parser": "*",
     "spdy": "*"
   },
+  "devDependencies": {
+    "mrdoc": "*"
+  },
   "private": true
 }

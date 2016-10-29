@@ -20,18 +20,19 @@ module.exports = function(FLUX) {
 
 			FLUX.Node.getValuesFromInput(lightIn, state).then((lights) => {
 
-				let i = 0;
-				lights.forEach((light) => {
+				let duration = +NODE.data.duration || 0;
+				if (duration) {
 
-					light.powerOn(NODE.data.duration).then(() => {
-
-						if (++i === lights.length) {
-							FLUX.Node.triggerOutputs(doneOut, state);
-						}
-
+					NODE.addProgressBar({
+						percentage: 0,
+						updateOverTime: duration,
+						timeout: duration + 700
 					});
 
-				});
+				}
+
+				Promise.all(lights.map((light) => light.powerOn(duration)))
+					.then(() => FLUX.Node.triggerOutputs(doneOut, state));
 
 			});
 
@@ -43,8 +44,7 @@ module.exports = function(FLUX) {
 		type: "action",
 		level: 0,
 		groups: ["glow"],
-		description: "Powers on a light registrered in Glow.",
-		editorContent: `<input data-outputvalue="duration" type="number" placeholder="duration"/>`
+		description: "Powers on a light registrered in Glow."
 	}, constr);
 
 };

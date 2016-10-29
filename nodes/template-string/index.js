@@ -25,7 +25,6 @@ module.exports = function(FLUX) {
 		type: "object",
 		level: 0,
 		groups: ["basics"],
-		editorContent: `<input type="text" data-outputvalue="value" />`,
 		inputs: {
 			"variable": {
 				type: "variable"

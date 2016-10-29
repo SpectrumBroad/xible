@@ -19,13 +19,26 @@ module.exports = function(FLUX) {
 		let connected = false;
 		NODE.on('init', (state) => {
 
+			//disconnect if already connected
+			let properConnection = glow && glow.connected && glow.hostname === NODE.data.host && glow.port === NODE.data.port && glow.token === NODE.data.token;
+			if (glow && glow.connected && !properConnection) {
+				glow.close();
+			}
+
+			//if we already have a working connection, keep it open
+			if (properConnection) {
+				return;
+			}
+
+			//setup connection
 			glow = new glowWrapper({
+
 				hostname: NODE.data.host,
 				port: NODE.data.port,
 				token: NODE.data.token
+
 			});
 
-			//setup connection
 			glow.connect().catch((err) => {
 
 				NODE.addStatus({
@@ -34,6 +47,7 @@ module.exports = function(FLUX) {
 				});
 
 			});
+
 			glow.autoReconnect(10000);
 
 			glow.on('open', () => {

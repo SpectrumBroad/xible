@@ -10,7 +10,7 @@ const path = require('path');
 /**
  *	Constructor for Flow
  *	@constructor
- *	@param	{Object=}	FLUX
+ *	@param	{Object}	FLUX
  */
 var Flow = module.exports = function Flow(FLUX) {
 
@@ -258,11 +258,11 @@ Flow.prototype.initJson = function(json, newFlow) {
 		}
 
 		//construct a dummy editorContents
-		if(!fluxNode.nodeExists) {
+		if (!fluxNode.nodeExists) {
 
-			fluxNode.editorContent='';
-			for(var key in fluxNode.data) {
-				fluxNode.editorContent+=`<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
+			fluxNode.editorContent = '';
+			for (var key in fluxNode.data) {
+				fluxNode.editorContent += `<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
 			}
 
 		}
@@ -336,7 +336,7 @@ Flow.prototype.delete = function(callback) {
 		Flow.saveStatuses(statuses);
 
 		//remove from Flux instance
-		if(this.flux) {
+		if (this.flux) {
 			delete this.flux.flows[this._id];
 		}
 
@@ -494,14 +494,75 @@ Flow.prototype.saveStatus = function(running) {
 
 
 /**
+ *	Starts a flow in direct mode, on a given set of nodes
+ *	@param	{Node[]} nodes	nodes to direct
+ */
+Flow.prototype.direct = function(nodes) {
+
+	if (cluster.isMaster) {
+
+		//ensure that the flow is running
+		if (this.worker) {
+
+			this.worker.send({
+				"method": "directNodes",
+				"directNodes": nodes
+			});
+
+		} else {
+			this.start(nodes);
+		}
+
+	} else {
+
+		//cancel all output triggers
+		this.flux.Node.triggerOutputs = () => {};
+
+		//set the data accordingly
+		//init all of them
+		//and fetch the action nodes
+		let actionNodes = [];
+		nodes.forEach((node) => {
+
+			let realNode = this.getNodeById(node._id);
+			realNode.data = node.data;
+
+			realNode.emit('init');
+
+			if (realNode.type === 'action') {
+				actionNodes.push(realNode);
+			}
+
+		});
+
+		//trigger the action nodes
+		actionNodes.forEach((node) => {
+
+			node.getInputs().filter((input) => input.type === 'trigger').forEach((input) => {
+				input.emit('trigger', null, new FlowState());
+			});
+
+		});
+
+	}
+
+};
+
+
+/**
  *	Starts a flow. Stops it first if it is already running.
  *	Note that the behaviour is different when called from a worker process
+ *	@param	{Node[]} directNodes	nodes to direct
  *	@return {Promise}
  */
-Flow.prototype.start = function() {
+Flow.prototype.start = function(directNodes) {
 
 	if (!this.runnable) {
-		return;
+		return Promise.reject(`not runnable`);
+	}
+
+	if (this.worker) {
+		return Promise.resolve();
 	}
 
 	if (cluster.isMaster) {
@@ -529,7 +590,8 @@ Flow.prototype.start = function() {
 
 								this.worker.send({
 									"method": "start",
-									"flow": this.json
+									"flow": this.json,
+									"directNodes": directNodes
 								});
 
 							} else {
@@ -617,7 +679,7 @@ Flow.prototype.stop = function() {
 			if (this.worker && this.worker.isConnected()) {
 
 				flowDebug('stopping flow from master');
-				var killTimeout;
+				let killTimeout;
 
 				this.worker.on('disconnect', () => {
 

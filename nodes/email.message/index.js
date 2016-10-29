@@ -91,8 +91,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('email.message', {
 		type: "object",
 		level: 0,
-		groups: ["basics"],
-		editorContent: `<input type="email" multiple placeholder="from" data-outputvalue="from" data-hideifattached="input[name=from]" /><input type="email" multiple placeholder="to" data-outputvalue="to" data-hideifattached="input[name=to]" /><input type="email" multiple placeholder="cc" data-outputvalue="cc" data-hideifattached="input[name=cc]" /><input type="email" multiple placeholder="bcc" data-outputvalue="bcc" data-hideifattached="input[name=bcc]" /><input type="text" placeholder="subject" data-outputvalue="subject" data-hideifattached="input[name=subject]" /><input type="text" placeholder="text" data-outputvalue="text" data-hideifattached="input[name=text]" /><input type="text" placeholder="html" data-outputvalue="html" data-hideifattached="input[name=html]" />`,
+		groups: ["basics"]
 	}, constr);
 
 };

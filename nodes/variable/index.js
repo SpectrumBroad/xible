@@ -98,8 +98,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('variable', {
 		type: "object",
 		level: 0,
-		groups: ["basics"],
-		editorContent: `<input type="text" placeholder="name" data-outputvalue="name" />`
+		groups: ["basics"]
 	}, constr);
 
 };

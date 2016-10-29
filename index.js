@@ -15,7 +15,7 @@ const Flux = module.exports = function Flux(obj) {
 	this.nodes = {};
 	this.flows = {};
 
-	this.express=obj.express;
+	this.express = obj.express;
 
 	//host the client nodes
 	if (obj.expressApp) {
@@ -56,8 +56,8 @@ Flux.getNativeModules = function() {
 };
 
 
-Flux.checkUsedDeps=function() {
-	let depcheck=require('depcheck');
+Flux.checkUsedDeps = function() {
+	let depcheck = require('depcheck');
 };
 
 
@@ -182,6 +182,27 @@ Flux.prototype.getFlowById = function(id, callback) {
 	}
 
 	return this.flows[id];
+
+};
+
+
+Flux.prototype.getFlowByName = function(name, callback) {
+
+	//same?
+	return this.getFlowById(name, callback);
+
+	//TODO: decide if this can indeed be removed
+	let flowId = Object.keys(this.flows).find((flowId) => this.flows[flowId].name === name);
+	let flow = null;
+	if (flowId) {
+		flow = this.flows[flowId];
+	}
+
+	if (typeof callback === 'function') {
+		callback(flow);
+	}
+
+	return flow;
 
 };
 

@@ -92,9 +92,7 @@ Node.initFromPath = function(path, FLUX) {
 
 							}
 
-						} catch(e) {
-							console.log(e);
-						}
+						} catch(e) {}
 
 					}
 
@@ -140,6 +138,28 @@ Node.prototype.addOutput = function(name, output) {
 	this.outputs[name] = output;
 
 	return output;
+
+};
+
+
+Node.prototype.getInputs = function() {
+
+	let inputs = [];
+	for (let name in this.inputs) {
+		inputs.push(this.inputs[name]);
+	}
+	return inputs;
+
+};
+
+
+Node.prototype.getOutputs = function() {
+
+	let outputs = [];
+	for (let name in this.outputs) {
+		outputs.push(this.outputs[name]);
+	}
+	return outputs;
 
 };
 

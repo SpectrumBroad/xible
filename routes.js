@@ -165,6 +165,30 @@ module.exports = function(FLUX) {
 	});
 
 
+	//run part of a flow directly
+	expressApp.patch('/api/flows/:flowId/direct', (req, res) => {
+
+		//get the nodes that are allowed to run
+		req.locals.flow.direct(req.body);
+
+		//output the flow id
+		res.end();
+
+	});
+
+
+	//run part of a flow directly
+	expressApp.patch('/api/flows/:flowId/undirect', (req, res) => {
+
+		//get the nodes that are allowed to run
+		req.locals.flow.undirect();
+
+		//output the flow id
+		res.end();
+
+	});
+
+
 	//get an existing flow
 	expressApp.get('/api/flows/:flowId', (req, res) => {
 

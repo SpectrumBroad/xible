@@ -30,11 +30,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('console log', {
+	FLUX.addNode('consoleLog', {
 		type: "action",
 		level: 0,
 		groups: ["basics", "logging"],
-		editorContent: `<input data-hideifattached="input[name=value]" data-outputvalue="value" type="text" placeholder="value"/>`,
 		inputs: {
 			"trigger": {
 				type: "trigger"

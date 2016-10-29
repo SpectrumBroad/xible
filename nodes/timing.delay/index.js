@@ -16,13 +16,6 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			let delayFunction = (statusId) => {
-
-				NODE.removeProgressBarById(statusId, 700);
-				FLUX.Node.triggerOutputs(triggerOut, state);
-
-			};
-
 			FLUX.Node.getValuesFromInput(msecIn, state).then(delays => {
 
 				let fromData = false;
@@ -40,10 +33,11 @@ module.exports = function(FLUX) {
 					let statusId = NODE.addProgressBar({
 						message: (fromData ? null : `waiting for ${delay} msec`),
 						percentage: 0,
-						updateOverTime: delay
+						updateOverTime: delay,
+						timeout: delay + 700
 					});
 
-					setTimeout(() => delayFunction(statusId), delay);
+					setTimeout(() => FLUX.Node.triggerOutputs(triggerOut, state), delay);
 
 				});
 

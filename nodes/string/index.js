@@ -1,6 +1,6 @@
 module.exports = function(FLUX) {
 
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
 		var stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
@@ -18,6 +18,7 @@ module.exports = function(FLUX) {
 				}
 
 			});
+
 		});
 
 	}
@@ -26,7 +27,6 @@ module.exports = function(FLUX) {
 		type: "object",
 		level: 0,
 		groups: ["basics"],
-		editorContent: `<input type="text" data-outputvalue="value" />`,
 		inputs: {
 			"concat": {
 				type: "string"
@@ -37,6 +37,6 @@ module.exports = function(FLUX) {
 				type: "string"
 			}
 		}
-	}, constructorFunction);
+	}, constr);
 
 };

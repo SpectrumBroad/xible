@@ -19,7 +19,7 @@ module.exports = function(FLUX) {
 	}
 
 	FLUX.addNode('flux.flow.stop', {
-		type: "object",
+		type: "action",
 		level: 0,
 		groups: ["basics"]
 	}, constr);

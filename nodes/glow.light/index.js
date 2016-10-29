@@ -35,7 +35,7 @@ module.exports = function(FLUX) {
 
 					if (labelIn.connectors.length) {
 
-						FLUX.Node.getValuesFromInput(labelIn)
+						FLUX.Node.getValuesFromInput(labelIn, state)
 							.then((labels) => Promise.all(labels.map((label) => glowServer.Light.getByLabel(label))))
 							.then((lights) => callback(lights.map((light) => light.power)));
 
@@ -58,7 +58,7 @@ module.exports = function(FLUX) {
 
 					if (labelIn.connectors.length) {
 
-						FLUX.Node.getValuesFromInput(labelIn)
+						FLUX.Node.getValuesFromInput(labelIn, state)
 							.then((labels) => Promise.all(labels.map((label) => glowServer.Light.getByLabel(label))))
 							.then((lights) => callback(lights));
 
@@ -77,8 +77,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.light', {
 		type: "object",
 		level: 0,
-		groups: ["glow"],
-		editorContent: `<input data-hideifattached="input[name=label]" data-outputvalue="label" type="text" placeholder="label"/>`
+		groups: ["glow"]
 	}, constr);
 
 };

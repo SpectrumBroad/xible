@@ -38,8 +38,10 @@ if (cluster.isMaster) {
 		res.header('access-control-allow-headers', 'x-access-token, content-type');
 		res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
 
+		expressDebug(`${req.method} ${req.originalUrl}`);
+
 		if ('OPTIONS' == req.method) {
-      return res.send(200);
+      return res.status(200).end();
     }
 
 		//local vars for requests
@@ -116,8 +118,7 @@ if (cluster.isMaster) {
 	});
 
 	//init message handler
-	process.on('message', message => {
-
+	process.on('message', (message) => {
 		switch (message.method) {
 
 			case 'start':
@@ -126,7 +127,12 @@ if (cluster.isMaster) {
 
 					flow = new flux.Flow(flux);
 					flow.initJson(message.flow);
-					flow.start();
+
+					if(message.directNodes) {
+						flow.direct(message.directNodes);
+					} else {
+						flow.start();
+					}
 
 				} catch (e) {
 
@@ -151,6 +157,14 @@ if (cluster.isMaster) {
 				}
 
 				break;
+
+			case 'directNodes':
+
+				if(flow) {
+
+					flow.direct(message.directNodes);
+
+				}
 
 		}
 
