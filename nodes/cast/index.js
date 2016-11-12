@@ -2,13 +2,6 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		NODE.on('editorContentLoad', function() {
-			let castTypeSelect = this.getElementsByTagName('selectcontainer')[0].firstChild;
-			castTypeSelect.onchange = () => {
-				this.getOutputByName('result').setType(castTypeSelect.value);
-			};
-		});
-
 		var valuesIn = NODE.getInputByName('values');
 		var anyOut = NODE.getOutputByName('result');
 		anyOut.on('trigger', (conn, state, callback) => {
@@ -58,7 +51,6 @@ module.exports = function(FLUX) {
 		type: "object",
 		level: 0,
 		groups: ["basics"],
-		editorContent: '<selectcontainer><select data-outputvalue="castType"><option selected>string</option><option>boolean</option><option>math.number</option><option>date</option><option>time</option></select></selectcontainer>',
 		inputs: {
 			"values": {}
 		},

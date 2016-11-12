@@ -1,0 +1,15 @@
+<selectcontainer>
+	<select data-outputvalue="castType">
+    <option selected>string</option>
+    <option>boolean</option>
+    <option>math.number</option>
+    <option>date</option>
+    <option>time</option>
+  </select>
+</selectcontainer>
+<script>
+	let castTypeSelect = this.editorContentEl.getElementsByTagName('select')[0];
+	castTypeSelect.onchange = () => {
+		this.getOutputByName('result').setType(castTypeSelect.value);
+	};
+</script>

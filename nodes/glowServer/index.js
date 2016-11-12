@@ -5,7 +5,7 @@ const ws = require('ws');
 const EventEmitter = require('events').EventEmitter;
 
 
-const glowWrapper = require('../../../glowWrapper');
+const GlowWrapper = require('../../../GlowWrapper');
 
 
 module.exports = function(FLUX) {
@@ -31,7 +31,7 @@ module.exports = function(FLUX) {
 			}
 
 			//setup connection
-			glow = new glowWrapper({
+			glow = new GlowWrapper({
 
 				hostname: NODE.data.host,
 				port: NODE.data.port,
@@ -106,7 +106,16 @@ module.exports = function(FLUX) {
 
 		//return reference glow
 		glowServerOut.on('trigger', (conn, state, callback) => {
+
+			if(!glow) {
+
+				this.once('init', () => callback(glow));
+				return;
+
+			}
+
 			callback(glow);
+
 		});
 
 	}
@@ -114,8 +123,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glowServer', {
 		type: "object",
 		level: 0,
-		groups: ["glow"],
-		editorContent: `<input type="text" placeholder="host" data-outputvalue="host" /><input type="text" placeholder="port" data-outputvalue="port" /><input type="text" placeholder="token" data-outputvalue="token" />`,
+		groups: ["glow"]
 	}, constr);
 
 };

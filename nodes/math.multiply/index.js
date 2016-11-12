@@ -50,8 +50,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.multiply', {
 		type: "object",
 		level: 0,
-		groups: ["math"],
-		editorContent: '<input type="number" placeholder="multiplier" value="0" data-outputvalue="value" data-hideifattached="input[name=multiplier]"/>'
+		groups: ["math"]
 	}, constr);
 
 };

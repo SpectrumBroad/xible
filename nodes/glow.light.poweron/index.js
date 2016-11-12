@@ -31,7 +31,7 @@ module.exports = function(FLUX) {
 
 				}
 
-				Promise.all(lights.map((light) => light.powerOn(duration)))
+				Promise.all(lights.map((light) => light.connected && light.powerOn(duration)))
 					.then(() => FLUX.Node.triggerOutputs(doneOut, state));
 
 			});

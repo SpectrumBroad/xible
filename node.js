@@ -12,8 +12,8 @@ let Node = module.exports = function Node(obj) {
 	this.level = obj.level;
 	this.groups = obj.groups;
 	this.description = obj.description;
-	this.editorContent = obj.editorContent;
 	this.nodeExists = true; //indicates whether this is an existing installed flux.Node
+	this.hostsEditorContent = obj.hostsEditorContent; //indicates whether it has a ./editor/index.htm file
 
 	this._states = {};
 
@@ -77,22 +77,23 @@ Node.initFromPath = function(path, FLUX) {
 					node(FLUX);
 
 					//find client content and host it
-					if(cluster.isMaster) {
+					if (cluster.isMaster && FLUX.nodes[file]) {
 
 						let clientFilePath = `${filepath}/editor`;
 						try {
 
-							if (fs.statSync(clientFilePath).isDirectory()) {
+							if (fs.statSync(`${clientFilePath}/index.htm`).isFile()) {
 
 								nodeDebug(`hosting ${clientFilePath} on /api/nodes/${file}/editor`);
-
 								FLUX.expressApp.use(`/api/nodes/${file}/editor`, FLUX.express.static(clientFilePath, {
 									index: false
 								}));
 
+								FLUX.nodes[file].hostsEditorContent = true;
+
 							}
 
-						} catch(e) {}
+						} catch (e) {}
 
 					}
 

@@ -19,6 +19,7 @@ var Flow = module.exports = function Flow(FLUX) {
 	this.connectors = [];
 	this.usage = null;
 	this.runnable = true;
+	this.directed = false;
 
 	if (FLUX) {
 
@@ -502,7 +503,7 @@ Flow.prototype.direct = function(nodes) {
 	if (cluster.isMaster) {
 
 		//ensure that the flow is running
-		if (this.worker) {
+		if (this.worker && this.directed) {
 
 			this.worker.send({
 				"method": "directNodes",
@@ -527,7 +528,7 @@ Flow.prototype.direct = function(nodes) {
 			let realNode = this.getNodeById(node._id);
 			realNode.data = node.data;
 
-			realNode.emit('init');
+			realNode.emit('init', new FlowState());
 
 			if (realNode.type === 'action') {
 				actionNodes.push(realNode);
@@ -561,10 +562,6 @@ Flow.prototype.start = function(directNodes) {
 		return Promise.reject(`not runnable`);
 	}
 
-	if (this.worker) {
-		return Promise.resolve();
-	}
-
 	if (cluster.isMaster) {
 
 		return new Promise((resolve, reject) => {
@@ -574,7 +571,14 @@ Flow.prototype.start = function(directNodes) {
 				flowDebug('starting flow from master');
 
 				//save the status
-				this.saveStatus(true);
+				if (!directNodes) {
+
+					this.saveStatus(true);
+					this.directed = false;
+
+				} else {
+					this.directed = true;
+				}
 
 				this.worker = cluster.fork();
 				this.worker.on('message', message => {

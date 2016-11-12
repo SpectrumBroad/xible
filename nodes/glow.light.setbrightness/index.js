@@ -31,7 +31,7 @@ module.exports = function(FLUX) {
 
 				}
 
-				Promise.all(lights.map((light) => light.connected && light.powerOff(duration)))
+				Promise.all(lights.map((light) => light.setBrightness(+NODE.data.brightness, duration)))
 					.then(() => FLUX.Node.triggerOutputs(doneOut, state));
 
 			});
@@ -40,11 +40,11 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.poweroff', {
+	FLUX.addNode('glow.light.setbrightness', {
 		type: "action",
 		level: 0,
 		groups: ["glow"],
-		description: "Powers off a light registered in Glow."
+		description: "Sets the brightness on a light registered in Glow."
 	}, constr);
 
 };

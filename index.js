@@ -123,7 +123,7 @@ Flux.prototype.broadcastWebSocket = function(message) {
 Flux.prototype.addNode = function(name, obj, constructorFunction) {
 
 	if (!name || !obj || (!constructorFunction && !obj.constructorFunction)) {
-		throw new Error('first argument needs to be string, second object, third a function');
+		throw new Error('first argument needs to be string, second object, third a constructor function');
 	}
 
 	//check if a similar node with the same name doesn't already exist

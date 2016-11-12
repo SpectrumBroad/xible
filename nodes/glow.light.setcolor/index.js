@@ -67,7 +67,7 @@ module.exports = function(FLUX) {
 		});
 
 		let colorIn = NODE.addInput('color', {
-			type: "color"
+			type: "color.hex"
 		});
 
 		let doneOut = NODE.addOutput('done', {
@@ -111,7 +111,7 @@ module.exports = function(FLUX) {
 
 					}
 
-					Promise.all(lights.map((light) => light.color(color.h, color.s, color.v, duration)))
+					Promise.all(lights.map((light) => light.connected && light.setColor(color.h, color.s, color.v, duration)))
 						.then(() => FLUX.Node.triggerOutputs(doneOut, state));
 
 				});

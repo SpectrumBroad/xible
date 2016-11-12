@@ -4,8 +4,8 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		let tempOut = NODE.addOutput('temp', {
-			type: "colortemperature"
+		let tempOut = NODE.addOutput('temperature', {
+			type: "color.temperature"
 		});
 
 		tempOut.on('trigger', (conn, state, callback) => {
@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('colortemperature', {
+	FLUX.addNode('color.temperature', {
 		type: "object",
 		level: 0,
 		groups: ["basics"],

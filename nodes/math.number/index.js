@@ -15,8 +15,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.number', {
 		type: "object",
 		level: 0,
-		groups: ["basics", "math"],
-		editorContent: '<input type="number" value="0" data-outputvalue="value" />'
+		groups: ["basics", "math"]
 	}, constr);
 
 };

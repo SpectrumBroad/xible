@@ -43,7 +43,6 @@ module.exports = function(FLUX) {
 		type: "object",
 		level: 0,
 		groups: ["math"],
-		editorContent: '<input type="number" placeholder="value" value="0" data-outputvalue="value" data-hideifattached="input[name=b]"/>',
 		inputs: {
 			"a": {
 				type: "math.number"

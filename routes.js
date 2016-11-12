@@ -66,7 +66,6 @@ module.exports = function(FLUX) {
 		for (const NODE_NAME in FLUX.nodes) {
 
 			let node = new FLUX.Node(FLUX.nodes[NODE_NAME]);
-
 			if (!node) {
 				throw new Error(`constructor for node "${NODE_NAME}" is not returning actual node`);
 			}
