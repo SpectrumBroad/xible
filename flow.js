@@ -1,5 +1,4 @@
-'use strict';
-
+const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
 const flowDebug = debug('flux:flow');
 const cluster = require('cluster');
@@ -29,6 +28,9 @@ var Flow = module.exports = function Flow(FLUX) {
 	}
 
 };
+
+
+Object.setPrototypeOf(Flow.prototype, EventEmitter.prototype);
 
 
 /**
@@ -568,6 +570,12 @@ Flow.prototype.start = function(directNodes) {
 
 			this.stop().then(() => {
 
+				//let client now we're starting up the flow
+				this.flux.broadcastWebSocket({
+					method: 'flux.flow.starting',
+					flowId: this._id
+				});
+
 				flowDebug('starting flow from master');
 
 				//save the status
@@ -590,12 +598,17 @@ Flow.prototype.start = function(directNodes) {
 							if (this.worker && this.worker.isConnected()) {
 
 								flowDebug('flow/worker has started');
-								resolve();
+								resolve(this);
 
 								this.worker.send({
 									"method": "start",
 									"flow": this.json,
 									"directNodes": directNodes
+								});
+
+								this.flux.broadcastWebSocket({
+									method: 'flux.flow.started',
+									flowId: this._id
 								});
 
 							} else {
@@ -682,6 +695,11 @@ Flow.prototype.stop = function() {
 
 			if (this.worker && this.worker.isConnected()) {
 
+				this.flux.broadcastWebSocket({
+					method: 'flux.flow.stopping',
+					flowId: this._id
+				});
+
 				flowDebug('stopping flow from master');
 				let killTimeout;
 
@@ -699,7 +717,12 @@ Flow.prototype.stop = function() {
 					//cleanup all open statuses
 					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
 
-					resolve();
+					this.flux.broadcastWebSocket({
+						method: 'flux.flow.stopped',
+						flowId: this._id
+					});
+
+					resolve(this);
 
 				});
 

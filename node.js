@@ -1,5 +1,3 @@
-'use strict';
-
 const EventEmitter = require('events').EventEmitter;
 const nodeDebug = require('debug')('flux:node');
 const path = require('path');

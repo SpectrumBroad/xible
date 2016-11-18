@@ -107,7 +107,7 @@ Flux.prototype.broadcastWebSocket = function(message) {
 		message = JSON.stringify(message);
 	}
 
-	this.webSocketServer.clients.forEach(client => {
+	this.webSocketServer.clients.forEach((client) => {
 		client.send(message, (err) => {
 			if (err) {
 				webSocketDebug(`client websocket send failed: ${err}`);

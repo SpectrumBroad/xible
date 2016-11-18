@@ -93,7 +93,8 @@ module.exports = function(FLUX) {
 				nodes: [],
 				connectors: flows[id].json.connectors,
 				viewState: flows[id].json.viewState,
-				runnable: flows[id].runnable
+				runnable: flows[id].runnable,
+				running: flows[id].worker && flows[id].worker.isConnected()
 			};
 
 			flows[id].nodes.forEach((node) => {
