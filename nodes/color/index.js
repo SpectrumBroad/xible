@@ -74,7 +74,7 @@ module.exports = function(FLUX) {
 
 				let rgb = hsvToRgb(+NODE.data.h, +NODE.data.s, (+NODE.data.v) / 100);
 				hex = rgbToHex(rgb.r, rgb.g, rgb.b);
-				
+
 			}
 
 			callback(hex);

@@ -1,4 +1,5 @@
 {
-  "esversion": 6,
-  "node": true
+	"esversion": 6,
+	"node": true,
+	"strict": "implied"
 }

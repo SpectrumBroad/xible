@@ -150,7 +150,7 @@ module.exports = function(FLUX) {
 
 					light.on('connect', () => lightConnected(light));
 					light.on('close', () => lightDisconnected(light));
-					
+
 				}
 
 				if (!light.connected) {
@@ -166,7 +166,7 @@ module.exports = function(FLUX) {
 		}
 
 		powerOut.on('trigger', (conn, state, callback) => {
-			getLights(state).then((lights) => callback(lights.some((light) => light.power === true)));
+			getLights(state).then((lights) => callback(lights.some((light) => light.poweredOn === true)));
 		});
 
 		lightOut.on('trigger', (conn, state, callback) => {
