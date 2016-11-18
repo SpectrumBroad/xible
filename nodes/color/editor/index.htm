@@ -65,7 +65,7 @@
 	<canvas class="wheel"></canvas>
 	<div class="selector"></div>
 </div>
-<input data-outputvalue="v" name="value" type="range" min="0" max="100" step="1" value="0" oninput="this.setAttribute('value', this.value);" />
+<input data-outputvalue="v" name="value" type="range" min="0" max="100" step="1" value="100" oninput="this.setAttribute('value', this.value);" />
 <script>
 	let brightness = this.editorContentEl.querySelector('input[name="value"]');
 	let canvas = this.editorContentEl.getElementsByTagName('canvas')[0];
@@ -145,11 +145,22 @@
 
 	}
 
+	//set initial data
+	if (typeof this.getData('h') !== 'number') {
+		this.setData({
+			h: 0
+		});
+	}
+	if (typeof this.getData('s') !== 'number') {
+		this.setData({
+			s: 0
+		});
+	}
+
 	//set the correct canvas height and width
 	//if we don't do this, the getImageData positions are incorrect
 	canvas.setAttribute('width', canvas.offsetWidth);
 	canvas.setAttribute('height', canvas.offsetHeight);
-
 
 	//load the color wheel
 	let img = new Image();

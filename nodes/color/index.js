@@ -54,7 +54,7 @@ module.exports = function(FLUX) {
 		let colorOut = NODE.addOutput('color', {
 			type: "color.hex"
 		});
-
+/*
 		let hueOut = NODE.addOutput('hue', {
 			type: "color.hue"
 		});
@@ -66,7 +66,7 @@ module.exports = function(FLUX) {
 		let brightnessOut = NODE.addOutput('brightness', {
 			type: "color.brightness"
 		});
-
+*/
 		colorOut.on('trigger', (conn, state, callback) => {
 
 			let hex = 'ffffff';
