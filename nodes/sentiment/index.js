@@ -37,7 +37,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('sentiment', {
 		type: "object",
 		level: 0,
-		groups: ["social"]
+		groups: ["analysis"]
 	}, constr);
 
 };

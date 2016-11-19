@@ -13,7 +13,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('flux.flow.onstart', {
 		type: "event",
 		level: 0,
-		groups: ["basics"],
+		groups: ["xible"],
 		description: "Triggered whenever this flow is started.",
 		outputs: {
 			"trigger": {

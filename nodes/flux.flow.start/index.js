@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -8,15 +6,23 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
+		let doneOut = NODE.addOutput('done', {
+			type: "trigger"
+		});
+
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.getFlowById(NODE.data.flowName, (flow) => {
+//TODO: fix this
+//doesn't work because in the clustered thread, only the current flow exists in FLUX.flows
+//need to push something to master for this to work
+			let flow = FLUX.getFlowById(NODE.data.flowName);
+			if (flow) {
 
-				if (flow) {
-					flow.start();
-				}
+				flow.start().then(() => {
+					FLUX.Node.triggerOutputs(doneOut, state);
+				});
 
-			});
+			}
 
 		});
 
@@ -25,7 +31,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('flux.flow.start', {
 		type: "action",
 		level: 0,
-		groups: ["basics"]
+		groups: ["xible"]
 	}, constr);
 
 };

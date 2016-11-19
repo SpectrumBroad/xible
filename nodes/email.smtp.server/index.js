@@ -33,7 +33,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('email.smtp.server', {
 		type: "action",
 		level: 0,
-		groups: ["basics"]
+		groups: ["email"]
 	}, constr);
 
 };

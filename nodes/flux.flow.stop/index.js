@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -21,7 +19,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('flux.flow.stop', {
 		type: "action",
 		level: 0,
-		groups: ["basics"]
+		groups: ["xible"]
 	}, constr);
 
 };
