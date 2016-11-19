@@ -213,17 +213,21 @@ module.exports = function(FLUX) {
 	expressApp.put('/api/flows/:flowId', (req, res) => {
 
 		//stop it first
-		req.locals.flow.stop();
+		req.locals.flow.stop().then(() => {
 
-		//init the newly provided json over the existing flow
-		req.locals.flow.initJson(req.body);
+			//init the newly provided json over the existing flow
+			req.locals.flow.initJson(req.body);
 
-		//save it to file
-		req.locals.flow.save();
+			//save it to file
+			req.locals.flow.save().then(() => {
 
-		//output the flow id
-		res.json({
-			_id: req.locals.flow._id
+				//output the flow id
+				res.json({
+					_id: req.locals.flow._id
+				});
+
+			});
+
 		});
 
 	});
@@ -232,9 +236,9 @@ module.exports = function(FLUX) {
 	//delete an existing flow
 	expressApp.delete('/api/flows/:flowId', (req, res) => {
 
-		req.locals.flow.stop();
-		req.locals.flow.delete();
-		res.end();
+		req.locals.flow.delete().then(() => {
+			res.end();
+		});
 
 	});
 

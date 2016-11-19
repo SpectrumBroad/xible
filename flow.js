@@ -305,16 +305,25 @@ Flow.prototype.initJson = function(json, newFlow) {
 /**
  *	saves a flow to the configured flows directory
  *	only works if this is a the master thread
- *	@param {Function}	callback
+ *	@return {Promise}
  */
-Flow.prototype.save = function(callback) {
+Flow.prototype.save = function() {
 
-	if (cluster.isMaster && this._id && Flow.flowPath) {
+	return new Promise((resolve, reject) => {
+
+		if (!cluster.isMaster || !this._id || !Flow.flowPath) {
+
+			reject(`not master, no _id or no flowPath specified`);
+			return;
+
+		}
 
 		flowDebug(`saving ${this._id}`);
-		fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json), callback);
+		fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json), () => {
+			resolve(this);
+		});
 
-	}
+	});
 
 };
 
@@ -322,28 +331,39 @@ Flow.prototype.save = function(callback) {
 /**
  *	deletes a flow from the configured flows directory
  *	only works if this is a the master thread
- *	@param {Function}	callback
+ *	@return {Promise}
  */
-Flow.prototype.delete = function(callback) {
+Flow.prototype.delete = function() {
 
-	this.stop();
+	return new Promise((resolve, reject) => {
 
-	if (cluster.isMaster && this._id && Flow.flowPath) {
+		if (!cluster.isMaster || !this._id || !Flow.flowPath) {
 
-		flowDebug(`deleting ${this._id}`);
-		fs.unlink(`${Flow.flowPath}/${this._id}.json`, callback);
+			reject(`not master, no _id or no flowPath specified`);
+			return;
 
-		//update status file
-		let statuses = Flow.getStatuses();
-		delete statuses[this._id];
-		Flow.saveStatuses(statuses);
-
-		//remove from Flux instance
-		if (this.flux) {
-			delete this.flux.flows[this._id];
 		}
 
-	}
+		this.stop().then(() => {
+
+			flowDebug(`deleting ${this._id}`);
+			fs.unlink(`${Flow.flowPath}/${this._id}.json`, () => {
+				resolve(this);
+			});
+
+			//update status file
+			let statuses = Flow.getStatuses();
+			delete statuses[this._id];
+			Flow.saveStatuses(statuses);
+
+			//remove from Flux instance
+			if (this.flux) {
+				delete this.flux.flows[this._id];
+			}
+
+		});
+
+	});
 
 };
 
