@@ -150,8 +150,12 @@ module.exports = function(FLUX) {
 	//stop an existing flow
 	expressApp.patch('/api/flows/:flowId/stop', (req, res) => {
 
-		req.locals.flow.stop();
-		res.end();
+		req.locals.flow.stop().then(() => {
+				res.end();
+			})
+			.catch(() => {
+				res.end();
+			});
 
 	});
 
@@ -159,8 +163,13 @@ module.exports = function(FLUX) {
 	//start an existing flow
 	expressApp.patch('/api/flows/:flowId/start', (req, res) => {
 
-		req.locals.flow.start();
-		res.end();
+		req.locals.flow.start()
+			.then(() => {
+				res.end();
+			})
+			.catch(() => {
+				res.end();
+			});
 
 	});
 

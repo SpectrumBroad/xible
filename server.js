@@ -41,8 +41,8 @@ if (cluster.isMaster) {
 		expressDebug(`${req.method} ${req.originalUrl}`);
 
 		if ('OPTIONS' == req.method) {
-      return res.status(200).end();
-    }
+			return res.status(200).end();
+		}
 
 		//local vars for requests
 		req.locals = {};
@@ -105,9 +105,15 @@ if (cluster.isMaster) {
 
 		if (flow) {
 
-			process.send({
-				method: 'stop'
-			});
+			if (cluster.worker.isConnected()) {
+
+				process.send({
+					method: 'stop'
+				});
+
+			} else {
+				flow.stop();
+			}
 
 		}
 
@@ -128,7 +134,7 @@ if (cluster.isMaster) {
 					flow = new flux.Flow(flux);
 					flow.initJson(message.flow);
 
-					if(message.directNodes) {
+					if (message.directNodes) {
 						flow.direct(message.directNodes);
 					} else {
 						flow.start();
@@ -140,9 +146,15 @@ if (cluster.isMaster) {
 
 					if (flow) {
 
-						process.send({
-							method: 'stop'
-						});
+						if (cluster.worker.isConnected()) {
+
+							process.send({
+								method: 'stop'
+							});
+
+						} else {
+							flow.stop();
+						}
 
 					}
 
@@ -160,7 +172,7 @@ if (cluster.isMaster) {
 
 			case 'directNodes':
 
-				if(flow) {
+				if (flow) {
 
 					flow.direct(message.directNodes);
 
@@ -171,9 +183,11 @@ if (cluster.isMaster) {
 	});
 
 	//inform the master we're done
-	process.send({
-		method: 'init'
-	});
+	if (cluster.worker.isConnected()) {
+		process.send({
+			method: 'init'
+		});
+	}
 
 	//report memory usage back to master
 	let cpuUsageStart = process.cpuUsage();
@@ -191,17 +205,21 @@ if (cluster.isMaster) {
 
 		let cpuPercent = (100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1000000));
 
-		process.send({
-			method: 'usage',
-			usage: {
-				cpu: {
-					user: cpuUsage.user,
-					system: cpuUsage.system,
-					percentage: cpuPercent
-				},
-				memory: process.memoryUsage()
-			}
-		});
+		if (cluster.worker.isConnected()) {
+
+			process.send({
+				method: 'usage',
+				usage: {
+					cpu: {
+						user: cpuUsage.user,
+						system: cpuUsage.system,
+						percentage: cpuPercent
+					},
+					memory: process.memoryUsage()
+				}
+			});
+
+		}
 
 	}, 1000);
 

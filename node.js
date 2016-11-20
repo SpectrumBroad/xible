@@ -177,7 +177,7 @@ Node.prototype.addProgressBar = function(status) {
 
 	status._id = Node.Flux.generateObjectId();
 
-	process.send({
+	this.sendProcessMessage({
 		method: "broadcastWebSocket",
 		message: {
 
@@ -194,11 +194,20 @@ Node.prototype.addProgressBar = function(status) {
 };
 
 
+Node.prototype.sendProcessMessage = function(obj) {
+
+	if(cluster.worker.isConnected()) {
+		process.send(obj);
+	}
+
+};
+
+
 Node.prototype.updateProgressBarById = function(statusId, status) {
 
 	status._id = Node.Flux.generateObjectId();
 
-	process.send({
+	this.sendProcessMessage({
 		method: "broadcastWebSocket",
 		message: {
 
@@ -219,7 +228,7 @@ Node.prototype.addStatus = function(status) {
 
 	status._id = Node.Flux.generateObjectId();
 
-	process.send({
+	this.sendProcessMessage({
 		method: "broadcastWebSocket",
 		message: {
 
@@ -238,7 +247,7 @@ Node.prototype.addStatus = function(status) {
 
 Node.prototype.removeStatusById = Node.prototype.removeProgressBarById = function(statusId, timeout) {
 
-	process.send({
+	this.sendProcessMessage({
 		method: "broadcastWebSocket",
 		message: {
 
@@ -257,7 +266,7 @@ Node.prototype.removeStatusById = Node.prototype.removeProgressBarById = functio
 
 Node.prototype.removeAllStatuses = function() {
 
-	process.send({
+	this.sendProcessMessage({
 		method: "broadcastWebSocket",
 		message: {
 
@@ -272,7 +281,7 @@ Node.prototype.removeAllStatuses = function() {
 
 Node.prototype.setTracker = function(status) {
 
-	process.send({
+	this.sendProcessMessage({
 		method: "broadcastWebSocket",
 		message: {
 

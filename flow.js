@@ -19,6 +19,8 @@ var Flow = module.exports = function Flow(FLUX) {
 	this.usage = null;
 	this.runnable = true;
 	this.directed = false;
+	this.starting = this.started = false;
+	this.stopped = this.stopping = false;
 
 	if (FLUX) {
 
@@ -584,6 +586,10 @@ Flow.prototype.start = function(directNodes) {
 		return Promise.reject(`not runnable`);
 	}
 
+	if (this.starting) {
+		return Promise.reject(`already starting`);
+	}
+
 	if (cluster.isMaster) {
 
 		return new Promise((resolve, reject) => {
@@ -591,6 +597,7 @@ Flow.prototype.start = function(directNodes) {
 			this.stop().then(() => {
 
 				//let client now we're starting up the flow
+				this.starting = true;
 				this.flux.broadcastWebSocket({
 					method: 'flux.flow.starting',
 					flowId: this._id
@@ -611,6 +618,10 @@ Flow.prototype.start = function(directNodes) {
 				this.worker = cluster.fork();
 				this.worker.on('message', message => {
 
+					if (this._intermediateStop) {
+						return;
+					}
+
 					switch (message.method) {
 
 						case 'init':
@@ -620,6 +631,9 @@ Flow.prototype.start = function(directNodes) {
 								flowDebug('flow/worker has started');
 								resolve(this);
 
+								this.starting = this.stopping = this.stopped = false;
+								this.started = true;
+								this.emit('started');
 								this.worker.send({
 									"method": "start",
 									"flow": this.json,
@@ -668,11 +682,19 @@ Flow.prototype.start = function(directNodes) {
 				});
 
 				this.worker.on('exit', () => {
+
+					this.emit('stopped');
+					this.started = this.starting = this.stopping = this.stopped = false;
 					flowDebug(`worker exited`);
+
 				});
 
 				this.worker.on('disconnect', () => {
+
+					this.emit('stopped');
+					this.started = this.starting = this.stopping = this.stopped = false;
 					flowDebug(`worker disconnected`);
+
 				});
 
 			});
@@ -713,12 +735,28 @@ Flow.prototype.stop = function() {
 
 			this.saveStatus(false);
 
-			if (this.worker && this.worker.isConnected()) {
+			if (this.worker) {
 
+				this.stopping = true;
 				this.flux.broadcastWebSocket({
 					method: 'flux.flow.stopping',
 					flowId: this._id
 				});
+
+				if (this.starting) {
+
+					flowDebug('stopping flow from master, after start finished');
+					this.once('started', () => {
+
+						this.stop().then(() => {
+							resolve();
+						});
+
+					});
+
+					return;
+
+				}
 
 				flowDebug('stopping flow from master');
 				let killTimeout;
@@ -737,6 +775,8 @@ Flow.prototype.stop = function() {
 					//cleanup all open statuses
 					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
 
+					this.stopping = this.started = this.starting = false;
+					this.stopped = true;
 					this.flux.broadcastWebSocket({
 						method: 'flux.flow.stopped',
 						flowId: this._id
@@ -749,7 +789,9 @@ Flow.prototype.stop = function() {
 				this.worker.send({
 					"method": "stop"
 				});
+
 				this.worker.disconnect();
+
 
 				//forcibly kill after 5 seconds
 				killTimeout = setTimeout(() => {
@@ -776,9 +818,11 @@ Flow.prototype.stop = function() {
 		flowDebug('stopping flow from worker');
 
 		//close any node that wants to
-		this.nodes.forEach(node => node.emit('close'));
+		this.nodes.forEach((node) => node.emit('close'));
 
 		flowDebug('stopped flow from worker');
+
+		process.exit(0);
 
 	}
 
