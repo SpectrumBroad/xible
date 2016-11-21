@@ -20,7 +20,8 @@ var Flow = module.exports = function Flow(FLUX) {
 	this.runnable = true;
 	this.directed = false;
 	this.starting = this.started = false;
-	this.stopped = this.stopping = false;
+	this.stopping = false;
+	this.stopped = true;
 
 	if (FLUX) {
 
@@ -340,30 +341,27 @@ Flow.prototype.delete = function() {
 	return new Promise((resolve, reject) => {
 
 		if (!cluster.isMaster || !this._id || !Flow.flowPath) {
-
-			reject(`not master, no _id or no flowPath specified`);
-			return;
-
+			return reject(`not master, no _id or no flowPath specified`);
 		}
 
-		this.stop().then(() => {
+		if (!this.stopped) {
+			return reject(`flow is not stopped`);
+		}
 
-			flowDebug(`deleting ${this._id}`);
-			fs.unlink(`${Flow.flowPath}/${this._id}.json`, () => {
-				resolve(this);
-			});
-
-			//update status file
-			let statuses = Flow.getStatuses();
-			delete statuses[this._id];
-			Flow.saveStatuses(statuses);
-
-			//remove from Flux instance
-			if (this.flux) {
-				delete this.flux.flows[this._id];
-			}
-
+		flowDebug(`deleting ${this._id}`);
+		fs.unlink(`${Flow.flowPath}/${this._id}.json`, () => {
+			resolve(this);
 		});
+
+		//update status file
+		let statuses = Flow.getStatuses();
+		delete statuses[this._id];
+		Flow.saveStatuses(statuses);
+
+		//remove from Flux instance
+		if (this.flux) {
+			delete this.flux.flows[this._id];
+		}
 
 	});
 
@@ -527,15 +525,31 @@ Flow.prototype.direct = function(nodes) {
 	if (cluster.isMaster) {
 
 		//ensure that the flow is running
-		if (this.worker && this.directed) {
+		if (this.started && this.directed) {
 
 			this.worker.send({
 				"method": "directNodes",
 				"directNodes": nodes
 			});
 
-		} else {
+		} else if (this.started) {
+
+			this.stop.then(() => {
+				this.direct(nodes);
+			});
+
+		} else if (this.starting) {
+
+			this.once('started', () => {
+				this.direct(nodes);
+			});
+
+		} else if (this.stopped) {
 			this.start(nodes);
+		} else if (this.stopping) {
+			this.once('stopped', () => {
+				this.start(nodes);
+			});
 		}
 
 	} else {
@@ -586,117 +600,118 @@ Flow.prototype.start = function(directNodes) {
 		return Promise.reject(`not runnable`);
 	}
 
-	if (this.starting) {
-		return Promise.reject(`already starting`);
-	}
-
 	if (cluster.isMaster) {
+
+		if (!this.stopped) {
+			return Promise.reject(`cannot start; flow is not stopped`);
+		}
 
 		return new Promise((resolve, reject) => {
 
-			this.stop().then(() => {
+			//let client now we're starting up the flow
+			this.started = this.stopped = false;
+			this.starting = true;
+			this.flux.broadcastWebSocket({
+				method: 'flux.flow.starting',
+				flowId: this._id
+			});
 
-				//let client now we're starting up the flow
-				this.starting = true;
+			flowDebug('starting flow from master');
+
+			//save the status
+			if (!directNodes) {
+
+				this.saveStatus(true);
+				this.directed = false;
+
+			} else {
+				this.directed = true;
+			}
+
+			this.worker = cluster.fork();
+			this.worker.on('message', message => {
+
+				if (this._intermediateStop) {
+					return;
+				}
+
+				switch (message.method) {
+
+					case 'init':
+
+						if (this.worker && this.worker.isConnected()) {
+
+							flowDebug('flow/worker has started');
+							resolve(this);
+
+							this.starting = this.stopped = false;
+							this.started = true;
+							this.emit('started');
+							this.worker.send({
+								"method": "start",
+								"flow": this.json,
+								"directNodes": directNodes
+							});
+
+							this.flux.broadcastWebSocket({
+								method: 'flux.flow.started',
+								flowId: this._id
+							});
+
+						} else {
+
+							flowDebug('flow/worker has started, but no such worker in master');
+							reject(`no such worker in master`);
+
+						}
+
+						break;
+
+					case 'stop':
+
+						this.stop();
+						break;
+
+					case 'broadcastWebSocket':
+
+						this.flux.broadcastWebSocket(message.message);
+						break;
+
+					case 'usage':
+
+						this.usage = message.usage;
+
+						//broadcast the memory usage
+						this.flux.broadcastWebSocket({
+							method: 'flux.flow.usage',
+							flowId: this._id,
+							usage: this.usage
+						});
+
+						break;
+
+				}
+
+			});
+
+			this.worker.on('exit', () => {
+
+				this.stopping = this.started = this.starting = false;
+				this.stopped = true;
+				this.emit('stopped');
 				this.flux.broadcastWebSocket({
-					method: 'flux.flow.starting',
+					method: 'flux.flow.stopped',
 					flowId: this._id
 				});
 
-				flowDebug('starting flow from master');
+				flowDebug(`worker exited`);
 
-				//save the status
-				if (!directNodes) {
+				this.worker = null;
 
-					this.saveStatus(true);
-					this.directed = false;
+			});
 
-				} else {
-					this.directed = true;
-				}
-
-				this.worker = cluster.fork();
-				this.worker.on('message', message => {
-
-					if (this._intermediateStop) {
-						return;
-					}
-
-					switch (message.method) {
-
-						case 'init':
-
-							if (this.worker && this.worker.isConnected()) {
-
-								flowDebug('flow/worker has started');
-								resolve(this);
-
-								this.starting = this.stopping = this.stopped = false;
-								this.started = true;
-								this.emit('started');
-								this.worker.send({
-									"method": "start",
-									"flow": this.json,
-									"directNodes": directNodes
-								});
-
-								this.flux.broadcastWebSocket({
-									method: 'flux.flow.started',
-									flowId: this._id
-								});
-
-							} else {
-
-								flowDebug('flow/worker has started, but no such worker in master');
-								reject(`no such worker in master`);
-
-							}
-
-							break;
-
-						case 'stop':
-
-							this.stop();
-							break;
-
-						case 'broadcastWebSocket':
-
-							this.flux.broadcastWebSocket(message.message);
-							break;
-
-						case 'usage':
-
-							this.usage = message.usage;
-
-							//broadcast the memory usage
-							this.flux.broadcastWebSocket({
-								method: 'flux.flow.usage',
-								flowId: this._id,
-								usage: this.usage
-							});
-
-							break;
-
-					}
-
-				});
-
-				this.worker.on('exit', () => {
-
-					this.emit('stopped');
-					this.started = this.starting = this.stopping = this.stopped = false;
-					flowDebug(`worker exited`);
-
-				});
-
-				this.worker.on('disconnect', () => {
-
-					this.emit('stopped');
-					this.started = this.starting = this.stopping = this.stopped = false;
-					flowDebug(`worker disconnected`);
-
-				});
-
+			this.worker.on('disconnect', () => {
+				flowDebug(`worker disconnected`);
 			});
 
 		});
@@ -731,6 +746,10 @@ Flow.prototype.stop = function() {
 
 	if (cluster.isMaster) {
 
+		if (!this.started && !this.starting) {
+			return Promise.reject(`cannot stop; flow is not started`);
+		}
+
 		return new Promise((resolve, reject) => {
 
 			this.saveStatus(false);
@@ -743,6 +762,7 @@ Flow.prototype.stop = function() {
 					flowId: this._id
 				});
 
+				//if the flow is in starting mode, wait for it to finish starting and stop it afterwards
 				if (this.starting) {
 
 					flowDebug('stopping flow from master, after start finished');
@@ -761,6 +781,10 @@ Flow.prototype.stop = function() {
 				flowDebug('stopping flow from master');
 				let killTimeout;
 
+				this.worker.once('exit', () => {
+					resolve(this);
+				});
+
 				this.worker.on('disconnect', () => {
 
 					clearTimeout(killTimeout);
@@ -770,19 +794,8 @@ Flow.prototype.stop = function() {
 						this.worker.kill();
 					}
 
-					this.worker = null;
-
 					//cleanup all open statuses
 					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
-
-					this.stopping = this.started = this.starting = false;
-					this.stopped = true;
-					this.flux.broadcastWebSocket({
-						method: 'flux.flow.stopped',
-						flowId: this._id
-					});
-
-					resolve(this);
 
 				});
 
@@ -791,7 +804,6 @@ Flow.prototype.stop = function() {
 				});
 
 				this.worker.disconnect();
-
 
 				//forcibly kill after 5 seconds
 				killTimeout = setTimeout(() => {
