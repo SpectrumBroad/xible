@@ -534,7 +534,7 @@ Flow.prototype.direct = function(nodes) {
 
 		} else if (this.started) {
 
-			this.stop.then(() => {
+			this.stop().then(() => {
 				this.direct(nodes);
 			});
 
