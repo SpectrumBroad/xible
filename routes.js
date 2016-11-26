@@ -150,26 +150,13 @@ module.exports = function(FLUX) {
 	//stop an existing flow
 	expressApp.patch('/api/flows/:flowId/stop', (req, res) => {
 
-		let flow = req.locals.flow;
-
-		function stopFlow() {
-
-			flow.stop().then(() => {
-					res.end();
-				})
-				.catch(() => {
-					res.status(500).end();
-				});
-
-		}
-
-		if (flow.started) {
-			stopFlow();
-		} else if (flow.starting) {
-
-			flow.once('started', stopFlow);
-
-		}
+		req.locals.flow.forceStop()
+			.then(() => {
+				res.end();
+			})
+			.catch(() => {
+				res.status(500).end();
+			});
 
 	});
 
@@ -177,27 +164,13 @@ module.exports = function(FLUX) {
 	//start an existing flow
 	expressApp.patch('/api/flows/:flowId/start', (req, res) => {
 
-		let flow = req.locals.flow;
-
-		function startFlow() {
-
-			flow.start()
-				.then(() => {
-					res.end();
-				})
-				.catch(() => {
-					res.status(500).end();
-				});
-
-		}
-
-		if (flow.stopped) {
-			startFlow();
-		} else if (flow.stopping) {
-			flow.once('stopped', startFlow);
-		} else if (flow.started) {
-			flow.stop().then(startFlow);
-		}
+		req.locals.flow.forceStart()
+			.then(() => {
+				res.end();
+			})
+			.catch((err) => {
+				res.status(500).end();
+			});
 
 	});
 
@@ -250,38 +223,22 @@ module.exports = function(FLUX) {
 	expressApp.put('/api/flows/:flowId', (req, res) => {
 
 		let flow = req.locals.flow;
-
-		function updateFlow() {
+		flow.forceStop().then(() => {
 
 			//init the newly provided json over the existing flow
-			req.locals.flow.initJson(req.body);
+			flow.initJson(req.body);
 
 			//save it to file
-			req.locals.flow.save().then(() => {
+			flow.save().then(() => {
 
 				//output the flow id
 				res.json({
-					_id: req.locals.flow._id
+					_id: flow._id
 				});
 
 			});
 
-		}
-
-		//stop it first
-		if(flow.stopped) {
-			updateFlow();
-		} else if (flow.started) {
-			flow.stop().then(updateFlow);
-		} else if (flow.starting) {
-
-			flow.once('started', () => {
-				flow.stop().then(updateFlow);
-			});
-
-		} else if (flow.stopping) {
-			flow.once('stopped', updateFlow);
-		}
+		});
 
 	});
 
@@ -290,29 +247,13 @@ module.exports = function(FLUX) {
 	expressApp.delete('/api/flows/:flowId', (req, res) => {
 
 		let flow = req.locals.flow;
-
-		function deleteFlow() {
+		flow.forceStop().then(() => {
 
 			flow.delete().then(() => {
 				res.end();
 			});
 
-		}
-
-		//stop it first
-		if(flow.stopped) {
-			deleteFlow();
-		} else if (flow.started) {
-			flow.stop().then(deleteFlow);
-		} else if (flow.starting) {
-
-			flow.once('started', () => {
-				flow.stop().then(deleteFlow);
-			});
-
-		} else if (flow.stopping) {
-			flow.once('stopped', deleteFlow);
-		}
+		});
 
 	});
 
