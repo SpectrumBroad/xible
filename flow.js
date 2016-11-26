@@ -704,17 +704,24 @@ Flow.prototype.start = function(directNodes) {
 						break;
 
 					case 'startFlowById':
-						//TODO: this sux
-						let flow = FLUX.getFlowById(message.flowId);
+
+						let flow = this.flux.getFlowById(message.flowId);
 						if (flow) {
 
-							flow.start().then(() => {
+							flow.forceStart().then(() => {
 								if (this.worker && this.worker.isConnected()) {
 									this.worker.send({
 										method: "flowStarted",
 										flowId: message.flowId
 									});
 								}
+							});
+
+						} else {
+
+							this.worker.send({
+								method: "flowNotExist",
+								flowId: message.flowId
 							});
 
 						}
@@ -765,7 +772,7 @@ Flow.prototype.start = function(directNodes) {
 			});
 
 			this.worker.on('disconnect', () => {
-				flowDebug(`worker disconnected`);
+				flowDebug(`worker disconnected from master`);
 			});
 
 		});
@@ -872,23 +879,32 @@ Flow.prototype.stop = function() {
 				let killTimeout;
 
 				this.worker.once('exit', () => {
+
+					if (killTimeout) {
+
+						clearTimeout(killTimeout);
+						killTimeout = null;
+
+					}
+
 					resolve(this);
+
 				});
 
 				this.worker.on('disconnect', () => {
-
-					clearTimeout(killTimeout);
-					flowDebug('worker disconnected from master');
 
 					if (this.worker) {
 
 						flowDebug('killing worker the normal way');
 						this.worker.kill();
 
+					} else if (killTimeout) {
+						clearTimeout(killTimeout);
+						killTimeout = null;
 					}
 
 					//cleanup all open statuses
-					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
+					this.flux.broadcastWebSocket(`{"method":"flux.flow.removeAllStatuses", "flowId": "${this._id}"}`);
 
 				});
 
@@ -905,7 +921,9 @@ Flow.prototype.stop = function() {
 					this.worker.kill('SIGKILL');
 
 					//cleanup all open statuses
-					this.flux.broadcastWebSocket('{\"method\":\"flux.removeAllStatuses\"}');
+					this.flux.broadcastWebSocket(`{"method":"flux.flow.removeAllStatuses", "flowId": "${this._id}"}`);
+
+					killTimeout = null;
 
 				}, 5000);
 

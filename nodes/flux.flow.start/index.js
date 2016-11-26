@@ -12,17 +12,45 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-//TODO: fix this
-//doesn't work because in the clustered thread, only the current flow exists in FLUX.flows
-//need to push something to master for this to work
-			let flow = FLUX.getFlowById(NODE.data.flowName);
-			if (flow) {
+			let flowId = NODE.data.flowName;
 
-				flow.start().then(() => {
-					FLUX.Node.triggerOutputs(doneOut, state);
-				});
+			let messageHandler = (message) => {
 
-			}
+				if (message.flowId !== flowId) {
+					return;
+				}
+
+				switch (message.method) {
+
+					case 'flowStarted':
+						FLUX.Node.triggerOutputs(doneOut, state);
+						break;
+
+					case 'flowNotExist':
+						NODE.addStatus({
+							message: `flow does not exist`,
+							color: 'red',
+							timeout: 5000
+						});
+
+						break;
+
+					default:
+						return;
+
+				}
+
+				process.removeListener('message', messageHandler);
+				messageHandler = null;
+
+			};
+
+			process.on('message', messageHandler);
+
+			process.send({
+				method: 'startFlowById',
+				flowId: flowId
+			});
 
 		});
 
