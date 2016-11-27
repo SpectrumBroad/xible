@@ -1,4 +1,4 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 	function constructorFunction(NODE) {
 
@@ -20,9 +20,9 @@ module.exports = function(flux) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			flux.Node.getValuesFromInput(sceneIn, state).then((scenes) => {
+			NODE.getValuesFromInput(sceneIn, state).then((scenes) => {
 
-				flux.Node.getValuesFromInput(lightIn, state).then((lights) => {
+				NODE.getValuesFromInput(lightIn, state).then((lights) => {
 
 					let i = 0;
 					lights.forEach((light) => {
@@ -30,7 +30,7 @@ module.exports = function(flux) {
 						light.selectScene(scenes[0]).then(() => {
 
 							if (++i === lights.length) {
-								flux.Node.triggerOutputs(triggerOut, state);
+								FLUX.Node.triggerOutputs(triggerOut, state);
 							}
 
 						});
@@ -45,7 +45,7 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('glow.light.setscene', {
+	FLUX.addNode('glow.light.setscene', {
 		type: "action",
 		level: 0,
 		groups: ["glow"],

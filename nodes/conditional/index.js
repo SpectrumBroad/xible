@@ -15,7 +15,7 @@ module.exports = function(FLUX) {
 		let valueOut = NODE.addOutput('value');
 		valueOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(conditionIn, state).then((bools) => {
+			NODE.getValuesFromInput(conditionIn, state).then((bools) => {
 
 				if (bools.length) {
 
@@ -25,7 +25,7 @@ module.exports = function(FLUX) {
 					} else {
 						input = trueIn;
 					}
-					FLUX.Node.getValuesFromInput(input, state).then((values) => callback(values));
+					NODE.getValuesFromInput(input, state).then((values) => callback(values));
 
 				} else {
 					callback(null);

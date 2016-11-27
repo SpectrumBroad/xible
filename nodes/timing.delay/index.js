@@ -16,7 +16,7 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(msecIn, state).then(delays => {
+			NODE.getValuesFromInput(msecIn, state).then(delays => {
 
 				let fromData = false;
 				if (!delays.length) {

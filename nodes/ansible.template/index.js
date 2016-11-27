@@ -24,7 +24,7 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(hostIn, state).then((hosts) => {
+			NODE.getValuesFromInput(hostIn, state).then((hosts) => {
 
 				hosts.forEach((host) => {
 

@@ -23,9 +23,9 @@ module.exports = function(FLUX) {
 		//return reference glow
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(serverIn, state).then((servers) => {
+			NODE.getValuesFromInput(serverIn, state).then((servers) => {
 
-        FLUX.Node.getValuesFromInput(messageIn, state).then((messages) => {
+        NODE.getValuesFromInput(messageIn, state).then((messages) => {
 
           servers.forEach((server) => {
 

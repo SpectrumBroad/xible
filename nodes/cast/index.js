@@ -7,39 +7,35 @@ module.exports = function(FLUX) {
 		anyOut.on('trigger', (conn, state, callback) => {
 
 			//get the input values
-			FLUX.Node.getValuesFromInput(valuesIn, state).then((vals) => {
+			NODE.getValuesFromInput(valuesIn, state).then((vals) => {
 
-				let values = [];
-				vals.forEach(val => {
+				callback(vals.map((val) => {
 
 					switch (NODE.data.castType) {
 
 						case 'string':
-							values.push('' + val);
-							break;
+							return '' + val;
 
 						case 'math.number':
-							values.push(+val);
-							break;
+							return +val;
 
 						case 'boolean':
-							values.push(!!val);
-							break;
+							return !!val;
 
 						case 'date':
-							values.push(new Date(val));
-							break;
+							return new Date(val);
 
 						case 'time':
-							values.push(new Date(val));
-							value.setFullYear(0, 0, 1);
-							break;
+							let d = new Date(val);
+							d.setFullYear(0, 0, 1);
+							return d;
+
+						default:	//just in case
+							return val;
 
 					}
 
-				});
-
-				callback(values);
+				}));
 
 			});
 

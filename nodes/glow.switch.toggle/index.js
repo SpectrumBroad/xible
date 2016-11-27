@@ -18,7 +18,7 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(swIn, state).then((sws) => {
+			NODE.getValuesFromInput(swIn, state).then((sws) => {
 
 				Promise.all(sws.map((sw) => {
 

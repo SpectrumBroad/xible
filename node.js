@@ -12,6 +12,9 @@ let Node = module.exports = function Node(obj) {
 	this.description = obj.description;
 	this.nodeExists = true; //indicates whether this is an existing installed flux.Node
 	this.hostsEditorContent = obj.hostsEditorContent; //indicates whether it has a ./editor/index.htm file
+	this.top = 0;
+	this.left = 0;
+	this.flow = null;
 
 	this._states = {};
 
@@ -196,7 +199,7 @@ Node.prototype.addProgressBar = function(status) {
 
 Node.prototype.sendProcessMessage = function(obj) {
 
-	if(cluster.worker.isConnected()) {
+	if (cluster.worker.isConnected()) {
 		process.send(obj);
 	}
 
@@ -335,16 +338,24 @@ Node.flowStateCheck = function(state) {
 };
 
 
-Node.getValuesFromInput = function(input, state) {
+Node.prototype.getValuesFromInput = function(input, state) {
 
-	this.flowStateCheck(state);
+	Node.flowStateCheck(state);
 
 	return new Promise((resolve, reject) => {
 
-		let values = [];
-		let i = 0;
-		let connLength = input.connectors.length;
+		let conns = input.connectors;
 
+		//add global outputs as a dummy connector to the connector list
+		if (!conns.length) {
+
+			conns = this.flow.getGlobalOutputsByType(input.type).map((output) => ({
+				origin: output
+			}));
+
+		}
+
+		let connLength = conns.length;
 		if (!connLength) {
 
 			resolve([]);
@@ -352,7 +363,9 @@ Node.getValuesFromInput = function(input, state) {
 
 		}
 
-		input.connectors.forEach(conn => {
+		let values = [];
+		let i = 0;
+		conns.forEach((conn) => {
 
 			//trigger the input
 			conn.origin.emit('trigger', conn, state, (value) => {
@@ -384,47 +397,61 @@ Node.getValuesFromInput = function(input, state) {
 };
 
 
-function NodeIo(obj) {
+class NodeIo extends EventEmitter {
 
-	this.type = null;
-	this.singleType = false;
-	this.maxConnectors = null;
+	constructor(obj) {
 
-	if (obj) {
+		super();
 
-		if (typeof obj.type === 'string') {
-			this.type = obj.type;
+		this.type = null;
+		this.singleType = false;
+		this.maxConnectors = null;
+
+		if (obj) {
+
+			if (typeof obj.type === 'string') {
+
+				if (obj.type === 'global') {
+					throw new TypeError(`you cannot define a input or output with type 'global'`);
+				}
+
+				this.type = obj.type;
+
+			}
+
+			if (typeof obj.singleType === 'boolean') {
+				this.singleType = obj.singleType;
+			}
+
+			if (typeof obj.maxConnectors === 'number') {
+				this.maxConnectors = obj.maxConnectors;
+			}
+
 		}
 
-		if (typeof obj.singleType === 'boolean') {
-			this.singleType = obj.singleType;
-		}
-
-		if (typeof obj.maxConnectors === 'number') {
-			this.maxConnectors = obj.maxConnectors;
-		}
+		this.connectors = [];
 
 	}
 
-	this.connectors = [];
+}
+
+
+class NodeInput extends NodeIo {
+
+	constructor() {
+		super(...arguments);
+	}
 
 }
 
 
-Object.setPrototypeOf(NodeIo.prototype, EventEmitter.prototype);
+class NodeOutput extends NodeIo {
 
+	constructor() {
 
-function NodeInput(obj) {
-	NodeIo.apply(this, arguments);
+		super(...arguments);
+		this.global = false;
+
+	}
+
 }
-
-
-Object.setPrototypeOf(NodeInput.prototype, NodeIo.prototype);
-
-
-function NodeOutput() {
-	NodeIo.apply(this, arguments);
-}
-
-
-Object.setPrototypeOf(NodeOutput.prototype, NodeIo.prototype);

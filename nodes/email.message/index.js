@@ -49,24 +49,24 @@ module.exports = function(FLUX) {
 
 			Promise.all([
 
-				FLUX.Node.getValuesFromInput(fromIn, state).then((addrs) => addrConnHandler(addrs, 'from', mail)),
-				FLUX.Node.getValuesFromInput(toIn, state).then((addrs) => addrConnHandler(addrs, 'to', mail)),
-				FLUX.Node.getValuesFromInput(ccIn, state).then((addrs) => addrConnHandler(addrs, 'cc', mail)),
-				FLUX.Node.getValuesFromInput(bccIn, state).then((addrs) => addrConnHandler(addrs, 'bcc', mail)),
+				NODE.getValuesFromInput(fromIn, state).then((addrs) => addrConnHandler(addrs, 'from', mail)),
+				NODE.getValuesFromInput(toIn, state).then((addrs) => addrConnHandler(addrs, 'to', mail)),
+				NODE.getValuesFromInput(ccIn, state).then((addrs) => addrConnHandler(addrs, 'cc', mail)),
+				NODE.getValuesFromInput(bccIn, state).then((addrs) => addrConnHandler(addrs, 'bcc', mail)),
 
-				FLUX.Node.getValuesFromInput(subjectIn, state).then((subjects) => {
+				NODE.getValuesFromInput(subjectIn, state).then((subjects) => {
 					if (subjects.length) {
 						mail.subject = subjects[0];
 					}
 				}),
 
-				FLUX.Node.getValuesFromInput(textIn, state).then((texts) => {
+				NODE.getValuesFromInput(textIn, state).then((texts) => {
 					if (texts.length) {
 						mail.text = texts[0];
 					}
 				}),
 
-				FLUX.Node.getValuesFromInput(htmlIn, state).then((htmls) => {
+				NODE.getValuesFromInput(htmlIn, state).then((htmls) => {
 					if (htmls.length) {
 						mail.html = htmls[0];
 					}

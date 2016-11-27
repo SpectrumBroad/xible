@@ -13,7 +13,7 @@ module.exports = function(FLUX) {
 		NODE.on('trigger', (state) => {
 
 			//get the glow server
-			FLUX.Node.getValuesFromInput(glowServerIn, state).then((glowServers) => {
+			NODE.getValuesFromInput(glowServerIn, state).then((glowServers) => {
 
 				glowServers.forEach((glowServer) => {
 

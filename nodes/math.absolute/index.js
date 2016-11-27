@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(this.node.inputs[0], state).then((numbers) => {
+			NODE.getValuesFromInput(this.node.inputs[0], state).then((numbers) => {
 
 				//take all aNumbers minus the min and output them
 				let result = numbers.map((number) => Math.abs(number));

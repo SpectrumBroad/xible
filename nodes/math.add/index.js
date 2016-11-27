@@ -7,7 +7,7 @@ module.exports = function(FLUX) {
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(NODE.getInputByName('values'), state).then((vals) => {
+			NODE.getValuesFromInput(NODE.getInputByName('values'), state).then((vals) => {
 
 				let result = vals.reduce((prevVal, newVal) => {
 					return +prevVal + newVal;

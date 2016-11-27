@@ -24,7 +24,7 @@ module.exports = function(FLUX) {
 
 			//get the input values
 			refreshing = true;
-			FLUX.Node.getValuesFromInput(valueIn, state).then(vals => {
+			NODE.getValuesFromInput(valueIn, state).then(vals => {
 
 				//
 				used = true;
@@ -74,7 +74,7 @@ module.exports = function(FLUX) {
 
 			//perform a refresh of all inputs and return those values
 			refreshing = true;
-			FLUX.Node.getValuesFromInput(valueIn, state).then((vals) => {
+			NODE.getValuesFromInput(valueIn, state).then((vals) => {
 
 				values = vals;
 				used = true;

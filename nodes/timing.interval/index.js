@@ -33,7 +33,7 @@ module.exports = function(FLUX) {
 		let regIntervals = [];
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(msecIn, state).then((intervals) => {
+			NODE.getValuesFromInput(msecIn, state).then((intervals) => {
 
 				let fromData = false;
 				if (!intervals.length) {

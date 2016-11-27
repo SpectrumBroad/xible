@@ -1,4 +1,4 @@
-module.exports = function(flux) {
+module.exports = function(FLUX) {
 
 	function constructorFunction(NODE) {
 
@@ -17,7 +17,7 @@ module.exports = function(flux) {
 		sceneOut.on('trigger', (conn, state, callback) => {
 
 			if (stringInput.connectors.length) {
-				this.getValuesFromInput(sceneIn, state).then(strs => callback(strs.map(str => Scene.getByName(str))));
+				NODE.getValuesFromInput(sceneIn, state).then(strs => callback(strs.map(str => Scene.getByName(str))));
 			} else {
 				callback(Scene.getByName(this.value));
 			}
@@ -26,7 +26,7 @@ module.exports = function(flux) {
 
 	}
 
-	flux.addNode('glow.scene', {
+	FLUX.addNode('glow.scene', {
 		type: "object",
 		level: 0,
 		groups: ["glow"],

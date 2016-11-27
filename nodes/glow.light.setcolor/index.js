@@ -76,7 +76,7 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(colorIn, state).then((hexColors) => {
+			NODE.getValuesFromInput(colorIn, state).then((hexColors) => {
 
 				if (!hexColors.length) {
 
@@ -98,7 +98,7 @@ module.exports = function(FLUX) {
 				//for now
 				let color = colors[0];
 
-				FLUX.Node.getValuesFromInput(lightIn, state).then((lights) => {
+				NODE.getValuesFromInput(lightIn, state).then((lights) => {
 
 					let duration = +NODE.data.duration || 0;
 					if (duration) {

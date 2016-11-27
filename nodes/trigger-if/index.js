@@ -22,7 +22,7 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(conditionIn, state).then((bools) => {
+			NODE.getValuesFromInput(conditionIn, state).then((bools) => {
 
 				if (bools.length) {
 

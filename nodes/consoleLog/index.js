@@ -5,7 +5,7 @@ module.exports = function(FLUX) {
 		let triggerIn = NODE.getInputByName('trigger');
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(NODE.getInputByName('value'), state).then((strs) => {
+			NODE.getValuesFromInput(NODE.getInputByName('value'), state).then((strs) => {
 
 				if (!strs.length) {
 					strs.push(NODE.data.value || '');

@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(valuesIn, state).then((numbers) => {
+			NODE.getValuesFromInput(valuesIn, state).then((numbers) => {
 
 				let result = numbers.reduce((previousValue, currentValue) => previousValue + currentValue);
 				callback(result);

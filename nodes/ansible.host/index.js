@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 		hostOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(varIn, state).then((vars) => {
+			NODE.getValuesFromInput(varIn, state).then((vars) => {
 
 				callback({
 					variables: vars,

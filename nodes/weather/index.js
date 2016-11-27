@@ -51,9 +51,9 @@ module.exports = function(FLUX) {
 
 		tempOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(locationIn, state).then((locations) => {
+			NODE.getValuesFromInput(locationIn, state).then((locations) => {
 
-				FLUX.Node.getValuesFromInput(dateIn, state).then((dates) => {
+				NODE.getValuesFromInput(dateIn, state).then((dates) => {
 
 					var result = [];
 

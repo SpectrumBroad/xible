@@ -260,6 +260,7 @@ Flow.prototype.initJson = function(json, newFlow) {
 			}
 
 			fluxNode.outputs[name]._id = node.outputs[name]._id;
+			fluxNode.outputs[name].global = node.outputs[name].global || false;
 
 		}
 
@@ -267,7 +268,7 @@ Flow.prototype.initJson = function(json, newFlow) {
 		if (!fluxNode.nodeExists) {
 
 			fluxNode.editorContent = '';
-			for (var key in fluxNode.data) {
+			for (let key in fluxNode.data) {
 				fluxNode.editorContent += `<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
 			}
 
@@ -499,6 +500,33 @@ Flow.prototype.getOutputById = function(id) {
 		}
 
 	}
+
+};
+
+
+/**
+ *	returns all global outputs with a given type
+ *	@param {String}	type	the type of global outputs to be fetched
+ *	@return {NodeOutput[]}	the global nodeOutputs
+ */
+Flow.prototype.getGlobalOutputsByType = function(type) {
+
+	let outputs = [];
+	this.nodes.forEach((node) => {
+
+		for (let name in node.outputs) {
+
+			let output = node.outputs[name];
+			console.log(output.type, output.global, type);
+			if (output.global && output.type === type) {
+				outputs.push(output);
+			}
+
+		}
+
+	});
+
+	return outputs;
 
 };
 

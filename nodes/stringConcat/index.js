@@ -16,9 +16,9 @@ module.exports = function(FLUX) {
 
 		stringOut.on('trigger', function(state, callback) {
 
-			FLUX.Node.getValuesFromInput(aIn, state).then(strsa => {
+			NODE.getValuesFromInput(aIn, state).then(strsa => {
 
-				FLUX.Node.getValuesFromInput(bIn, state).then(strsb => {
+				NODE.getValuesFromInput(bIn, state).then(strsb => {
 
 					let result = '';
 					if (strsa.length) {

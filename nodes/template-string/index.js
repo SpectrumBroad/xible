@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 		var stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(NODE.getInputByName('variable'), state).then((vars) => {
+			NODE.getValuesFromInput(NODE.getInputByName('variable'), state).then((vars) => {
 				callback(templateStringParser(NODE.data.value || '', vars));
 			});
 		});

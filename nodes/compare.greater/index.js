@@ -18,9 +18,9 @@ module.exports = function(FLUX) {
 
 		boolOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(aIn, state).then((as) => {
+			NODE.getValuesFromInput(aIn, state).then((as) => {
 
-				FLUX.Node.getValuesFromInput(bIn, state).then((bs) => {
+				NODE.getValuesFromInput(bIn, state).then((bs) => {
 
 					if (as.length && bs.length) {
 

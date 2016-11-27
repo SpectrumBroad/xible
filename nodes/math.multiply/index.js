@@ -18,9 +18,9 @@ module.exports = function(FLUX) {
 
 		numberOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(multiplicandIn, state).then((multiplicands) => {
+			NODE.getValuesFromInput(multiplicandIn, state).then((multiplicands) => {
 
-				FLUX.Node.getValuesFromInput(multiplierIn, state).then((multipliers) => {
+				NODE.getValuesFromInput(multiplierIn, state).then((multipliers) => {
 
 					//get the multiplier
 					//if multiply multipliers given, we take the first one only

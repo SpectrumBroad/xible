@@ -5,7 +5,7 @@ module.exports = function(FLUX) {
 		var stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {
+			NODE.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {
 
 				let concatStr;
 				if(strs.length) {

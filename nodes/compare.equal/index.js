@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 		boolOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(valuesIn, state).then((vals) => {
+			NODE.getValuesFromInput(valuesIn, state).then((vals) => {
 
 				if (vals.length) {
 

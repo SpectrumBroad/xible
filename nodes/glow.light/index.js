@@ -29,13 +29,13 @@ module.exports = function(FLUX) {
 		function getLightsPerServer(state) {
 
 			//get the glow server
-			return FLUX.Node.getValuesFromInput(glowServerIn, state).then((glowServers) => {
+			return NODE.getValuesFromInput(glowServerIn, state).then((glowServers) => {
 
 				return Promise.all(glowServers.map((glowServer) => {
 
 					if (nameIn.connectors.length) {
 
-						return FLUX.Node.getValuesFromInput(nameIn, state)
+						return NODE.getValuesFromInput(nameIn, state)
 							.then((names) => Promise.all(names.map((name) => glowServer.Light.getByName(name))))
 							.then((lights) => ({
 								server: glowServer,

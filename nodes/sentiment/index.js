@@ -16,7 +16,7 @@ module.exports = function(FLUX) {
 
 		scoreOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(stringIn, state).then((strs) => {
+			NODE.getValuesFromInput(stringIn, state).then((strs) => {
 
 				let results;
 

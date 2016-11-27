@@ -18,7 +18,7 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			FLUX.Node.getValuesFromInput(lightIn, state).then((lights) => {
+			NODE.getValuesFromInput(lightIn, state).then((lights) => {
 
 				let duration = +NODE.data.duration || 0;
 				if (duration) {

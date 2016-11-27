@@ -14,7 +14,7 @@ module.exports = function(FLUX) {
 
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(numberIn, state).then((numbers) => {
+			NODE.getValuesFromInput(numberIn, state).then((numbers) => {
 
 				let result = numbers.map((number) => {
 					return Math.round(number);

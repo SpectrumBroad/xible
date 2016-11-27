@@ -7,9 +7,9 @@ module.exports = function(FLUX) {
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			FLUX.Node.getValuesFromInput(NODE.getInputByName('a'), state).then((aNumbers) => {
+			NODE.getValuesFromInput(NODE.getInputByName('a'), state).then((aNumbers) => {
 
-				FLUX.Node.getValuesFromInput(NODE.getInputByName('b'), state).then((bNumbers) => {
+				NODE.getValuesFromInput(NODE.getInputByName('b'), state).then((bNumbers) => {
 
 					//get the min (b) value
 					//if multiply b values given, we take the first one only
