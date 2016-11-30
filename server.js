@@ -40,7 +40,7 @@ if (cluster.isMaster) {
 
 		expressDebug(`${req.method} ${req.originalUrl}`);
 
-		if ('OPTIONS' == req.method) {
+		if ('OPTIONS' === req.method) {
 			return res.status(200).end();
 		}
 

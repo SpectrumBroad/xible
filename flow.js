@@ -504,6 +504,9 @@ Flow.prototype.getOutputById = function(id) {
 };
 
 
+let globalOutputs = null; //caching
+
+
 /**
  *	returns all global outputs with a given type
  *	@param {String}	type	the type of global outputs to be fetched
@@ -512,19 +515,32 @@ Flow.prototype.getOutputById = function(id) {
 Flow.prototype.getGlobalOutputsByType = function(type) {
 
 	let outputs = [];
-	this.nodes.forEach((node) => {
 
-		for (let name in node.outputs) {
+	if (globalOutputs) {
+		outputs = globalOutputs.filter((globalOutput) => globalOutput.type === type);
+	} else {
 
-			let output = node.outputs[name];
-			console.log(output.type, output.global, type);
-			if (output.global && output.type === type) {
-				outputs.push(output);
+		globalOutputs = [];
+		this.nodes.forEach((node) => {
+
+			for (let name in node.outputs) {
+
+				let output = node.outputs[name];
+				if (output.global) {
+
+					globalOutputs.push(output);
+
+					if (output.type === type) {
+						outputs.push(output);
+					}
+
+				}
+
 			}
 
-		}
+		});
 
-	});
+	}
 
 	return outputs;
 

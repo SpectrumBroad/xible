@@ -1,0 +1,10 @@
+{
+  "name": "xible-http.server",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "4.*",
+    "body-parser": "1.*",
+    "spdy": "*"
+  },
+  "private": true
+}

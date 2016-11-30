@@ -1,5 +1,3 @@
-'use strict';
-
 let nodemailer = require('nodemailer');
 
 module.exports = function(FLUX) {
@@ -31,7 +29,7 @@ module.exports = function(FLUX) {
 	}
 
 	FLUX.addNode('email.smtp.server', {
-		type: "action",
+		type: "object",
 		level: 0,
 		groups: ["email"]
 	}, constr);
