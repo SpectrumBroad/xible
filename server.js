@@ -203,7 +203,7 @@ if (cluster.isMaster) {
 		cpuUsageStart = process.cpuUsage();
 		cpuStartTime = process.hrtime();
 
-		let cpuPercent = (100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1000000));
+		let cpuPercent = Math.round(100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1000000));
 
 		if (cluster.worker.isConnected()) {
 

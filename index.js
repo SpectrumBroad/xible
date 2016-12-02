@@ -36,6 +36,25 @@ const Flux = module.exports = function Flux(obj) {
 		Flow.initFromPath(obj.flowsPath, this);
 	}
 
+	//broadcast flow stats every second
+	setInterval(() => {
+
+		let flows=this.getFlows();
+		let flowsUsage = Object.keys(flows)
+			.map((key) => flows[key])
+			.filter((flow) => !!flow.usage)
+			.map((flow) => ({
+				_id: flow._id,
+				usage: flow.usage
+			}));
+
+		this.broadcastWebSocket({
+			method: 'flux.flow.usage',
+			flows: flowsUsage
+		});
+
+	}, 1000);
+
 };
 
 

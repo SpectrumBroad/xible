@@ -785,14 +785,6 @@ Flow.prototype.start = function(directNodes) {
 					case 'usage':
 
 						this.usage = message.usage;
-
-						//broadcast the memory usage
-						this.flux.broadcastWebSocket({
-							method: 'flux.flow.usage',
-							flowId: this._id,
-							usage: this.usage
-						});
-
 						break;
 
 				}
@@ -804,6 +796,7 @@ Flow.prototype.start = function(directNodes) {
 				this.stopping = this.started = this.starting = false;
 				this.stopped = true;
 				this.worker = null;
+				this.usage = null;
 
 				this.emit('stopped');
 				this.flux.broadcastWebSocket({
@@ -816,7 +809,10 @@ Flow.prototype.start = function(directNodes) {
 			});
 
 			this.worker.on('disconnect', () => {
+
 				flowDebug(`worker disconnected from master`);
+				this.usage = null;
+
 			});
 
 		});
