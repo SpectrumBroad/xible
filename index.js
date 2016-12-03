@@ -7,20 +7,17 @@ const webSocketDebug = debug('flux:webSocket');
 const cluster = require('cluster');
 
 
-const Node = require('./node.js');
-const Flow = require('./flow.js');
-
-
 const Flux = module.exports = function Flux(obj) {
+
+	const Node = this.Node = require('./Node.js')(this, obj.express, obj.expressApp);
+	const Flow = this.Flow = require('./Flow.js')(this, obj.express, obj.expressApp);
 
 	this.nodes = {};
 	this.flows = {};
 
-	this.express = obj.express;
-
 	//host the client nodes
 	if (obj.expressApp) {
-		this.initExpress(obj.expressApp);
+		this.initExpress(obj.express, obj.expressApp);
 	}
 
 	if (obj.webSocketServer) {
@@ -29,7 +26,7 @@ const Flux = module.exports = function Flux(obj) {
 
 	//get all installed nodes
 	if (obj.nodesPath) {
-		Node.initFromPath(obj.nodesPath, this);
+		Node.initFromPath(obj.nodesPath);
 	}
 
 	//get all installed flows
@@ -80,14 +77,6 @@ const Flux = module.exports = function Flux(obj) {
 };
 
 
-//init requires
-Flow.init(Flux);
-Node.init(Flux);
-
-
-Flux.init = function() {};
-
-
 Flux.getNativeModules = function() {
 
 	return Object.keys(process.binding('natives')).filter(function(el) {
@@ -115,14 +104,13 @@ Flux.generateObjectId = Flux.prototype.generateObjectId = function() {
 };
 
 
-Flux.prototype.initExpress = function(expressApp) {
+Flux.prototype.initExpress = function(express, expressApp) {
 
 	if (!expressApp) {
 		return;
 	}
 
-	this.expressApp = expressApp;
-	require('./routes.js')(this);
+	require('./routes.js')(this, expressApp);
 
 };
 

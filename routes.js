@@ -1,8 +1,6 @@
 'use strict';
 
-module.exports = function(FLUX) {
-
-	let expressApp = FLUX.expressApp;
+module.exports = function(FLUX, expressApp) {
 
 
 	//TODO: refactor this nodeCopy crap

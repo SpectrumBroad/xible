@@ -122,6 +122,7 @@ if (cluster.isMaster) {
 
 	//init message handler
 	process.on('message', (message) => {
+
 		switch (message.method) {
 
 			case 'start':
@@ -170,10 +171,10 @@ if (cluster.isMaster) {
 			case 'directNodes':
 
 				if (flow) {
-
 					flow.direct(message.directNodes);
-
 				}
+
+				break;
 
 		}
 

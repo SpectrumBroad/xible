@@ -5,7 +5,10 @@
 	"description": "twitter connection node for xible",
 
 	"dependencies": {
-		"twitter-ng": "*"
+		"twitter-ng": "*",
+		"express": "*",
+		"spdy": "*",
+		"body-parser": "*"
 	},
 
 	"private": true
