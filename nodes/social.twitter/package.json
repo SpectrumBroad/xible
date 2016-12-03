@@ -1,0 +1,13 @@
+{
+
+	"name": "xible-social.twitter",
+	"version": "0.0.1",
+	"description": "twitter connection node for xible",
+
+	"dependencies": {
+		"twitter-ng": "*"
+	},
+
+	"private": true
+
+}

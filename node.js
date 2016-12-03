@@ -304,7 +304,7 @@ Node.prototype.hasConnectedInputsOfType = function(type) {
 };
 
 
-Node.triggerOutputs = function(output, state) {
+Node.triggerOutputs = Node.prototype.triggerOutputs = function(output, state) {
 
 	this.flowStateCheck(state);
 

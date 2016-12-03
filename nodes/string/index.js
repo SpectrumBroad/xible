@@ -2,7 +2,7 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		var stringOut = NODE.getOutputByName('result');
+		let stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
 			NODE.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {

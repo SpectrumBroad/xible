@@ -18,13 +18,8 @@ module.exports = function(FLUX) {
 
 		pathOut.on('trigger', (conn, state, callback) => {
 
-			let path = null;
 			let thisState = state.get(this);
-			if (thisState) {
-				path = thisState.path;
-			}
-
-			callback(path);
+			callback((thisState && thisState.path) || null);
 
 		});
 

@@ -1,12 +1,9 @@
 'use strict';
 
 const debug = require('debug');
-
-//config
-const config = require('./config.json');
-
-//cluster
 const cluster = require('cluster');
+
+const config = require('./config.json');
 
 //flux
 const Flux = require('./index.js');
