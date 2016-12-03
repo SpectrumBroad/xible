@@ -389,7 +389,7 @@ Flow.prototype.addNode = function(node) {
 	node.prependListener('trigger', () => {
 
 		var d = new Date();
-		node._trackerTriggerTime = d.getTime();
+		//node._trackerTriggerTime = d.getTime();
 
 		node.setTracker({
 			message: 'start @ ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ':' + d.getMilliseconds(),
@@ -404,7 +404,7 @@ Flow.prototype.addNode = function(node) {
 		node.outputs[name].prependListener('trigger', () => {
 
 			var d = new Date();
-			node._trackerTriggerTime = d.getTime();
+			//node._trackerTriggerTime = d.getTime();
 			node.setTracker({
 				message: 'start @ ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ':' + d.getMilliseconds(),
 				timeout: 3000
@@ -416,6 +416,8 @@ Flow.prototype.addNode = function(node) {
 
 
 	//track output triggers
+	/*
+	//uncommenting this needs to take care of commented _trackerTriggerTime elsewhere
 	node.prependListener('triggerout', (output) => {
 
 		if (!output.connectors.length) {
@@ -440,6 +442,7 @@ Flow.prototype.addNode = function(node) {
 		});
 
 	});
+	*/
 
 	//add and return
 	this.nodes.push(node);
@@ -944,7 +947,10 @@ Flow.prototype.stop = function() {
 					}
 
 					//cleanup all open statuses
-					this.flux.broadcastWebSocket(`{"method":"flux.flow.removeAllStatuses", "flowId": "${this._id}"}`);
+					this.flux.broadcastWebSocket({
+						'method': 'flux.flow.removeAllStatuses',
+						'flowId': this._id
+					});
 
 				});
 
@@ -961,7 +967,10 @@ Flow.prototype.stop = function() {
 					this.worker.kill('SIGKILL');
 
 					//cleanup all open statuses
-					this.flux.broadcastWebSocket(`{"method":"flux.flow.removeAllStatuses", "flowId": "${this._id}"}`);
+					this.flux.broadcastWebSocket({
+						'method': 'flux.flow.removeAllStatuses',
+						'flowId': this._id
+					});
 
 					killTimeout = null;
 

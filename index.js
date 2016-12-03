@@ -4,6 +4,7 @@
 //setup debug
 const debug = require('debug');
 const webSocketDebug = debug('flux:webSocket');
+const cluster = require('cluster');
 
 
 const Node = require('./node.js');
@@ -36,24 +37,45 @@ const Flux = module.exports = function Flux(obj) {
 		Flow.initFromPath(obj.flowsPath, this);
 	}
 
-	//broadcast flow stats every second
-	setInterval(() => {
+	if (cluster.isMaster) {
 
-		let flows=this.getFlows();
-		let flowsUsage = Object.keys(flows)
-			.map((key) => flows[key])
-			.filter((flow) => !!flow.usage)
-			.map((flow) => ({
-				_id: flow._id,
-				usage: flow.usage
-			}));
+		//throttle broadcast flow stats every second
+		setInterval(() => {
 
-		this.broadcastWebSocket({
-			method: 'flux.flow.usage',
-			flows: flowsUsage
-		});
+			let flows = this.getFlows();
+			let flowsUsage = Object.keys(flows)
+				.map((key) => flows[key])
+				.filter((flow) => !!flow.usage)
+				.map((flow) => ({
+					_id: flow._id,
+					usage: flow.usage
+				}));
 
-	}, 1000);
+			this.broadcastWebSocket({
+				method: 'flux.flow.usage',
+				flows: flowsUsage
+			});
+
+		}, 1000);
+
+		//throttle broadcast messages every 50ms
+		setInterval(() => {
+
+			if (broadcastWebSocketMessagesThrottle.length) {
+
+				let message = JSON.stringify({
+					method: 'flux.messages',
+					messages: broadcastWebSocketMessagesThrottle
+				});
+				broadcastWebSocketMessagesThrottle = [];
+
+				this.broadcastWebSocket(message);
+
+			}
+
+		}, 100);
+
+	}
 
 };
 
@@ -116,23 +138,30 @@ Flux.prototype.initWebSocket = function(webSocketServer) {
 };
 
 
+function handleBroadcastWebSocketError(err) {
+	if (err) {
+		webSocketDebug(`client websocket send failed: ${err}`);
+	}
+}
+
+
+let broadcastWebSocketMessagesThrottle = [];
 Flux.prototype.broadcastWebSocket = function(message) {
 
 	if (!this.webSocketServer) {
 		return;
 	}
 
+	//throttle any message that's not a string
 	if (typeof message !== 'string') {
-		message = JSON.stringify(message);
+
+		broadcastWebSocketMessagesThrottle.push(message);
+		return;
+
 	}
 
 	this.webSocketServer.clients.forEach((client) => {
-		client.send(message, (err) => {
-			if (err) {
-				webSocketDebug(`client websocket send failed: ${err}`);
-			}
-		});
-
+		client.send(message, handleBroadcastWebSocketError);
 	});
 
 };

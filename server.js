@@ -189,7 +189,9 @@ if (cluster.isMaster) {
 		});
 	}
 
-	//report memory usage back to master
+	//report cpu and memory usage back to master
+	//note that, at least on a raspi 3,
+	//the resolution of cpuUsage is stuck to 1000ms or 1%
 	let cpuUsageStart = process.cpuUsage();
 	let cpuStartTime = process.hrtime();
 
@@ -203,8 +205,6 @@ if (cluster.isMaster) {
 		cpuUsageStart = process.cpuUsage();
 		cpuStartTime = process.hrtime();
 
-		let cpuPercent = Math.round(100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1000000));
-
 		if (cluster.worker.isConnected()) {
 
 			process.send({
@@ -213,14 +213,15 @@ if (cluster.isMaster) {
 					cpu: {
 						user: cpuUsage.user,
 						system: cpuUsage.system,
-						percentage: cpuPercent
+						percentage: Math.round(100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1e6))
 					},
-					memory: process.memoryUsage()
+					memory: process.memoryUsage(),
+					delay: Math.round((cpuTime[0] * 1e9 + cpuTime[1] - 1e9) / 1000)
 				}
 			});
 
 		}
 
-	}, 1000);
+	}, 1000).unref();
 
 }
