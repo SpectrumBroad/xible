@@ -3,3 +3,4 @@ out.log
 flows/
 ssl/
 docs/
+vault.json

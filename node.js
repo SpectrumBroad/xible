@@ -1,5 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
-const nodeDebug = require('debug')('flux:node');
+const debug = require('debug');
+const nodeDebug = debug('flux:node');
 const path = require('path');
 const cluster = require('cluster');
 const fs = require('fs');
@@ -17,11 +18,13 @@ module.exports = function(XIBLE, express, expressApp) {
 			this.level = obj.level;
 			this.groups = obj.groups;
 			this.description = obj.description;
-			this.nodeExists = true; //indicates whether this is an existing installed Node
+			this.nodeExists = true; //indicates whether this is an existing installed Node (in ./nodes/)
 			this.hostsEditorContent = obj.hostsEditorContent; //indicates whether it has a ./editor/index.htm file
-			this.top = 0;
-			this.left = 0;
+			this.top = obj.top || 0;
+			this.left = obj.left || 0;
+			this.data = obj.data || {};
 			this.flow = null;
+			this._id = obj._id;
 
 			this._states = {};
 
@@ -39,6 +42,11 @@ module.exports = function(XIBLE, express, expressApp) {
 				for (const name in obj.outputs) {
 					this.addOutput(name, obj.outputs[name]);
 				}
+			}
+
+			//vault
+			if (this._id) {
+				this.vault = new NodeVault(this);
 			}
 
 			//construct
@@ -459,6 +467,88 @@ class NodeOutput extends NodeIo {
 		super(...arguments);
 		this.global = false;
 
+	}
+
+}
+
+
+//TODO: encryption on the vault
+const vaultDebug = debug('flux:vault');
+let vault;
+class MainVault {
+
+	static init() {
+
+		//create the vault if it doesn't exist
+		if (!fs.existsSync(`vault.json`)) {
+
+			vaultDebug(`creating new`);
+			fs.writeFileSync(`vault.json`, '{}');
+
+		}
+
+		try {
+			vault = JSON.parse(fs.readFileSync(`vault.json`));
+		} catch (err) {
+			vaultDebug(`could not open vault.json`);
+		}
+
+	}
+
+	static save() {
+
+		try {
+			fs.writeFileSync(`vault.json`, JSON.stringify(vault));
+		} catch (e) {
+			vaultDebug(`could not save vault.json`);
+		}
+
+	}
+
+	static get(node) {
+
+		if (!node || !node._id) {
+			return;
+		}
+
+		if (!vault) {
+			this.init();
+		}
+
+		return vault[node._id];
+
+	}
+
+	static set(node, obj) {
+
+		if (!node || !node._id) {
+			return;
+		}
+
+		if (!vault) {
+			this.init();
+		}
+
+		vault[node._id] = obj;
+		this.save();
+
+	}
+
+}
+
+
+class NodeVault {
+
+	constructor(node) {
+		this.node = node;
+	}
+
+	set(obj) {
+		return MainVault.set(this.node, obj);
+	}
+
+	get() {
+		return MainVault.get(this.node);
 	}
 
 }

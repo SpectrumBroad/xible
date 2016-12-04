@@ -183,18 +183,18 @@ module.exports = function(XIBLE, express, expressApp) {
 				} else {
 
 					//init a working node
-					fluxNode = new XIBLE.Node(nodeConstr);
+					fluxNode = new XIBLE.Node(Object.assign(nodeConstr, {_id: node._id, data: node.data, left: node.left, top: node.top}));
 					if (!fluxNode) {
 						throw new Error(`Could not construct node '${node.name}'`);
 					}
 
 				}
-
+/*
 				fluxNode._id = node._id;
 				fluxNode.data = node.data;
 				fluxNode.left = node.left;
 				fluxNode.top = node.top;
-
+*/
 				this.addNode(fluxNode);
 
 				for (let name in node.inputs) {

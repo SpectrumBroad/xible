@@ -1,9 +1,7 @@
-'use strict';
-
 module.exports = function(FLUX, expressApp) {
 
 
-	//TODO: refactor this nodeCopy crap
+	//TODO: refactor this nodeCopy stuff
 
 
 	//copies inputs/outputs from node to nodecopy
@@ -33,20 +31,15 @@ module.exports = function(FLUX, expressApp) {
 	function nodeCopy(node) {
 
 		//copy the node so we can mutate it where need be
-		//this does NOT make a deep clone, maybe we should change that
 		let nodeCopy = Object.assign({}, node);
 		delete nodeCopy.flow;
 		delete nodeCopy._states;
 		delete nodeCopy._events;
 		delete nodeCopy._eventsCount;
-		if (node.data) {
-			nodeCopy.data = JSON.parse(JSON.stringify(node.data));
-		}
-
-		//attach stringified listeners
-		nodeCopy.listeners = {
-			editorContentLoad: node.listeners('editorContentLoad').map(fn => fn.toString())
-		};
+		delete nodeCopy.vault;
+		//if (node.data) {
+		//	nodeCopy.data = JSON.parse(JSON.stringify(node.data));
+		//}
 
 		//attach stringified listeners to the io's
 		nodeIoCopy('inputs', nodeCopy, node);

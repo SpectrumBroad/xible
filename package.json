@@ -8,13 +8,14 @@
   },
   "dependencies": {
     "ws": "*",
+    "bufferutil": "*",
     "debug": "*",
     "express": "*",
     "body-parser": "*",
     "spdy": "*"
   },
   "devDependencies": {
-    "mrdoc": "*"
+    "mr-doc": "*"
   },
   "private": true
 }

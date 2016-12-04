@@ -1,5 +1,5 @@
 {
 
-  "ignore": ["flows/*"]
+  "ignore": ["flows/*", "vault.json"]
 
 }
