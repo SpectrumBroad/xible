@@ -34,6 +34,38 @@ const Flux = module.exports = function Flux(obj) {
 		Flow.initFromPath(obj.flowsPath, this);
 	}
 
+	this.initStats();
+
+	if (cluster.isMaster) {
+
+		//throttle broadcast messages
+		setInterval(() => {
+
+			if (broadcastWebSocketMessagesThrottle.length) {
+
+				let message = JSON.stringify({
+					method: 'flux.messages',
+					messages: broadcastWebSocketMessagesThrottle
+				});
+				broadcastWebSocketMessagesThrottle = [];
+
+				this.broadcastWebSocket(message);
+
+			}
+
+		}, 100);
+
+	}
+
+};
+
+
+//a value below the broadcast throttle interval (100) won't have any effect
+const STAT_INTERVAL = 1000;
+
+
+Flux.prototype.initStats = function() {
+
 	if (cluster.isMaster) {
 
 		//throttle broadcast flow stats every second
@@ -53,24 +85,44 @@ const Flux = module.exports = function Flux(obj) {
 				flows: flowsUsage
 			});
 
-		}, 1000);
+		}, STAT_INTERVAL);
 
-		//throttle broadcast messages every 50ms
+	} else {
+
+		//report cpu and memory usage back to master
+		//note that, at least on a raspi 3,
+		//the resolution of cpuUsage is stuck to 1000ms or 1%
+		let cpuUsageStart = process.cpuUsage();
+		let cpuStartTime = process.hrtime();
+
 		setInterval(() => {
 
-			if (broadcastWebSocketMessagesThrottle.length) {
+			//get values over passed time
+			let cpuUsage = process.cpuUsage(cpuUsageStart);
+			let cpuTime = process.hrtime(cpuStartTime);
 
-				let message = JSON.stringify({
-					method: 'flux.messages',
-					messages: broadcastWebSocketMessagesThrottle
+			//reset for next loop
+			cpuUsageStart = process.cpuUsage();
+			cpuStartTime = process.hrtime();
+
+			if (cluster.worker.isConnected()) {
+
+				process.send({
+					method: 'usage',
+					usage: {
+						cpu: {
+							user: cpuUsage.user,
+							system: cpuUsage.system,
+							percentage: Math.round(100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1e6))
+						},
+						memory: process.memoryUsage(),
+						delay: Math.round((cpuTime[0] * 1e9 + cpuTime[1] - STAT_INTERVAL * 1e6) / 1000)
+					}
 				});
-				broadcastWebSocketMessagesThrottle = [];
-
-				this.broadcastWebSocket(message);
 
 			}
 
-		}, 100);
+		}, STAT_INTERVAL).unref();
 
 	}
 
