@@ -1,4 +1,4 @@
-module.exports = function(FLUX, expressApp) {
+module.exports = function(XIBLE, expressApp) {
 
 
 	//TODO: refactor this nodeCopy stuff
@@ -37,9 +37,6 @@ module.exports = function(FLUX, expressApp) {
 		delete nodeCopy._events;
 		delete nodeCopy._eventsCount;
 		delete nodeCopy.vault;
-		//if (node.data) {
-		//	nodeCopy.data = JSON.parse(JSON.stringify(node.data));
-		//}
 
 		//attach stringified listeners to the io's
 		nodeIoCopy('inputs', nodeCopy, node);
@@ -54,9 +51,9 @@ module.exports = function(FLUX, expressApp) {
 	expressApp.get('/api/nodes', (req, res) => {
 
 		let nodes = {};
-		for (const NODE_NAME in FLUX.nodes) {
+		for (const NODE_NAME in XIBLE.nodes) {
 
-			let node = new FLUX.Node(FLUX.nodes[NODE_NAME]);
+			let node = new XIBLE.Node(XIBLE.nodes[NODE_NAME]);
 			if (!node) {
 				throw new Error(`constructor for node "${NODE_NAME}" is not returning actual node`);
 			}
@@ -74,21 +71,23 @@ module.exports = function(FLUX, expressApp) {
 	//retrieve all flows
 	expressApp.get('/api/flows', (req, res) => {
 
-		let flows = FLUX.getFlows();
+		let flows = XIBLE.getFlows();
 		let returnFlows = {};
 
 		for (let id in flows) {
 
+			let flow=flows[id];
+
 			returnFlows[id] = {
 				_id: id,
 				nodes: [],
-				connectors: flows[id].json.connectors,
-				viewState: flows[id].json.viewState,
-				runnable: flows[id].runnable,
-				running: flows[id].worker && flows[id].worker.isConnected()
+				connectors: flow.json.connectors,
+				viewState: flow.json.viewState,
+				runnable: flow.runnable,
+				running: flow.worker && flow.worker.isConnected()
 			};
 
-			flows[id].nodes.forEach((node) => {
+			flow.nodes.forEach((node) => {
 				returnFlows[id].nodes.push(nodeCopy(node));
 			});
 
@@ -106,7 +105,7 @@ module.exports = function(FLUX, expressApp) {
 			res.status(400).end();
 		} else {
 
-			var flow = new FLUX.Flow(FLUX);
+			var flow = new XIBLE.Flow(XIBLE);
 			flow.initJson(req.body, true);
 			flow.save();
 
@@ -122,7 +121,7 @@ module.exports = function(FLUX, expressApp) {
 	//get a flow by a given id
 	expressApp.param('flowId', (req, res, next, id) => {
 
-		FLUX.getFlowById(id, (flow) => {
+		XIBLE.getFlowById(id, (flow) => {
 
 			if (flow) {
 
