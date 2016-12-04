@@ -34,6 +34,19 @@ module.exports = function(FLUX) {
 			const spdy = require('spdy');
 			const fs = require('fs');
 
+			//if we have the oAuth keys, setup twitter right away
+			let vault = NODE.vault.get();
+			if (vault && vault.oAuthAccessToken && vault.oAuthAccessTokenSecret) {
+
+				twitter = new TwitterNg({
+					consumer_key: CONSUMER_KEY,
+					consumer_secret: CONSUMER_SECRET,
+					access_token_key: vault.oAuthAccessToken,
+					access_token_secret: vault.oAuthAccessTokenSecret
+				});
+
+			}
+
 			//host a webserver for auth requests
 			let expressApp = express();
 			expressApp.use(bodyParser.json());
@@ -74,21 +87,18 @@ module.exports = function(FLUX) {
 				cert: fs.readFileSync('./ssl/ssl.crt')
 			}, expressApp).listen(9620, () => {});
 
-			let oAuthToken;
-			let oAuthTokenSecret;
+			let oAuthRequestToken;
+			let oAuthRequestTokenSecret;
 
-			let oAuthAccessToken;
-			let oAuthAccessTokenSecret;
+			expressApp.get(`/${NODE._id}/auth`, (req, res, next) => {
 
-			expressApp.get(`/auth`, (req, res, next) => {
-
-				twitter = new TwitterNg({
+				let tempTwitter = new TwitterNg({
 					consumer_key: CONSUMER_KEY,
 					consumer_secret: CONSUMER_SECRET
 				});
 
-				twitter.oauth.getOAuthRequestToken({
-					oauth_callback: 'https://10.0.0.20:9620/auth/callback'
+				tempTwitter.oauth.getOAuthRequestToken({
+					oauth_callback: `https://10.0.0.20:9620/${NODE._id}/auth/callback`
 				}, (err, token, tokenSecret, results) => {
 
 					if (err) {
@@ -105,8 +115,8 @@ module.exports = function(FLUX) {
 
 					} else {
 
-						oAuthToken = token;
-						oAuthTokenSecret = tokenSecret;
+						oAuthRequestToken = token;
+						oAuthRequestTokenSecret = tokenSecret;
 						res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${token}`);
 
 					}
@@ -116,14 +126,14 @@ module.exports = function(FLUX) {
 
 			});
 
-			expressApp.get(`/auth/callback`, (req, res) => {
+			expressApp.get(`/${NODE._id}/auth/callback`, (req, res) => {
 
-				twitter = new TwitterNg({
+				let tempTwitter = new TwitterNg({
 					consumer_key: CONSUMER_KEY,
-					consumer_secret: CONSUMER_SECRET,
+					consumer_secret: CONSUMER_SECRET
 				});
 
-				twitter.oauth.getOAuthAccessToken(oAuthToken, oAuthTokenSecret, req.query.oauth_verifier, (err, accessToken, accessTokenSecret, results) => {
+				tempTwitter.oauth.getOAuthAccessToken(oAuthRequestToken, oAuthRequestTokenSecret, req.query.oauth_verifier, (err, oAuthAccessToken, oAuthAccessTokenSecret, results) => {
 
 					if (err) {
 
@@ -133,10 +143,24 @@ module.exports = function(FLUX) {
 
 					} else {
 
-						oAuthAccessToken = oAuthToken;
-						oAuthAccessTokenSecret = oAuthTokenSecret;
+						//store the values in the vault
+						NODE.vault.set({
+							oAuthAccessToken: oAuthAccessToken,
+							oAuthAccessTokenSecret: oAuthAccessTokenSecret,
+							screenName: results.screen_name
+						});
 
-						res.send('success');
+						//setup the proper twitter
+						twitter = new TwitterNg({
+							consumer_key: CONSUMER_KEY,
+							consumer_secret: CONSUMER_SECRET,
+							access_token_key: oAuthAccessToken,
+							access_token_secret: oAuthAccessTokenSecret
+						});
+
+						res.sendFile('authSuccess.htm', {
+							root: __dirname
+						});
 
 					}
 

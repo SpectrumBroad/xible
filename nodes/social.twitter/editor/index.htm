@@ -1,1 +1,6 @@
-<button type="button" onclick="window.alert('not implemented yet');">Authenticate</button>
+<button type="button">Authenticate</button>
+<script>
+	this.editorContentEl.querySelector('button').addEventListener('click', (event) => {
+		window.open(`https://${location.hostname}:9620/${this._id}/auth`);
+	});
+</script>

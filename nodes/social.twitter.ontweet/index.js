@@ -43,7 +43,11 @@ module.exports = function(FLUX) {
 
 				twitters.forEach((twitter) => {
 
-					twitter.stream(type, (stream) => {
+					if(!twitter) {
+						return;
+					}
+
+					twitter.stream(type, {'track':NODE.data.track}, (stream) => {
 
 						stream.on('data', (data) => {
 
@@ -54,12 +58,20 @@ module.exports = function(FLUX) {
 
 						});
 
-						stream.on('end', () => {
+						stream.on('limit', () => {
+							console.log('ratelimit!');
+						});
 
+						stream.on('error', (tw, tc) => {
+							console.log(tw, tc);
+						});
+
+						stream.on('end', () => {
+console.log('end!');
 						});
 
 						stream.on('destroy', () => {
-
+console.log('destroy!');
 						});
 
 					});
