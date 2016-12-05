@@ -7,6 +7,10 @@ const webSocketDebug = debug('flux:webSocket');
 const cluster = require('cluster');
 
 
+//config flags
+const WEB_SOCKET_THROTTLE = 100; //<1 === don't throttle
+const STAT_INTERVAL = 1000; //a value below the broadcast throttle interval (100) won't have any effect
+
 const Flux = module.exports = function Flux(obj) {
 
 	const Node = this.Node = require('./Node.js')(this, obj.express, obj.expressApp);
@@ -36,7 +40,7 @@ const Flux = module.exports = function Flux(obj) {
 
 	this.initStats();
 
-	if (cluster.isMaster) {
+	if (cluster.isMaster && WEB_SOCKET_THROTTLE > 0) {
 
 		//throttle broadcast messages
 		setInterval(() => {
@@ -53,15 +57,11 @@ const Flux = module.exports = function Flux(obj) {
 
 			}
 
-		}, 100);
+		}, WEB_SOCKET_THROTTLE);
 
 	}
 
 };
-
-
-//a value below the broadcast throttle interval (100) won't have any effect
-const STAT_INTERVAL = 1000;
 
 
 Flux.prototype.initStats = function() {
@@ -193,12 +193,20 @@ Flux.prototype.broadcastWebSocket = function(message) {
 	}
 
 	//throttle any message that's not a string
+
 	if (typeof message !== 'string') {
 
-		broadcastWebSocketMessagesThrottle.push(message);
-		return;
+		if (WEB_SOCKET_THROTTLE > 0) {
+
+			broadcastWebSocketMessagesThrottle.push(message);
+			return;
+
+		}
+
+		message = JSON.stringify(message);
 
 	}
+
 
 	this.webSocketServer.clients.forEach((client) => {
 		client.send(message, handleBroadcastWebSocketError);

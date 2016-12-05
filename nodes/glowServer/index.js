@@ -1,10 +1,4 @@
-'use strict';
-
-
-const ws = require('ws');
 const EventEmitter = require('events').EventEmitter;
-
-
 const GlowWrapper = require('../../../GlowWrapper');
 
 

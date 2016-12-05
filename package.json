@@ -4,11 +4,10 @@
   "description": "flux",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "export DEBUG=\"flux:*\"; nodemon server.js"
+    "test": "export DEBUG=\"flux*\"; nodemon server.js"
   },
   "dependencies": {
-    "ws": "*",
-    "bufferutil": "*",
+    "uws": "*",
     "debug": "*",
     "express": "*",
     "body-parser": "*",

@@ -24,12 +24,12 @@ module.exports = function(FLUX) {
 
 				NODE.getValuesFromInput(stateIn, state).then((states) => {
 
-					let state = NODE.data.state === 'true';
+					let switchState = NODE.data.state === 'true';
 					if (states.length) {
-						state = states.indexOf(false) === -1;
+						switchState = states.indexOf(false) === -1;
 					}
 
-					Promise.all(sws.map((sw) => sw.connected && (state ? sw.switchOn() : sw.switchOff())))
+					Promise.all(sws.map((sw) => sw.connected && (switchState ? sw.switchOn() : sw.switchOff())))
 						.then(() => FLUX.Node.triggerOutputs(doneOut, state));
 
 				});

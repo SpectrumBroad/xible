@@ -1,6 +1,5 @@
 'use strict';
 
-const debug = require('debug');
 const cluster = require('cluster');
 
 const config = require('./config.json');
@@ -9,6 +8,10 @@ const config = require('./config.json');
 const Flux = require('./index.js');
 
 if (cluster.isMaster) {
+
+	const debug = require('debug');
+	const fluxDebug = debug('flux');
+	fluxDebug(process.versions);
 
 	//setup client requests over https
 	const spdy = require('spdy');
@@ -60,7 +63,7 @@ if (cluster.isMaster) {
 
 		//websocket
 		const wsDebug = debug('flux:websocket');
-		const ws = require('ws');
+		const ws = require('uws');
 
 		const spdyWebSocketServer = spdy.createServer({
 
