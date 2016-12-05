@@ -10,6 +10,10 @@ module.exports = function(FLUX) {
 			type: "glow.switch"
 		});
 
+		let stateIn = NODE.addInput('state', {
+			type: "boolean"
+		});
+
 		let doneOut = NODE.addOutput('done', {
 			type: "trigger"
 		});
@@ -18,8 +22,17 @@ module.exports = function(FLUX) {
 
 			NODE.getValuesFromInput(swIn, state).then((sws) => {
 
-				Promise.all(sws.map((sw) => sw.connected && sw.switchOn()))
-					.then(() => FLUX.Node.triggerOutputs(doneOut, state));
+				NODE.getValuesFromInput(stateIn, state).then((states) => {
+
+					let state = NODE.data.state === 'true';
+					if (states.length) {
+						state = states.indexOf(false) === -1;
+					}
+
+					Promise.all(sws.map((sw) => sw.connected && (state ? sw.switchOn() : sw.switchOff())))
+						.then(() => FLUX.Node.triggerOutputs(doneOut, state));
+
+				});
 
 			});
 
@@ -27,7 +40,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.switch.switchon', {
+	FLUX.addNode('glow.switch.setstate', {
 		type: "action",
 		level: 0,
 		groups: ["glow"],
