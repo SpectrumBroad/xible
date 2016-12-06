@@ -178,6 +178,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 					fluxNode = new XIBLE.Node(node);
 					fluxNode.nodeExists = false;
+					fluxNode.data = node.data;
 					this.runnable = false;
 
 				} else {

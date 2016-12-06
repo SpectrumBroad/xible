@@ -2,8 +2,8 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		let glowServerIn = NODE.addInput('glowServer', {
-			type: "glowServer"
+		let glowIn = NODE.addInput('glow', {
+			type: "glow"
 		});
 
 		let nameIn = NODE.addInput('name', {
@@ -29,24 +29,24 @@ module.exports = function(FLUX) {
 		function getLightsPerServer(state) {
 
 			//get the glow server
-			return NODE.getValuesFromInput(glowServerIn, state).then((glowServers) => {
+			return NODE.getValuesFromInput(glowIn, state).then((glows) => {
 
-				return Promise.all(glowServers.map((glowServer) => {
+				return Promise.all(glows.map((glow) => {
 
 					if (nameIn.connectors.length) {
 
 						return NODE.getValuesFromInput(nameIn, state)
-							.then((names) => Promise.all(names.map((name) => glowServer.Light.getByName(name))))
+							.then((names) => Promise.all(names.map((name) => glow.Light.getByName(name))))
 							.then((lights) => ({
-								server: glowServer,
+								server: glow,
 								lights: lights
 							}));
 
 					} else {
 
-						return glowServer.Light.getByName(NODE.data.name)
+						return glow.Light.getByName(NODE.data.name)
 							.then((light) => ({
-								server: glowServer,
+								server: glow,
 								lights: [light]
 							}));
 

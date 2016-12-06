@@ -2,8 +2,8 @@ module.exports = function(FLUX) {
 
 	function constr(NODE) {
 
-		let glowServerIn = NODE.addInput('glowServer', {
-			type: "glowServer"
+		let glowIn = NODE.addInput('glow', {
+			type: "glow"
 		});
 
 		let triggerOut = NODE.addOutput('trigger', {
@@ -13,11 +13,11 @@ module.exports = function(FLUX) {
 		NODE.on('trigger', (state) => {
 
 			//get the glow server
-			NODE.getValuesFromInput(glowServerIn, state).then((glowServers) => {
+			NODE.getValuesFromInput(glowIn, state).then((glows) => {
 
-				glowServers.forEach((glowServer) => {
+				glows.forEach((glow) => {
 
-					glowServer.MediaPlayer.on('stop', (event) => {
+					glow.MediaPlayer.on('stop', (event) => {
 						FLUX.Node.triggerOutputs(triggerOut, state);
 					});
 

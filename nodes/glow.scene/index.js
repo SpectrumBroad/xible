@@ -2,8 +2,8 @@ module.exports = function(FLUX) {
 
 	function constructorFunction(NODE) {
 
-		let glowIn = NODE.addInput('glowServer', {
-			type: "glowServer"
+		let glowIn = NODE.addInput('glow', {
+			type: "glow"
 		});
 
 		let sceneIn = NODE.addInput('name', {

@@ -94,12 +94,12 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
-		let glowServerOut = NODE.addOutput('glowServer', {
-			type: "glowServer"
+		let glowOut = NODE.addOutput('glow', {
+			type: "glow"
 		});
 
 		//return reference glow
-		glowServerOut.on('trigger', (conn, state, callback) => {
+		glowOut.on('trigger', (conn, state, callback) => {
 
 			if(!glow) {
 
@@ -114,7 +114,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glowServer', {
+	FLUX.addNode('glow', {
 		type: "object",
 		level: 0,
 		groups: ["glow"]

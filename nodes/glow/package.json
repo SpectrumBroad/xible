@@ -1,5 +1,5 @@
 {
-  "name": "flux-glowServer",
+  "name": "flux-glow",
   "version": "0.0.1",
   "dependencies": {
     "ws": "*"
