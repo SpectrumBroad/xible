@@ -102,6 +102,9 @@ Flux.prototype.initStats = function() {
 			let cpuTime = process.hrtime(cpuStartTime);
 
 			//reset for next loop
+			//this is different from the setImmediate approach for getting event loop delay
+			//because we are using a setInterval, we may get negative delays back
+			//not sure yet if that's correct or not
 			cpuUsageStart = process.cpuUsage();
 			cpuStartTime = process.hrtime();
 

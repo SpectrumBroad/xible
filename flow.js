@@ -933,7 +933,7 @@ module.exports = function(XIBLE, express, expressApp) {
 							this.worker.kill('SIGKILL');
 
 							//cleanup all open statuses
-							this.flux.broadcastWebSocket({
+							XIBLE.broadcastWebSocket({
 								'method': 'flux.flow.removeAllStatuses',
 								'flowId': this._id
 							});

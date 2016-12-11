@@ -63,8 +63,8 @@ module.exports = function(FLUX) {
 				.then((lightsPerServers) => lightsPerServers.reduce((prev, lightsPerServer) => prev.concat(...lightsPerServer.lights), []));
 		}
 
-		let lightStatuses = {};
-		let serverStatuses = {};
+		let lightStatuses;
+		let serverStatuses;
 		let lightAllConnectedStatus;
 
 		function lightDisconnected(light) {
@@ -132,8 +132,8 @@ module.exports = function(FLUX) {
 
 		}
 
-		let serverLightEventsHooked = {};
-		let serverEventsHooked = {};
+		let serverLightEventsHooked = [];
+		let serverEventsHooked = [];
 
 		function serverConnected(server, lights) {
 
@@ -146,7 +146,7 @@ module.exports = function(FLUX) {
 
 			lights.forEach((light) => {
 
-				if (!serverLightEventsHooked[server.hostname]) {
+				if (serverLightEventsHooked.indexOf(server) === -1) {
 
 					light.on('connect', () => lightConnected(light));
 					light.on('close', () => lightDisconnected(light));
@@ -161,7 +161,7 @@ module.exports = function(FLUX) {
 
 			});
 
-			serverLightEventsHooked[server.hostname] = true;
+			serverLightEventsHooked.push(server);
 
 		}
 
@@ -178,6 +178,11 @@ module.exports = function(FLUX) {
 		let connected = false;
 		NODE.on('init', (state) => {
 
+			this.removeAllStatuses();
+			lightStatuses = {};
+			serverStatuses = {};
+			lightAllConnectedStatus = null;
+
 			getLightsPerServer(state).then((lightsPerServers) => {
 
 				lightsPerServers.forEach((lightsPerServer) => {
@@ -189,15 +194,15 @@ module.exports = function(FLUX) {
 						return;
 					}
 
-					if (!serverEventsHooked[server.hostname]) {
+					if (serverEventsHooked.indexOf(server) === -1) {
 
 						server.on('open', () => serverConnected(server, lights));
 						server.on('close', () => serverDisconnected(server, lights));
 
 					}
-					serverEventsHooked[server.hostname] = true;
+					serverEventsHooked.push(server);
 
-					if (server.connected) {
+					if (server.readyState === 1) {
 						serverConnected(server, lights);
 					} else {
 						serverDisconnected(server, lights);
