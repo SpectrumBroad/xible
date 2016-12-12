@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -40,7 +38,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('conditional', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Return the selected value(s) based on the condition.`
 	}, constr);
 
 };

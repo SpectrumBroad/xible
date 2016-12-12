@@ -52,7 +52,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('http.request.respond', {
 		type: "action",
 		level: 0,
-		groups: ["http"]
+		description: `Responds to a HTTP request.`
 	}, constr);
 
 };

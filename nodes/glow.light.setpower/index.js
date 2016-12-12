@@ -54,7 +54,6 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.light.setpower', {
 		type: "action",
 		level: 0,
-		groups: ["glow"],
 		description: "Changes the power setting on a registrered in Glow."
 	}, constr);
 

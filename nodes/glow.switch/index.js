@@ -127,8 +127,8 @@ module.exports = function(FLUX) {
 
 		}
 
-		let serverswEventsHooked = {};
-		let serverEventsHooked = {};
+		let serverSwEventsHooked = [];
+		let serverEventsHooked = [];
 
 		function serverConnected(server, sws) {
 
@@ -141,7 +141,7 @@ module.exports = function(FLUX) {
 
 			sws.forEach((sw) => {
 
-				if (!serverswEventsHooked[server.hostname]) {
+				if (serverSwEventsHooked.indexOf(sw) === -1) {
 
 					sw.on('connect', () => swConnected(sw));
 					sw.on('close', () => swDisconnected(sw));
@@ -156,7 +156,9 @@ module.exports = function(FLUX) {
 
 			});
 
-			serverswEventsHooked[server.hostname] = true;
+			if (serverSwEventsHooked.indexOf(server) === -1) {
+				serverSwEventsHooked.push(server);
+			}
 
 		}
 
@@ -184,15 +186,17 @@ module.exports = function(FLUX) {
 						return;
 					}
 
-					if (!serverEventsHooked[server.hostname]) {
+					if (serverEventsHooked.indexOf(server) === -1) {
 
 						server.on('open', () => serverConnected(server, sws));
 						server.on('close', () => serverDisconnected(server, sws));
 
-					}
-					serverEventsHooked[server.hostname] = true;
+						serverEventsHooked.push(server);
 
-					if (server.connected) {
+					}
+
+
+					if (server.readyState === 1) {
 						serverConnected(server, sws);
 					} else {
 						serverDisconnected(server, sws);
@@ -209,7 +213,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.switch', {
 		type: "object",
 		level: 0,
-		groups: ["glow"]
+		description: `References a switch registered in Glow.`
 	}, constr);
 
 };

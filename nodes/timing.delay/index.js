@@ -50,7 +50,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('timing.delay', {
 		type: "action",
 		level: 0,
-		groups: ["timing"]
+		description: `Waits the given time in milliseconds before triggering the output.`
 	}, constr);
 
 };

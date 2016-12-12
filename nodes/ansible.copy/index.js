@@ -41,8 +41,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('ansible.copy', {
 		type: "action",
 		level: 0,
-		groups: ["ansible"],
-		editorContent: `<input type="text" placeholder="origin path" data-outputvalue="origPath" data-hideifattached="input[name=origin]" /><input type="text" placeholder="destination path" data-outputvalue="destPath" data-hideifattached="input[name=destination]" /><input type="text" placeholder="owner" data-outputvalue="owner" /><input type="text" placeholder="group" data-outputvalue="group" /><input type="text" placeholder="permissions" data-outputvalue="permissions" />`
+		description: 'Copies a file on the local box to remote locations.'
 	}, constr);
 
 };

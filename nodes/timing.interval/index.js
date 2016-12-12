@@ -76,7 +76,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('timing.interval', {
 		type: "action",
 		level: 0,
-		groups: ["timing"]
+		description: `Triggers the output in an interval, every given x milliseconds.`
 	}, constr);
 
 };

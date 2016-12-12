@@ -32,7 +32,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.mediaplayer.onstop', {
 		type: "event",
 		level: 0,
-		groups: ["glow"]
+		description: `Triggered whenever a mediaplayer connected through Glow stops.`
 	}, constr);
 
 };

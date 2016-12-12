@@ -31,7 +31,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('email.smtp.server', {
 		type: "object",
 		level: 0,
-		groups: ["email"]
+		description: `Defines an email SMTP server.`
 	}, constr);
 
 };

@@ -84,7 +84,6 @@ module.exports = function(FLUX) {
 	FLUX.addNode('color', {
 		type: "object",
 		level: 0,
-		groups: ["basics"],
 		description: "Returns a color object."
 	}, constr);
 

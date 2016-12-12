@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -18,7 +16,7 @@ module.exports = function(FLUX) {
 
 				let result = numbers.map((number) => {
 					return Math.round(number);
-				})
+				});
 
 				callback(result);
 
@@ -31,7 +29,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.round', {
 		type: "object",
 		level: 0,
-		groups: ["math"]
+		description: `Returns the value of a number rounded to the nearest integer.`
 	}, constr);
 
 };

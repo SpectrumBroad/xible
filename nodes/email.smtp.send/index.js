@@ -63,7 +63,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('email.smtp.send', {
 		type: "action",
 		level: 0,
-		groups: ["email"]
+		description: `Sends an email messages to a given smtp server.`
 	}, constr);
 
 };

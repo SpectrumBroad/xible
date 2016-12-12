@@ -125,7 +125,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('timing.time', {
 		type: "event",
 		level: 0,
-		groups: ["timing"]
+		description: `Triggered when the given time hits.`
 	}, constr);
 
 };

@@ -2,7 +2,7 @@ module.exports = function(FLUX) {
 
 
 	//constructor for the node
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (conn, state, callback) => {
@@ -26,7 +26,7 @@ module.exports = function(FLUX) {
 
 		type: "object",
 		level: 0,
-		groups: ["math"],
+		description: `Sums all the input values together, including the given value.`,
 		inputs: {
 			"values": {
 				type: "math.number"
@@ -38,6 +38,6 @@ module.exports = function(FLUX) {
 			}
 		}
 
-	}, constructorFunction);
+	}, constr);
 
 };

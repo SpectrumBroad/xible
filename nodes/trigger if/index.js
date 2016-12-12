@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -45,7 +43,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('trigger if', {
 		type: "action",
 		level: 0,
-		groups: ["basics"]
+		description: `Triggers an output based on a condition.`
 	}, constr);
 
 };

@@ -47,7 +47,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('filter', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Filters data based on an input condition.`
 	}, constr);
 
 };

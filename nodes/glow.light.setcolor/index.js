@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function hexToRgb(hex) {
@@ -125,7 +123,6 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.light.setcolor', {
 		type: "action",
 		level: 0,
-		groups: ["glow"],
 		description: "Sets the color on a light registerd in Glow."
 	}, constr);
 

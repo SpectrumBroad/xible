@@ -43,7 +43,6 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.switch.setstate', {
 		type: "action",
 		level: 0,
-		groups: ["glow"],
 		description: "Toggles a switch registrered in Glow."
 	}, constr);
 

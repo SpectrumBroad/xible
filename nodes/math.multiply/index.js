@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -50,7 +48,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.multiply', {
 		type: "object",
 		level: 0,
-		groups: ["math"]
+		description: `Returns a list of values for each multiplicand times the first multiplier input or the given multiplier.`
 	}, constr);
 
 };

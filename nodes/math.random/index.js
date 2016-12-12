@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -17,7 +15,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.random', {
 		type: "object",
 		level: 0,
-		groups: ["math"]
+		description: `Returns a pseudo-random floating point number from 0 to 1, but not including 1.`
 	}, constr);
 
 };

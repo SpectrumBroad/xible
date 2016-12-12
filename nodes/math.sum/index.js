@@ -26,7 +26,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.sum', {
 		type: "object",
 		level: 0,
-		groups: ["math"]
+		description: `Sums up all given input values.`
 	}, constr);
 
 };

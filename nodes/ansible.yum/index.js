@@ -33,8 +33,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('ansible.yum', {
 		type: "action",
 		level: 0,
-		groups: ["ansible"],
-		editorContent: `<input type="text" placeholder="package" data-outputvalue="package" />`
+		description: 'Install, upgrade, removes and lists packages and groups with the yum package manager.'
 	}, constr);
 
 };

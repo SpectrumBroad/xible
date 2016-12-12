@@ -16,10 +16,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('flux.flow.stop', {
+	FLUX.addNode('xible.flow.stop', {
 		type: "action",
 		level: 0,
-		groups: ["xible"]
+		description: `Stops this flow.`
 	}, constr);
 
 };

@@ -54,7 +54,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.light.onpoweron', {
 		type: "event",
 		level: 0,
-		groups: ["glow"]
+		description: `Event triggered whenever a light powers on in Glow.`
 	}, constr);
 
 };

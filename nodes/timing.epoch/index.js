@@ -15,7 +15,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('timing.epoch', {
 		type: "object",
 		level: 0,
-		groups: ["timing"]
+		description: `Returns the amount of milliseconds since Unix epoch. That is, 1 January 1970 00:00:00 UTC.`
 	}, constr);
 
 };

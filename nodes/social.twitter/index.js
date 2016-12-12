@@ -176,7 +176,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('social.twitter', {
 		type: 'object',
 		level: 0,
-		groups: ['social']
+		description: `Connects to Twitter given certain credentials.`
 	}, constr);
 
 };

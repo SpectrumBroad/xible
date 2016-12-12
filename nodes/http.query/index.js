@@ -31,7 +31,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('http.query', {
 		type: "object",
 		level: 0,
-		groups: ["http"]
+		description: `Returns the value of the given querystring field from a HTTP request.`
 	}, constr);
 
 };

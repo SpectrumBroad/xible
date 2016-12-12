@@ -1,6 +1,6 @@
 module.exports = function(FLUX) {
 
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
 		let glowIn = NODE.addInput('glow', {
 			type: "glow"
@@ -16,11 +16,21 @@ module.exports = function(FLUX) {
 
 		sceneOut.on('trigger', (conn, state, callback) => {
 
-			if (stringInput.connectors.length) {
-				NODE.getValuesFromInput(sceneIn, state).then(strs => callback(strs.map(str => Scene.getByName(str))));
-			} else {
-				callback(Scene.getByName(this.value));
-			}
+			//get the glow server
+			NODE.getValuesFromInput(glowIn, state).then((glows) => {
+
+				callback(glows.map((glow) => {
+
+					if (sceneIn.connectors.length) {
+						return NODE.getValuesFromInput(sceneIn, state)
+							.then((strs) => strs.map((str) => glow.Scene.getByName(str)));
+					} else {
+						return glow.Scene.getByName(NODE.data.value);
+					}
+
+				}));
+
+			});
 
 		});
 
@@ -29,8 +39,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.scene', {
 		type: "object",
 		level: 0,
-		groups: ["glow"],
-		description: "A Glow light scene."
-	}, constructorFunction);
+		description: "References a Glow light scene."
+	}, constr);
 
 };

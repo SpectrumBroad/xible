@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -43,7 +41,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('compare.greater', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Checks if all the inputs of 'a' or greater than any of the inputs of 'b'.`
 	}, constr);
 
 };

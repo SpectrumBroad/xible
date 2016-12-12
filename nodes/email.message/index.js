@@ -89,7 +89,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('email.message', {
 		type: "object",
 		level: 0,
-		groups: ["email"]
+		description: `Defines an email message.`
 	}, constr);
 
 };

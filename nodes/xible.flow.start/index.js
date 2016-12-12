@@ -56,10 +56,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('flux.flow.start', {
+	FLUX.addNode('xible.flow.start', {
 		type: "action",
 		level: 0,
-		groups: ["xible"]
+		description: `Starts another flow.`
 	}, constr);
 
 };

@@ -26,7 +26,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('string', {
 		type: "object",
 		level: 0,
-		groups: ["basics"],
+		description: `A string representation.`,
 		inputs: {
 			"concat": {
 				type: "string"

@@ -32,7 +32,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('compare.equal', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: 'Compares all inputs and verifies that they equal.'
 	}, constr);
 
 };

@@ -129,7 +129,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow', {
 		type: "object",
 		level: 0,
-		groups: ["glow"]
+		description: `Specifies a Glow server.`
 	}, constr);
 
 };

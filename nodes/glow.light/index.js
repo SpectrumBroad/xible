@@ -161,7 +161,9 @@ module.exports = function(FLUX) {
 
 			});
 
-			serverLightEventsHooked.push(server);
+			if (serverLightEventsHooked.indexOf(server) === -1) {
+				serverLightEventsHooked.push(server);
+			}
 
 		}
 
@@ -199,8 +201,9 @@ module.exports = function(FLUX) {
 						server.on('open', () => serverConnected(server, lights));
 						server.on('close', () => serverDisconnected(server, lights));
 
+						serverEventsHooked.push(server);
+
 					}
-					serverEventsHooked.push(server);
 
 					if (server.readyState === 1) {
 						serverConnected(server, lights);
@@ -219,7 +222,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.light', {
 		type: "object",
 		level: 0,
-		groups: ["glow"]
+		description: `References a light registered in Glow.`
 	}, constr);
 
 };

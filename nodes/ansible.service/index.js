@@ -33,8 +33,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('ansible.service', {
 		type: "action",
 		level: 0,
-		groups: ["ansible"],
-		editorContent: `<input type="text" placeholder="service name" data-outputvalue="name" /><select data-outputvalue="state"><option>started</option><option>stopped</option><option>restarted</option><option>reloaded</option></select>`
+		description: 'Controls services on remote hosts.'
 	}, constr);
 
 };

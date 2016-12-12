@@ -48,7 +48,6 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.light.setscene', {
 		type: "action",
 		level: 0,
-		groups: ["glow"],
 		description: "Applies a Glow light scene to one or more lights."
 	}, constructorFunction);
 

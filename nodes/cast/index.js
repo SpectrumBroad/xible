@@ -46,7 +46,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('cast', {
 		type: "object",
 		level: 0,
-		groups: ["basics"],
+		description: 'Change data type into another.',
 		inputs: {
 			"values": {}
 		},

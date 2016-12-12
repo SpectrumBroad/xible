@@ -87,7 +87,7 @@ console.log('destroy!');
 	FLUX.addNode('social.twitter.ontweet', {
 		type: 'event',
 		level: 0,
-		groups: ['social']
+		description: `Triggered whenever a tweet comes in on the given search tags.`
 	}, constr);
 
 };

@@ -42,10 +42,9 @@ module.exports = function(FLUX) {
 	}
 
 	FLUX.addNode('group', {
-
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Groups multiple input values together.`
 	}, constr);
 
 };

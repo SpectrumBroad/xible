@@ -47,10 +47,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('string concat', {
+	FLUX.addNode('string.concat', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Concatenates strings a and b together in that order.`
 	}, constr);
 
 };

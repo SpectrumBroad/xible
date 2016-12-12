@@ -72,7 +72,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('http.server.onrequest', {
 		type: "event",
 		level: 0,
-		groups: ["http"]
+		description: `Triggered whenever a HTTP request lands on the given route.`
 	}, constr);
 
 };

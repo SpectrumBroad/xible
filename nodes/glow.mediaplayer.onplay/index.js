@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -51,7 +49,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('glow.mediaplayer.onplay', {
 		type: "event",
 		level: 0,
-		groups: ["glow"]
+		description: `Triggered whenever a mediaplayer connected through Glow begins to play.`
 	}, constr);
 
 };

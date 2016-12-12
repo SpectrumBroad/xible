@@ -81,7 +81,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('http.server', {
 		type: "object",
 		level: 0,
-		groups: ["http"]
+		description: `Sets up a HTTP server.`
 	}, constr);
 
 };

@@ -41,8 +41,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('ansible.template', {
 		type: "action",
 		level: 0,
-		groups: ["ansible"],
-		editorContent: `<input type="text" placeholder="origin path" data-outputvalue="origPath" data-hideifattached="input[name=origin]" /><input type="text" placeholder="destination path" data-outputvalue="destPath" data-hideifattached="input[name=destination]" />`
+		description: 'Templates are processed by the Jinja2 templating language.'
 	}, constr);
 
 };

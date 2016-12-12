@@ -96,7 +96,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('timing.now', {
 		type: "object",
 		level: 0,
-		groups: ["timing"]
+		description: `Returns a time object representing 'now'.`
 	}, constr);
 
 };

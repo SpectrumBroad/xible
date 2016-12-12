@@ -37,8 +37,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('ansible.shell', {
 		type: "action",
 		level: 0,
-		groups: ["ansible"],
-		editorContent: `<input type="text" placeholder="command" data-outputvalue="cmd" data-hideifattached="input[name=command]" />`
+		description: 'Runs the given command through a shell on the remote node.'
 	}, constr);
 
 };

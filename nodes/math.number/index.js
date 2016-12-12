@@ -15,7 +15,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.number', {
 		type: "object",
 		level: 0,
-		groups: ["basics", "math"]
+		description: `Defines a number.`
 	}, constr);
 
 };

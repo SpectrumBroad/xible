@@ -119,10 +119,6 @@ if (cluster.isMaster) {
 
 	});
 
-	let flux = new Flux({
-		nodesPath: './nodes'
-	});
-
 	//init message handler
 	process.on('message', (message) => {
 
@@ -132,7 +128,21 @@ if (cluster.isMaster) {
 
 				try {
 
-					flow = new flux.Flow(flux);
+					//get the nodenames we need to init
+					let nodeNames = {};
+					message.flow.nodes.forEach((node) => {
+						if (!nodeNames[node.name]) {
+							nodeNames[node.name] = true;
+						}
+					});
+
+					//setup xible with the nodeNames
+					let xible = new Flux({
+						nodesPath: './nodes',
+						nodeNames: Object.keys(nodeNames)
+					});
+
+					flow = new xible.Flow();
 					flow.initJson(message.flow);
 
 					if (message.directNodes) {

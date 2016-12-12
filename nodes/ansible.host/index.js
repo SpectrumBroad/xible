@@ -28,8 +28,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('ansible.host', {
 		type: "object",
 		level: 0,
-		groups: ["ansible"],
-		editorContent: `<input type="text" placeholder="hostname" data-outputvalue="hostname" />`
+		description: 'Specifies a remote host to address. In Ansible you would find these in the hosts.ini.'
 	}, constr);
 
 };

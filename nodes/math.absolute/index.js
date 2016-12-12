@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -30,7 +28,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('math.absolute', {
 		type: "object",
 		level: 0,
-		groups: ["math"]
+		description: `Returns the absolute value of a number.`
 	}, constr);
 
 };

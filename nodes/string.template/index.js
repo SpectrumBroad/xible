@@ -1,6 +1,6 @@
 module.exports = function(FLUX) {
 
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
 		function templateStringParser(str, vars) {
 			return str.replace(/(^|(?:\\\\)+|\\.|[^\\])\$\{(\w*?)\}/g, (match, pre, varName) => {
@@ -21,10 +21,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('template-string', {
+	FLUX.addNode('string.template', {
 		type: "object",
 		level: 0,
-		groups: ["basics"],
+		description: `Parses a template string with input variables. Variables can be addressed by their name like so: \${variableName}`,
 		inputs: {
 			"variable": {
 				type: "variable"
@@ -35,6 +35,6 @@ module.exports = function(FLUX) {
 				type: "string"
 			}
 		}
-	}, constructorFunction);
+	}, constr);
 
 };

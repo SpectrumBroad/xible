@@ -88,7 +88,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('store', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Stores a value allowing direct re-use.`
 	}, constr);
 
 };

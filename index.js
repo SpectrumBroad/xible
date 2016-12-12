@@ -30,7 +30,7 @@ const Flux = module.exports = function Flux(obj) {
 
 	//get all installed nodes
 	if (obj.nodesPath) {
-		Node.initFromPath(obj.nodesPath);
+		Node.initFromPath(obj.nodesPath, obj.nodeNames);
 	}
 
 	//get all installed flows

@@ -35,7 +35,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('sentiment', {
 		type: "object",
 		level: 0,
-		groups: ["analysis"]
+		description: `Performs sentiment analysis on the input string(s) and returns the corresponding sentiment number. Uses the AFINN-165 wordlist to do so.`
 	}, constr);
 
 };

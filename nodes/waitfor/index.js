@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -61,7 +59,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('waitfor', {
 		type: "action",
 		level: 0,
-		groups: ["basics"]
+		description: `Waits for all the input triggers to have triggered, before continuing.`
 	}, constr);
 
 };

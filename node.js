@@ -56,7 +56,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-		static initFromPath(path) {
+		static initFromPath(path, files) {
 
 			nodeDebug(`init nodes from ${path}`);
 
@@ -66,7 +66,9 @@ module.exports = function(XIBLE, express, expressApp) {
 
 			Node.nodesPath = path;
 
-			let files = fs.readdirSync(path);
+			if(!Array.isArray(files)) {
+				files = fs.readdirSync(path);
+			}
 			files.forEach((file) => {
 
 				let filepath = `${path}/${file}`;
@@ -404,8 +406,6 @@ module.exports = function(XIBLE, express, expressApp) {
 		}
 
 	}
-
-	//Node.xible = Node.flux = XIBLE;
 
 	return Node;
 

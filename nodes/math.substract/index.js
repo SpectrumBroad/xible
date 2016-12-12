@@ -2,7 +2,7 @@ module.exports = function(FLUX) {
 
 
 	//constructor for the node
-	function constructorFunction(NODE) {
+	function constr(NODE) {
 
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (conn, state, callback) => {
@@ -42,7 +42,7 @@ module.exports = function(FLUX) {
 
 		type: "object",
 		level: 0,
-		groups: ["math"],
+		description: `Returns a list of all 'a' inputs minus the first 'b' input or the given value.`,
 		inputs: {
 			"a": {
 				type: "math.number"
@@ -57,6 +57,6 @@ module.exports = function(FLUX) {
 			}
 		}
 
-	}, constructorFunction);
+	}, constr);
 
 };

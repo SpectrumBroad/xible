@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -32,7 +30,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('compare.differ', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: 'Compares all inputs and checks if they differ from eachother.'
 	}, constr);
 
 };

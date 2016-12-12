@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(FLUX) {
 
 	function constr(NODE) {
@@ -98,7 +96,7 @@ module.exports = function(FLUX) {
 	FLUX.addNode('variable', {
 		type: "object",
 		level: 0,
-		groups: ["basics"]
+		description: `Represents a named variable.`
 	}, constr);
 
 };
