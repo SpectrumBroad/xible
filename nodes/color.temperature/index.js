@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('color.temperature', {
+	XIBLE.addNode('color.temperature', {
 		type: "object",
 		level: 0,
 		groups: ["basics"],

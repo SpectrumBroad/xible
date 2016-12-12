@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -6,13 +6,17 @@ module.exports = function(FLUX) {
 			type: "trigger"
 		});
 
-		let hostIn = NODE.addInput('hosts', {
-			type: "ansible.host"
+		let ansibleIn = NODE.addInput('ansible', {
+			type: "ansible"
 		});
 
-    let cmdIn = NODE.addInput('command', {
-      type: "string"
-    });
+		let hostIn = NODE.addInput('hostgroup', {
+			type: "ansible.hostgroup"
+		});
+
+		let cmdIn = NODE.addInput('command', {
+			type: "string"
+		});
 
 		let triggerOut = NODE.addOutput('done', {
 			type: "trigger"
@@ -20,13 +24,57 @@ module.exports = function(FLUX) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(hostIn, state).then((hosts) => {
+			if (!NODE.data.cmd || !hostIn.isConnected() || !ansibleIn.isConnected()) {
+				return;
+			}
 
-				hosts.forEach((host) => {
+			NODE.getValuesFromInput(ansibleIn, state).then((ansibles) => {
+
+				NODE.getValuesFromInput(hostIn, state).then((hosts) => {
+
+					ansibles.forEach((ansible) => {
+
+						hosts.forEach((host) => {
+
+							let cmd = ansible.module('shell').hosts(host.groupName).args(NODE.data.cmd);
+
+							cmd.on('stdout', (data) => {
+
+								data = data.toString();
+								if (!data) {
+									return;
+								}
+
+								NODE.addStatus({
+									message: data,
+									timeout: 5000,
+									color: data.indexOf('| success ') > -1 ? 'green' : null,
+								});
+
+							});
+							cmd.on('stderr', (data) => {
+
+								data = data.toString();
+								if (!data) {
+									return;
+								}
+
+								NODE.addStatus({
+									message: data.toString(),
+									timeout: 5000,
+									color: 'red'
+								});
+
+							});
+							cmd.exec().then(() => {
+								XIBLE.Node.triggerOutputs(triggerOut, state);
+							});
+
+						});
+
+					});
 
 				});
-
-				FLUX.Node.triggerOutputs(triggerOut, state);
 
 			});
 
@@ -34,7 +82,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('ansible.shell', {
+	XIBLE.addNode('ansible.shell', {
 		type: "action",
 		level: 0,
 		description: 'Runs the given command through a shell on the remote node.'

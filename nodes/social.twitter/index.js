@@ -3,7 +3,7 @@ const TwitterNg = require('twitter-ng');
 const CONSUMER_KEY = 'BnQEOrezeCOwWAMOYGh5yVKIf';
 const CONSUMER_SECRET = 'zKYMMxP3G4tbgTg0108j1Ye8soUd4krqJIcAOeQYNK33CzQezH';
 
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -173,7 +173,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('social.twitter', {
+	XIBLE.addNode('social.twitter', {
 		type: 'object',
 		level: 0,
 		description: `Connects to Twitter given certain credentials.`

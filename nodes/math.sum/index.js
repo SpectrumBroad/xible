@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -23,7 +23,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('math.sum', {
+	XIBLE.addNode('math.sum', {
 		type: "object",
 		level: 0,
 		description: `Sums up all given input values.`

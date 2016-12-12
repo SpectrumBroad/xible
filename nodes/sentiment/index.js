@@ -1,6 +1,6 @@
 const sentiment = require('sentiment');
 
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -32,7 +32,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('sentiment', {
+	XIBLE.addNode('sentiment', {
 		type: "object",
 		level: 0,
 		description: `Performs sentiment analysis on the input string(s) and returns the corresponding sentiment number. Uses the AFINN-165 wordlist to do so.`

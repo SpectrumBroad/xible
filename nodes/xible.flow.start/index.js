@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -23,7 +23,7 @@ module.exports = function(FLUX) {
 				switch (message.method) {
 
 					case 'flowStarted':
-						FLUX.Node.triggerOutputs(doneOut, state);
+						XIBLE.Node.triggerOutputs(doneOut, state);
 						break;
 
 					case 'flowNotExist':
@@ -56,7 +56,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('xible.flow.start', {
+	XIBLE.addNode('xible.flow.start', {
 		type: "action",
 		level: 0,
 		description: `Starts another flow.`

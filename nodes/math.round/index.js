@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -26,7 +26,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('math.round', {
+	XIBLE.addNode('math.round', {
 		type: "object",
 		level: 0,
 		description: `Returns the value of a number rounded to the nearest integer.`

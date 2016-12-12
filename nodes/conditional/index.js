@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -35,7 +35,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('conditional', {
+	XIBLE.addNode('conditional', {
 		type: "object",
 		level: 0,
 		description: `Return the selected value(s) based on the condition.`

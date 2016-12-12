@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -39,7 +39,7 @@ module.exports = function(FLUX) {
 							light: event.light
 						});
 
-						FLUX.Node.triggerOutputs(triggerOut, state);
+						XIBLE.Node.triggerOutputs(triggerOut, state);
 
 					});
 
@@ -51,7 +51,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.onpoweron', {
+	XIBLE.addNode('glow.light.onpoweron', {
 		type: "event",
 		level: 0,
 		description: `Event triggered whenever a light powers on in Glow.`

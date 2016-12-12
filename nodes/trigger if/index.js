@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -25,13 +25,13 @@ module.exports = function(FLUX) {
 				if (bools.length) {
 
 					if (bools.some(bool => !bool)) {
-						FLUX.Node.triggerOutputs(elseOut, state);
+						XIBLE.Node.triggerOutputs(elseOut, state);
 					} else {
-						FLUX.Node.triggerOutputs(thenOut, state);
+						XIBLE.Node.triggerOutputs(thenOut, state);
 					}
 
 				} else {
-					FLUX.Node.triggerOutputs(elseOut, state);
+					XIBLE.Node.triggerOutputs(elseOut, state);
 				}
 
 			});
@@ -40,7 +40,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('trigger if', {
+	XIBLE.addNode('trigger if', {
 		type: "action",
 		level: 0,
 		description: `Triggers an output based on a condition.`

@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -26,7 +26,7 @@ module.exports = function(FLUX) {
 				updateOverTime: interval,
 				timeout: interval + 700
 			});
-			FLUX.Node.triggerOutputs(triggerOut, state);
+			XIBLE.Node.triggerOutputs(triggerOut, state);
 
 		};
 
@@ -73,7 +73,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('timing.interval', {
+	XIBLE.addNode('timing.interval', {
 		type: "action",
 		level: 0,
 		description: `Triggers the output in an interval, every given x milliseconds.`

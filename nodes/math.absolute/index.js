@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -25,7 +25,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('math.absolute', {
+	XIBLE.addNode('math.absolute', {
 		type: "object",
 		level: 0,
 		description: `Returns the absolute value of a number.`

@@ -1,6 +1,6 @@
 const https = require('https');
 
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function getWeatherInfo(location, date, unit, callback) {
 
@@ -99,7 +99,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('weather', {
+	XIBLE.addNode('weather', {
 		type: "object",
 		level: 0,
 		description: "Retrieve the weather for a specific location using the yahoo API."

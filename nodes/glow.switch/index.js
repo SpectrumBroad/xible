@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -28,7 +28,7 @@ module.exports = function(FLUX) {
 
 				return Promise.all(glows.map((glow) => {
 
-					if (nameIn.connectors.length) {
+					if (nameIn.isConnected()) {
 
 						return NODE.getValuesFromInput(nameIn, state)
 							.then((names) => Promise.all(names.map((name) => glow.Switch.getByName(name))))
@@ -210,7 +210,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.switch', {
+	XIBLE.addNode('glow.switch', {
 		type: "object",
 		level: 0,
 		description: `References a switch registered in Glow.`

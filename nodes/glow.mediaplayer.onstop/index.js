@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -18,7 +18,7 @@ module.exports = function(FLUX) {
 				glows.forEach((glow) => {
 
 					glow.MediaPlayer.on('stop', (event) => {
-						FLUX.Node.triggerOutputs(triggerOut, state);
+						XIBLE.Node.triggerOutputs(triggerOut, state);
 					});
 
 				});
@@ -29,7 +29,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.mediaplayer.onstop', {
+	XIBLE.addNode('glow.mediaplayer.onstop', {
 		type: "event",
 		level: 0,
 		description: `Triggered whenever a mediaplayer connected through Glow stops.`

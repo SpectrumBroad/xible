@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -6,8 +6,8 @@ module.exports = function(FLUX) {
 			type: "variable"
 		});
 
-		let hostOut = NODE.addOutput('host', {
-			type: "ansible.host"
+		let hostOut = NODE.addOutput('hostgroup', {
+			type: "ansible.hostgroup"
 		});
 
 		hostOut.on('trigger', (conn, state, callback) => {
@@ -16,7 +16,7 @@ module.exports = function(FLUX) {
 
 				callback({
 					variables: vars,
-					hostname: NODE.data.hostname
+					groupName: NODE.data.groupName
 				});
 
 			});
@@ -25,10 +25,10 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('ansible.host', {
+	XIBLE.addNode('ansible.hostgroup', {
 		type: "object",
 		level: 0,
-		description: 'Specifies a remote host to address. In Ansible you would find these in the hosts.ini.'
+		description: 'Specifies a hostgroup as defined in the host inventory.'
 	}, constr);
 
 };

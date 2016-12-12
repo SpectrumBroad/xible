@@ -66,7 +66,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 			Node.nodesPath = path;
 
-			if(!Array.isArray(files)) {
+			if (!Array.isArray(files)) {
 				files = fs.readdirSync(path);
 			}
 			files.forEach((file) => {
@@ -418,9 +418,11 @@ class NodeIo extends EventEmitter {
 
 		super();
 
+		this.name = null;
 		this.type = null;
 		this.singleType = false;
 		this.maxConnectors = null;
+		this.node = null;
 
 		if (obj) {
 
@@ -445,6 +447,27 @@ class NodeIo extends EventEmitter {
 		}
 
 		this.connectors = [];
+
+	}
+
+	isConnected() {
+
+		let conns = this.connectors;
+
+		//check global outputs
+		if (!conns.length && this.node && this.node.flow) {
+
+			conns = this.node.flow.getGlobalOutputsByType(this.type).map((output) => ({
+				origin: output
+			}));
+
+		}
+
+		if (conns.length) {
+			return true;
+		}
+
+		return false;
 
 	}
 

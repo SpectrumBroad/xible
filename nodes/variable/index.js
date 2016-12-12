@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -37,7 +37,7 @@ module.exports = function(FLUX) {
 				//save the state
 				state.set(this, variable);
 
-				FLUX.Node.triggerOutputs(refreshOut, state);
+				XIBLE.Node.triggerOutputs(refreshOut, state);
 
 			});
 
@@ -93,7 +93,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('variable', {
+	XIBLE.addNode('variable', {
 		type: "object",
 		level: 0,
 		description: `Represents a named variable.`

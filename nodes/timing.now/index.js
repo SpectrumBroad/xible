@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -93,7 +93,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('timing.now', {
+	XIBLE.addNode('timing.now', {
 		type: "object",
 		level: 0,
 		description: `Returns a time object representing 'now'.`

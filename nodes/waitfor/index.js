@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -48,7 +48,7 @@ module.exports = function(FLUX) {
 
 				stack.shift();
 				NODE.removeStatusById(thisStack.statusId, 700);
-				FLUX.Node.triggerOutputs(doneOut, state);
+				XIBLE.Node.triggerOutputs(doneOut, state);
 
 			}
 
@@ -56,7 +56,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('waitfor', {
+	XIBLE.addNode('waitfor', {
 		type: "action",
 		level: 0,
 		description: `Waits for all the input triggers to have triggered, before continuing.`

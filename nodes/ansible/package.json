@@ -1,0 +1,13 @@
+{
+
+	"name": "xible-ansible",
+	"version": "0.0.1",
+	"description": "ansible node for Xible",
+
+	"dependencies": {
+		"node-ansible": "*"
+	},
+
+	"private": true
+
+}

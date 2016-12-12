@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 
 	//constructor for the node
@@ -22,7 +22,7 @@ module.exports = function(FLUX) {
 
 
 	//setup the node definition
-	FLUX.addNode('math.add', {
+	XIBLE.addNode('math.add', {
 
 		type: "object",
 		level: 0,
