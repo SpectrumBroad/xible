@@ -326,7 +326,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				delete statuses[this._id];
 				Flow.saveStatuses(statuses);
 
-				//remove from Flux instance
+				//remove from Xible instance
 				if (XIBLE) {
 					delete XIBLE.flows[this._id];
 				}

@@ -5,7 +5,7 @@ const cluster = require('cluster');
 const config = require('./config.json');
 
 //xible
-const Flux = require('./index.js');
+const Xible = require('./index.js');
 
 if (cluster.isMaster) {
 
@@ -83,7 +83,7 @@ if (cluster.isMaster) {
 				server: spdyWebSocketServer
 			});
 
-			new Flux({
+			new Xible({
 				express: express,
 				expressApp: expressApp,
 				webSocketServer: webSocketServer,
@@ -137,7 +137,7 @@ if (cluster.isMaster) {
 					});
 
 					//setup xible with the nodeNames
-					let xible = new Flux({
+					let xible = new Xible({
 						nodesPath: './nodes',
 						nodeNames: Object.keys(nodeNames)
 					});

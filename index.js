@@ -11,7 +11,7 @@ const cluster = require('cluster');
 const WEB_SOCKET_THROTTLE = 100; //<1 === don't throttle
 const STAT_INTERVAL = 1000; //a value below the broadcast throttle interval (100) won't have any effect
 
-const Flux = module.exports = function Flux(obj) {
+const Xible = module.exports = function Xible(obj) {
 
 	const Node = this.Node = require('./Node.js')(this, obj.express, obj.expressApp);
 	const Flow = this.Flow = require('./Flow.js')(this, obj.express, obj.expressApp);
@@ -64,7 +64,7 @@ const Flux = module.exports = function Flux(obj) {
 };
 
 
-Flux.prototype.initStats = function() {
+Xible.prototype.initStats = function() {
 
 	if (cluster.isMaster) {
 
@@ -132,7 +132,7 @@ Flux.prototype.initStats = function() {
 };
 
 
-Flux.getNativeModules = function() {
+Xible.getNativeModules = function() {
 
 	return Object.keys(process.binding('natives')).filter(function(el) {
 		return !/^_|^internal|\//.test(el);
@@ -141,12 +141,12 @@ Flux.getNativeModules = function() {
 };
 
 
-Flux.checkUsedDeps = function() {
+Xible.checkUsedDeps = function() {
 	let depcheck = require('depcheck');
 };
 
 
-Flux.generateObjectId = Flux.prototype.generateObjectId = function() {
+Xible.generateObjectId = Xible.prototype.generateObjectId = function() {
 
 	function s4() {
 		return Math.floor((1 + Math.random()) * 0x10000)
@@ -159,7 +159,7 @@ Flux.generateObjectId = Flux.prototype.generateObjectId = function() {
 };
 
 
-Flux.prototype.initExpress = function(express, expressApp) {
+Xible.prototype.initExpress = function(express, expressApp) {
 
 	if (!expressApp) {
 		return;
@@ -170,7 +170,7 @@ Flux.prototype.initExpress = function(express, expressApp) {
 };
 
 
-Flux.prototype.initWebSocket = function(webSocketServer) {
+Xible.prototype.initWebSocket = function(webSocketServer) {
 
 	if (!webSocketServer) {
 		return;
@@ -189,7 +189,7 @@ function handleBroadcastWebSocketError(err) {
 
 
 let broadcastWebSocketMessagesThrottle = [];
-Flux.prototype.broadcastWebSocket = function(message) {
+Xible.prototype.broadcastWebSocket = function(message) {
 
 	if (!this.webSocketServer) {
 		return;
@@ -219,7 +219,7 @@ Flux.prototype.broadcastWebSocket = function(message) {
 
 
 //register a node
-Flux.prototype.addNode = function(name, obj, constructorFunction) {
+Xible.prototype.addNode = function(name, obj, constructorFunction) {
 
 	if (!name || !obj || (!constructorFunction && !obj.constructorFunction)) {
 		throw new Error('first argument needs to be string, second object, third a constructor function');
@@ -243,17 +243,17 @@ Flux.prototype.addNode = function(name, obj, constructorFunction) {
 };
 
 
-Flux.prototype.getNodes = function() {
+Xible.prototype.getNodes = function() {
 	return this.nodes;
 };
 
 
-Flux.prototype.getNodeByName = function(name) {
+Xible.prototype.getNodeByName = function(name) {
 	return this.nodes[name];
 };
 
 
-Flux.prototype.addFlow = function(flow, callback) {
+Xible.prototype.addFlow = function(flow, callback) {
 	this.flows[flow._id] = flow;
 
 	if (typeof callback === 'function') {
@@ -263,7 +263,7 @@ Flux.prototype.addFlow = function(flow, callback) {
 };
 
 
-Flux.prototype.getFlows = function(callback) {
+Xible.prototype.getFlows = function(callback) {
 
 	if (typeof callback === 'function') {
 		callback(this.flows);
@@ -274,7 +274,7 @@ Flux.prototype.getFlows = function(callback) {
 };
 
 
-Flux.prototype.getFlowById = function(id, callback) {
+Xible.prototype.getFlowById = function(id, callback) {
 
 	if (typeof callback === 'function') {
 		callback(this.flows[id]);
@@ -285,7 +285,7 @@ Flux.prototype.getFlowById = function(id, callback) {
 };
 
 
-Flux.prototype.getFlowByName = function(name, callback) {
+Xible.prototype.getFlowByName = function(name, callback) {
 
 	//same?
 	return this.getFlowById(name, callback);
@@ -306,7 +306,7 @@ Flux.prototype.getFlowByName = function(name, callback) {
 };
 
 
-Flux.prototype.deleteFlow = function(flow, callback) {
+Xible.prototype.deleteFlow = function(flow, callback) {
 
 	if (flow._id) {
 		delete this.flows[flow._id];
@@ -319,7 +319,7 @@ Flux.prototype.deleteFlow = function(flow, callback) {
 };
 
 
-Flux.prototype.deleteFlowById = function(id, callback) {
+Xible.prototype.deleteFlowById = function(id, callback) {
 
 	if (id) {
 		delete this.flows[id];
@@ -332,6 +332,6 @@ Flux.prototype.deleteFlowById = function(id, callback) {
 };
 
 
-Flux.prototype.getNodeConstructorByName = function(name) {
+Xible.prototype.getNodeConstructorByName = function(name) {
 	return this.nodes[name].constructorFunction;
 };
