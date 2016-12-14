@@ -1,10 +1,10 @@
 {
-  "name": "flux",
+  "name": "xible",
   "version": "0.0.1",
-  "description": "flux",
+  "description": "xible",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "export DEBUG=\"flux*\"; nodemon server.js"
+    "test": "export DEBUG=\"xible*\"; nodemon server.js"
   },
   "dependencies": {
     "uws": "*",

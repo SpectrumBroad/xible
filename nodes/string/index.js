@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -23,7 +23,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('string', {
+	XIBLE.addNode('string', {
 		type: "object",
 		level: 0,
 		description: `A string representation.`,

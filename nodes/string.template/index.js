@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -21,7 +21,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('string.template', {
+	XIBLE.addNode('string.template', {
 		type: "object",
 		level: 0,
 		description: `Parses a template string with input variables. Variables can be addressed by their name like so: \${variableName}`,

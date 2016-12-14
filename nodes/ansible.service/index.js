@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -22,7 +22,7 @@ module.exports = function(FLUX) {
 
 				});
 
-				FLUX.Node.triggerOutputs(triggerOut, state);
+				XIBLE.Node.triggerOutputs(triggerOut, state);
 
 			});
 
@@ -30,7 +30,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('ansible.service', {
+	XIBLE.addNode('ansible.service', {
 		type: "action",
 		level: 0,
 		description: 'Controls services on remote hosts.'

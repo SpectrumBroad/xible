@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -28,7 +28,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('http.query', {
+	XIBLE.addNode('http.query', {
 		type: "object",
 		level: 0,
 		description: `Returns the value of the given querystring field from a HTTP request.`

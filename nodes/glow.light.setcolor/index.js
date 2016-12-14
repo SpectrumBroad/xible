@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function hexToRgb(hex) {
 
@@ -78,7 +78,7 @@ module.exports = function(FLUX) {
 
 				if (!hexColors.length) {
 
-					FLUX.Node.triggerOutputs(doneOut, state);
+					XIBLE.Node.triggerOutputs(doneOut, state);
 					return;
 
 				}
@@ -110,7 +110,7 @@ module.exports = function(FLUX) {
 					}
 
 					Promise.all(lights.map((light) => light.connected && light.setColor(color.h, color.s, color.v, duration)))
-						.then(() => FLUX.Node.triggerOutputs(doneOut, state));
+						.then(() => XIBLE.Node.triggerOutputs(doneOut, state));
 
 				});
 
@@ -120,7 +120,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.setcolor', {
+	XIBLE.addNode('glow.light.setcolor', {
 		type: "action",
 		level: 0,
 		description: "Sets the color on a light registerd in Glow."

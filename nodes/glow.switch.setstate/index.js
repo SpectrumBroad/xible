@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -30,7 +30,7 @@ module.exports = function(FLUX) {
 					}
 
 					Promise.all(sws.map((sw) => sw.connected && (switchState ? sw.switchOn() : sw.switchOff())))
-						.then(() => FLUX.Node.triggerOutputs(doneOut, state));
+						.then(() => XIBLE.Node.triggerOutputs(doneOut, state));
 
 				});
 
@@ -40,7 +40,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.switch.setstate', {
+	XIBLE.addNode('glow.switch.setstate', {
 		type: "action",
 		level: 0,
 		description: "Toggles a switch registrered in Glow."

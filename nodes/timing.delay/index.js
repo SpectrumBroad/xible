@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -37,7 +37,7 @@ module.exports = function(FLUX) {
 						timeout: delay + 700
 					});
 
-					setTimeout(() => FLUX.Node.triggerOutputs(triggerOut, state), delay);
+					setTimeout(() => XIBLE.Node.triggerOutputs(triggerOut, state), delay);
 
 				});
 
@@ -47,7 +47,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('timing.delay', {
+	XIBLE.addNode('timing.delay', {
 		type: "action",
 		level: 0,
 		description: `Waits the given time in milliseconds before triggering the output.`

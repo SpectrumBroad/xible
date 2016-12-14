@@ -2,7 +2,7 @@ const EventEmitter = require('events').EventEmitter;
 const GlowWrapper = require('../../../GlowWrapper');
 
 
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -65,7 +65,7 @@ module.exports = function(FLUX) {
 
 					connected = true;
 
-					FLUX.Node.triggerOutputs(glowConnected, state);
+					XIBLE.Node.triggerOutputs(glowConnected, state);
 
 				});
 
@@ -87,7 +87,7 @@ module.exports = function(FLUX) {
 					});
 
 					if (connected) {
-						FLUX.Node.triggerOutputs(glowDisconnected, state);
+						XIBLE.Node.triggerOutputs(glowDisconnected, state);
 					}
 
 					connected = false;
@@ -126,7 +126,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow', {
+	XIBLE.addNode('glow', {
 		type: "object",
 		level: 0,
 		description: `Specifies a Glow server.`

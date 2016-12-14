@@ -3,7 +3,7 @@
 
 //setup debug
 const debug = require('debug');
-const webSocketDebug = debug('flux:webSocket');
+const webSocketDebug = debug('xible:webSocket');
 const cluster = require('cluster');
 
 
@@ -48,7 +48,7 @@ const Flux = module.exports = function Flux(obj) {
 			if (broadcastWebSocketMessagesThrottle.length) {
 
 				let message = JSON.stringify({
-					method: 'flux.messages',
+					method: 'xible.messages',
 					messages: broadcastWebSocketMessagesThrottle
 				});
 				broadcastWebSocketMessagesThrottle = [];
@@ -81,7 +81,7 @@ Flux.prototype.initStats = function() {
 				}));
 
 			this.broadcastWebSocket({
-				method: 'flux.flow.usage',
+				method: 'xible.flow.usage',
 				flows: flowsUsage
 			});
 

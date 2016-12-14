@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -100,10 +100,10 @@ module.exports = function(FLUX) {
 			//setTimeout trigger on the difference
 			//unless it's this second, than trigger immediately
 			if (diff >= 0 && diff < 1000) {
-				FLUX.Node.triggerOutputs(triggerOut, state);
+				XIBLE.Node.triggerOutputs(triggerOut, state);
 			} else if (diff > 0) {
 				timeout = setTimeout(() => {
-					FLUX.Node.triggerOutputs(triggerOut, state);
+					XIBLE.Node.triggerOutputs(triggerOut, state);
 				}, diff);
 			}
 
@@ -122,7 +122,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('timing.time', {
+	XIBLE.addNode('timing.time', {
 		type: "event",
 		level: 0,
 		description: `Triggered when the given time hits.`

@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -78,7 +78,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('http.server', {
+	XIBLE.addNode('http.server', {
 		type: "object",
 		level: 0,
 		description: `Sets up a HTTP server.`

@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -45,7 +45,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('math.multiply', {
+	XIBLE.addNode('math.multiply', {
 		type: "object",
 		level: 0,
 		description: `Returns a list of values for each multiplicand times the first multiplier input or the given multiplier.`

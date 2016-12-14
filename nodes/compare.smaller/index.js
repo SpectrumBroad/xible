@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -38,7 +38,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('compare.smaller', {
+	XIBLE.addNode('compare.smaller', {
 		type: "object",
 		level: 0,
 		description: `Checks if all the inputs of 'a' or smaller than any of the inputs of 'b'.`

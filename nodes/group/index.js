@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -41,7 +41,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('group', {
+	XIBLE.addNode('group', {
 		type: "object",
 		level: 0,
 		description: `Groups multiple input values together.`

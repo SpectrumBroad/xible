@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -47,7 +47,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('string.concat', {
+	XIBLE.addNode('string.concat', {
 		type: "object",
 		level: 0,
 		description: `Concatenates strings a and b together in that order.`

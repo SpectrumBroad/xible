@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -34,7 +34,7 @@ module.exports = function(FLUX) {
 							path: event.path
 						});
 
-						FLUX.Node.triggerOutputs(triggerOut, state);
+						XIBLE.Node.triggerOutputs(triggerOut, state);
 
 					});
 
@@ -46,7 +46,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.mediaplayer.onplay', {
+	XIBLE.addNode('glow.mediaplayer.onplay', {
 		type: "event",
 		level: 0,
 		description: `Triggered whenever a mediaplayer connected through Glow begins to play.`

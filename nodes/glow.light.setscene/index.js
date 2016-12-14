@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constructorFunction(NODE) {
 
@@ -30,7 +30,7 @@ module.exports = function(FLUX) {
 						light.selectScene(scenes[0]).then(() => {
 
 							if (++i === lights.length) {
-								FLUX.Node.triggerOutputs(triggerOut, state);
+								XIBLE.Node.triggerOutputs(triggerOut, state);
 							}
 
 						});
@@ -45,7 +45,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.setscene', {
+	XIBLE.addNode('glow.light.setscene', {
 		type: "action",
 		level: 0,
 		description: "Applies a Glow light scene to one or more lights."

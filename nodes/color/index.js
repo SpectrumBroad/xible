@@ -45,7 +45,7 @@ function hsvToRgb(h, s, v) {
 
 }
 
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -81,7 +81,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('color', {
+	XIBLE.addNode('color', {
 		type: "object",
 		level: 0,
 		description: "Returns a color object."

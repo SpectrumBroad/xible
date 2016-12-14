@@ -1,6 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
-const flowDebug = debug('flux:flow');
+const flowDebug = debug('xible:flow');
 const cluster = require('cluster');
 const fs = require('fs');
 const path = require('path');
@@ -42,10 +42,10 @@ module.exports = function(XIBLE, express, expressApp) {
 		 *	Note that a path cannot be initiated twice because it is used for saveStatuses()
 		 *	@static
 		 *	@param	{String}	path
-		 *	@param	{Object}	flux
+		 *	@param	{Object}	xible
 		 *	@return {Object.<String, Flow>}	list of flows by their _id
 		 */
-		static initFromPath(flowPath, FLUX) {
+		static initFromPath(flowPath, XIBLE) {
 
 			flowDebug(`init flows from ${flowPath}`);
 
@@ -74,7 +74,7 @@ module.exports = function(XIBLE, express, expressApp) {
 						let json = JSON.parse(fs.readFileSync(filepath));
 						if (json._id) {
 
-							let flow = new Flow(FLUX);
+							let flow = new Flow(XIBLE);
 							flow.initJson(json);
 							flows[flow._id] = flow;
 
@@ -169,74 +169,74 @@ module.exports = function(XIBLE, express, expressApp) {
 			json.nodes.forEach(node => {
 
 				let nodeConstr = XIBLE.getNodeByName(node.name);
-				let fluxNode;
+				let xibleNode;
 
 				//init a dummy node directly based on the json and ensure the flow is set to unconstructable
 				if (!nodeConstr) {
 
 					flowDebug(`Node '${node.name}' does not exist`);
 
-					fluxNode = new XIBLE.Node(node);
-					fluxNode.nodeExists = false;
-					fluxNode.data = node.data;
+					xibleNode = new XIBLE.Node(node);
+					xibleNode.nodeExists = false;
+					xibleNode.data = node.data;
 					this.runnable = false;
 
 				} else {
 
 					//init a working node
-					fluxNode = new XIBLE.Node(Object.assign({}, nodeConstr, {
+					xibleNode = new XIBLE.Node(Object.assign({}, nodeConstr, {
 						_id: node._id,
 						data: node.data,
 						left: node.left,
 						top: node.top
 					}));
-					if (!fluxNode) {
+					if (!xibleNode) {
 						throw new Error(`Could not construct node '${node.name}'`);
 					}
 
 				}
 
-				this.addNode(fluxNode);
+				this.addNode(xibleNode);
 
 				for (let name in node.inputs) {
 
-					if (!fluxNode.inputs[name]) {
+					if (!xibleNode.inputs[name]) {
 
 						flowDebug(`Node '${node.name}' does not have input '${name}'`);
 
-						fluxNode.addInput(name, node.inputs[name]);
-						fluxNode.nodeExists = false;
+						xibleNode.addInput(name, node.inputs[name]);
+						xibleNode.nodeExists = false;
 						this.runnable = false;
 
 					}
 
-					fluxNode.inputs[name]._id = node.inputs[name]._id;
+					xibleNode.inputs[name]._id = node.inputs[name]._id;
 
 				}
 
 				for (let name in node.outputs) {
 
-					if (!fluxNode.outputs[name]) {
+					if (!xibleNode.outputs[name]) {
 
 						flowDebug(`Node '${node.name}' does not have output '${name}'`);
 
-						fluxNode.addOutput(name, node.outputs[name]);
-						fluxNode.nodeExists = false;
+						xibleNode.addOutput(name, node.outputs[name]);
+						xibleNode.nodeExists = false;
 						this.runnable = false;
 
 					}
 
-					fluxNode.outputs[name]._id = node.outputs[name]._id;
-					fluxNode.outputs[name].global = node.outputs[name].global || false;
+					xibleNode.outputs[name]._id = node.outputs[name]._id;
+					xibleNode.outputs[name].global = node.outputs[name].global || false;
 
 				}
 
 				//construct a dummy editorContents
-				if (!fluxNode.nodeExists) {
+				if (!xibleNode.nodeExists) {
 
-					fluxNode.editorContent = '';
-					for (let key in fluxNode.data) {
-						fluxNode.editorContent += `<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
+					xibleNode.editorContent = '';
+					for (let key in xibleNode.data) {
+						xibleNode.editorContent += `<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
 					}
 
 				}
@@ -256,15 +256,15 @@ module.exports = function(XIBLE, express, expressApp) {
 					throw new Error(`Cannot find input by id '${connector.destination}'`);
 				}
 
-				var fluxConnector = {
+				var xibleConnector = {
 
 					origin: origin,
 					destination: destination
 
 				};
 
-				origin.connectors.push(fluxConnector);
-				destination.connectors.push(fluxConnector);
+				origin.connectors.push(xibleConnector);
+				destination.connectors.push(xibleConnector);
 
 			});
 
@@ -663,7 +663,7 @@ module.exports = function(XIBLE, express, expressApp) {
 					this.started = this.stopped = false;
 					this.starting = true;
 					XIBLE.broadcastWebSocket({
-						method: 'flux.flow.starting',
+						method: 'xible.flow.starting',
 						flowId: this._id
 					});
 
@@ -703,7 +703,7 @@ module.exports = function(XIBLE, express, expressApp) {
 									this.emit('started');
 
 									XIBLE.broadcastWebSocket({
-										method: 'flux.flow.started',
+										method: 'xible.flow.started',
 										flowId: this._id
 									});
 
@@ -769,7 +769,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 						this.emit('stopped');
 						XIBLE.broadcastWebSocket({
-							method: 'flux.flow.stopped',
+							method: 'xible.flow.stopped',
 							flowId: this._id
 						});
 
@@ -864,7 +864,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 						this.stopping = true;
 						XIBLE.broadcastWebSocket({
-							method: 'flux.flow.stopping',
+							method: 'xible.flow.stopping',
 							flowId: this._id
 						});
 
@@ -914,7 +914,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 							//cleanup all open statuses
 							XIBLE.broadcastWebSocket({
-								'method': 'flux.flow.removeAllStatuses',
+								'method': 'xible.flow.removeAllStatuses',
 								'flowId': this._id
 							});
 
@@ -934,7 +934,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 							//cleanup all open statuses
 							XIBLE.broadcastWebSocket({
-								'method': 'flux.flow.removeAllStatuses',
+								'method': 'xible.flow.removeAllStatuses',
 								'flowId': this._id
 							});
 
@@ -1019,7 +1019,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 	}
 
-	//Flow.xible = Flow.flux = XIBLE;
+	//Flow.xible = Flow.xible = XIBLE;
 
 	XIBLE.FlowState = FlowState;
 

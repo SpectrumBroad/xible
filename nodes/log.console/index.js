@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function log(str, NODE) {
 
@@ -21,7 +21,7 @@ module.exports = function(FLUX) {
 			if (!valueInput.connectors.length) {
 
 				log(NODE.data.value || '', NODE);
-				return FLUX.Node.triggerOutputs(NODE.getOutputByName('done'), state);
+				return XIBLE.Node.triggerOutputs(NODE.getOutputByName('done'), state);
 
 			}
 
@@ -31,7 +31,7 @@ module.exports = function(FLUX) {
 					log(str, NODE);
 				});
 
-				FLUX.Node.triggerOutputs(NODE.getOutputByName('done'), state);
+				XIBLE.Node.triggerOutputs(NODE.getOutputByName('done'), state);
 
 			});
 
@@ -39,7 +39,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('log.console', {
+	XIBLE.addNode('log.console', {
 		type: "action",
 		level: 0,
 		description: `Writes the given value(s) to the console.`,

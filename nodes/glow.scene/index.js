@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -36,7 +36,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.scene', {
+	XIBLE.addNode('glow.scene', {
 		type: "object",
 		level: 0,
 		description: "References a Glow light scene."

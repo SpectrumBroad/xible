@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -43,7 +43,7 @@ module.exports = function(FLUX) {
 								req: req
 							});
 
-							FLUX.Node.triggerOutputs(triggerOut, state);
+							XIBLE.Node.triggerOutputs(triggerOut, state);
 
 						});
 
@@ -57,7 +57,7 @@ module.exports = function(FLUX) {
 							req: req
 						});
 
-						FLUX.Node.triggerOutputs(triggerOut, state);
+						XIBLE.Node.triggerOutputs(triggerOut, state);
 
 					});
 
@@ -69,7 +69,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('http.server.onrequest', {
+	XIBLE.addNode('http.server.onrequest', {
 		type: "event",
 		level: 0,
 		description: `Triggered whenever a HTTP request lands on the given route.`

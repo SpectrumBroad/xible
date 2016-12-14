@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -86,7 +86,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('email.message', {
+	XIBLE.addNode('email.message', {
 		type: "object",
 		level: 0,
 		description: `Defines an email message.`

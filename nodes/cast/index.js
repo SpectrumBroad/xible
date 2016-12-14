@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -43,7 +43,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('cast', {
+	XIBLE.addNode('cast', {
 		type: "object",
 		level: 0,
 		description: 'Change data type into another.',

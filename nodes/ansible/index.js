@@ -1,6 +1,6 @@
 const Ansible = require('node-ansible');
 
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -18,7 +18,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('ansible', {
+	XIBLE.addNode('ansible', {
 		type: "object",
 		level: 0,
 		description: 'Reference to a Ansible instance.'

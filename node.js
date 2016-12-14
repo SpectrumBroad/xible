@@ -1,6 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
-const nodeDebug = debug('flux:node');
+const nodeDebug = debug('xible:node');
 const path = require('path');
 const cluster = require('cluster');
 const fs = require('fs');
@@ -184,7 +184,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				method: "broadcastWebSocket",
 				message: {
 
-					method: "flux.node.addProgressBar",
+					method: "xible.node.addProgressBar",
 					nodeId: this._id,
 					status: status
 
@@ -214,7 +214,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				method: "broadcastWebSocket",
 				message: {
 
-					method: "flux.node.updateProgressBarById",
+					method: "xible.node.updateProgressBarById",
 					nodeId: this._id,
 					status: {
 						_id: statusId,
@@ -235,7 +235,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				method: "broadcastWebSocket",
 				message: {
 
-					method: "flux.node.addStatus",
+					method: "xible.node.addStatus",
 					nodeId: this._id,
 					status: status
 
@@ -258,7 +258,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				method: "broadcastWebSocket",
 				message: {
 
-					method: "flux.node.removeStatusById",
+					method: "xible.node.removeStatusById",
 					nodeId: this._id,
 					status: {
 						_id: statusId,
@@ -277,7 +277,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				method: "broadcastWebSocket",
 				message: {
 
-					method: "flux.node.removeAllStatuses",
+					method: "xible.node.removeAllStatuses",
 					nodeId: this._id
 
 				}
@@ -292,7 +292,7 @@ module.exports = function(XIBLE, express, expressApp) {
 				method: "broadcastWebSocket",
 				message: {
 
-					method: "flux.node.setTracker",
+					method: "xible.node.setTracker",
 					nodeId: this._id,
 					status: status
 
@@ -496,7 +496,7 @@ class NodeOutput extends NodeIo {
 
 
 //TODO: encryption on the vault
-const vaultDebug = debug('flux:vault');
+const vaultDebug = debug('xible:vault');
 let vault;
 class MainVault {
 

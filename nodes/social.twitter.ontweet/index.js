@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -84,7 +84,7 @@ console.log('destroy!');
 
 	}
 
-	FLUX.addNode('social.twitter.ontweet', {
+	XIBLE.addNode('social.twitter.ontweet', {
 		type: 'event',
 		level: 0,
 		description: `Triggered whenever a tweet comes in on the given search tags.`

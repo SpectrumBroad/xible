@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -34,7 +34,7 @@ module.exports = function(FLUX) {
 					values: vals
 				});
 
-				FLUX.Node.triggerOutputs(refreshOut, state);
+				XIBLE.Node.triggerOutputs(refreshOut, state);
 
 			});
 
@@ -85,7 +85,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('store', {
+	XIBLE.addNode('store', {
 		type: "object",
 		level: 0,
 		description: `Stores a value allowing direct re-use.`

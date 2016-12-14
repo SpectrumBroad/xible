@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('math.number', {
+	XIBLE.addNode('math.number', {
 		type: "object",
 		level: 0,
 		description: `Defines a number.`

@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -26,7 +26,7 @@ module.exports = function(FLUX) {
 
 				});
 
-				FLUX.Node.triggerOutputs(triggerOut, state);
+				XIBLE.Node.triggerOutputs(triggerOut, state);
 
 			});
 
@@ -34,7 +34,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('ansible.file', {
+	XIBLE.addNode('ansible.file', {
 		type: "action",
 		level: 0,
 		description: 'Sets attributes of files, symlinks, and directories, or removes files/symlinks/directories.'

@@ -1,8 +1,8 @@
 {
 
-	"name": "flux-sentiment",
+	"name": "xible-sentiment",
 	"version": "0.0.1",
-	"description": "sentiment object for flux",
+	"description": "sentiment object for xible",
 
 	"dependencies": {
 		"sentiment": "*"

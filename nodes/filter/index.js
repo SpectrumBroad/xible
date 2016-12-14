@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -44,7 +44,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('filter', {
+	XIBLE.addNode('filter', {
 		type: "object",
 		level: 0,
 		description: `Filters data based on an input condition.`

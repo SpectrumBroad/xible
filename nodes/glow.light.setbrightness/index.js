@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -30,7 +30,7 @@ module.exports = function(FLUX) {
 				}
 
 				Promise.all(lights.map((light) => light.setBrightness(+NODE.data.brightness, duration)))
-					.then(() => FLUX.Node.triggerOutputs(doneOut, state));
+					.then(() => XIBLE.Node.triggerOutputs(doneOut, state));
 
 			});
 
@@ -38,7 +38,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('glow.light.setbrightness', {
+	XIBLE.addNode('glow.light.setbrightness', {
 		type: "action",
 		level: 0,
 		description: "Sets the brightness on a light registered in Glow."

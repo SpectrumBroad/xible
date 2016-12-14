@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('math.random', {
+	XIBLE.addNode('math.random', {
 		type: "object",
 		level: 0,
 		description: `Returns a pseudo-random floating point number from 0 to 1, but not including 1.`

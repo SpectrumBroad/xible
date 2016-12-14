@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -12,7 +12,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('timing.epoch', {
+	XIBLE.addNode('timing.epoch', {
 		type: "object",
 		level: 0,
 		description: `Returns the amount of milliseconds since Unix epoch. That is, 1 January 1970 00:00:00 UTC.`

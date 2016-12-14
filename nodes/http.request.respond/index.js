@@ -1,4 +1,4 @@
-module.exports = function(FLUX) {
+module.exports = function(XIBLE) {
 
 	function constr(NODE) {
 
@@ -33,7 +33,7 @@ module.exports = function(FLUX) {
 						if (req && req.res) {
 
 							req.res.status(NODE.data.status || 200).send(ress.join(''));
-							FLUX.Node.triggerOutputs(doneOut, state);
+							XIBLE.Node.triggerOutputs(doneOut, state);
 
 						}
 
@@ -49,7 +49,7 @@ module.exports = function(FLUX) {
 
 	}
 
-	FLUX.addNode('http.request.respond', {
+	XIBLE.addNode('http.request.respond', {
 		type: "action",
 		level: 0,
 		description: `Responds to a HTTP request.`

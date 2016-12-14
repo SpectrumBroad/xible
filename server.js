@@ -4,18 +4,18 @@ const cluster = require('cluster');
 
 const config = require('./config.json');
 
-//flux
+//xible
 const Flux = require('./index.js');
 
 if (cluster.isMaster) {
 
 	const debug = require('debug');
-	const fluxDebug = debug('flux');
-	fluxDebug(process.versions);
+	const xibleDebug = debug('xible');
+	xibleDebug(process.versions);
 
 	//setup client requests over https
 	const spdy = require('spdy');
-	const expressDebug = debug('flux:express');
+	const expressDebug = debug('xible:express');
 	const express = require('express');
 	const bodyParser = require('body-parser');
 	const fs = require('fs');
@@ -62,7 +62,7 @@ if (cluster.isMaster) {
 		expressDebug(`listening on: ${spdyServer.address().address}:${spdyServer.address().port}`);
 
 		//websocket
-		const wsDebug = debug('flux:websocket');
+		const wsDebug = debug('xible:websocket');
 		const ws = require('uws');
 
 		const spdyWebSocketServer = spdy.createServer({

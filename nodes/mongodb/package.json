@@ -1,8 +1,8 @@
 {
-  "name": "xible-glow",
+  "name": "xible-mongodb",
   "version": "0.0.1",
   "dependencies": {
-    "ws": "*"
+    "mongodb": "*"
   },
   "private": true
 }
