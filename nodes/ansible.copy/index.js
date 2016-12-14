@@ -26,61 +26,75 @@ module.exports = function(XIBLE) {
 			type: "trigger"
 		});
 
+		let failOut = NODE.addOutput('fail', {
+			type: "trigger"
+		});
+
 		triggerIn.on('trigger', (conn, state) => {
 
-			if (!NODE.data.origPath || !NODE.data.destPath || !hostIn.isConnected() || !ansibleIn.isConnected()) {
+			if (!hostIn.isConnected() || !ansibleIn.isConnected()) {
 				return;
 			}
 
-			NODE.getValuesFromInput(ansibleIn, state).then((ansibles) => {
+			Promise.all([NODE.getValuesFromInput(ansibleIn, state), NODE.getValuesFromInput(hostIn, state), NODE.getValuesFromInput(origPathIn, state), NODE.getValuesFromInput(destPathIn, state)])
+				.then(([ansibles, hosts, origPaths, destPaths]) => {
 
-				NODE.getValuesFromInput(hostIn, state).then((hosts) => {
+					if (!origPaths.length) {
+						origPaths = [NODE.data.origPath];
+					}
 
-					ansibles.forEach((ansible) => {
+					if (!destPaths.length) {
+						destPaths = [NODE.data.destPath];
+					}
 
-						hosts.forEach((host) => {
+					return Promise.all(ansibles.map((ansible) => {
 
-							let cmd = ansible.module('copy').hosts(host.groupName).args(`src=${NODE.data.origPath} dest=${NODE.data.destPath}`);
+						return Promise.all(hosts.map((host) => {
 
-							cmd.on('stdout', (data) => {
+							return Promise.all(origPaths.map((origPath) => {
 
-								data = data.toString();
-								if (!data) {
-									return;
-								}
+								return Promise.all(destPaths.map((destPath) => {
 
-								NODE.addStatus({
-									message: data,
-									timeout: 5000,
-									color: data.indexOf('| success ') > -1 ? 'green' : null,
-								});
+									let cmd = ansible.module('copy').hosts(host.groupName).args(`src=${NODE.data.origPath} dest=${NODE.data.destPath}`);
 
-							});
-							cmd.on('stderr', (data) => {
+									cmd.on('stdout', (data) => {
 
-								data = data.toString();
-								if (!data) {
-									return;
-								}
+										data = data.toString();
+										if (!data) {
+											return;
+										}
 
-								NODE.addStatus({
-									message: data.toString(),
-									timeout: 5000,
-									color: 'red'
-								});
+										NODE.addStatus({
+											message: data,
+											timeout: 5000,
+											color: data.indexOf('| success ') > -1 ? 'green' : null,
+										});
 
-							});
-							cmd.exec().then(() => {
-								XIBLE.Node.triggerOutputs(triggerOut, state);
-							});
+									});
 
-						});
+									return cmd.exec();
 
+								}));
+
+							}));
+
+						}));
+
+					}));
+
+				}).then(() => {
+					XIBLE.Node.triggerOutputs(triggerOut, state);
+				}).catch((err) => {
+
+					NODE.addStatus({
+						message: err.toString(),
+						timeout: 5000,
+						color: 'red'
 					});
 
-				});
+					XIBLE.Node.triggerOutputs(failOut, state);
 
-			});
+				});
 
 		});
 
