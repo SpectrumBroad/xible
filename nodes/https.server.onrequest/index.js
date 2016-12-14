@@ -69,10 +69,10 @@ module.exports = function(XIBLE) {
 
 	}
 
-	XIBLE.addNode('http.server.onrequest', {
+	XIBLE.addNode('https.server.onrequest', {
 		type: "event",
 		level: 0,
-		description: `Triggered whenever a HTTP request lands on the given route.`
+		description: `Triggered whenever a HTTPS request lands on the given route.`
 	}, constr);
 
 };

@@ -49,7 +49,7 @@ module.exports = function(XIBLE) {
 
 	}
 
-	XIBLE.addNode('http.request.respond', {
+	XIBLE.addNode('https.request.respond', {
 		type: "action",
 		level: 0,
 		description: `Responds to a HTTP request.`

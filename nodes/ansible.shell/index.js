@@ -22,6 +22,10 @@ module.exports = function(XIBLE) {
 			type: "trigger"
 		});
 
+		let failOut = NODE.addOutput('fail', {
+			type: "trigger"
+		});
+
 		triggerIn.on('trigger', (conn, state) => {
 
 			if (!NODE.data.cmd || !hostIn.isConnected() || !ansibleIn.isConnected()) {

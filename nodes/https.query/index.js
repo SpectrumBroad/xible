@@ -28,7 +28,7 @@ module.exports = function(XIBLE) {
 
 	}
 
-	XIBLE.addNode('http.query', {
+	XIBLE.addNode('https.query', {
 		type: "object",
 		level: 0,
 		description: `Returns the value of the given querystring field from a HTTP request.`

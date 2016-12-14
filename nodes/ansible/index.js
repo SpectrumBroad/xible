@@ -13,7 +13,23 @@ module.exports = function(XIBLE) {
 		});
 
 		ansibleOut.on('trigger', (conn, state, callback) => {
-			callback(new Ansible.AdHoc().user(NODE.data.remoteUser).inventory(NODE.data.inventoryPath));
+
+			let cmd = new Ansible.AdHoc();
+
+			if (NODE.data.remoteUser) {
+				cmd.user(NODE.data.remoteUser);
+			}
+
+			if (NODE.data.inventoryPath) {
+				cmd.inventory(NODE.data.inventoryPath);
+			}
+
+			if (NODE.data.connection) {
+				cmd.connection(NODE.data.connection);
+			}
+
+			callback(cmd);
+
 		});
 
 	}

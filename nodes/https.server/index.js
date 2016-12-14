@@ -78,7 +78,7 @@ module.exports = function(XIBLE) {
 
 	}
 
-	XIBLE.addNode('http.server', {
+	XIBLE.addNode('https.server', {
 		type: "object",
 		level: 0,
 		description: `Sets up a HTTP server.`
