@@ -2,7 +2,7 @@
 
   "ignore": ["flows/*", "vault.json"],
   "execMap": {
-    "js": "node --harmony --inspect"
+    "js": "node --harmony"
   }
 
 }
