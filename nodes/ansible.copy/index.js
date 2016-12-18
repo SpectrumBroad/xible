@@ -55,19 +55,44 @@ module.exports = function(XIBLE) {
 
 								return Promise.all(destPaths.map((destPath) => {
 
-									let cmd = ansible.module('copy').hosts(host.groupName).args(`src=${NODE.data.origPath} dest=${NODE.data.destPath}`);
+									let args = {
+										src: origPath,
+										dest: destPath
+									};
+
+									if (NODE.data.owner) {
+										args.owner = NODE.data.owner;
+									}
+
+									if (NODE.data.group) {
+										args.group = NODE.data.group;
+									}
+
+									if (NODE.data.permissions) {
+										args.mode = NODE.data.permissions;
+									}
+
+									let cmd = ansible
+										.module('copy')
+										.hosts(host.groupName)
+										.args(args);
 
 									cmd.on('stdout', (data) => {
 
 										data = data.toString();
-										if (!data) {
+										if (!data || !data.replace(/[\r\n]/g, '').trim()) {
+											return;
+										}
+
+										//let this be handlded by the generic fail handler
+										if (data.indexOf('| FAILED ') > -1) {
 											return;
 										}
 
 										NODE.addStatus({
 											message: data,
 											timeout: 5000,
-											color: data.indexOf('| success ') > -1 ? 'green' : null,
+											color: data.indexOf('| FAILED ') > -1 ? 'red' : (data.indexOf('| success ') > -1 ? 'green' : null),
 										});
 
 									});

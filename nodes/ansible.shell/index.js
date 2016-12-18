@@ -28,59 +28,62 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			if (!NODE.data.cmd || !hostIn.isConnected() || !ansibleIn.isConnected()) {
+			if (!hostIn.isConnected() || !ansibleIn.isConnected()) {
 				return;
 			}
 
-			ansibleIn.getValues(state).then((ansibles) => {
+			Promise.all([ansibleIn.getValues(state), hostIn.getValues(state), cmdIn.getValues(state)])
+				.then(([ansibles, hosts, cmds]) => {
 
-				hostIn.getValues(state).then((hosts) => {
+					if (!cmds.length) {
+						cmds = [NODE.data.cmd];
+					}
 
-					ansibles.forEach((ansible) => {
+					return Promise.all(ansibles.map((ansible) => {
 
-						hosts.forEach((host) => {
+						return Promise.all(hosts.map((host) => {
 
 							let cmd = ansible.module('shell').hosts(host.groupName).args(NODE.data.cmd);
 
 							cmd.on('stdout', (data) => {
 
 								data = data.toString();
-								if (!data) {
+								if (!data || !data.replace(/[\r\n]/g, '').trim()) {
+									return;
+								}
+
+								//let this be handlded by the generic fail handler
+								if (data.indexOf('| FAILED ') > -1) {
 									return;
 								}
 
 								NODE.addStatus({
 									message: data,
 									timeout: 5000,
-									color: data.indexOf('| success ') > -1 ? 'green' : null,
+									color: data.indexOf('| FAILED ') > -1 ? 'red' : (data.indexOf('| success ') > -1 ? 'green' : null),
 								});
 
 							});
-							cmd.on('stderr', (data) => {
 
-								data = data.toString();
-								if (!data) {
-									return;
-								}
+							return cmd.exec();
 
-								NODE.addStatus({
-									message: data.toString(),
-									timeout: 5000,
-									color: 'red'
-								});
+						}));
 
-							});
-							cmd.exec().then(() => {
-								XIBLE.Node.triggerOutputs(triggerOut, state);
-							});
+					}));
 
-						});
+				}).then(() => {
+					XIBLE.Node.triggerOutputs(triggerOut, state);
+				}).catch((err) => {
 
+					NODE.addStatus({
+						message: err.toString(),
+						timeout: 5000,
+						color: 'red'
 					});
 
-				});
+					XIBLE.Node.triggerOutputs(failOut, state);
 
-			});
+				});
 
 		});
 
