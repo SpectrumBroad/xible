@@ -12,7 +12,7 @@ module.exports = function(XIBLE) {
 
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(valuesIn, state).then((numbers) => {
+			valuesIn.getValues(state).then((numbers) => {
 
 				let result = numbers.reduce((previousValue, currentValue) => previousValue + currentValue);
 				callback(result);

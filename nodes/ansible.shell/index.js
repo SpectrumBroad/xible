@@ -32,9 +32,9 @@ module.exports = function(XIBLE) {
 				return;
 			}
 
-			NODE.getValuesFromInput(ansibleIn, state).then((ansibles) => {
+			ansibleIn.getValues(state).then((ansibles) => {
 
-				NODE.getValuesFromInput(hostIn, state).then((hosts) => {
+				hostIn.getValues(state).then((hosts) => {
 
 					ansibles.forEach((ansible) => {
 

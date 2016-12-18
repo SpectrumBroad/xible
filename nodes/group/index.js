@@ -25,7 +25,7 @@ module.exports = function(XIBLE) {
 
 		groupedOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(anyIn, state).then((vals) => {
+			anyIn.getValues(state).then((vals) => {
 				callback(vals);
 			});
 

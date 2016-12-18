@@ -16,9 +16,9 @@ module.exports = function(XIBLE) {
 
 		stringOut.on('trigger', function(state, callback) {
 
-			NODE.getValuesFromInput(aIn, state).then(strsa => {
+			aIn.getValues(state).then(strsa => {
 
-				NODE.getValuesFromInput(bIn, state).then(strsb => {
+				bIn.getValues(state).then(strsb => {
 
 					let result = '';
 					if (strsa.length) {

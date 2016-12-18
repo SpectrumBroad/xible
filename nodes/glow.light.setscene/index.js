@@ -20,9 +20,9 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(sceneIn, state).then((scenes) => {
+			sceneIn.getValues(state).then((scenes) => {
 
-				NODE.getValuesFromInput(lightIn, state).then((lights) => {
+				lightIn.getValues(state).then((lights) => {
 
 					let i = 0;
 					lights.forEach((light) => {

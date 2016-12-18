@@ -480,6 +480,10 @@ class NodeInput extends NodeIo {
 		super(...arguments);
 	}
 
+	getValues(state) {
+		return this.node.getValuesFromInput(this, state);
+	}
+
 }
 
 

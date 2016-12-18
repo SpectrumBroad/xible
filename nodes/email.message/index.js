@@ -49,24 +49,24 @@ module.exports = function(XIBLE) {
 
 			Promise.all([
 
-				NODE.getValuesFromInput(fromIn, state).then((addrs) => addrConnHandler(addrs, 'from', mail)),
-				NODE.getValuesFromInput(toIn, state).then((addrs) => addrConnHandler(addrs, 'to', mail)),
-				NODE.getValuesFromInput(ccIn, state).then((addrs) => addrConnHandler(addrs, 'cc', mail)),
-				NODE.getValuesFromInput(bccIn, state).then((addrs) => addrConnHandler(addrs, 'bcc', mail)),
+				fromIn.getValues(state).then((addrs) => addrConnHandler(addrs, 'from', mail)),
+				toIn.getValues(state).then((addrs) => addrConnHandler(addrs, 'to', mail)),
+				ccIn.getValues(state).then((addrs) => addrConnHandler(addrs, 'cc', mail)),
+				bccIn.getValues(state).then((addrs) => addrConnHandler(addrs, 'bcc', mail)),
 
-				NODE.getValuesFromInput(subjectIn, state).then((subjects) => {
+				subjectIn.getValues(state).then((subjects) => {
 					if (subjects.length) {
 						mail.subject = subjects[0];
 					}
 				}),
 
-				NODE.getValuesFromInput(textIn, state).then((texts) => {
+				textIn.getValues(state).then((texts) => {
 					if (texts.length) {
 						mail.text = texts[0];
 					}
 				}),
 
-				NODE.getValuesFromInput(htmlIn, state).then((htmls) => {
+				htmlIn.getValues(state).then((htmls) => {
 					if (htmls.length) {
 						mail.html = htmls[0];
 					}

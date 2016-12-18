@@ -24,13 +24,13 @@ module.exports = function(XIBLE) {
 		function getSwitchesPerServer(state) {
 
 			//get the glow server
-			return NODE.getValuesFromInput(glowIn, state).then((glows) => {
+			return glowIn.getValues(state).then((glows) => {
 
 				return Promise.all(glows.map((glow) => {
 
 					if (nameIn.isConnected()) {
 
-						return NODE.getValuesFromInput(nameIn, state)
+						return nameIn.getValues(state)
 							.then((names) => Promise.all(names.map((name) => glow.Switch.getByName(name))))
 							.then((sws) => ({
 								server: glow,

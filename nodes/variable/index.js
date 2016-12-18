@@ -24,7 +24,7 @@ module.exports = function(XIBLE) {
 
 			//get the input values
 			refreshing = true;
-			NODE.getValuesFromInput(valueIn, state).then(vals => {
+			valueIn.getValues(state).then(vals => {
 
 				//
 				used = true;
@@ -75,7 +75,7 @@ module.exports = function(XIBLE) {
 
 			//perform a refresh of all inputs and return those values
 			refreshing = true;
-			NODE.getValuesFromInput(valueIn, state).then((vals) => {
+			valueIn.getValues(state).then((vals) => {
 
 				variable = {
 					name: NODE.data.name,

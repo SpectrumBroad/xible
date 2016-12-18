@@ -17,12 +17,12 @@ module.exports = function(XIBLE) {
 		sceneOut.on('trigger', (conn, state, callback) => {
 
 			//get the glow server
-			NODE.getValuesFromInput(glowIn, state).then((glows) => {
+			glowIn.getValues(state).then((glows) => {
 
 				callback(glows.map((glow) => {
 
 					if (sceneIn.connectors.length) {
-						return NODE.getValuesFromInput(sceneIn, state)
+						return sceneIn.getValues(state)
 							.then((strs) => strs.map((str) => glow.Scene.getByName(str)));
 					} else {
 						return glow.Scene.getByName(NODE.data.value);

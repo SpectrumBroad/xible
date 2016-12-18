@@ -7,7 +7,7 @@ module.exports = function(XIBLE) {
 		anyOut.on('trigger', (conn, state, callback) => {
 
 			//get the input values
-			NODE.getValuesFromInput(valuesIn, state).then((vals) => {
+			valuesIn.getValues(state).then((vals) => {
 
 				callback(vals.map((val) => {
 

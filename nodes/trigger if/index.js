@@ -20,7 +20,7 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(conditionIn, state).then((bools) => {
+			conditionIn.getValues(state).then((bools) => {
 
 				if (bools.length) {
 

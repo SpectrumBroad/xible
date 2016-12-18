@@ -13,7 +13,7 @@ module.exports = function(XIBLE) {
 		let valueOut = NODE.addOutput('value');
 		valueOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(conditionIn, state).then((bools) => {
+			conditionIn.getValues(state).then((bools) => {
 
 				if (bools.length) {
 
@@ -23,7 +23,7 @@ module.exports = function(XIBLE) {
 					} else {
 						input = trueIn;
 					}
-					NODE.getValuesFromInput(input, state).then((values) => callback(values));
+					input.getValues(state).then((values) => callback(values));
 
 				} else {
 					callback(null);

@@ -20,9 +20,9 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(lightIn, state).then((lights) => {
+			lightIn.getValues(state).then((lights) => {
 
-				NODE.getValuesFromInput(powerIn, state).then((powers) => {
+				powerIn.getValues(state).then((powers) => {
 
 					let power = NODE.data.power === 'true';
 					if (powers.length) {

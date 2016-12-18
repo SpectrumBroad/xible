@@ -16,7 +16,7 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(lightIn, state).then((lights) => {
+			lightIn.getValues(state).then((lights) => {
 
 				let duration = +NODE.data.duration || 0;
 				if (duration) {

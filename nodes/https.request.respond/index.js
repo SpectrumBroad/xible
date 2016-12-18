@@ -20,13 +20,13 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(reqIn, state).then((reqs) => {
+			reqIn.getValues(state).then((reqs) => {
 
 				if (!reqs.length) {
 					return;
 				}
 
-				NODE.getValuesFromInput(resIn, state).then((ress) => {
+				resIn.getValues(state).then((ress) => {
 
 					reqs.forEach((req) => {
 

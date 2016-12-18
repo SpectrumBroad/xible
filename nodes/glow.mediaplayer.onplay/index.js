@@ -24,7 +24,7 @@ module.exports = function(XIBLE) {
 		NODE.on('trigger', (state) => {
 
 			//get the glow server
-			NODE.getValuesFromInput(glowIn, state).then((glows) => {
+			glowIn.getValues(state).then((glows) => {
 
 				glows.forEach((glow) => {
 

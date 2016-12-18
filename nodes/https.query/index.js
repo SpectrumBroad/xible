@@ -12,7 +12,7 @@ module.exports = function(XIBLE) {
 
 		valueOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(reqIn, state).then((requests) => {
+			reqIn.getValues(state).then((requests) => {
 
 				requests.forEach((req) => {
 

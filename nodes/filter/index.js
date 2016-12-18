@@ -11,9 +11,9 @@ module.exports = function(XIBLE) {
 		let filteredOut = NODE.addOutput('filtered');
 		filteredOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(anyIn, state).then((values) => {
+			anyIn.getValues(state).then((values) => {
 
-				NODE.getValuesFromInput(boolIn, state).then((conditions) => {
+				boolIn.getValues(state).then((conditions) => {
 
 					if (conditions.indexOf(false) === -1) {
 						callback(values);
@@ -28,9 +28,9 @@ module.exports = function(XIBLE) {
 		let droppedOut = NODE.addOutput('dropped');
     droppedOut.on('trigger', (conn, state, callback) => {
 
-      NODE.getValuesFromInput(anyIn, state).then((values) => {
+      anyIn.getValues(state).then((values) => {
 
-        NODE.getValuesFromInput(boolIn, state).then((conditions) => {
+        boolIn.getValues(state).then((conditions) => {
 
           if (conditions.indexOf(true) === -1) {
             callback(values);

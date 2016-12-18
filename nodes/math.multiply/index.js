@@ -16,9 +16,9 @@ module.exports = function(XIBLE) {
 
 		numberOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(multiplicandIn, state).then((multiplicands) => {
+			multiplicandIn.getValues(state).then((multiplicands) => {
 
-				NODE.getValuesFromInput(multiplierIn, state).then((multipliers) => {
+				multiplierIn.getValues(state).then((multipliers) => {
 
 					//get the multiplier
 					//if multiply multipliers given, we take the first one only

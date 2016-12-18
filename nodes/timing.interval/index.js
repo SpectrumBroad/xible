@@ -33,7 +33,7 @@ module.exports = function(XIBLE) {
 		let regIntervals = [];
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(msecIn, state).then((intervals) => {
+			msecIn.getValues(state).then((intervals) => {
 
 				let fromData = false;
 				if (!intervals.length) {

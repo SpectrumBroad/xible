@@ -16,7 +16,7 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(msecIn, state).then(delays => {
+			msecIn.getValues(state).then(delays => {
 
 				let fromData = false;
 				if (!delays.length) {

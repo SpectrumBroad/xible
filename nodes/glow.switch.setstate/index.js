@@ -20,9 +20,9 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(swIn, state).then((sws) => {
+			swIn.getValues(state).then((sws) => {
 
-				NODE.getValuesFromInput(stateIn, state).then((states) => {
+				stateIn.getValues(state).then((states) => {
 
 					let switchState = NODE.data.state === 'true';
 					if (states.length) {

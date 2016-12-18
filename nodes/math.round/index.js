@@ -12,7 +12,7 @@ module.exports = function(XIBLE) {
 
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(numberIn, state).then((numbers) => {
+			numberIn.getValues(state).then((numbers) => {
 
 				let result = numbers.map((number) => {
 					return Math.round(number);

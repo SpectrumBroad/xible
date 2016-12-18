@@ -24,7 +24,7 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(hostIn, state).then((hosts) => {
+			hostIn.getValues(state).then((hosts) => {
 
 				hosts.forEach((host) => {
 

@@ -74,7 +74,7 @@ module.exports = function(XIBLE) {
 
 		triggerIn.on('trigger', (conn, state) => {
 
-			NODE.getValuesFromInput(colorIn, state).then((hexColors) => {
+			colorIn.getValues(state).then((hexColors) => {
 
 				if (!hexColors.length) {
 
@@ -96,7 +96,7 @@ module.exports = function(XIBLE) {
 				//for now
 				let color = colors[0];
 
-				NODE.getValuesFromInput(lightIn, state).then((lights) => {
+				lightIn.getValues(state).then((lights) => {
 
 					let duration = +NODE.data.duration || 0;
 					if (duration) {

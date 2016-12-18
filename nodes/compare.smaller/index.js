@@ -16,9 +16,9 @@ module.exports = function(XIBLE) {
 
 		boolOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(aIn, state).then((as) => {
+			aIn.getValues(state).then((as) => {
 
-				NODE.getValuesFromInput(bIn, state).then((bs) => {
+				bIn.getValues(state).then((bs) => {
 
 					if (as.length && bs.length) {
 

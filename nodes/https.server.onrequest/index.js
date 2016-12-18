@@ -29,15 +29,16 @@ module.exports = function(XIBLE) {
 
 		NODE.on('init', (state) => {
 
-			let type = NODE.data.type.toLowerCase() || 'use';
+			let method = NODE.data.method || 'get';
+			method = method.toLowerCase();
 
-			NODE.getValuesFromInput(serverIn, state).then((servers) => {
+			serverIn.getValues(state).then((servers) => {
 
 				servers.forEach((server) => {
 
 					if (!NODE.data.path) {
 
-						server[type]((req, res) => {
+						server[method]((req, res) => {
 
 							state.set(NODE, {
 								req: req
@@ -51,7 +52,7 @@ module.exports = function(XIBLE) {
 
 					}
 
-					server[type](NODE.data.path, (req, res) => {
+					server[method](NODE.data.path, (req, res) => {
 
 						state.set(NODE, {
 							req: req

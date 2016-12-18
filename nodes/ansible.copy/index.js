@@ -36,7 +36,7 @@ module.exports = function(XIBLE) {
 				return;
 			}
 
-			Promise.all([NODE.getValuesFromInput(ansibleIn, state), NODE.getValuesFromInput(hostIn, state), NODE.getValuesFromInput(origPathIn, state), NODE.getValuesFromInput(destPathIn, state)])
+			Promise.all([ansibleIn.getValues(state), hostIn.getValues(state), origPathIn.getValues(state), destPathIn.getValues(state)])
 				.then(([ansibles, hosts, origPaths, destPaths]) => {
 
 					if (!origPaths.length) {

@@ -39,7 +39,7 @@ module.exports = function(XIBLE) {
 				return;
 			}
 
-			NODE.getValuesFromInput(twitterIn, state).then((twitters) => {
+			twitterIn.getValues(state).then((twitters) => {
 
 				twitters.forEach((twitter) => {
 

@@ -25,7 +25,7 @@ module.exports = function(XIBLE) {
 
 			}
 
-			NODE.getValuesFromInput(valueInput, state).then((strs) => {
+			valueInput.getValues(state).then((strs) => {
 
 				strs.forEach(str => {
 					log(str, NODE);

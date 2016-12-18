@@ -49,9 +49,9 @@ module.exports = function(XIBLE) {
 
 		tempOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(locationIn, state).then((locations) => {
+			locationIn.getValues(state).then((locations) => {
 
-				NODE.getValuesFromInput(dateIn, state).then((dates) => {
+				dateIn.getValues(state).then((dates) => {
 
 					var result = [];
 
