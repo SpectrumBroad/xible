@@ -7,7 +7,7 @@ module.exports = function(XIBLE) {
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(NODE.getInputByName('values'), state).then((vals) => {
+			NODE.getInputByName('values').getValues(state).then((vals) => {
 
 				let result = vals.reduce((prevVal, newVal) => {
 					return +prevVal + newVal;

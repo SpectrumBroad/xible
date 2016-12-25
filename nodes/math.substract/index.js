@@ -1,15 +1,14 @@
 module.exports = function(XIBLE) {
 
-
 	//constructor for the node
 	function constr(NODE) {
 
 		let resultOut = NODE.getOutputByName('result');
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(NODE.getInputByName('a'), state).then((aNumbers) => {
+			NODE.getInputByName('a').getValues(state).then((aNumbers) => {
 
-				NODE.getValuesFromInput(NODE.getInputByName('b'), state).then((bNumbers) => {
+				NODE.getInputByName('b').getValues(state).then((bNumbers) => {
 
 					//get the min (b) value
 					//if multiply b values given, we take the first one only

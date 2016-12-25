@@ -346,19 +346,89 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
+	}
 
-		getValuesFromInput(input, state) {
+
+	class NodeIo extends EventEmitter {
+
+		constructor(obj) {
+
+			super();
+
+			this.name = null;
+			this.type = null;
+			this.singleType = false;
+			this.maxConnectors = null;
+			this.node = null;
+
+			if (obj) {
+
+				if (typeof obj.type === 'string') {
+
+					if (obj.type === 'global') {
+						throw new TypeError(`you cannot define a input or output with type 'global'`);
+					}
+
+					this.type = obj.type;
+
+				}
+
+				if (typeof obj.singleType === 'boolean') {
+					this.singleType = obj.singleType;
+				}
+
+				if (typeof obj.maxConnectors === 'number') {
+					this.maxConnectors = obj.maxConnectors;
+				}
+
+			}
+
+			this.connectors = [];
+
+		}
+
+		isConnected() {
+
+			let conns = this.connectors;
+
+			//check global outputs
+			if (!conns.length && this.node && this.node.flow) {
+
+				conns = this.node.flow.getGlobalOutputsByType(this.type).map((output) => ({
+					origin: output
+				}));
+
+			}
+
+			if (conns.length) {
+				return true;
+			}
+
+			return false;
+
+		}
+
+	}
+
+
+	class NodeInput extends NodeIo {
+
+		constructor() {
+			super(...arguments);
+		}
+
+		getValues(state) {
 
 			Node.flowStateCheck(state);
 
 			return new Promise((resolve, reject) => {
 
-				let conns = input.connectors;
+				let conns = this.connectors;
 
 				//add global outputs as a dummy connector to the connector list
 				if (!conns.length) {
 
-					conns = this.flow.getGlobalOutputsByType(input.type).map((output) => ({
+					conns = this.node.flow.getGlobalOutputsByType(this.type).map((output) => ({
 						origin: output
 					}));
 
@@ -407,96 +477,21 @@ module.exports = function(XIBLE, express, expressApp) {
 
 	}
 
+
+	class NodeOutput extends NodeIo {
+
+		constructor() {
+
+			super(...arguments);
+			this.global = false;
+
+		}
+
+	}
+
 	return Node;
 
 };
-
-
-class NodeIo extends EventEmitter {
-
-	constructor(obj) {
-
-		super();
-
-		this.name = null;
-		this.type = null;
-		this.singleType = false;
-		this.maxConnectors = null;
-		this.node = null;
-
-		if (obj) {
-
-			if (typeof obj.type === 'string') {
-
-				if (obj.type === 'global') {
-					throw new TypeError(`you cannot define a input or output with type 'global'`);
-				}
-
-				this.type = obj.type;
-
-			}
-
-			if (typeof obj.singleType === 'boolean') {
-				this.singleType = obj.singleType;
-			}
-
-			if (typeof obj.maxConnectors === 'number') {
-				this.maxConnectors = obj.maxConnectors;
-			}
-
-		}
-
-		this.connectors = [];
-
-	}
-
-	isConnected() {
-
-		let conns = this.connectors;
-
-		//check global outputs
-		if (!conns.length && this.node && this.node.flow) {
-
-			conns = this.node.flow.getGlobalOutputsByType(this.type).map((output) => ({
-				origin: output
-			}));
-
-		}
-
-		if (conns.length) {
-			return true;
-		}
-
-		return false;
-
-	}
-
-}
-
-
-class NodeInput extends NodeIo {
-
-	constructor() {
-		super(...arguments);
-	}
-
-	getValues(state) {
-		return this.node.getValuesFromInput(this, state);
-	}
-
-}
-
-
-class NodeOutput extends NodeIo {
-
-	constructor() {
-
-		super(...arguments);
-		this.global = false;
-
-	}
-
-}
 
 
 //TODO: encryption on the vault

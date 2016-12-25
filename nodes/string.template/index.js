@@ -14,7 +14,7 @@ module.exports = function(XIBLE) {
 		var stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(NODE.getInputByName('variable'), state).then((vars) => {
+			NODE.getInputByName('variable').getValues(state).then((vars) => {
 				callback(templateStringParser(NODE.data.value || '', vars));
 			});
 		});

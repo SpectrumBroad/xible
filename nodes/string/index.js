@@ -5,7 +5,7 @@ module.exports = function(XIBLE) {
 		let stringOut = NODE.getOutputByName('result');
 		stringOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(NODE.getInputByName('concat'), state).then(strs => {
+			NODE.getInputByName('concat').getValues(state).then(strs => {
 
 				let concatStr;
 				if(strs.length) {

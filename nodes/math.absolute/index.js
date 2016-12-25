@@ -12,12 +12,10 @@ module.exports = function(XIBLE) {
 
 		resultOut.on('trigger', (conn, state, callback) => {
 
-			NODE.getValuesFromInput(this.node.inputs[0], state).then((numbers) => {
+			numberIn.getValues(state).then((numbers) => {
 
 				//take all aNumbers minus the min and output them
-				let result = numbers.map((number) => Math.abs(number));
-
-				callback(result);
+				callback(numbers.map((number) => Math.abs(number)));
 
 			});
 
