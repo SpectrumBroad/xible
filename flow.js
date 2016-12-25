@@ -791,12 +791,12 @@ module.exports = function(XIBLE, express, expressApp) {
 				flowDebug('starting flow from worker');
 
 				//init any node that wants to
-				this.nodes.forEach(node => {
+				this.nodes.forEach((node) => {
 					node.emit('init', new FlowState());
 				});
 
 				//trigger all event objects that are listening
-				this.nodes.forEach(node => {
+				this.nodes.forEach((node) => {
 					if (node.type === 'event') {
 						node.emit('trigger', new FlowState());
 					}

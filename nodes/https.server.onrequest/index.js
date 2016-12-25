@@ -44,7 +44,7 @@ module.exports = function(XIBLE) {
 								req: req
 							});
 
-							XIBLE.Node.triggerOutputs(triggerOut, state);
+							XIBLE.Node.triggerOutput(triggerOut, state);
 
 						});
 
@@ -58,7 +58,7 @@ module.exports = function(XIBLE) {
 							req: req
 						});
 
-						XIBLE.Node.triggerOutputs(triggerOut, state);
+						XIBLE.Node.triggerOutput(triggerOut, state);
 
 					});
 

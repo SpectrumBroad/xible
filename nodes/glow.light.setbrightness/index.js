@@ -30,7 +30,7 @@ module.exports = function(XIBLE) {
 				}
 
 				Promise.all(lights.map((light) => light.setBrightness(+NODE.data.brightness, duration)))
-					.then(() => XIBLE.Node.triggerOutputs(doneOut, state));
+					.then(() => XIBLE.Node.triggerOutput(doneOut, state));
 
 			});
 

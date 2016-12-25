@@ -308,18 +308,18 @@ module.exports = function(XIBLE, express, expressApp) {
 		}
 
 
-		triggerOutputs() {
-			Node.triggerOutputs(...arguments);
+		triggerOutput() {
+			Node.triggerOutput(...arguments);
 		}
 
 
-		static triggerOutputs(output, state) {
+		static triggerOutput(output, state) {
 
 			this.flowStateCheck(state);
 
 			output.node.emit('triggerout', output);
 
-			output.connectors.forEach(conn => {
+			output.connectors.forEach((conn) => {
 
 				conn.destination.node.emit('trigger');
 				conn.destination.emit('trigger', conn, state.split());

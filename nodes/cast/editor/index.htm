@@ -1,6 +1,7 @@
 <selectcontainer>
 	<select data-outputvalue="castType">
     <option selected>string</option>
+		<option>json string</option>
     <option>boolean</option>
     <option>math.number</option>
     <option>date</option>
@@ -8,7 +9,7 @@
   </select>
 </selectcontainer>
 <script>
-	let castTypeSelect = this.editorContentEl.getElementsByTagName('select')[0];
+	let castTypeSelect = document.querySelector('select');
 	castTypeSelect.onchange = () => {
 		this.getOutputByName('result').setType(castTypeSelect.value);
 	};

@@ -7,7 +7,7 @@
 
 		let datalist = contentEl.appendChild(document.createElement('datalist'));
 		datalist.setAttribute('id', 'test');
-		contentEl.getElementsByTagName('input')[0].setAttribute('list', 'test');
+		contentEl.querySelector('input').setAttribute('list', 'test');
 		scenes.forEach(scene => {
 			datalist.appendChild(document.createElement('option')).setAttribute('value', scene.name);
 		});

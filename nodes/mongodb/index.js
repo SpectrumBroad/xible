@@ -15,7 +15,7 @@ module.exports = function(XIBLE) {
 
 			if (!db) {
 
-				this.once('init', () => callback(db));
+				NODE.once('connected', () => callback(db));
 				return;
 
 			}
@@ -45,6 +45,7 @@ module.exports = function(XIBLE) {
 				});
 
 				db = connDb;
+				NODE.emit('connected');
 
         db.on('error', (err) => {
 

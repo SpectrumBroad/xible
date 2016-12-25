@@ -11,10 +11,14 @@ module.exports = function(XIBLE) {
 		});
 
 		let tweetOut = NODE.addOutput('tweet', {
-			type: 'social.twitter.tweet'
+			type: 'document'
 		});
 
 		let textOut = NODE.addOutput('text', {
+			type: 'string'
+		});
+
+		let userNameOut = NODE.addOutput('username', {
 			type: 'string'
 		});
 
@@ -29,6 +33,13 @@ module.exports = function(XIBLE) {
 
 			let thisState = state.get(this);
 			callback((thisState && thisState.tweet && thisState.tweet.text) || null);
+
+		});
+
+		userNameOut.on('trigger', (conn, state, callback) => {
+
+			let thisState = state.get(this);
+			callback((thisState && thisState.tweet && thisState.tweet.user && thisState.tweet.user.screen_name) || null);
 
 		});
 
@@ -54,7 +65,7 @@ module.exports = function(XIBLE) {
 							state.set(this, {
 								tweet: data
 							});
-							NODE.triggerOutputs(triggerOut, state);
+							NODE.triggerOutput(triggerOut, state);
 
 						});
 

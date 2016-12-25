@@ -65,7 +65,7 @@ module.exports = function(XIBLE) {
 
 					connected = true;
 
-					XIBLE.Node.triggerOutputs(glowConnected, state);
+					XIBLE.Node.triggerOutput(glowConnected, state);
 
 				});
 
@@ -87,7 +87,7 @@ module.exports = function(XIBLE) {
 					});
 
 					if (connected) {
-						XIBLE.Node.triggerOutputs(glowDisconnected, state);
+						XIBLE.Node.triggerOutput(glowDisconnected, state);
 					}
 
 					connected = false;
@@ -115,7 +115,7 @@ module.exports = function(XIBLE) {
 
 			if (!glow) {
 
-				this.once('init', () => callback(glow));
+				NODE.once('init', () => callback(glow));
 				return;
 
 			}

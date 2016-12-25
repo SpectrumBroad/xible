@@ -16,6 +16,9 @@ module.exports = function(XIBLE) {
 						case 'string':
 							return '' + val;
 
+						case 'json string':
+							return JSON.stringify(val);
+
 						case 'math.number':
 							return +val;
 

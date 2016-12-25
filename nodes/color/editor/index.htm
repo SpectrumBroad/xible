@@ -67,11 +67,11 @@
 </div>
 <input data-outputvalue="v" name="value" type="range" min="0" max="100" step="1" value="100" oninput="this.setAttribute('value', this.value);" />
 <script>
-	let brightness = this.editorContentEl.querySelector('input[name="value"]');
-	let canvas = this.editorContentEl.getElementsByTagName('canvas')[0];
+	let brightness = document.querySelector('input[name="value"]');
+	let canvas = document.querySelector('canvas');
 	let ctx = canvas.getContext('2d');
 
-	let selector = this.editorContentEl.querySelector('.selector');
+	let selector = document.querySelector('.selector');
 
 	function rgbToHsv(r, g, b) {
 
@@ -132,7 +132,7 @@
 
 		//get the mouse position
 		selector.style.top = (y - 4) + 'px';
-		selector.style.left = (x - 2) + 'px';
+		selector.style.left = (x - 3) + 'px';
 
 		let imageData = ctx.getImageData(x, y, 1, 1).data;
 		let hsv = rgbToHsv(imageData[0], imageData[1], imageData[2]);
@@ -159,26 +159,32 @@
 
 	//set the correct canvas height and width
 	//if we don't do this, the getImageData positions are incorrect
-	canvas.setAttribute('width', canvas.offsetWidth);
-	canvas.setAttribute('height', canvas.offsetHeight);
+	//we need to wait for css from import to be loaded for the canvas.offsets to be correct
+	//editorContentLoad waits for that
+	this.on('editorContentLoad', () => {
 
-	//load the color wheel
-	let img = new Image();
-	img.crossOrigin = 'anonymous';
-	img.onload = () => {
+		canvas.setAttribute('width', canvas.offsetWidth);
+		canvas.setAttribute('height', canvas.offsetHeight);
 
-		//correct the height and width of the canvas
-		//canvas.height = canvas.offsetHeight;
-		//canvas.width = canvas.offsetWidth;
-		ctx.drawImage(img, 0, 0);
+		//load the color wheel
+		let img = new Image();
+		img.crossOrigin = 'anonymous';
+		img.onload = () => {
 
-		//set the initial position
-		if (typeof this.data.y === 'number' && typeof this.data.x === 'number') {
-			setColorPosition(this.data.x, this.data.y);
+			//correct the height and width of the canvas
+			//canvas.height = canvas.offsetHeight;
+			//canvas.width = canvas.offsetWidth;
+			ctx.drawImage(img, 0, 0);
+
+			//set the initial position
+			if (typeof this.data.y === 'number' && typeof this.data.x === 'number') {
+				setColorPosition(this.data.x, this.data.y);
+			}
+
 		}
+		img.src = 'https://10.0.0.20:9600/api/nodes/color/editor/wheel.svg';
 
-	}
-	img.src = 'https://10.0.0.20:9600/api/nodes/color/editor/wheel.svg';
+	});
 
 	//change
 	selector.onmousedown = canvas.onmousedown = function(event) {
@@ -187,14 +193,14 @@
 		event.stopPropagation();
 
 		//hook mousemove
-		document.body.addEventListener('mousemove', setColorPositionOnEvent);
+		document.addEventListener('mousemove', setColorPositionOnEvent);
 
 		//cancel mousemove
 		let mouseUpFn;
-		document.body.addEventListener('mouseup', mouseUpFn = (event) => {
+		document.addEventListener('mouseup', mouseUpFn = (event) => {
 
-			document.body.removeEventListener('mousemove', setColorPositionOnEvent);
-			document.body.removeEventListener('mouseup', mouseUpFn);
+			document.removeEventListener('mousemove', setColorPositionOnEvent);
+			document.removeEventListener('mouseup', mouseUpFn);
 			mouseUpFn = null;
 
 		});

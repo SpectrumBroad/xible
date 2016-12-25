@@ -18,7 +18,7 @@ module.exports = function(XIBLE) {
 				glows.forEach((glow) => {
 
 					glow.MediaPlayer.on('stop', (event) => {
-						XIBLE.Node.triggerOutputs(triggerOut, state);
+						XIBLE.Node.triggerOutput(triggerOut, state);
 					});
 
 				});

@@ -78,7 +78,7 @@ module.exports = function(XIBLE) {
 
 				if (!hexColors.length) {
 
-					XIBLE.Node.triggerOutputs(doneOut, state);
+					XIBLE.Node.triggerOutput(doneOut, state);
 					return;
 
 				}
@@ -110,7 +110,7 @@ module.exports = function(XIBLE) {
 					}
 
 					Promise.all(lights.map((light) => light.connected && light.setColor(color.h, color.s, color.v, duration)))
-						.then(() => XIBLE.Node.triggerOutputs(doneOut, state));
+						.then(() => XIBLE.Node.triggerOutput(doneOut, state));
 
 				});
 

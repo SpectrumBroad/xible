@@ -1,6 +1,6 @@
 <button type="button">Authenticate</button>
 <script>
-	this.editorContentEl.querySelector('button').addEventListener('click', (event) => {
-		window.open(`https://${location.hostname}:9620/${this._id}/auth`);
+	document.querySelector('button').addEventListener('click', (event) => {
+		open(`https://${location.hostname}:9620/${this._id}/auth`);
 	});
 </script>
