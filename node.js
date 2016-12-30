@@ -359,7 +359,9 @@ module.exports = function(XIBLE, express, expressApp) {
 			this.type = null;
 			this.singleType = false;
 			this.maxConnectors = null;
+			this.global = false;
 			this.node = null;
+			this.description = null;
 
 			if (obj) {
 
@@ -379,6 +381,14 @@ module.exports = function(XIBLE, express, expressApp) {
 
 				if (typeof obj.maxConnectors === 'number') {
 					this.maxConnectors = obj.maxConnectors;
+				}
+
+				if (typeof obj.global === 'boolean') {
+					this.global = obj.global;
+				}
+
+				if (typeof obj.description === 'string') {
+					this.description = obj.description;
 				}
 
 			}
@@ -481,10 +491,7 @@ module.exports = function(XIBLE, express, expressApp) {
 	class NodeOutput extends NodeIo {
 
 		constructor() {
-
 			super(...arguments);
-			this.global = false;
-
 		}
 
 	}

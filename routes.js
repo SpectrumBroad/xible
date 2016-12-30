@@ -68,6 +68,21 @@ module.exports = function(XIBLE, expressApp) {
 	});
 
 
+	//returns a list of online nodes
+	expressApp.get('/api/nodes/online', (req, res) => {
+
+		res.json({
+			test: {
+				description: 'woot'
+			},
+			blaat: {
+				description: 'meuq'
+			}
+		});
+
+	});
+
+
 	//retrieve all flows
 	expressApp.get('/api/flows', (req, res) => {
 
@@ -76,7 +91,7 @@ module.exports = function(XIBLE, expressApp) {
 
 		for (let id in flows) {
 
-			let flow=flows[id];
+			let flow = flows[id];
 
 			returnFlows[id] = {
 				_id: id,

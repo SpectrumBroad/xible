@@ -3,19 +3,23 @@ module.exports = function(XIBLE) {
 	function constr(NODE) {
 
 		let triggerIn = NODE.addInput('trigger', {
-			type: "trigger"
+			type: "trigger",
+			description: "Input trigger"
 		});
 
 		let lightIn = NODE.addInput('light', {
-			type: "glow.light"
+			type: "glow.light",
+			description: "The light to change the power state of."
 		});
 
 		let powerIn = NODE.addInput('power', {
-			type: "boolean"
+			type: "boolean",
+			description: "If connected, the switch is ignored and this input value is used instead. If there are multiple connectors, they are evaluated using 'AND'."
 		});
 
 		let doneOut = NODE.addOutput('done', {
-			type: "trigger"
+			type: "trigger",
+			description: "Triggered when the switch has been completed. Will also trigger if there is no state change."
 		});
 
 		triggerIn.on('trigger', (conn, state) => {
