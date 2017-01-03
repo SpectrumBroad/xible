@@ -1,4 +1,4 @@
-View.routes.actions = function() {
+View.routes.editor = function() {
 
 	this.element.style.height = '100%';
 
@@ -7,9 +7,9 @@ View.routes.actions = function() {
 	flowListUl.classList.add('flowList');
 	this.element.appendChild(flowListUl);
 
-	let xibleEditor = View.routes.actions.xibleEditor;
+	let xibleEditor = View.routes.editor.xibleEditor;
 	if (!xibleEditor) {
-		xibleEditor = View.routes.actions.xibleEditor = new XibleEditor();
+		xibleEditor = View.routes.editor.xibleEditor = new XibleEditor();
 	}
 	subMenuViewHolder.render(new View('xibleSubMenu', {
 		xibleEditor: xibleEditor

@@ -109,4 +109,6 @@ View.routes.xibleSubMenu = function() {
 	label.setAttribute('id', 'delay');
 	label.appendChild(document.createTextNode('event loop delay'));
 
+	xibleEditor.initConsole();
+
 };
