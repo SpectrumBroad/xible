@@ -68,7 +68,7 @@ class XibleEditorFlow extends xibleWrapper.Flow {
 			backgroundTop: this.editor.backgroundTop
 		});
 
-		super.toJson(nodes, connectors);
+		return super.toJson(nodes, connectors);
 
 	}
 

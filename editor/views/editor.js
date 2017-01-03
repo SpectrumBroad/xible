@@ -99,7 +99,7 @@ View.routes.editor = function() {
 				li.classList.remove('open');
 			});
 
-			let flow = new XibleFlow();
+			let flow = new XibleEditorFlow();
 			xibleEditor.viewFlow(flow);
 			flow.save().then(() => {
 

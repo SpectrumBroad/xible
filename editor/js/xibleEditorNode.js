@@ -781,7 +781,7 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 
 	enableHook() {
 
-		var el = this.element;
+		let el = this.element;
 
 		//handle whenever someone inits a new connector on this action
 		el.addEventListener('mousedown', (event) => {

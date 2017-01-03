@@ -122,18 +122,16 @@ module.exports = function(XIBLE, expressApp) {
 	expressApp.post('/api/flows', (req, res) => {
 
 		if (!req.body) {
-			res.status(400).end();
-		} else {
-
-			var flow = new XIBLE.Flow(XIBLE);
-			flow.initJson(req.body, true);
-			flow.save();
-
-			res.json({
-				_id: flow._id
-			});
-
+			return res.status(400).end();
 		}
+
+		var flow = new XIBLE.Flow(XIBLE);
+		flow.initJson(req.body, true);
+		flow.save();
+
+		res.json({
+			_id: flow._id
+		});
 
 	});
 
@@ -232,8 +230,8 @@ module.exports = function(XIBLE, expressApp) {
 	//update an existing flow
 	expressApp.put('/api/flows/:flowId', (req, res) => {
 
-		if(!req.body || !req.body.nodes) {
-			res.status(400).end();
+		if (!req.body) {
+			return res.status(400).end();
 		}
 
 		let flow = req.locals.flow;

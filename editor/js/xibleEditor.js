@@ -36,6 +36,31 @@ class XibleEditor {
 		let describeEl = this.element.appendChild(document.createElement('div'));
 		describeEl.classList.add('describe');
 
+		//close button
+		let closeButton = describeEl.appendChild(document.createElement('button'));
+		closeButton.setAttribute('type', 'button');
+		closeButton.appendChild(document.createTextNode('X'));
+		closeButton.onclick = () => {
+			this.element.removeChild(describeEl);
+		};
+
+		//ignore default xible container event handlers
+		describeEl.addEventListener('wheel', (event) => {
+			event.stopPropagation();
+		});
+
+		describeEl.addEventListener('mousedown', (event) => {
+			event.stopPropagation();
+		});
+
+		describeEl.addEventListener('mouseup', (event) => {
+			event.stopPropagation();
+		});
+
+		describeEl.addEventListener('click', (event) => {
+			event.stopPropagation();
+		});
+
 		//append the node descriptionEl
 		let descriptionEl = describeEl.appendChild(document.createElement('p'));
 		descriptionEl.appendChild(document.createTextNode(node.description || 'not described'));
@@ -65,6 +90,12 @@ class XibleEditor {
 		//add the description for each io
 		node.getInputs().concat(node.getOutputs()).forEach((io) => {
 
+			//get rid of event listeners
+			let clonedNode = io.element.cloneNode(true);
+			io.element.parentNode.replaceChild(clonedNode, io.element);
+			io.element = clonedNode;
+
+			//add description
 			let descriptionEl = io.element.appendChild(document.createElement('p'));
 			descriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.type || 'any'));
 			descriptionEl.appendChild(document.createTextNode(io.description || 'not described'));
@@ -123,11 +154,6 @@ class XibleEditor {
 		node.editor = this;
 
 		node.emit('append');
-
-		//hide the describe element onclick
-		describeEl.onmousedown = (event) => {
-			this.element.removeChild(describeEl);
-		};
 
 	}
 
@@ -1589,23 +1615,23 @@ class XibleEditor {
 		this.zoom = 1;
 
 		//trigger zoom from scrollwheel
-		this.element.addEventListener('wheel', e => {
+		this.element.addEventListener('wheel', (event) => {
 
 			//prevent default browser action; scroll
-			e.preventDefault();
+			event.preventDefault();
 
 			//find the current cursor position, relative against the actions, but no transform (translate/zoom) applied
-			var mouseLeft = e.pageX - this.getOffsetPosition().left;
-			var mouseTop = e.pageY - this.getOffsetPosition().top;
+			var mouseLeft = event.pageX - this.getOffsetPosition().left;
+			var mouseTop = event.pageY - this.getOffsetPosition().top;
 
 			//find the current cursor position, relative against the actions, but now with transform (translate/zoom) applied
 			var relativeMouseLeft = (mouseLeft - this.left) / this.zoom;
 			var relativeMouseTop = (mouseTop - this.top) / this.zoom;
 
 			//in or out
-			if (e.deltaY > 0 && this.zoom >= 0.5) {
+			if (event.deltaY > 0 && this.zoom >= 0.5) {
 				this.zoom -= 0.1;
-			} else if (e.deltaY < 0 && this.zoom < 5) {
+			} else if (event.deltaY < 0 && this.zoom < 5) {
 				this.zoom += 0.1;
 			}
 
