@@ -4,22 +4,22 @@ module.exports = function(XIBLE) {
 
 		let triggerIn = NODE.addInput('trigger', {
 			type: "trigger",
-			description: "Input trigger"
+			description: "Input trigger to start this action."
 		});
 
 		let lightIn = NODE.addInput('light', {
 			type: "glow.light",
-			description: "The light to change the power state of."
+			description: "The light(s) to change the power state of."
 		});
 
 		let powerIn = NODE.addInput('power', {
 			type: "boolean",
-			description: "If connected, the switch is ignored and this input value is used instead. If there are multiple connectors, they are evaluated using 'AND'."
+			description: "If connected, the power state switch is hidden/ignored and this connected value is used instead to set the new power state of the light(s). If there are multiple connectors, all have to be 'true' or else the new power state will be off (false)."
 		});
 
 		let doneOut = NODE.addOutput('done', {
 			type: "trigger",
-			description: "Triggered when the switch has been completed. Will also trigger if there is no state change."
+			description: "Triggered when the power state change has been completed. This will also trigger if there is no state change."
 		});
 
 		triggerIn.on('trigger', (conn, state) => {
@@ -58,7 +58,7 @@ module.exports = function(XIBLE) {
 	XIBLE.addNode('glow.light.setpower', {
 		type: "action",
 		level: 0,
-		description: "Changes the power setting on a registrered in Glow."
+		description: "Changes the power setting on a registrered light in Glow."
 	}, constr);
 
 };

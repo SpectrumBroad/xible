@@ -2,9 +2,29 @@
   "name": "xible",
   "version": "0.0.1",
   "description": "xible",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Stefan de Jong"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spectrumbroad/xible"
+  },
+  "bugs": {
+    "url": "https://github.com/spectrumbroad/xible/issues",
+    "email": "bugs@xible.io"
+  },
+  "keywords": [
+    "xible",
+    "visual",
+    "connector",
+    "wire",
+    "programming",
+    "node"
+  ],
   "scripts": {
-    "start": "nodemon server.js",
-    "test": "export DEBUG=\"xible*\"; nodemon server.js"
+    "start": "node server.js",
+    "debug": "set DEBUG=\"xible*\";export DEBUG=\"xible*\"; nodemon server.js"
   },
   "dependencies": {
     "uws": "*",

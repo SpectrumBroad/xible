@@ -1,0 +1,1054 @@
+@font-face {
+	font-family: 'robotothin';
+	src: url('../fonts/Roboto-Thin.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'robotolight';
+	src: url('../fonts/Roboto-Light.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'robotobold';
+	src: url('../fonts/Roboto-Bold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'awesome';
+	src: url('../fonts/fontawesome-webfont.ttf') format('truetype');
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: robotolight;
+	font-size: 22px;
+	text-align: center;
+}
+
+body {
+	display: flex;
+}
+
+nav {
+	display: flex;
+	box-sizing: border-box;
+	overflow: hidden;
+	flex: 0 0 auto;
+}
+
+nav.open {
+	width: auto;
+}
+
+nav>ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background-color: rgb(49, 53, 65);
+	color: #fff;
+	width: 100px;
+}
+
+nav>ul>li {
+	height: 100px;
+	width: 100px;
+	font-weight: bold;
+}
+
+nav>ul>li>a {
+	text-decoration: none;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	color: rgb(102, 113, 126);
+	transition: background-color ease-out .3s, color ease .2s;
+	font-size: 13px;
+	letter-spacing: 1px;
+	border-right: 1px solid rgb(54, 59, 72);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+nav>ul>li>a:focus, nav>ul>li>a:target {
+	outline: 0;
+	color: #fff;
+	background-color: rgb(234, 90, 90);
+	border-right: 1px solid rgb(237, 103, 103);
+}
+
+nav>ul>li>a>span {
+	font-weight: normal;
+	font-size: 36px;
+	font-family: awesome;
+	margin-bottom: 6px;
+}
+
+#sub {
+	font-family: arial;
+	background-color: rgb(40, 44, 55);
+	box-shadow: inset 5px 0 5px -5px rgba(0, 0, 0, .5);
+	width: 0;
+	transition: width ease-out 200ms;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: auto;
+	position: relative;
+	padding: 0;
+}
+
+#sub.open {
+	padding: 22px;
+	width: 250px;
+}
+
+#sub.loading {
+	width: 5px;
+}
+
+#sub.loading::after {
+	display: block;
+	content: "";
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 5px;
+	height: 100%;
+	background-image: repeating-linear-gradient(135deg, #000, #000 3px, #0092b7 0, #0092b7 9px);
+	background-repeat: repeat;
+	background-size: 100% 200%;
+	animation: loadingAnim 40s linear infinite;
+}
+
+@keyframes loadingAnim {
+	0% {
+		background-position-y: 0%
+	}
+	100% {
+		background-position-y: 100%
+	}
+}
+
+#sub section {
+	position: relative;
+	margin: 0;
+	padding: 22px 0;
+	text-align: left;
+	overflow: hidden;
+	box-sizing: border-box;
+	border-bottom: 1px solid #1f222d;
+}
+
+#sub section:first-child {
+	padding-top: 0;
+}
+
+#sub section:last-child {
+	border-bottom: none;
+}
+
+#sub section>h1 {
+	box-sizing: border-box;
+	padding: 8px 20px;
+	color: #fff;
+	font-size: 15px;
+	margin: 0;
+}
+
+#sub section>ul {
+	font-size: 13px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#sub section>ul>li {
+	margin: 0;
+	padding: 8px 20px;
+	font-weight: bold;
+	color: #74808f;
+}
+
+main {
+	box-sizing: border-box;
+	height: 100%;
+	flex: 1 1 auto;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+section {
+	width: 100%;
+	padding: 40px;
+	box-sizing: border-box;
+	font-size: 16px;
+}
+
+#console {
+	width: 100%;
+}
+
+#console>.stats {
+	width: 100%;
+	height: 200px;
+}
+
+#console>.stats>canvas {
+	display: block;
+	width: 100%;
+	height: 50%;
+}
+
+#console>.stats>label {
+	display: block;
+	float: left;
+	position: relative;
+	font-size: 11px;
+	margin: 4px;
+}
+
+#console>.stats>label::before {
+	margin: 3px 4px 4px;
+	display: block;
+	float: left;
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+}
+
+#nodeSelector {
+	position: absolute;
+	display: block;
+	margin: 0;
+	padding: 0;
+	background-color: #eee;
+	font-size: 13px;
+	width: 180px;
+	text-align: left;
+	box-shadow: 0 0 8px rgba(0, 0, 0, 1);
+	border: 1px solid #000;
+}
+
+#nodeSelector>input, #nodeSelector>button {
+	box-sizing: border-box;
+	width: 100%;
+	border: none;
+	padding: 12px;
+	font-size: 14px;
+	background-color: inherit;
+	font-family: inherit;
+	transition: background-color 0.1s ease-in;
+	color: inherit;
+	text-align: inherit;
+}
+
+#nodeSelector>button {
+	background-color: #45679E;
+	border: 2px solid #000;
+	border-width: 0 0 2px 0;
+	cursor: pointer;
+	color: #fff;
+}
+
+#nodeSelector>button:hover, #nodeSelector>button:focus {
+	outline: none;
+	background-color: #5b7cb3;
+}
+
+#nodeSelector>button:active {
+	outline: none;
+	border-width: 2px 0 0 0;
+	border-color: rgb(30, 30, 30);
+	background-color: #31599b;
+}
+
+#nodeSelector>input:focus {
+	-webkit-appearance: none;
+	appearance: none;
+	outline: none;
+}
+
+#nodeSelector.noresults {
+	background-color: #f77878;
+	color: #fff;
+}
+
+#nodeSelector>ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: block;
+	max-height: 40vh;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#nodeSelector.hidden {
+	display: none;
+}
+
+#nodeSelector>ul>li {
+	display: block;
+	margin: 0;
+	padding: 12px;
+	border-top: 1px solid #ccc;
+	cursor: pointer;
+	position: relative;
+}
+
+#nodeSelector>ul>li:first-child {
+	border-top: none;
+}
+
+#nodeSelector>ul>li.hidden {
+	display: none;
+}
+
+#nodeSelector>ul>li.online::after {
+	content: "\f019";
+	font-size: 30px;
+	color: #bbb;
+	box-sizing: border-box;
+	font-family: awesome;
+	display: flex;
+	align-items: center;
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	padding: 12px;
+}
+
+#nodeSelector>ul>li.online.downloading::before {
+	display: block;
+	height: 5px;
+	width: 10px;
+	background-color: #333;
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: -15px;
+	animation: loading 1s ease 0s infinite normal none running;
+}
+
+@keyframes loading {
+	0% {
+		width: 10px;
+		left: -15px;
+	}
+	50% {
+		width: 50px;
+		left: calc( 50% - 20px);
+	}
+	100% {
+		width: 10px;
+		left: 100%;
+	}
+}
+
+#nodeSelector>ul>li:hover {
+	background-color: #45679E;
+	color: #fff;
+}
+
+#nodeSelector>ul>li>h1 {
+	font-size: inherit;
+	font-weight: bold;
+	padding: 0;
+	margin: 0;
+	text-transform: uppercase;
+	box-sizing: border-box;
+	width: 100%;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+	white-space: nowrap;
+}
+
+@keyframes scroll {
+	0% {
+		transform: translateX(0%);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
+#nodeSelector>ul>li>h1.overflow {
+	color: transparent;
+	text-overflow: clip;
+}
+
+#nodeSelector>ul>li>h1.overflow::before {
+	display: block;
+	content: "\00a0" attr(title) "\00a0" attr(title);
+	position: absolute;
+	box-sizing: border-box;
+	left: 0;
+	top: 0;
+	color: #fff;
+	text-transform: inherit;
+	transform: translateX(0%);
+	-webkit-animation: scroll 8s linear 0.2s infinite normal forwards;
+	animation: scroll 8s linear 0.2s infinite normal forwards;
+}
+
+#nodeSelector>ul>li>h1.overflow::after {
+	display: block;
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-image: linear-gradient(90deg, #45679E, transparent 8%, transparent 92%, #45679E);
+}
+
+#nodeSelector>ul>li>p {
+	margin: 8px 0 0 0;
+	padding: 0;
+}
+
+#heapUsed::before {
+	background-color: rgba(255, 99, 132, 1);
+}
+
+#heapTotal::before {
+	background-color: rgba(54, 162, 235, 1);
+}
+
+#rss::before {
+	background-color: rgba(255, 206, 86, 1);
+}
+
+#cpu::before {
+	background-color: rgba(75, 192, 192, 1);
+}
+
+#delay::before {
+	background-color: purple;
+}
+
+.flowList {
+	height: 25px;
+	overflow: visible;
+	top: 0;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #000;
+	position: relative;
+	z-index: 1;
+	box-shadow: 0 0 5px #000;
+}
+
+.flowList li {
+	display: block;
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	color: #fff;
+	height: 100%;
+	padding: 4px;
+	border-right: 1px dotted #fff;
+	box-sizing: border-box;
+	width: 100px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	cursor: pointer;
+	border-bottom: 2px solid #333;
+}
+
+.flowList li.notRunnable {
+	color: red;
+	border-bottom: 2px solid red;
+}
+
+.flowList li.started {
+	border-bottom: 2px solid Lime;
+}
+
+.flowList li.stopping, .flowList li.starting {
+	border-bottom: 2px solid darkorange;
+}
+
+.flowList li.open {
+	background-color: #333;
+	box-shadow: 0 3px 15px -5px #fff;
+}
+
+#xibleFlowDeleteButton, #xibleFlowSaveButton, #xibleFlowDeployButton, #xibleFlowStartButton, #xibleFlowStopButton {
+	-webkit-appearance: none;
+	appearance: none;
+	color: #fff;
+	font-weight: bold;
+	border: none;
+	background-color: rgb(35, 39, 51);
+	padding: 10px;
+	cursor: pointer;
+	display: block;
+	border-radius: 4px;
+	margin: 10px;
+	float: left;
+	width: 64px;
+}
+
+#xibleFlowDeployButton {
+	width: 148px;
+}
+
+#xibleFlowStartButton {
+	clear: left;
+}
+
+#xibleFlowDeleteButton:hover, #xibleFlowSaveButton:hover, #xibleFlowDeployButton:hover, #xibleFlowStartButton:hover, #xibleFlowStopButton:hover {
+	background-color: rgb(45, 49, 61);
+}
+
+#xibleFlowDeleteButton::before, #xibleFlowSaveButton::before, #xibleFlowDeployButton::before, #xibleFlowStartButton::before, #xibleFlowStopButton::before {
+	font-family: awesome;
+	display: block;
+	content: "\f04b";
+	margin-bottom: 6px;
+}
+
+#xibleFlowDeployButton::before {
+	content: "\f063";
+}
+
+#xibleFlowStartButton::before {
+	content: "\f04b";
+}
+
+#xibleFlowStopButton::before {
+	content: "\f04d";
+}
+
+#xibleFlowSaveButton::before {
+	content: "\f019";
+}
+
+#xibleFlowDeleteButton::before {
+	content: "\f014";
+}
+
+.nodeList {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.xible {
+	position: relative;
+	width: 100%;
+	height: calc( 100% - 25px);
+	overflow: hidden;
+	background-color: #292929;
+	background-size: 50px 50px;
+	background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+}
+
+.xible.panning {
+	cursor: all-scroll;
+}
+
+.xible.panning * {
+	cursor: all-scroll !important;
+}
+
+.xible>.describe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: rgba(0, 0, 0, 0.9);
+	position: relative;
+	overflow: auto;
+}
+
+.xible>.describe>p {
+	text-align: left;
+	padding: 40px;
+	margin: 10px;
+	color: #fff;
+}
+
+.xible>.describe>p.none {
+	font-style: italic;
+}
+
+.xible>.describe .node {
+	zoom: 2;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.xible>.describe .node>h1 {
+	position: relative;
+	overflow: visible;
+}
+
+.xible>.describe .node>h1>p {
+	position: absolute;
+	margin: 0;
+	left: 0;
+	top: 0;
+	transform: translateY(-100%);
+	color: #ccc;
+	font-size: 7px;
+	transition: color 0.2s ease-out;
+	font-weight: normal;
+	font-family: robotolight;
+}
+
+.xible>.describe .node:hover>h1>p {
+	color: #555;
+}
+
+.xible>.describe .node>h1:hover>p {
+	color: #fff;
+}
+
+.xible>.describe .node .io li p {
+	color: #ccc;
+	background-color: #000;
+	position: absolute;
+	top: 0;
+	padding: 0 4px;
+	margin: 0;
+	font-size: 0.5em;
+	white-space: normal;
+	box-sizing: border-box;
+	height: 100%;
+	width: 150%;
+	overflow: hidden;
+	transition: color 0.2s ease-out;
+}
+
+.xible>.describe .node .io li p::before, .xible>.describe .node .io li:hover p.overflow::after {
+	display: block;
+	position: absolute;
+	content: "";
+	height: 0.5px;
+	width: 100%;
+	top: 0;
+	bottom: 0;
+	background-image: linear-gradient(to right, #333, #333 80%, transparent);
+	z-index: -1;
+}
+
+.xible>.describe .node .io .input li p::before, .xible>.describe .node .io .input li:hover p.overflow::after {
+	right: 0;
+	background-image: linear-gradient(to left, #333, #333 80%, transparent);
+}
+
+.xible>.describe .node .io .global::after {
+	display: none;
+}
+
+.xible>.describe .node:hover .io p {
+	color: #555;
+}
+
+.xible>.describe .node .io li:hover p {
+	overflow: visible;
+	color: #fff;
+	z-index: 2;
+}
+
+.xible>.describe .node .io li p.overflow::after {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	background-image: linear-gradient(to right, transparent, #000 40%, #000);
+	box-sizing: border-box;
+	height: 9px;
+	padding: 0 4px 0 6px;
+	display: block;
+	font-family: awesome;
+	content: "\f0d7";
+	line-height: 9px;
+	font-size: 11px;
+	color: #eee;
+}
+
+.xible>.describe .node:hover .io li p.overflow::after {
+	color: #333;
+}
+
+.xible>.describe .node .io li:hover p.overflow {
+	height: auto;
+}
+
+.xible>.describe .node .io li:hover p.overflow::after {
+	top: auto;
+	bottom: 0;
+}
+
+.xible>.describe .node .input li p {
+	text-align: right;
+	left: -5px;
+	transform: translateX(-100%);
+}
+
+.xible>.describe .node .output li p {
+	text-align: left;
+	right: -5px;
+	transform: translateX(100%);
+}
+
+.xible>.describe .node .io li p.none {
+	font-style: italic;
+}
+
+
+/* type information */
+
+.xible>.describe .node .io li p span, .xible>.describe .node>h1>p span {
+	font-style: normal;
+	font-weight: bold;
+	padding: 1px;
+	margin-right: 1px;
+	border-radius: 2px;
+	background-color: #ccc;
+	color: #000;
+	line-height: 1em;
+	transition: background-color 0.2s ease-out;
+}
+
+.xible>.describe .node:hover .io li p span, .xible>.describe .node:hover>h1>p span {
+	background-color: #333;
+}
+
+.xible>.describe .node .io li:hover p span, .xible>.describe .node>h1:hover>p span {
+	background-color: #ccc;
+}
+
+
+/* area selector */
+
+.xible .area {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 2px solid #45679E;
+	background-color: rgba(255, 255, 255, 0.07);
+	z-index: 10;
+}
+
+.xible .editor {
+	transform-origin: 0 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.xible .editor>.connector {
+	z-index: 1;
+	display: block;
+	position: absolute;
+	-webkit-filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 2px #000);
+	filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 2px #000);
+	pointer-events: none;
+}
+
+.xible .editor>.connector>path {
+	stroke: #fff;
+	stroke-width: 2px;
+	fill: none;
+	pointer-events: all;
+}
+
+
+/*
+.xible .editor>.connector.selected {
+	z-index:2;
+}
+*/
+
+.xible .editor>.connector.selected>path {
+	stroke: gold;
+}
+
+.xible .editor>.connector.nodirect {
+	opacity: 0.1;
+}
+
+.xible .editor>.connector.splice>path {
+	stroke-dasharray: 10, 10;
+}
+
+.xible .node {
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+	position: absolute;
+	background-color: rgb(30, 30, 30);
+	width: 200px;
+	min-height: 10px;
+	border-radius: 6px;
+	color: #fff;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	z-index: 2;
+	border: 2px solid #000;
+	text-align: center;
+}
+
+.xible .node.fail {
+	border: 2px solid #f00;
+	background-color: rgba(255, 0, 0, 0.3);
+	box-shadow: 0 0 10px 4px rgba(255, 0, 0, 0.4);
+}
+
+.xible .node.splice {
+	background-color: rgba(30, 30, 30, 0.6);
+}
+
+.xible .node.splice * {
+	opacity: 0.6;
+}
+
+.xible .node.selected {
+	border-color: gold;
+	z-index: 3;
+}
+
+.xible .node.nodirect {
+	opacity: 0.2;
+}
+
+.xible .node>h1 {
+	font-size: 14px;
+	font-weight: bold;
+	background-color: #373737;
+	margin: 0;
+	padding: 2px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	cursor: pointer;
+	overflow: hidden;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.xible .node.fail>h1 {
+	background-color: rgba(255, 0, 0, 0.3);
+}
+
+.xible .node>.io {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.xible .node>.io>ul {
+	width: 50%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	min-height: 10px;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	font-size: 14px;
+}
+
+.xible .node>.io>ul.input {
+	text-align: left;
+}
+
+.xible .node>.io>ul.output {
+	top: 0;
+	text-align: right;
+}
+
+.xible .node>.io>ul>li {
+	display: block;
+	padding: 0 2px;
+	border-width: 0;
+	cursor: default;
+	white-space: nowrap;
+	position: relative;
+}
+
+.xible .node>.io>ul>li>div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.xible .node>.io>.input>li {
+	border-left: 3px solid #000;
+}
+
+.xible .node>.io>.output>li {
+	border-right: 3px solid #000;
+}
+
+.xible .node>.io>ul>.global::after {
+	display: block;
+	content: "";
+	width: 30px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	right: 0;
+	transform: translateX(35px);
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+	pointer-events: none;
+}
+
+.xible .node>.io>.input>.global::after {
+	left: 0;
+	right: auto;
+	transform: translateX(-35px);
+	background-image: linear-gradient(to left, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+}
+
+.xible .node>.io>ul>.math\.number {
+	border-color: red;
+}
+
+.xible .node>.io>ul>.trigger {
+	border-color: white;
+}
+
+.xible .node>.io>ul>.glow\.light {
+	border-color: green;
+}
+
+.xible .node>.io>ul>.glow\.scene {
+	border-color: blue;
+}
+
+.xible .node>.io>ul>.boolean {
+	border-color: purple;
+}
+
+.xible .node>.io>ul>.string {
+	border-color: yellow;
+}
+
+.xible .node>.content {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 3px 6px 6px;
+	clear: left;
+	position: relative;
+	text-align: left;
+	/* overflow: hidden; */
+}
+
+
+/*
+.xible .node>.content {
+	padding: 3px 6px 6px;
+}
+
+.xible .node>.content:has(> [style*="display:none"]) { {
+	display:none;
+}
+*/
+
+
+/*
+.xible .node>.content>[style*="none"] + :not([style*="none"]) {
+	margin-bottom:6px;
+}
+*/
+
+.xible .node>.statuses, .xible .node>.tracker {
+	box-sizing: border-box;
+	position: absolute;
+	color: #fff;
+	width: 100%;
+	font-size: 13px;
+	text-align: left;
+}
+
+.xible .node>.tracker {
+	top: 0;
+	padding: 2px;
+	margin: -1px 0 0 0;
+	overflow: hidden;
+	transform: translatey(-100%);
+	background-image: linear-gradient(to top, rgba(0, 0, 0, .3), rgba(0, 0, 0, .3) 70%, transparent);
+}
+
+.xible .node>.statuses {
+	top: 100%;
+	padding: 0;
+	margin: 1px 0 0 0;
+	list-style-type: none;
+}
+
+.xible .node>.statuses>li {
+	padding: 2px;
+	display: block;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, .3);
+	border-bottom: 1px dotted #444;
+	box-sizing: border-box;
+}
+
+.xible .node>.statuses>li.bar>.holder {
+	margin: 2px;
+	padding: 1px;
+	box-sizing: border-box;
+	width: calc( 100% - 4px);
+	height: 4px;
+	background-color: rgba(0, 0, 0, .6);
+	border-radius: 4px;
+}
+
+.xible .node>.statuses>li.bar>.holder>div {
+	background-color: #00ff00;
+	box-sizing: border-box;
+	height: 2px;
+	border-radius: 2px;
+	width: 0;
+}
+
+.xible .node>.statuses>li:last-child {
+	border-bottom: none;
+	background-color: transparent;
+	background-image: linear-gradient(to bottom, rgba(0, 0, 0, .3), rgba(0, 0, 0, .3) 70%, transparent);
+}
+
+.xible .node>.statuses>li:not(.bar)::before, .xible .node>.tracker::before {
+	display: block;
+	content: '';
+	margin: 3px 8px 2px 2px;
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+	background-color: silver;
+	float: left;
+}
+
+.xible .node>.statuses>li.green:not(.bar)::before, .xible .node>.tracker.green::before {
+	background-color: lime;
+}
+
+.xible .node>.statuses>li.blue:not(.bar)::before, .xible .node>.tracker.blue::before {
+	background-color: darkturquoise;
+}
+
+.xible .node>.statuses>li.red:not(.bar)::before, .xible .node>.tracker.red::before {
+	background-color: red;
+}

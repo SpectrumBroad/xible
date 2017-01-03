@@ -4,3 +4,5 @@ flows/
 ssl/
 docs/
 vault.json
+editor/js/xibleWrapper.js
+editor/js/oohttprequest.js

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="EN">
+
+<head>
+
+	<title>XIBLE</title>
+
+	<link rel="stylesheet" href="css/index.css" type="text/css" media="screen, handheld, projection">
+
+	<!-- shared common stuff -->
+	<script src="js/oohttprequest.js"></script>
+	<script src="js/EventEmitter.min.js"></script>
+	<script src="js/xibleWrapper.js"></script>
+	<script src="js/Chart.min.js"></script>
+	<script src="js/view.js"></script>
+
+	<!-- <script src="js/ShadowDOM.min.js"></script> -->
+	<script src="js/actions.js"></script>
+
+	<script>
+		OoHttpRequest.defaults.headers['content-type'] = 'application/json';
+	</script>
+
+</head>
+
+<body>
+
+	<nav>
+
+		<ul>
+
+			<li><a href="#flows"><span>&#xf16d;</span>Flows</a></li>
+			<li><a href="#scenes"><span>&#xf2a8;</span>Nodes</a></li>
+			<li><a href="#settings"><span>&#xf00c;</span>Settings</a></li>
+			<li><a href="#actions"><span>&#xf00c;</span>Editor</a></li>
+
+		</ul>
+
+		<ul id="sub">
+		</ul>
+
+	</nav>
+
+	<main id="main">
+	</main>
+
+	<script>
+		xible = new XibleWrapper({
+
+			hostname: window.location.hostname,
+			port: window.location.port
+
+		});
+
+		mainViewHolder = new ViewHolder(document.getElementById('main'));
+		subMenuViewHolder = new ViewHolder(document.getElementById('sub'));
+
+		mainViewHolder.hookHashHandler(mainViewHolder);
+		if(!mainViewHolder.loadHash()) {
+			mainViewHolder.render(new View('flows'));
+		}
+
+	</script>
+
+
+</body>
+
+</html>

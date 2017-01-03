@@ -1,5 +1,5 @@
 const EventEmitter = require('events').EventEmitter;
-const GlowWrapper = require('../../../GlowWrapper');
+const GlowWrapper = require('../../../glowWrapper');
 
 
 module.exports = function(XIBLE) {

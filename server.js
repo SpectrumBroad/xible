@@ -51,6 +51,11 @@ if (cluster.isMaster) {
 
 	});
 
+	//editor
+	expressApp.use(express.static('editor', {
+		index: false
+	}));
+
 	//init the webserver
 	expressDebug(`starting on port: ${config.webServer.port}`);
 

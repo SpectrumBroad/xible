@@ -1,0 +1,8 @@
+{
+	"esversion": 6,
+	"node": true,
+	"esversion": 6,
+	"freeze": true,
+	"browser": true,
+	"node": true
+}

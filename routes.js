@@ -1,5 +1,10 @@
 module.exports = function(XIBLE, expressApp) {
 
+	//redirect to index.htm from root
+	expressApp.get('/', (req, res) => {
+		res.redirect('/index.htm');
+	});
+
 
 	//TODO: refactor this nodeCopy stuff
 
@@ -226,6 +231,10 @@ module.exports = function(XIBLE, expressApp) {
 
 	//update an existing flow
 	expressApp.put('/api/flows/:flowId', (req, res) => {
+
+		if(!req.body || !req.body.nodes) {
+			res.status(400).end();
+		}
 
 		let flow = req.locals.flow;
 		flow.forceStop().then(() => {
