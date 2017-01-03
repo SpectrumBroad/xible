@@ -378,8 +378,8 @@ class XibleEditor {
 
 	//TODO: should use XibleWrapper.flows.getAll() instead
 	/**
-	*	Gets the flows from the Xible API
-	*/
+	 *	Gets the flows from the Xible API
+	 */
 	getFlows() {
 
 		return new Promise((resolve, reject) => {
@@ -407,8 +407,8 @@ class XibleEditor {
 	}
 
 	/**
-	*	Sets up the stat charts
-	*/
+	 *	Sets up the stat charts
+	 */
 	initStats() {
 
 		if (this.memChart) {
@@ -588,9 +588,9 @@ class XibleEditor {
 	}
 
 	/**
-	*	Handles a WebSocket message
-	*	@param {Object}	json	The message Object, the JSON.parse result of WebSocketMessageEvent.data
-	*/
+	 *	Handles a WebSocket message
+	 *	@param {Object}	json	The message Object, the JSON.parse result of WebSocketMessageEvent.data
+	 */
 	webSocketMessageHandler(json) {
 
 		var node;
@@ -744,9 +744,9 @@ class XibleEditor {
 	}
 
 	/**
-	*	Sets up message events for a (open) WebSocket
-	*	@param	{WebSocket}	socket	The WebSocket to listen to
-	*/
+	 *	Sets up message events for a (open) WebSocket
+	 *	@param	{WebSocket}	socket	The WebSocket to listen to
+	 */
 	initWebSocket(socket) {
 
 		if (!socket) {
@@ -778,19 +778,19 @@ class XibleEditor {
 	}
 
 	/**
-	*	Returns a Flow by the given id, or undefined if not found
-	*	@param	{Number}
-	*	@return	{XibleEditorFlow|Void}	The found Flow
-	*/
+	 *	Returns a Flow by the given id, or undefined if not found
+	 *	@param	{Number}
+	 *	@return	{XibleEditorFlow|Void}	The found Flow
+	 */
 	getFlowById(id) {
 		return this.flows.find((flow) => flow._id === id);
 	}
 
 	/**
-	*	Appends the given Node to the Editor
-	*	@param	{XibleEditorNode}	node	The Node to add
-	*	@return	{XibleEditorNode}	The given Node
-	*/
+	 *	Appends the given Node to the Editor
+	 *	@param	{XibleEditorNode}	node	The Node to add
+	 *	@return	{XibleEditorNode}	The given Node
+	 */
 	addNode(node) {
 
 		node.emit('beforeAppend');
@@ -1101,6 +1101,12 @@ class XibleEditor {
 		//catch the mousemove event
 		document.body.addEventListener('mousemove', window.nodeDragListener = (event) => {
 
+			//check if mouse actually moved
+			//see crbug.com/327114
+			if (initPageX === event.pageX && initPageY === event.pageY) {
+				return;
+			}
+
 			window.nodeDragHasFired = true;
 
 			//check how much we moved since the initial mousedown event
@@ -1356,7 +1362,7 @@ class XibleEditor {
 				window.nodeDragSpliceConnector.setDestination(selInput);
 
 				//connect a duplicate of the connector to the first output of type of the selected node
-				var dupConn = new XibleConnector();
+				var dupConn = new XibleEditorConnector();
 				this.loadedFlow.connectors.push(dupConn);
 
 				var selOutputs = selNode.getOutputsByType(window.nodeDragSpliceConnector.origin.type);
@@ -1524,7 +1530,7 @@ class XibleEditor {
 
 						processedConnectors.push(`${conn.origin._id},${conn.destination._id}`);
 
-						let dupConn = new XibleConnector({
+						let dupConn = new XibleEditorConnector({
 							origin: dupMap[sel._id].getOutputByName(output.name),
 							destination: dupMap[conn.destination.node._id].getInputByName(conn.destination.name)
 						});
@@ -1544,7 +1550,7 @@ class XibleEditor {
 		//make a copy of all connectors with only one side connected in the selection
 		this.selection.forEach((conn) => {
 
-			if (!(conn instanceof XibleConnector)) {
+			if (!(conn instanceof XibleEditorConnector)) {
 				return;
 			}
 
@@ -1556,7 +1562,7 @@ class XibleEditor {
 			let destNode = dupMap[conn.destination.node._id];
 			if (!origNode || !destNode) {
 
-				let dupConn = new XibleConnector({
+				let dupConn = new XibleEditorConnector({
 					origin: origNode ? origNode.getOutputByName(conn.origin.name) : conn.origin,
 					destination: destNode ? destNode.getInputByName(conn.destination.name) : conn.destination
 				});

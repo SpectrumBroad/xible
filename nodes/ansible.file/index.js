@@ -85,7 +85,7 @@ module.exports = function(XIBLE) {
 									NODE.addStatus({
 										message: data,
 										timeout: 5000,
-										color: data.indexOf('| FAILED ') > -1 ? 'red' : (data.indexOf('| success ') > -1 ? 'green' : null),
+										color: data.indexOf('| FAILED ') > -1 ? 'red' : (data.indexOf('| success ') > -1 ? 'green' : null)
 									});
 
 								});

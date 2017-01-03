@@ -26,10 +26,20 @@ module.exports = function(XIBLE) {
 
 					//loop the collections and insert
 					return Promise.all(collections.map((collection) => {
-            return collection.drop();
+						return collection.drop();
 					}));
 
-				}).then(() => NODE.triggerOutput(doneOut, state));
+				})
+				.then(() => NODE.triggerOutput(doneOut, state))
+				.catch((err) => {
+
+					NODE.addStatus({
+						message: '' + err,
+						timeout: 5000,
+						color: 'red'
+					});
+
+				});
 
 		});
 

@@ -62,7 +62,7 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 			this.destination.node.removeListener('position', this.destinationDrawFn);
 
 			//find global conns with same type
-			if (!this.destination.connectors.length && this.destination.type && document.querySelector(`.output>.${this.destination.type.replace(/\./g,'\\.')}.global`)) {
+			if (this.destination.connectors.length === 1 && this.destination.type && document.querySelector(`.output>.${this.destination.type.replace(/\./g,'\\.')}.global`)) {
 				this.destination.setGlobal(true);
 			}
 

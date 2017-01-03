@@ -24,8 +24,8 @@ module.exports = function(XIBLE, expressApp) {
 			delete nodeCopy[ioName][name].connectors;
 
 			nodeCopy[ioName][name].listeners = {
-				editorAttach: node[ioName][name].listeners('editorAttach').map(fn => fn.toString()),
-				editorDetach: node[ioName][name].listeners('editorDetach').map(fn => fn.toString())
+				attach: node[ioName][name].listeners('attach').map((fn) => fn.toString()),
+				detach: node[ioName][name].listeners('detach').map((fn) => fn.toString())
 			};
 
 		}

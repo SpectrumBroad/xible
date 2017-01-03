@@ -6,14 +6,14 @@ module.exports = function(XIBLE) {
 			singleType: true
 		});
 
-		anyIn.on('editorAttach', function(connector) {
+		anyIn.on('attach', function(connector) {
 
 			let type = connector.origin.type;
 			this.node.getOutputByName('grouped').setType(type);
 
 		});
 
-		anyIn.on('editorDetach', function(connector) {
+		anyIn.on('detach', function(connector) {
 
 			if (!this.connectors.length) {
 				this.node.getOutputByName('grouped').setType(null);
