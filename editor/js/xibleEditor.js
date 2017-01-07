@@ -250,11 +250,11 @@ class XibleEditor {
 			li.addEventListener('mousedown', (event) => {
 
 				let actionsOffset = this.getOffsetPosition();
-				node = this.addNode(new XibleEditorNode(node));
-				this.loadedFlow.nodes.push(node);
-				node.setPosition(((event.pageX - actionsOffset.left - this.left) / this.zoom) - (node.element.firstChild.offsetWidth / 2), ((event.pageY - actionsOffset.top - this.top) / this.zoom) - (node.element.firstChild.offsetHeight / 2));
+				let editorNode = this.addNode(new XibleEditorNode(node));
+				this.loadedFlow.addNode(editorNode);
+				editorNode.setPosition(((event.pageX - actionsOffset.left - this.left) / this.zoom) - (editorNode.element.firstChild.offsetWidth / 2), ((event.pageY - actionsOffset.top - this.top) / this.zoom) - (editorNode.element.firstChild.offsetHeight / 2));
 				this.deselect();
-				this.select(node);
+				this.select(editorNode);
 				this.initDrag(event);
 
 				div.classList.add('hidden');
@@ -1432,126 +1432,132 @@ class XibleEditor {
 		//key handlers
 		document.body.addEventListener('keydown', (event) => {
 
-			if (!this.loadedFlow) {
+			if (!this.loadedFlow || XibleEditor.isInputElement(event.target)) {
 				return;
 			}
 
-			if (!XibleEditor.isInputElement(event.target)) {
+			switch (event.key) {
 
-				switch (event.key) {
+				//remove selection on delete or backspace
+				case 'Delete':
+				case 'Backspace':
 
-					//remove selection on delete or backspace
-					case 'Delete':
-					case 'Backspace':
+					while (this.selection.length) {
+						this.selection[0].delete();
+					}
+					event.preventDefault();
 
-						while (this.selection.length) {
-							this.selection[0].delete();
-						}
+					break;
+
+					//select all
+				case 'a':
+
+					if (event.ctrlKey) {
+
+						this.loadedFlow.nodes.forEach((node) => this.select(node));
+						this.loadedFlow.connectors.forEach((connector) => this.select(connector));
+
 						event.preventDefault();
 
-						break;
+					}
 
-						//select all
-					case 'a':
+					break;
 
-						if (event.ctrlKey) {
+					//deselect all
+				case 'd':
 
-							this.loadedFlow.nodes.forEach((node) => this.select(node));
-							this.loadedFlow.connectors.forEach((connector) => this.select(connector));
-
-							event.preventDefault();
-
-						}
-
-						break;
-
-						//deselect all
-					case 'd':
-
-						if (event.ctrlKey) {
-
-							this.deselect();
-							event.preventDefault();
-
-						}
-
-						break;
-
-						//deselect all
-					case 'Escape':
+					if (event.ctrlKey) {
 
 						this.deselect();
 						event.preventDefault();
 
-						break;
+					}
 
-						//duplicate layers
-					case 'j':
+					break;
 
-						if (event.ctrlKey) {
+					//deselect all
+				case 'Escape':
 
-							this.duplicateToEditor(this.selection);
-							event.preventDefault();
+					this.deselect();
+					event.preventDefault();
 
-						}
+					break;
 
-						break;
+					//duplicate layers
+				case 'j':
 
-						//cut
-					case 'x':
+					if (event.ctrlKey) {
 
-						if (event.ctrlKey && this.selection.length && !XibleEditor.isInputElement(event.target)) {
+						this.duplicateToEditor(this.selection);
+						event.preventDefault();
 
-							this.copySelection = this.duplicate(this.selection);
-							while (this.selection.length) {
-								this.selection[0].delete();
-							}
+					}
 
-							event.preventDefault();
+					break;
 
-						}
+					//cut
+				case 'x':
 
-						break;
+					if (event.ctrlKey && this.selection.length) {
 
-						//copy
-					case 'c':
-
-						if (event.ctrlKey && this.selection.length && !XibleEditor.isInputElement(event.target)) {
-							this.copySelection = this.duplicate(this.selection);
+						this.copySelection = this.duplicate(this.selection);
+						while (this.selection.length) {
+							this.selection[0].delete();
 						}
 
 						event.preventDefault();
 
-						break;
+					}
 
-						//paste
-					case 'v':
+					break;
 
-						if (event.ctrlKey && this.copySelection && !XibleEditor.isInputElement(event.target)) {
+					//copy
+				case 'c':
 
-							//TODO: ensure paste is in view
-							this.duplicateToEditor(this.copySelection);
+					if (event.ctrlKey && this.selection.length) {
+						this.copySelection = this.duplicate(this.selection);
+					}
 
-							event.preventDefault();
+					event.preventDefault();
 
-						}
+					break;
 
-						break;
+					//paste
+				case 'v':
 
-						//help
-					case 'h':
-					case '?':
+					if (event.ctrlKey && this.copySelection) {
 
-						if (this.selection.length === 1 && this.selection[0] instanceof XibleEditorNode) {
+						//TODO: ensure paste is in view
+						this.duplicateToEditor(this.copySelection);
 
-							this.describeNode(this.selection[0]);
-							event.preventDefault();
+						event.preventDefault();
 
-						}
+					}
 
-						break;
+					break;
 
-				}
+					//help
+				case 'h':
+				case '?':
+
+					if (this.selection.length === 1 && this.selection[0] instanceof XibleEditorNode) {
+
+						this.describeNode(this.selection[0]);
+						event.preventDefault();
+
+					}
+
+					break;
+
+					//save
+				case 's':
+
+					if (event.ctrlKey) {
+						
+						this.loadedFlow.save();
+						event.preventDefault();
+
+					}
 
 			}
 
