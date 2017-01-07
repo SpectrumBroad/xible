@@ -11,6 +11,8 @@ class XibleEditor {
 		this.element.firstChild.style.transformOrigin = '0 0';
 
 		this.selection = [];
+		this.copySelection = null;
+
 		this.flows = {};
 		this.loadedFlow = null;
 
@@ -185,7 +187,7 @@ class XibleEditor {
 					let headerTextContent = li.firstChild.textContent.toLowerCase();
 					if (headerTextContent === filterInputValue) {
 						li.classList.add('headerMatchExact');
-					} else if(vals.every((val) => headerTextContent.indexOf(val) > -1)) {
+					} else if (vals.every((val) => headerTextContent.indexOf(val) > -1)) {
 						li.classList.add('headerMatchPartial');
 					}
 
@@ -1488,7 +1490,48 @@ class XibleEditor {
 
 						if (event.ctrlKey) {
 
-							this.duplicateSelection();
+							this.duplicateToEditor(this.selection);
+							event.preventDefault();
+
+						}
+
+						break;
+
+						//cut
+					case 'x':
+
+						if (event.ctrlKey && this.selection.length && !XibleEditor.isInputElement(event.target)) {
+
+							this.copySelection = this.duplicate(this.selection);
+							while (this.selection.length) {
+								this.selection[0].delete();
+							}
+
+							event.preventDefault();
+
+						}
+
+						break;
+
+						//copy
+					case 'c':
+
+						if (event.ctrlKey && this.selection.length && !XibleEditor.isInputElement(event.target)) {
+							this.copySelection = this.duplicate(this.selection);
+						}
+
+						event.preventDefault();
+
+						break;
+
+						//paste
+					case 'v':
+
+						if (event.ctrlKey && this.copySelection && !XibleEditor.isInputElement(event.target)) {
+
+							//TODO: ensure paste is in view
+							this.duplicateToEditor(this.copySelection);
+
 							event.preventDefault();
 
 						}
@@ -1517,15 +1560,49 @@ class XibleEditor {
 	}
 
 	/**
-	 *	Duplicates the selection in the editor
+	 *	Duplicates the given selection in the editor
 	 *	Repositions the duplicated selection by x+20px, y+20px
+	 *	@param {(XibleEditorNode|XibleEditorConnector)[]}	[selection=]	the selection to duplicate
 	 */
-	duplicateSelection() {
+	duplicateToEditor(selection = this.selection) {
+
+		let duplicates = this.duplicate(selection);
+
+		duplicates.forEach((dup) => {
+
+			if (dup instanceof XibleEditorNode) {
+
+				//TODO: check if there's already an element at this position (within 20px radius)
+				//reposition if true
+				dup.setPosition(dup.left + 20, dup.top + 20);
+
+				this.loadedFlow.addNode(dup);
+				this.addNode(dup);
+
+			} else {
+
+				this.loadedFlow.addConnector(dup);
+				this.addConnector(dup);
+
+			}
+
+		});
+
+		this.deselect();
+		duplicates.forEach((dup) => this.select(dup));
+
+	}
+
+	/**
+	 *	Duplicates the given selection and returns that duplication as an array
+	 *	@param {(XibleEditorNode|XibleEditorConnector)[]}	[selection=]	the selection to duplicate
+	 */
+	duplicate(selection = this.selection) {
 
 		let newSelection = [];
 		let dupMap = {};
 
-		this.selection.forEach((sel) => {
+		selection.forEach((sel) => {
 
 			if (!(sel instanceof XibleEditorNode)) {
 				return;
@@ -1533,17 +1610,14 @@ class XibleEditor {
 
 			var dup = sel.duplicate();
 			dupMap[sel._id] = dup;
-			dup.setPosition(dup.left + 20, dup.top + 20);
 			newSelection.push(dup);
-			this.loadedFlow.nodes.push(dup);
-			this.addNode(dup);
 
 		});
 
 		//make a copy of all connectors between selected nodes
 		let processedOutputs = [];
 		let processedConnectors = [];
-		this.selection.forEach((sel) => {
+		selection.forEach((sel) => {
 
 			if (!(sel instanceof XibleEditorNode)) {
 				return;
@@ -1567,8 +1641,6 @@ class XibleEditor {
 							destination: dupMap[conn.destination.node._id].getInputByName(conn.destination.name)
 						});
 						newSelection.push(dupConn);
-						this.loadedFlow.connectors.push(dupConn);
-						this.addConnector(dupConn);
 
 					}
 
@@ -1580,7 +1652,7 @@ class XibleEditor {
 		processedOutputs = null;
 
 		//make a copy of all connectors with only one side connected in the selection
-		this.selection.forEach((conn) => {
+		selection.forEach((conn) => {
 
 			if (!(conn instanceof XibleEditorConnector)) {
 				return;
@@ -1599,17 +1671,12 @@ class XibleEditor {
 					destination: destNode ? destNode.getInputByName(conn.destination.name) : conn.destination
 				});
 				newSelection.push(dupConn);
-				this.loadedFlow.connectors.push(dupConn);
-				this.addConnector(dupConn);
 
 			}
 
 		});
 
-		//change selection to duplicated items
-		this.deselect();
-		newSelection.forEach(sel => this.select(sel));
-		newSelection = null;
+		return newSelection;
 
 	}
 

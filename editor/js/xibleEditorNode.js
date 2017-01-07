@@ -218,6 +218,8 @@ class XibleEditorNode extends xibleWrapper.Node {
 	duplicate(ignoreData) {
 
 		let duplicateXibleNode = new XibleEditorNode(this, ignoreData);
+		duplicateXibleNode.flow = null;
+		duplicateXibleNode.editor = null;
 
 		//create a unique id for the node
 		duplicateXibleNode._id = xibleWrapper.generateObjectId();
