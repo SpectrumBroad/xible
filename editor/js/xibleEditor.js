@@ -166,9 +166,6 @@ class XibleEditor {
 		//this list will be populated with the local installed nodes
 		let localUl = document.createElement('ul');
 
-		//this list will be populated with the online nodes
-		//let onlineUl = document.createElement('ul');
-
 		let filterInput = div.appendChild(document.createElement('input'));
 		filterInput.setAttribute('type', 'text');
 		filterInput.setAttribute('placeholder', 'filter nodes');
@@ -177,10 +174,20 @@ class XibleEditor {
 			let noResults = true;
 			localUl.querySelectorAll('li').forEach((li) => {
 
-				let vals = filterInput.value.replace(/[\W_]+/g, ' ').toLowerCase().split(' ');
+				let filterInputValue = filterInput.value.toLowerCase();
+				let vals = filterInputValue.replace(/[\W_]+/g, ' ').split(' ');
 				let textContent = li.textContent.toLowerCase();
 
+				li.classList.remove('headerMatchExact', 'headerMatchPartial');
 				if (!filterInput.value || vals.every((val) => textContent.indexOf(val) > -1)) {
+
+					//specify more relevant search results
+					let headerTextContent = li.firstChild.textContent.toLowerCase();
+					if (headerTextContent === filterInputValue) {
+						li.classList.add('headerMatchExact');
+					} else if(vals.every((val) => headerTextContent.indexOf(val) > -1)) {
+						li.classList.add('headerMatchPartial');
+					}
 
 					li.classList.remove('hidden');
 					noResults = false;
@@ -200,7 +207,6 @@ class XibleEditor {
 		});
 
 		div.appendChild(localUl);
-		//div.appendChild(onlineUl);
 
 		function buildNode(nodeName, node) {
 

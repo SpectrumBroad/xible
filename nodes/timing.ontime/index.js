@@ -122,7 +122,7 @@ module.exports = function(XIBLE) {
 
 	}
 
-	XIBLE.addNode('timing.time', {
+	XIBLE.addNode('timing.ontime', {
 		type: "event",
 		level: 0,
 		description: `Triggered when the given time hits.`

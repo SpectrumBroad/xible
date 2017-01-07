@@ -64,6 +64,7 @@ module.exports = function(XIBLE) {
 
 		clearIn.on('trigger', (conn, state) => {
 
+			//TODO: clear progress bars as well
 			regIntervals.forEach((regInterval) => {
 				clearInterval(regInterval);
 			});

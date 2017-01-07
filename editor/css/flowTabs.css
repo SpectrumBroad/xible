@@ -1,0 +1,47 @@
+.flowList {
+	overflow: auto;
+	top: 0;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #333;
+	color: #fff;
+	z-index: 1;
+	box-shadow: 0 0 5px #000;
+}
+
+.flowList li {
+	display: block;
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 8px;
+	border-right: 1px dotted #fff;
+	box-sizing: border-box;
+	width: 100px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	cursor: pointer;
+	border-bottom: 2px solid #333;
+	position: relative;
+}
+
+.flowList li.notRunnable {
+	color: red;
+	border-bottom: 2px solid red;
+}
+
+.flowList li.started {
+	border-bottom: 2px solid Lime;
+}
+
+.flowList li.stopping, .flowList li.starting {
+	border-bottom: 2px solid darkorange;
+}
+
+.flowList li.open {
+	background-color: gold;
+  color:#000;
+	box-shadow: 0 3px 15px -5px #fff;
+}

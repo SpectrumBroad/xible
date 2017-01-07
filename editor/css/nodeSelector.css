@@ -1,0 +1,203 @@
+#nodeSelector {
+	position: absolute;
+	display: block;
+	margin: 0;
+	padding: 0;
+	background-color: #eee;
+	font-size: 13px;
+	width: 180px;
+	text-align: left;
+	box-shadow: 0 0 8px rgba(0, 0, 0, 1);
+	border: 1px solid #000;
+}
+
+#nodeSelector>input, #nodeSelector>button {
+	box-sizing: border-box;
+	width: 100%;
+	border: none;
+	padding: 12px;
+	font-size: 14px;
+	background-color: inherit;
+	font-family: inherit;
+	transition: background-color 0.1s ease-in;
+	color: inherit;
+	text-align: inherit;
+}
+
+#nodeSelector>button {
+	background-color: #45679E;
+	border: 2px solid #000;
+	border-width: 0 0 2px 0;
+	cursor: pointer;
+	color: #fff;
+}
+
+#nodeSelector>button:hover, #nodeSelector>button:focus {
+	outline: none;
+	background-color: #5b7cb3;
+}
+
+#nodeSelector>button:active {
+	outline: none;
+	border-width: 2px 0 0 0;
+	border-color: rgb(30, 30, 30);
+	background-color: #31599b;
+}
+
+#nodeSelector>input:focus {
+	-webkit-appearance: none;
+	appearance: none;
+	outline: none;
+}
+
+#nodeSelector.noresults {
+	background-color: #f77878;
+	color: #fff;
+}
+
+#nodeSelector>ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+  flex-flow:column;
+	max-height: 40vh;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#nodeSelector.hidden {
+	display: none;
+}
+
+#nodeSelector>ul>li {
+	display: block;
+	margin: 0;
+	padding: 12px;
+	border-top: 1px solid #ccc;
+	cursor: pointer;
+	position: relative;
+  order:3;
+}
+
+#nodeSelector>ul>li:first-child {
+	border-top: none;
+}
+
+#nodeSelector>ul>li.headerMatchPartial {
+  order:2;
+}
+
+#nodeSelector>ul>li.headerMatchExact {
+  order:1;
+}
+
+#nodeSelector>ul>li.hidden {
+	display: none;
+}
+
+#nodeSelector>ul>li.online::before {
+	content: "\f019";
+	font-size: 30px;
+	color: #bbb;
+	box-sizing: border-box;
+	font-family: awesome;
+	display: flex;
+	align-items: center;
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	padding: 12px;
+}
+
+#nodeSelector>ul>li.online.downloading::after, .loading::after, .starting::after, .stopping::after {
+	display: block;
+	height: 5px;
+	width: 10px;
+	background-color: #333;
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: -15px;
+	animation: loading 1s ease 0s infinite normal none running;
+	z-index: 1;
+}
+
+@keyframes loading {
+	0% {
+		width: 10px;
+		left: -15px;
+	}
+	50% {
+		width: 50px;
+		left: calc( 50% - 20px);
+	}
+	100% {
+		width: 10px;
+		left: 100%;
+	}
+}
+
+#nodeSelector>ul>li:hover {
+	background-color: #45679E;
+	color: #fff;
+}
+
+#nodeSelector>ul>li>h1 {
+	font-size: inherit;
+	font-weight: bold;
+	padding: 0;
+	margin: 0;
+	text-transform: uppercase;
+	box-sizing: border-box;
+	width: 100%;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+	white-space: nowrap;
+}
+
+@keyframes scroll {
+	0% {
+		transform: translateX(0%);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
+#nodeSelector>ul>li>h1.overflow {
+	color: transparent;
+	text-overflow: clip;
+}
+
+#nodeSelector>ul>li>h1.overflow::before {
+	display: block;
+	content: "\00a0" attr(title) "\00a0" attr(title);
+	position: absolute;
+	box-sizing: border-box;
+	left: 0;
+	top: 0;
+	color: #fff;
+	text-transform: inherit;
+	transform: translateX(0%);
+	-webkit-animation: scroll 8s linear 0.2s infinite normal forwards;
+	animation: scroll 8s linear 0.2s infinite normal forwards;
+}
+
+#nodeSelector>ul>li>h1.overflow::after {
+	display: block;
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-image: linear-gradient(90deg, #45679E, transparent 8%, transparent 92%, #45679E);
+}
+
+#nodeSelector>ul>li>p {
+	margin: 8px 0 0 0;
+	padding: 0;
+}
