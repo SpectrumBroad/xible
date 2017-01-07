@@ -550,7 +550,7 @@ module.exports = function(XIBLE, express, expressApp) {
 			} else {
 
 				//cancel all output triggers
-				XIBLE.Node.triggerOutputs = () => {};
+				XIBLE.Node.triggerOutput = () => {};
 
 				//set the data accordingly
 				//init all of them

@@ -1581,6 +1581,7 @@ class XibleEditor {
 
 			} else {
 
+				//FIXME: currently fails if a connector crosses flows
 				this.loadedFlow.addConnector(dup);
 				this.addConnector(dup);
 

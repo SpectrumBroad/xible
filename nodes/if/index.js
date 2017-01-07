@@ -40,7 +40,7 @@ module.exports = function(XIBLE) {
 
 	}
 
-	XIBLE.addNode('trigger if', {
+	XIBLE.addNode('if', {
 		type: "action",
 		level: 0,
 		description: `Triggers an output based on a condition.`
