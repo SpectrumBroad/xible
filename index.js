@@ -286,23 +286,7 @@ Xible.prototype.getFlowById = function(id, callback) {
 
 
 Xible.prototype.getFlowByName = function(name, callback) {
-
-	//same?
 	return this.getFlowById(name, callback);
-
-	//TODO: decide if this can indeed be removed
-	let flowId = Object.keys(this.flows).find((flowId) => this.flows[flowId].name === name);
-	let flow = null;
-	if (flowId) {
-		flow = this.flows[flowId];
-	}
-
-	if (typeof callback === 'function') {
-		callback(flow);
-	}
-
-	return flow;
-
 };
 
 

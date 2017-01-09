@@ -22,7 +22,7 @@ module.exports = function(XIBLE) {
 
 				});
 
-				XIBLE.Node.triggerOutput(triggerOut, state);
+				NODE.triggerOutput(triggerOut, state);
 
 			});
 

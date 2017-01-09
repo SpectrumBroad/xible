@@ -30,7 +30,7 @@ module.exports = function(XIBLE) {
 					}
 
 					Promise.all(sws.map((sw) => sw.connected && (switchState ? sw.switchOn() : sw.switchOff())))
-						.then(() => XIBLE.Node.triggerOutput(doneOut, state));
+						.then(() => NODE.triggerOutput(doneOut, state));
 
 				});
 

@@ -31,10 +31,10 @@
     "debug": "*",
     "express": "*",
     "body-parser": "*",
-    "spdy": "*"
+    "spdy": "*",
+    "detective-es6": "*"
   },
   "devDependencies": {
-    "mr-doc": "*"
-  },
-  "private": true
+    "nodemon": "*"
+  }
 }

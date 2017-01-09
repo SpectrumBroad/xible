@@ -12,7 +12,6 @@ module.exports = function(XIBLE, express, expressApp) {
 	let globalOutputs = null; //caching
 	let expressRes = {}; //res objects for express calls from nodes
 
-
 	/**
 	 *	Flow class
 	 */
@@ -89,17 +88,25 @@ module.exports = function(XIBLE, express, expressApp) {
 			});
 
 			//start all flows which had status running before
+			//also do some cleaning while we're at it
 			let statuses = this.getStatuses();
+			let preStatusesLength = Object.keys(statuses).length;
 			for (let flowId in statuses) {
-				if (statuses[flowId] && flows[flowId]) {
+
+				//if a flow doesn't exist anymore, remove it from the statuses
+				if (!flows[flowId]) {
+					delete statuses[flowId];
+				} else if (statuses[flowId]) {
 					flows[flowId].start();
 				}
+
 			}
+
+			flowDebug(`cleared ${preStatusesLength-Object.keys(statuses).length} statuses`);
 
 			return flows;
 
 		}
-
 
 		/**
 		 *	get all flow statuses
@@ -112,18 +119,26 @@ module.exports = function(XIBLE, express, expressApp) {
 				return;
 			}
 
+			if (this._statuses) {
+				return this._statuses;
+			}
+
 			let statuses = {};
 
 			try {
+
 				statuses = JSON.parse(fs.readFileSync(`${this.flowPath}/status.json`));
+				flowDebug(`found ${Object.keys(statuses).length} statuses`);
+
 			} catch (err) {
 				flowDebug(`${this.flowPath}/status.json cannot be opened: ${err}`);
 			}
 
+			this._statuses = statuses;
+
 			return statuses;
 
 		}
-
 
 		/**
 		 *	save statuses
@@ -136,6 +151,8 @@ module.exports = function(XIBLE, express, expressApp) {
 				return;
 			}
 
+			this._statuses = statuses;
+
 			try {
 				fs.writeFileSync(`${this.flowPath}/status.json`, JSON.stringify(statuses));
 			} catch (err) {
@@ -143,7 +160,6 @@ module.exports = function(XIBLE, express, expressApp) {
 			}
 
 		}
-
 
 		/**
 		 *	init a flow, including all its nodes and connectors, from a json obj
@@ -272,7 +288,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/**
 		 *	saves a flow to the configured flows directory
 		 *	only works if this is a the master thread
@@ -297,7 +312,6 @@ module.exports = function(XIBLE, express, expressApp) {
 			});
 
 		}
-
 
 		/**
 		 *	deletes a flow from the configured flows directory
@@ -335,13 +349,11 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/*
 		addConnector(conn) {
 			this.connectors.push(conn);
 		}
 		*/
-
 
 		/**
 		 *	adds a node to a flow
@@ -381,7 +393,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 			}
 
-
 			//track output triggers
 			/*
 			//uncommenting this needs to take care of commented _trackerTriggerTime elsewhere
@@ -417,7 +428,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/**
 		 *	returns a node from a specific flow by the node._id
 		 *	@param {Number}	id	the _id of the node the be found
@@ -426,7 +436,6 @@ module.exports = function(XIBLE, express, expressApp) {
 		getNodeById(id) {
 			return this.nodes.find(node => node._id === id);
 		}
-
 
 		/**
 		 *	returns an input for any node by the input._id
@@ -450,7 +459,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/**
 		 *	returns an output for any node by the output._id
 		 *	@param {Number}	id	the _id of the nodeOutput to be found
@@ -473,7 +481,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/**
 		 *	returns all global outputs with a given type
 		 *	@param {String}	type	the type of global outputs to be fetched
@@ -488,8 +495,9 @@ module.exports = function(XIBLE, express, expressApp) {
 			} else {
 
 				globalOutputs = [];
-				this.nodes.forEach((node) => {
+				for (let i = 0; i < this.nodes.length; i++) {
 
+					let node = this.nodes[i];
 					for (let name in node.outputs) {
 
 						let output = node.outputs[name];
@@ -502,17 +510,14 @@ module.exports = function(XIBLE, express, expressApp) {
 							}
 
 						}
-
 					}
-
-				});
+				}
 
 			}
 
 			return outputs;
 
 		}
-
 
 		/**
 		 *	saves the status (running or not) for this flow by calling Flow.saveStatuses()
@@ -525,7 +530,6 @@ module.exports = function(XIBLE, express, expressApp) {
 			Flow.saveStatuses(statuses);
 
 		}
-
 
 		/**
 		 *	Starts a flow in direct mode, on a given set of nodes
@@ -582,7 +586,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/**
 		 *	Starts a flow. Stops the flow first if it is not stopped
 		 *	@param	{Node[]} directNodes	nodes to direct
@@ -637,7 +640,6 @@ module.exports = function(XIBLE, express, expressApp) {
 			}
 
 		}
-
 
 		/**
 		 *	Starts a flow. Rejects if flow is not stopped
@@ -806,7 +808,6 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
-
 		/**
 		 *	Stops a flow. Will not reject if it's already running
 		 *  If the flow is in starting mode, it will stop it after it has finished starting
@@ -841,7 +842,6 @@ module.exports = function(XIBLE, express, expressApp) {
 			}
 
 		}
-
 
 		/**
 		 *	Stops a flow. Will forcibly kill the flow if it is still running after 5 seconds.

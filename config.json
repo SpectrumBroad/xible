@@ -1,14 +1,25 @@
 {
 
 	"webSocketServer": {
-
 		"port": 9601
-
 	},
 
 	"webServer": {
-
 		"port": 9600
+	},
+
+	"registry": {
+
+		"flows": {
+			"allowpublish": true,
+			"allowinstall": true,
+			"url": "https://registry.xible.io"
+		},
+		"nodes": {
+			"allowpublish": true,
+			"allowinstall": true,
+			"url": "https://registry.xible.io"
+		}
 
 	}
 

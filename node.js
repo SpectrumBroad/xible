@@ -308,23 +308,20 @@ module.exports = function(XIBLE, express, expressApp) {
 		}
 
 
-		triggerOutput() {
-			Node.triggerOutput(...arguments);
-		}
+		triggerOutput(output, state) {
 
-
-		static triggerOutput(output, state) {
-
-			this.flowStateCheck(state);
+			Node.flowStateCheck(state);
 
 			output.node.emit('triggerout', output);
 
-			output.connectors.forEach((conn) => {
+			let conns = output.connectors;
+			for (let i = 0; i < conns.length; i++) {
 
+				let conn = conns[i];
 				conn.destination.node.emit('trigger');
 				conn.destination.emit('trigger', conn, state.split());
 
-			});
+			}
 
 		}
 
@@ -453,8 +450,10 @@ module.exports = function(XIBLE, express, expressApp) {
 				}
 
 				let values = [];
-				let i = 0;
-				conns.forEach((conn) => {
+				let callbacksReceived = 0;
+				for (let i = 0; i < connLength; i++) {
+
+					let conn = conns[i];
 
 					//trigger the input
 					conn.origin.emit('trigger', conn, state, (value) => {
@@ -473,13 +472,13 @@ module.exports = function(XIBLE, express, expressApp) {
 						}
 
 						//all done
-						if (++i === connLength) {
+						if (++callbacksReceived === connLength) {
 							resolve(values);
 						}
 
 					});
 
-				});
+				}
 
 			});
 

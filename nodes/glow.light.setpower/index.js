@@ -45,7 +45,7 @@ module.exports = function(XIBLE) {
 					}
 
 					Promise.all(lights.map((light) => light.connected && (power ? light.powerOn(duration) : light.powerOff(duration))))
-						.then(() => XIBLE.Node.triggerOutput(doneOut, state));
+						.then(() => NODE.triggerOutput(doneOut, state));
 
 				});
 

@@ -100,10 +100,10 @@ module.exports = function(XIBLE) {
 			//setTimeout trigger on the difference
 			//unless it's this second, than trigger immediately
 			if (diff >= 0 && diff < 1000) {
-				XIBLE.Node.triggerOutput(triggerOut, state);
+				NODE.triggerOutput(triggerOut, state);
 			} else if (diff > 0) {
 				timeout = setTimeout(() => {
-					XIBLE.Node.triggerOutput(triggerOut, state);
+					NODE.triggerOutput(triggerOut, state);
 				}, diff);
 			}
 

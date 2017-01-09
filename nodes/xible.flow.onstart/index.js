@@ -3,7 +3,7 @@ module.exports = function(XIBLE) {
 	function constr(NODE) {
 
 		NODE.on('trigger', (state) => {
-			XIBLE.Node.triggerOutput(NODE.getOutputByName('trigger'), state);
+			NODE.triggerOutput(NODE.getOutputByName('trigger'), state);
 		});
 
 	}

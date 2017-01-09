@@ -161,6 +161,38 @@ class XibleEditor {
 
 	enableInsertNode() {
 
+		//detail div for downloading new nodes
+		let detailDiv = document.body.appendChild(document.createElement('div'));
+		detailDiv.setAttribute('id', 'detailNodeSelector');
+		detailDiv.classList.add('hidden');
+		let detailDivSub = detailDiv.appendChild(document.createElement('div'));
+
+		//add contents to detailDiv
+		detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Permissions'));
+		detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('This node requires the following permissions;'));
+		let detailDivPermissionsUl = detailDivSub.appendChild(document.createElement('ul'));
+
+		let detailConfirmButton = detailDiv.appendChild(document.createElement('button'));
+		detailConfirmButton.appendChild(document.createTextNode('Confirm'));
+		detailConfirmButton.setAttribute('type', 'button');
+		detailConfirmButton.onclick = () => {
+
+			detailDiv.classList.add('hidden');
+
+		};
+
+		let detailCancelButton = detailDiv.appendChild(document.createElement('button'));
+		detailCancelButton.appendChild(document.createTextNode('Cancel'));
+		detailCancelButton.classList.add('cancel');
+		detailCancelButton.setAttribute('type', 'button');
+		detailCancelButton.onclick = () => {
+
+			div.classList.add('hidden');
+			detailDiv.classList.add('hidden');
+
+		};
+
+		//the div containing the node list
 		let div = document.body.appendChild(document.createElement('div'));
 		div.setAttribute('id', 'nodeSelector');
 		div.classList.add('hidden');
@@ -209,6 +241,22 @@ class XibleEditor {
 		});
 
 		div.appendChild(localUl);
+
+		function detailedNodeView(li, nodeName) {
+
+			li.classList.add('downloading');
+
+			detailDiv.classList.remove('hidden');
+			detailDiv.style.top = div.style.top;
+			detailDiv.style.left = (parseInt(div.style.left) + detailDiv.offsetWidth) + 'px';
+
+			//add the permissions to the list
+			detailDivPermissionsUl.innerHTML = '';
+			detailDivPermissionsUl.appendChild(document.createElement('li')).appendChild(document.createTextNode('filesystem'));
+			detailDivPermissionsUl.appendChild(document.createElement('li')).appendChild(document.createTextNode('network'));
+			detailDivPermissionsUl.appendChild(document.createElement('li')).appendChild(document.createTextNode('process'));
+
+		}
 
 		function buildNode(nodeName, node) {
 
@@ -280,18 +328,8 @@ class XibleEditor {
 					li.classList.add('online');
 					li.onclick = (event) => {
 
-						if (window.confirm('Download and install this node?')) {
-
-							li.classList.add('downloading');
-
-							window.setTimeout(() => {
-
-								li.onclick = null;
-								li.classList.remove('downloading', 'online');
-								hookNode(li, nodes[nodeName]);
-
-							}, 1000);
-						}
+						//open the detailed confirmation view
+						detailedNodeView(li, nodeName);
 
 					};
 					localUl.appendChild(li);
@@ -373,8 +411,11 @@ class XibleEditor {
 		//hide the nodeSelector element if selection moves elsewhere
 		document.body.addEventListener('mousedown', (event) => {
 
-			if (!div.classList.contains('hidden') && !div.contains(event.target)) {
+			if (!div.classList.contains('hidden') && !div.contains(event.target) && !detailDiv.contains(event.target)) {
+
 				div.classList.add('hidden');
+				detailDiv.classList.add('hidden');
+
 			}
 
 		});
@@ -1553,7 +1594,7 @@ class XibleEditor {
 				case 's':
 
 					if (event.ctrlKey) {
-						
+
 						this.loadedFlow.save();
 						event.preventDefault();
 

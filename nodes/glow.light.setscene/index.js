@@ -30,7 +30,7 @@ module.exports = function(XIBLE) {
 						light.selectScene(scenes[0]).then(() => {
 
 							if (++i === lights.length) {
-								XIBLE.Node.triggerOutput(triggerOut, state);
+								NODE.triggerOutput(triggerOut, state);
 							}
 
 						});

@@ -21,7 +21,7 @@ module.exports = function(XIBLE) {
 			if (!valueInput.connectors.length) {
 
 				log(NODE.data.value || '', NODE);
-				return XIBLE.Node.triggerOutput(NODE.getOutputByName('done'), state);
+				return NODE.triggerOutput(NODE.getOutputByName('done'), state);
 
 			}
 
@@ -31,7 +31,7 @@ module.exports = function(XIBLE) {
 					log(str, NODE);
 				});
 
-				XIBLE.Node.triggerOutput(NODE.getOutputByName('done'), state);
+				NODE.triggerOutput(NODE.getOutputByName('done'), state);
 
 			});
 

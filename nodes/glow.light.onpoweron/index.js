@@ -39,7 +39,7 @@ module.exports = function(XIBLE) {
 							light: event.light
 						});
 
-						XIBLE.Node.triggerOutput(triggerOut, state);
+						NODE.triggerOutput(triggerOut, state);
 
 					});
 
