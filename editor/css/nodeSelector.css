@@ -78,7 +78,7 @@
 	list-style: none;
 	display: flex;
 	flex-flow: column;
-	width:100%;
+	width: 100%;
 	max-height: 40vh;
 	overflow-y: auto;
 }
@@ -143,6 +143,8 @@
 	z-index: 1;
 }
 */
+
+
 /*
 #nodeSelector>ul>li.online.downloading::after, .loading::after {
 	display: block;
@@ -155,6 +157,7 @@
 	background-color:#eee;
 }
 */
+
 @keyframes loading {
 	0% {
 		width: 10px;
@@ -187,6 +190,14 @@
 	text-overflow: ellipsis;
 	position: relative;
 	white-space: nowrap;
+}
+
+#detailNodeSelector h1 {
+	margin: 8px 0 0;
+}
+
+#detailNodeSelector h1:first-child {
+	margin: 0;
 }
 
 @keyframes scroll {

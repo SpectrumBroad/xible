@@ -5,7 +5,7 @@ const path = require('path');
 const cluster = require('cluster');
 const fs = require('fs');
 
-module.exports = function(XIBLE, express, expressApp) {
+module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 	class Node extends EventEmitter {
 
@@ -56,6 +56,48 @@ module.exports = function(XIBLE, express, expressApp) {
 
 		}
 
+		//TODO: clean this
+		static nodeIoCopy(ioName, nodeCopy, node) {
+
+			nodeCopy[ioName] = {};
+			for (let name in node[ioName]) {
+
+				nodeCopy[ioName][name] = Object.assign({}, node[ioName][name]);
+				delete nodeCopy[ioName][name].node;
+				delete nodeCopy[ioName][name]._events;
+				delete nodeCopy[ioName][name]._eventsCount;
+				delete nodeCopy[ioName][name].origin;
+				delete nodeCopy[ioName][name].destination;
+				delete nodeCopy[ioName][name].connectors;
+
+				nodeCopy[ioName][name].listeners = {
+					attach: node[ioName][name].listeners('attach').map((fn) => fn.toString()),
+					detach: node[ioName][name].listeners('detach').map((fn) => fn.toString())
+				};
+
+			}
+
+		}
+
+		//TODO: clean this
+		static nodeCopy(node) {
+
+			//copy the node so we can mutate it where need be
+			let nodeCopy = Object.assign({}, node);
+			delete nodeCopy.flow;
+			delete nodeCopy._states;
+			delete nodeCopy._events;
+			delete nodeCopy._eventsCount;
+			delete nodeCopy.vault;
+
+			//attach stringified listeners to the io's
+			this.nodeIoCopy('inputs', nodeCopy, node);
+			this.nodeIoCopy('outputs', nodeCopy, node);
+
+			return nodeCopy;
+
+		}
+
 		static initFromPath(path, files) {
 
 			nodeDebug(`init nodes from ${path}`);
@@ -78,7 +120,7 @@ module.exports = function(XIBLE, express, expressApp) {
 
 					try {
 
-						node = require(filepath);
+						node = require(`${__dirname}/../../${filepath}`);
 						if (typeof node === 'function') {
 
 							node(XIBLE);
@@ -92,7 +134,7 @@ module.exports = function(XIBLE, express, expressApp) {
 									if (fs.statSync(`${clientFilePath}/index.htm`).isFile()) {
 
 										nodeDebug(`hosting /api/nodes/${file}/editor`);
-										expressApp.use(`/api/nodes/${file}/editor`, express.static(clientFilePath, {
+										EXPRESS_APP.use(`/api/nodes/${file}/editor`, EXPRESS.static(clientFilePath, {
 											index: false
 										}));
 
@@ -486,13 +528,16 @@ module.exports = function(XIBLE, express, expressApp) {
 
 	}
 
-
 	class NodeOutput extends NodeIo {
 
 		constructor() {
 			super(...arguments);
 		}
 
+	}
+
+	if(EXPRESS_APP) {
+		require('./routes.js')(Node, XIBLE, EXPRESS_APP);
 	}
 
 	return Node;

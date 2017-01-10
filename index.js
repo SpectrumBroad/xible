@@ -1,11 +1,9 @@
 'use strict';
 
-
 //setup debug
 const debug = require('debug');
 const webSocketDebug = debug('xible:webSocket');
 const cluster = require('cluster');
-
 
 //config flags
 const WEB_SOCKET_THROTTLE = 100; //<1 === don't throttle
@@ -13,8 +11,8 @@ const STAT_INTERVAL = 1000; //a value below the broadcast throttle interval (100
 
 const Xible = module.exports = function Xible(obj) {
 
-	const Node = this.Node = require('./Node.js')(this, obj.express, obj.expressApp);
-	const Flow = this.Flow = require('./Flow.js')(this, obj.express, obj.expressApp);
+	const Node = this.Node = require('./app/Node')(this, obj.express, obj.expressApp);
+	const Flow = this.Flow = require('./app/Flow')(this, obj.express, obj.expressApp);
 
 	this.nodes = {};
 	this.flows = {};

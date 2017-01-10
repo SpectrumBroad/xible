@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 
-module.exports = function(XIBLE, express, expressApp) {
+module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 	//global output caching
 	let globalOutputs = null; //caching
@@ -1019,9 +1019,11 @@ module.exports = function(XIBLE, express, expressApp) {
 
 	}
 
-	//Flow.xible = Flow.xible = XIBLE;
-
 	XIBLE.FlowState = FlowState;
+
+	if(EXPRESS_APP) {
+		require('./routes.js')(Flow, XIBLE, EXPRESS_APP);
+	}
 
 	return Flow;
 

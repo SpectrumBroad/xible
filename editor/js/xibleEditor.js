@@ -167,7 +167,11 @@ class XibleEditor {
 		detailDiv.classList.add('hidden');
 		let detailDivSub = detailDiv.appendChild(document.createElement('div'));
 
-		//add contents to detailDiv
+		//check if this is maintained by spectrumbroad
+		detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('maintained'));
+		detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('Spectrumbroad maintains this node.'));
+
+		//permissions in detailDiv
 		detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Permissions'));
 		detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('This node requires the following permissions;'));
 		let detailDivPermissionsUl = detailDivSub.appendChild(document.createElement('ul'));
