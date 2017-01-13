@@ -571,9 +571,10 @@ class XibleEditor {
 						ticks: {
 							beginAtZero: true,
 							padding: 2,
-							fontColor: '#74808f',
+							fontColor: '#666',
 							mirror: true,
-							callback: (value) => value + ' μs'
+							maxTicksLimit: 4,
+							callback: (value) => `${value} μs`
 						}
 					}]
 				}
@@ -618,9 +619,10 @@ class XibleEditor {
 						ticks: {
 							beginAtZero: true,
 							padding: 2,
-							fontColor: '#74808f',
+							fontColor: '#666',
 							mirror: true,
-							callback: (value) => value + ' %'
+							maxTicksLimit: 4,
+							callback: (value) => `${value} %`
 						}
 					}]
 				}
@@ -681,9 +683,10 @@ class XibleEditor {
 						ticks: {
 							beginAtZero: true,
 							padding: 2,
-							fontColor: '#74808f',
+							fontColor: '#666',
 							mirror: true,
-							callback: (value) => value + ' MiB'
+							maxTicksLimit: 4,
+							callback: (value) => `${value} MiB`
 						}
 					}]
 				}

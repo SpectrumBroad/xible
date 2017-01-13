@@ -8,6 +8,8 @@ View.routes.editor = function() {
 	let menuHolder = this.element.appendChild(document.createElement('div'));
 	menuHolder.setAttribute('id', 'sub');
 
+	menuHolder.appendChild(document.createElement('header')).appendChild(document.createTextNode('XIBLE'));
+
 	//create menu
 	let buttonSection = menuHolder.appendChild(document.createElement('section'));
 	buttonSection.classList.add('buttons');
@@ -209,6 +211,7 @@ View.routes.editor = function() {
 
 	//create button to add new flows
 	let li = flowListUl.appendChild(document.createElement('li'));
+	li.classList.add('add');
 	let a = li.appendChild(document.createElement('a'));
 	a.appendChild(document.createTextNode('+'));
 	a.onclick = () => {

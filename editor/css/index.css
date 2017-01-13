@@ -34,7 +34,6 @@ body {
 }
 
 nav {
-	display: flex;
 	box-sizing: border-box;
 	overflow: hidden;
 	flex: 0 0 auto;
@@ -51,6 +50,7 @@ nav>ul {
 	background-color: #eee;
 	color: #666;
 	width: 100px;
+	height: 100%;
 	position: relative;
 }
 
@@ -107,7 +107,7 @@ nav>ul>li>a>span {
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: relative;
-	padding: 22px 16px;
+	padding: 10px 16px;
 	height: 100%;
 	flex-shrink: 0;
 }
@@ -119,16 +119,11 @@ nav>ul>li>a>span {
 	text-align: left;
 	overflow: hidden;
 	box-sizing: border-box;
-	border-bottom: 1px solid #1f222d;
+	border-bottom: 1px solid #282828;
 }
 
 #sub section:first-child {
 	padding-top: 0;
-}
-
-#sub section.buttons {
-	margin: auto;
-	width: 168px;
 }
 
 #sub section:last-child {
@@ -159,22 +154,31 @@ nav>ul>li>a>span {
 
 #xibleView {
 	display: flex;
-	background-color: #151515;
+	background-color: #181818;
 	color: #bbb;
+}
+
+#xibleView header {
+	font-family: robotothin;
+	font-weight: normal;
+	color: gold;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	text-shadow: 0 1px rgba(0, 0, 0, 1);
 }
 
 #flowEditorHolder {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
+	flex: 1 1 auto;
+	width: 1px;
 }
 
 main {
 	box-sizing: border-box;
 	height: 100%;
 	flex: 1 1 auto;
-	overflow-x: hidden;
-	overflow-y: auto;
 }
 
 section {
@@ -237,39 +241,53 @@ section {
 	background-color: purple;
 }
 
-#xibleFlowDeleteButton, #xibleFlowSaveButton, #xibleFlowDeployButton, #xibleFlowStartButton, #xibleFlowStopButton {
+#sub section.buttons {
+	display: flex;
+	flex-wrap: wrap;
+	padding-top: 12px;
+}
+
+.buttons button {
 	-webkit-appearance: none;
 	appearance: none;
 	color: #fff;
 	font-weight: bold;
 	border: none;
-	background-color: rgb(35, 39, 51);
+	background-color: #282828;
 	padding: 10px;
 	cursor: pointer;
 	display: block;
 	border-radius: 4px;
 	margin: 10px;
-	float: left;
-	width: 64px;
+	min-width: 30%;
+	flex: 1 1 0;
 }
 
-#xibleFlowDeployButton {
-	width: 148px;
+.buttons button:hover {
+	background-color: #383838;
 }
 
-#xibleFlowStartButton {
-	clear: left;
+.buttons button:active, .buttons button:focus {
+	-webkit-appearance: none;
+	appearance: none;
+	outline: 0;
+	border: 2px solid #45679E;
+	padding: 8px;
 }
 
-#xibleFlowDeleteButton:hover, #xibleFlowSaveButton:hover, #xibleFlowDeployButton:hover, #xibleFlowStartButton:hover, #xibleFlowStopButton:hover {
-	background-color: rgb(45, 49, 61);
-}
-
-#xibleFlowDeleteButton::before, #xibleFlowSaveButton::before, #xibleFlowDeployButton::before, #xibleFlowStartButton::before, #xibleFlowStopButton::before {
+.buttons button::before {
 	font-family: awesome;
 	display: block;
 	content: "\f04b";
 	margin-bottom: 6px;
+}
+
+#xibleFlowDeployButton {
+	flex: 0 1 100%;
+}
+
+#xibleFlowStartButton {
+	clear: left;
 }
 
 #xibleFlowDeployButton::before {
@@ -303,8 +321,7 @@ section {
 	box-shadow: 0 0 6px 0 rgba(0, 0, 0, 1);
 	border-top-left-radius: 4px;
 	position: relative;
-	width: 100%;
-	height: 100%;
+	flex: 1 1 100%;
 	overflow: hidden;
 	background-color: #292929;
 	background-size: 50px 50px;

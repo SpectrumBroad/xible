@@ -5,40 +5,51 @@
 	color: #fff;
 	font-size: 13px;
 	font-weight: normal;
+	display: flex;
 }
 
 .flowList li {
 	display: block;
-	float: left;
 	box-sizing: border-box;
+	min-width: 0;
+	flex: 1 1 auto;
 	max-width: 180px;
 	cursor: pointer;
-	/* 	border-bottom: 2px solid #333; */
 	position: relative;
-	border-radius: 4px;
+	border-radius: 4px 4px 0 0;
 }
 
 .flowList li a {
 	display: block;
 	box-sizing: border-box;
-	width: 100%;
-	padding: 8px;
+	padding: 12px 6px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	height: 100%;
+}
+
+.flowList li.add {
+	flex-shrink: 0;
 }
 
 .flowList li.notRunnable {
 	color: red;
-	/* border-bottom: 2px solid red; */
 }
 
-.flowList li.started {
-	/* border-bottom: 2px solid Lime; */
+.flowList li.started a::before, .flowList li.stopping a::before, .flowList li.starting a::before {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	display: block;
+	height: 10px;
+	width: 100%;
+	border-bottom: 2px solid lime;
 }
 
-.flowList li.stopping, .flowList li.starting {
-	/* border-bottom: 2px solid darkorange; */
+.flowList li.stopping a::before, .flowList li.starting a::before {
+	border-bottom-color: darkorange;
 }
 
 .flowList li.open {
@@ -48,11 +59,15 @@
 
 .flowList li.open::after {
 	content: "";
-	width: 8px;
-	height: 8px;
+	width: 11px;
+	height: 11px;
 	background-color: inherit;
 	position: absolute;
 	left: 50%;
 	bottom: -7px;
 	transform: rotate(45deg) translatex(-50%);
+}
+
+.flowList li:not(.open):hover {
+	background-image: linear-gradient(to top, #282828, transparent 80%);
 }
