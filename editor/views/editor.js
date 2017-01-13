@@ -17,61 +17,60 @@ View.routes.editor = function() {
 	//deploy
 	var button = buttonSection.appendChild(document.createElement('button'));
 	button.appendChild(document.createTextNode('Deploy'));
+	button.setAttribute('type', 'button');
 	button.setAttribute('id', 'xibleFlowDeployButton');
 	button.onclick = function() {
-
 		xibleEditor.loadedFlow.save().then((flow) => flow.start());
-		return false;
-
 	};
 
 	//start
 	button = buttonSection.appendChild(document.createElement('button'));
 	button.appendChild(document.createTextNode('Start'));
+	button.setAttribute('type', 'button');
 	button.setAttribute('id', 'xibleFlowStartButton');
 	button.onclick = function() {
-
 		xibleEditor.loadedFlow.start();
-		return false;
-
 	};
 
 	//stop
 	button = buttonSection.appendChild(document.createElement('button'));
 	button.appendChild(document.createTextNode('Stop'));
+	button.setAttribute('type', 'button');
 	button.setAttribute('id', 'xibleFlowStopButton');
 	button.onclick = function() {
-
 		xibleEditor.loadedFlow.stop();
-		return false;
-
 	};
 
 	//save
 	button = buttonSection.appendChild(document.createElement('button'));
 	button.appendChild(document.createTextNode('Save'));
+	button.setAttribute('type', 'button');
 	button.setAttribute('id', 'xibleFlowSaveButton');
 	button.onclick = function() {
-
 		xibleEditor.loadedFlow.save();
-		return false;
-
 	};
 
 	//delete
 	button = buttonSection.appendChild(document.createElement('button'));
 	button.appendChild(document.createTextNode('Delete'));
+	button.setAttribute('type', 'button');
 	button.setAttribute('id', 'xibleFlowDeleteButton');
 	button.onclick = function() {
 
-		xibleEditor.loadedFlow.delete();
-
-		let flowTab = document.querySelector(`.flowList>li[data-flowid="${xibleEditor.loadedFlow._id}"]`);
-		if (flowTab) {
-			flowTab.parentNode.removeChild(flowTab);
+		if(!xibleEditor.loadedFlow){
+			return;
 		}
 
-		return false;
+		if(window.confirm(`Are you sure you wan't to permanently delete flow ${xibleEditor.loadedFlow._id}?`)) {
+
+			xibleEditor.loadedFlow.delete();
+
+			let flowTab = document.querySelector(`.flowList>li[data-flowid="${xibleEditor.loadedFlow._id}"]`);
+			if (flowTab) {
+				flowTab.parentNode.removeChild(flowTab);
+			}
+
+		}
 
 	};
 

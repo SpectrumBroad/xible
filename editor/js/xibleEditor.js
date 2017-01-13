@@ -589,8 +589,8 @@ class XibleEditor {
 				datasets: [{
 					lineTension: 0,
 					pointRadius: 0,
-					backgroundColor: 'rgba(75, 192, 192, 1)',
-					borderColor: 'rgba(75, 192, 192, 1)',
+					backgroundColor: 'rgb(50, 167, 167)',
+					borderColor: 'rgb(50, 167, 167)',
 					borderWidth: 1,
 					label: 'percentage',
 					data: []
@@ -637,24 +637,24 @@ class XibleEditor {
 				datasets: [{
 					lineTension: 0,
 					pointRadius: 0,
-					borderColor: 'rgba(255,99,132,1)',
-					backgroundColor: 'rgba(255,99,132,1)',
+					borderColor: 'rgb(230, 74, 107)',
+					backgroundColor: 'rgb(230, 74, 107)',
 					borderWidth: 1,
 					label: 'heap total',
 					data: []
 				}, {
 					lineTension: 0,
 					pointRadius: 0,
-					borderColor: 'rgba(54, 162, 235, 1)',
-					backgroundColor: 'rgba(54, 162, 235, 1)',
+					borderColor: 'rgb(29, 137, 210)',
+					backgroundColor: 'rgb(29, 137, 210)',
 					borderWidth: 1,
 					label: 'heap used',
 					data: []
 				}, {
 					lineTension: 0,
 					pointRadius: 0,
-					borderColor: 'rgba(255, 206, 86, 1)',
-					backgroundColor: 'rgba(255, 206, 86, 1)',
+					borderColor: 'rgb(230, 181, 61)',
+					backgroundColor: 'rgb(230, 181, 61)',
 					borderWidth: 1,
 					label: 'rss',
 					data: []

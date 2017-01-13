@@ -12,8 +12,8 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 		}));
 
 		//selection handlers
-		path.addEventListener('mousedown', e => this.editor.toggleSelectionOnMouseEvent(e, this));
-		path.addEventListener('mouseup', e => this.editor.toggleSelectionOnMouseEvent(e, this));
+		path.addEventListener('mousedown', (event) => this.editor.toggleSelectionOnMouseEvent(event, this));
+		path.addEventListener('mouseup', (event) => this.editor.toggleSelectionOnMouseEvent(event, this));
 
 	}
 
