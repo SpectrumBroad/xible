@@ -1,13 +1,12 @@
 'use strict';
 
 const cluster = require('cluster');
-
 const config = require('./config.json');
-
-//xible
 const Xible = require('./index.js');
 
 if (cluster.isMaster) {
+
+	const XibleRegistryWrapper = require('../xibleRegistryWrapper');
 
 	const debug = require('debug');
 	const xibleDebug = debug('xible');

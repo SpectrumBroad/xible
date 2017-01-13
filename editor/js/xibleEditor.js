@@ -246,7 +246,7 @@ class XibleEditor {
 
 		div.appendChild(localUl);
 
-		function detailedNodeView(li, nodeName) {
+		function detailedNodeView(li, nodeName, node) {
 
 			li.classList.add('downloading');
 
@@ -322,36 +322,44 @@ class XibleEditor {
 		searchOnlineButton.setAttribute('title', 'Search xible.io for nodes matching your filter');
 		searchOnlineButton.addEventListener('click', (event) => {
 
-			let req = new OoHttpRequest('GET', 'https://10.0.0.20:9600/api/nodes/online');
-			req.toObject(Object).then((nodes) => {
+			if (!filterInput.value) {
+				return;
+			}
 
-				let nodeNames = Object.keys(nodes);
-				nodeNames.forEach((nodeName) => {
+			xibleWrapper.Node
+				.searchRegistry(filterInput.value)
+				.then((nodes) => {
 
-					let li = buildNode(nodeName, nodes[nodeName]);
-					li.classList.add('online');
-					li.onclick = (event) => {
+					let nodeNames = Object.keys(nodes);
+					nodeNames.forEach((nodeName) => {
 
-						//open the detailed confirmation view
-						detailedNodeView(li, nodeName);
+						let li = buildNode(nodeName, nodes[nodeName]);
+						li.classList.add('online');
+						li.onclick = (event) => {
 
-					};
-					localUl.appendChild(li);
+							//open the detailed confirmation view
+							detailedNodeView(li, nodeName, nodes[nodeName]);
 
-				});
+						};
+						localUl.appendChild(li);
 
-				if (nodeNames.length) {
-					div.classList.remove('noresults');
-				} else {
+					});
+
+					if (nodeNames.length) {
+						div.classList.remove('noresults');
+					} else {
+						div.classList.add('noresults');
+					}
+
+				})
+				.catch((err) => {
 					div.classList.add('noresults');
-				}
-
-			});
+				});
 
 		});
 
 		//get the installed nodes
-		let req = new OoHttpRequest('GET', 'https://10.0.0.20:9600/api/nodes');
+		let req = new OoHttpRequest('GET', `https://${xibleWrapper.hostname}:${xibleWrapper.port}/api/nodes`);
 		req.toObject(Object).then((nodes) => {
 
 			Object.keys(nodes).forEach((nodeName) => {
@@ -455,15 +463,33 @@ class XibleEditor {
 
 	}
 
-	//TODO: should use XibleWrapper.flows.getAll() instead
+
 	/**
 	 *	Gets the flows from the Xible API
 	 */
 	getFlows() {
+		/*
 
+		TODO: should use XibleWrapper.flows.getAll() instead
+				return xibleWrapper.Flows.getAll().then((flows) => {
+
+					Object.keys(flows).forEach((flowId) => {
+
+						let flow = new XibleEditorFlow(flows[flowId]);
+						this.flows[flowId] = flow;
+
+						//set global appropriately when it's changed
+						flow.on('global', (output) => this.setGlobalFromOutput(flow, output));
+
+					});
+
+					return this.flows;
+
+				});
+		*/
 		return new Promise((resolve, reject) => {
 
-			let req = new OoHttpRequest('GET', 'https://10.0.0.20:9600/api/flows');
+			let req = new OoHttpRequest('GET', `https://${xibleWrapper.hostname}:${xibleWrapper.port}/api/flows`);
 
 			req.toObject(Object).then((flows) => {
 

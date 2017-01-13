@@ -48,9 +48,20 @@ nav>ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	background-color: rgb(49, 53, 65);
-	color: #fff;
+	background-color: #eee;
+	color: #666;
 	width: 100px;
+	position: relative;
+}
+
+nav>ul::before {
+	content: "";
+	position: absolute;
+	height: 100%;
+	width: 1px;
+	right: 1px;
+	top: 0;
+	background-color: #ccc;
 }
 
 nav>ul>li {
@@ -64,11 +75,10 @@ nav>ul>li>a {
 	width: 100%;
 	height: 100%;
 	box-sizing: border-box;
-	color: rgb(102, 113, 126);
+	color: inherit;
 	transition: background-color ease-out .3s, color ease .2s;
 	font-size: 13px;
 	letter-spacing: 1px;
-	border-right: 1px solid rgb(54, 59, 72);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -91,47 +101,15 @@ nav>ul>li>a>span {
 
 #sub {
 	font-family: arial;
-	background-color: rgb(40, 44, 55);
-	box-shadow: inset 5px 0 5px -5px rgba(0, 0, 0, .5);
-	width: 0;
-	transition: width ease-out 200ms;
+	box-shadow: inset 6px 0 6px -6px rgba(0, 0, 0, 1);
+	width: 240px;
 	box-sizing: border-box;
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: relative;
-	padding: 0;
-}
-
-#sub.open {
-	padding: 22px;
-	width: 250px;
-}
-
-#sub.loading {
-	width: 5px;
-}
-
-#sub.loading::after {
-	display: block;
-	content: "";
-	position: absolute;
-	right: 0;
-	top: 0;
-	width: 5px;
+	padding: 22px 16px;
 	height: 100%;
-	background-image: repeating-linear-gradient(135deg, #000, #000 3px, #0092b7 0, #0092b7 9px);
-	background-repeat: repeat;
-	background-size: 100% 200%;
-	animation: loadingAnim 40s linear infinite;
-}
-
-@keyframes loadingAnim {
-	0% {
-		background-position-y: 0%
-	}
-	100% {
-		background-position-y: 100%
-	}
+	flex-shrink: 0;
 }
 
 #sub section {
@@ -146,6 +124,11 @@ nav>ul>li>a>span {
 
 #sub section:first-child {
 	padding-top: 0;
+}
+
+#sub section.buttons {
+	margin: auto;
+	width: 168px;
 }
 
 #sub section:last-child {
@@ -172,6 +155,18 @@ nav>ul>li>a>span {
 	padding: 8px 20px;
 	font-weight: bold;
 	color: #74808f;
+}
+
+#xibleView {
+	display: flex;
+	background-color: #151515;
+	color: #bbb;
+}
+
+#flowEditorHolder {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
 }
 
 main {
@@ -305,9 +300,11 @@ section {
 }
 
 .xible {
+	box-shadow: 0 0 6px 0 rgba(0, 0, 0, 1);
+	border-top-left-radius: 4px;
 	position: relative;
 	width: 100%;
-	height: calc( 100% - 25px);
+	height: 100%;
 	overflow: hidden;
 	background-color: #292929;
 	background-size: 50px 50px;

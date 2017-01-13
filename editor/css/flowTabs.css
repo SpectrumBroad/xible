@@ -1,47 +1,58 @@
 .flowList {
-	overflow: auto;
-	top: 0;
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	background-color: #333;
 	color: #fff;
-	z-index: 1;
-	box-shadow: 0 0 5px #000;
+	font-size: 13px;
+	font-weight: normal;
 }
 
 .flowList li {
 	display: block;
 	float: left;
-	font-size: 14px;
-	font-weight: bold;
-	padding: 8px;
-	border-right: 1px dotted #fff;
 	box-sizing: border-box;
-	width: 100px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
+	max-width: 180px;
 	cursor: pointer;
-	border-bottom: 2px solid #333;
+	/* 	border-bottom: 2px solid #333; */
 	position: relative;
+	border-radius: 4px;
+}
+
+.flowList li a {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	padding: 8px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .flowList li.notRunnable {
 	color: red;
-	border-bottom: 2px solid red;
+	/* border-bottom: 2px solid red; */
 }
 
 .flowList li.started {
-	border-bottom: 2px solid Lime;
+	/* border-bottom: 2px solid Lime; */
 }
 
 .flowList li.stopping, .flowList li.starting {
-	border-bottom: 2px solid darkorange;
+	/* border-bottom: 2px solid darkorange; */
 }
 
 .flowList li.open {
-	background-color: gold;
-  color:#000;
-	box-shadow: 0 3px 15px -5px #fff;
+	background-color: #45679E;
+	z-index: 1;
+}
+
+.flowList li.open::after {
+	content: "";
+	width: 8px;
+	height: 8px;
+	background-color: inherit;
+	position: absolute;
+	left: 50%;
+	bottom: -7px;
+	transform: rotate(45deg) translatex(-50%);
 }
