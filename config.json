@@ -21,6 +21,12 @@
 			"url": "https://registry.xible.io"
 		}
 
+	},
+
+	"enterprise": {
+
+		"server": ""
+
 	}
 
 }

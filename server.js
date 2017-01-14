@@ -155,9 +155,9 @@ if (cluster.isMaster) {
 						flow.start();
 					}
 
-				} catch (e) {
+				} catch (err) {
 
-					console.log('exception:', e);
+					console.log('exception:', err);
 
 					if (flow) {
 

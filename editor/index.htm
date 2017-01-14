@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="css/describe.css" type="text/css" />
 	<link rel="stylesheet" href="css/flowTabs.css" type="text/css" />
 	<link rel="stylesheet" href="css/nodeSelector.css" type="text/css" />
+	<link rel="stylesheet" href="css/main.css" type="text/css" />
 
 	<script src="js/oohttprequest.js"></script>
 	<script src="js/EventEmitter.min.js"></script>
@@ -30,10 +31,10 @@
 
 		<ul>
 
-			<li><a href="#flows"><span>&#xf16d;</span>Flows</a></li>
-			<li><a href="#scenes"><span>&#xf2a8;</span>Nodes</a></li>
-			<li><a href="#settings"><span>&#xf00c;</span>Settings</a></li>
-			<li><a href="#editor"><span>&#xf00c;</span>Editor</a></li>
+			<li><a href="/flows" onclick="return mainViewHolder.navigate('/flows');"><span>&#xe059;</span>Flows</a></li>
+			<li><a href="/nodes" onclick="return mainViewHolder.navigate('/nodes');"><span>&#xe044;</span>Nodes</a></li>
+			<li><a href="/settings" onclick="return mainViewHolder.navigate('/settings');"><span>S</span>Settings</a></li>
+			<li><a href="/editor" onclick="return mainViewHolder.navigate('/editor');"><span>&#xe029;</span>Editor</a></li>
 
 		</ul>
 
@@ -53,11 +54,10 @@
 		mainViewHolder = new ViewHolder(document.getElementById('main'));
 		subMenuViewHolder = new ViewHolder(document.getElementById('sub'));
 
-		mainViewHolder.hookHashHandler(mainViewHolder);
-		if(!mainViewHolder.loadHash()) {
-			mainViewHolder.render(new View('flows'));
+		mainViewHolder.hookNavHandler();
+		if (!mainViewHolder.loadNav()) {
+			mainViewHolder.navigate('/welcome');
 		}
-
 	</script>
 
 	<script src="js/xibleEditorNode.js"></script>

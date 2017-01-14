@@ -62,6 +62,21 @@ const Xible = module.exports = function Xible(obj) {
 };
 
 
+Xible.prototype.validateConfigPermissions = function() {
+
+	fs.access(__dirname, fs.W_OK, function(err) {
+		if (err) {
+			console.error("can't write");
+			process.exit(1);
+		}
+
+		console.log("can write");
+		process.exit(0);
+	});
+
+};
+
+
 Xible.prototype.initStats = function() {
 
 	if (cluster.isMaster) {

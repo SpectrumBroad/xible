@@ -54,10 +54,8 @@ class View {
 
 }
 
+
 View.routes = {};
-View.defaultView = null;
-View.loadHandler = null;
-View.element = document.body;
 
 
 class ViewHolder { //extends EventEmitter
@@ -66,11 +64,81 @@ class ViewHolder { //extends EventEmitter
 
 		//super();
 		this.element = node;
+		this.parentViewHolder = null;
 
+	}
+
+	navigate(path) {
+
+		this.purge();
+
+		if (this.parentViewHolder) {
+
+		}
+
+		history.pushState(null, path, path);
+		this.render(new View(path.substring(1).replace(/\//g, '.'), this.getParams()));
+
+		//always return false so this fn can easily be used in a onclick
+		return false;
+
+	}
+
+	loadNav() {
+
+		let path = window.location.pathname;
+		if (!path || path==='/') {
+			return false;
+		}
+
+		this.navigate(path);
+		return true;
+
+	}
+
+	hookNavHandler() {
+
+		window.addEventListener('popstate', (event) => {
+			this.loadNav();
+		});
+		
 	}
 
 	hookHashHandler() {
 		window.addEventListener('hashchange', () => this.loadHash());
+	}
+
+	getParams(str) {
+
+		let queryParams = str;
+
+		if (!queryParams) {
+
+			if (!window.location.search) {
+				return {};
+			}
+			queryParams = window.location.search.substring(1);
+
+		}
+
+		let viewParams = {};
+		queryParams.forEach((val) => {
+
+			let valSplit = val.split('=');
+			let param = valSplit[0],
+				value = '';
+
+			if (valSplit.length > 1) {
+
+				value = valSplit.slice(1, valSplit.length).join('=');
+				viewParams[param] = value;
+
+			}
+
+		});
+
+		return params;
+
 	}
 
 	loadHash() {
@@ -86,21 +154,7 @@ class ViewHolder { //extends EventEmitter
 		let viewName = hashParams[0];
 
 		//populate the params
-		let viewParams = {};
-		hashParams.forEach((val) => {
-
-			let valSplit = val.split('=');
-			let param = valSplit[0],
-				value = '';
-
-			if (valSplit.length > 1) {
-
-				value = valSplit.slice(1, valSplit.length).join('=');
-				viewParams[param] = value;
-
-			}
-
-		});
+		let viewParams = this.getParams(hash);
 
 		//create and activate the view
 		this.render(new View(viewName, viewParams));

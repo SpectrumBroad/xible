@@ -2,9 +2,6 @@ View.routes.editor = function() {
 
 	let xibleEditor = View.routes.editor.xibleEditor = new XibleEditor();
 
-	this.element.style.height = '100%';
-	this.element.setAttribute('id', 'xibleView');
-
 	let menuHolder = this.element.appendChild(document.createElement('div'));
 	menuHolder.setAttribute('id', 'sub');
 
@@ -57,11 +54,11 @@ View.routes.editor = function() {
 	button.setAttribute('id', 'xibleFlowDeleteButton');
 	button.onclick = function() {
 
-		if(!xibleEditor.loadedFlow){
+		if (!xibleEditor.loadedFlow) {
 			return;
 		}
 
-		if(window.confirm(`Are you sure you wan't to permanently delete flow ${xibleEditor.loadedFlow._id}?`)) {
+		if (window.confirm(`Are you sure you wan't to permanently delete flow ${xibleEditor.loadedFlow._id}?`)) {
 
 			xibleEditor.loadedFlow.delete();
 
@@ -126,7 +123,7 @@ View.routes.editor = function() {
 
 	//create flowlist menu
 	let flowListUl = flowEditorHolder.appendChild(document.createElement('ul'));
-	flowListUl.classList.add('flowList');
+	flowListUl.classList.add('flowList', 'loading');
 
 	//let xibleEditor = View.routes.editor.xibleEditor;
 	//if (!xibleEditor) {
@@ -236,6 +233,13 @@ View.routes.editor = function() {
 		Object.keys(flows).forEach((id) => {
 			createFlowTab(flows[id]);
 		});
+
+		flowListUl.addEventListener('animationiteration', () => {
+			flowListUl.classList.remove('loading');
+		}, {
+			once: true
+		});
+
 
 	});
 
