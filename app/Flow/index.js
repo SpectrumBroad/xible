@@ -37,7 +37,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		/**
 		 *	Init flows from a given path.
-		 *	This will parse all json files except for status.json into flows.
+		 *	This will parse all json files except for _status.json into flows.
 		 *	Note that a path cannot be initiated twice because it is used for saveStatuses()
 		 *	@static
 		 *	@param	{String}	path
@@ -65,8 +65,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 				let filepath = flowPath + '/' + file;
 
-				//only fetch json files but ignore status.json
-				if (file !== 'status.json' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
+				//only fetch json files but ignore _status.json
+				if (file.substring(0, 1) !== '_' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
 
 					try {
 
@@ -127,11 +127,11 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 			try {
 
-				statuses = JSON.parse(fs.readFileSync(`${this.flowPath}/status.json`));
+				statuses = JSON.parse(fs.readFileSync(`${this.flowPath}/_status.json`));
 				flowDebug(`found ${Object.keys(statuses).length} statuses`);
 
 			} catch (err) {
-				flowDebug(`${this.flowPath}/status.json cannot be opened: ${err}`);
+				flowDebug(`${this.flowPath}/_status.json cannot be opened: ${err}`);
 			}
 
 			this._statuses = statuses;
@@ -154,7 +154,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			this._statuses = statuses;
 
 			try {
-				fs.writeFileSync(`${this.flowPath}/status.json`, JSON.stringify(statuses));
+				fs.writeFileSync(`${this.flowPath}/_status.json`, JSON.stringify(statuses));
 			} catch (err) {
 				flowDebug(`error saving status to file: ${err}`);
 			}
@@ -166,15 +166,19 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		 *	@param	{Object}	json
 		 *	@param	{Boolean}	newFlow	indicates if this is a new flow to be created
 		 */
-		initJson(json, newFlow) {
+		initJson(json) {
 
 			flowDebug(`initJson on ${json._id}`);
 
-			if (!newFlow && json._id) {
-				this._id = json._id;
-			} else {
-				json._id = this._id;
+			if (!json || !json._id) {
+				throw new Error(`object containing _id as argument is required`);
 			}
+
+			if (json._id === '_status') {
+				throw new Error(`flow _id cannot be "_status"`);
+			}
+
+			this._id = json._id;
 
 			this.json = json;
 			this.nodes = [];
@@ -1021,7 +1025,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 	XIBLE.FlowState = FlowState;
 
-	if(EXPRESS_APP) {
+	if (EXPRESS_APP) {
 		require('./routes.js')(Flow, XIBLE, EXPRESS_APP);
 	}
 

@@ -4,6 +4,9 @@ class View {
 
 		this.element = document.createElement('div');
 		this.element.classList.add('view');
+		this.style = this.element.style;
+		this.classList = this.element.classList;
+
 		this.element.view = this;
 		this.properties = props || {};
 
@@ -49,7 +52,11 @@ class View {
 	}
 
 	appendChild(node) {
-		this.element.appendChild(node);
+		return this.element.appendChild(node);
+	}
+
+	removeChild(node) {
+		return this.element.removeChild(node);
 	}
 
 }
@@ -68,16 +75,22 @@ class ViewHolder { //extends EventEmitter
 
 	}
 
-	navigate(path) {
+	navigate(path, nonav) {
 
-		this.purge();
-
+		let deepIndex = 0;
 		if (this.parentViewHolder) {
-
+			deepIndex = this.parentViewHolder.navigate(path, nonav);
 		}
 
 		history.pushState(null, path, path);
-		this.render(new View(path.substring(1).replace(/\//g, '.'), this.getParams()));
+		if (!nonav) {
+
+			this.purge();
+
+			let paths = path.substring(1).split('/');
+			this.render(new View(paths[deepIndex], this.getParams()));
+
+		}
 
 		//always return false so this fn can easily be used in a onclick
 		return false;
@@ -87,7 +100,7 @@ class ViewHolder { //extends EventEmitter
 	loadNav() {
 
 		let path = window.location.pathname;
-		if (!path || path==='/') {
+		if (!path || path === '/') {
 			return false;
 		}
 
@@ -101,7 +114,7 @@ class ViewHolder { //extends EventEmitter
 		window.addEventListener('popstate', (event) => {
 			this.loadNav();
 		});
-		
+
 	}
 
 	hookHashHandler() {

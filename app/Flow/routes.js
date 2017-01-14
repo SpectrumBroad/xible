@@ -29,12 +29,12 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 	//create a new flow
 	EXPRESS_APP.post('/api/flows', (req, res) => {
 
-		if (!req.body) {
+		if (!req.body || !req.body._id) {
 			return res.status(400).end();
 		}
 
 		var flow = new FLOW();
-		flow.initJson(req.body, true);
+		flow.initJson(req.body);
 		flow.save();
 
 		res.json({

@@ -79,7 +79,7 @@
 	display: flex;
 	flex-flow: column;
 	width: 100%;
-	max-height: 40vh;
+	max-height: 38vh;
 	overflow-y: auto;
 }
 

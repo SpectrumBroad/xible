@@ -82,16 +82,124 @@ View.routes.editor = function() {
 	stats.classList.add('stats');
 
 	//cpu chart
-	let cpuChart = stats.appendChild(document.createElement('canvas'));
-	cpuChart.setAttribute('id', 'cpuChart');
+	let cpuCanvas = stats.appendChild(document.createElement('canvas'));
+	cpuCanvas.setAttribute('id', 'cpuChart');
+	let cpuChart = new Chart(cpuCanvas, {
+		type: 'line',
+		data: {
+			labels: new Array(CHART_MAX_TICKS),
+			datasets: [{
+				lineTension: 0,
+				pointRadius: 0,
+				backgroundColor: 'rgb(50, 167, 167)',
+				borderColor: 'rgb(50, 167, 167)',
+				borderWidth: 1,
+				label: 'percentage',
+				data: []
+			}]
+		},
+
+		options: {
+			legend: {
+				display: false
+			},
+			tooltips: {
+				enabled: false
+			},
+			layout: {
+				padding: 0
+			},
+			scales: {
+				xAxes: [{
+					display: false
+				}],
+				yAxes: [{
+					position: 'right',
+					gridLines: {
+						tickMarkLength: 5
+					},
+					ticks: {
+						beginAtZero: true,
+						padding: 2,
+						fontColor: '#666',
+						mirror: true,
+						maxTicksLimit: 4,
+						callback: (value) => `${value} %`
+					}
+				}]
+			}
+		}
+	});
 
 	let label = stats.appendChild(document.createElement('label'));
 	label.setAttribute('id', 'cpu');
 	label.appendChild(document.createTextNode('cpu'));
 
 	//memory chart
-	let memChart = stats.appendChild(document.createElement('canvas'));
-	memChart.setAttribute('id', 'memChart');
+	let memCanvas = stats.appendChild(document.createElement('canvas'));
+	memCanvas.setAttribute('id', 'memChart');
+	let memChart = new Chart(memCanvas, {
+		type: 'line',
+		data: {
+			labels: new Array(CHART_MAX_TICKS),
+			datasets: [{
+				lineTension: 0,
+				pointRadius: 0,
+				borderColor: 'rgb(230, 74, 107)',
+				backgroundColor: 'rgb(230, 74, 107)',
+				borderWidth: 1,
+				label: 'heap total',
+				data: []
+			}, {
+				lineTension: 0,
+				pointRadius: 0,
+				borderColor: 'rgb(29, 137, 210)',
+				backgroundColor: 'rgb(29, 137, 210)',
+				borderWidth: 1,
+				label: 'heap used',
+				data: []
+			}, {
+				lineTension: 0,
+				pointRadius: 0,
+				borderColor: 'rgb(230, 181, 61)',
+				backgroundColor: 'rgb(230, 181, 61)',
+				borderWidth: 1,
+				label: 'rss',
+				data: []
+			}]
+		},
+
+		options: {
+			legend: {
+				display: false
+			},
+			tooltips: {
+				enabled: false
+			},
+			layout: {
+				padding: 0
+			},
+			scales: {
+				xAxes: [{
+					display: false
+				}],
+				yAxes: [{
+					position: 'right',
+					gridLines: {
+						tickMarkLength: 5
+					},
+					ticks: {
+						beginAtZero: true,
+						padding: 2,
+						fontColor: '#666',
+						mirror: true,
+						maxTicksLimit: 4,
+						callback: (value) => `${value} MiB`
+					}
+				}]
+			}
+		}
+	});
 
 	label = stats.appendChild(document.createElement('label'));
 	label.setAttribute('id', 'rss');
@@ -106,18 +214,125 @@ View.routes.editor = function() {
 	label.appendChild(document.createTextNode('heap used'));
 
 	//delay chart
-	let delayChart = stats.appendChild(document.createElement('canvas'));
-	delayChart.setAttribute('id', 'delayChart');
+	let delayCanvas = stats.appendChild(document.createElement('canvas'));
+	delayCanvas.setAttribute('id', 'delayChart');
+	let delayChart = new Chart(delayCanvas, {
+		type: 'line',
+		data: {
+			labels: new Array(CHART_MAX_TICKS),
+			datasets: [{
+				lineTension: 0,
+				pointRadius: 0,
+				backgroundColor: 'purple',
+				borderColor: 'purple',
+				borderWidth: 1,
+				label: 'nanoseconds',
+				data: []
+			}]
+		},
+
+		options: {
+			legend: {
+				display: false
+			},
+			tooltips: {
+				enabled: false
+			},
+			layout: {
+				padding: 0
+			},
+			scales: {
+				xAxes: [{
+					display: false
+				}],
+				yAxes: [{
+					position: 'right',
+					gridLines: {
+						tickMarkLength: 5
+					},
+					ticks: {
+						beginAtZero: true,
+						padding: 2,
+						fontColor: '#666',
+						mirror: true,
+						maxTicksLimit: 4,
+						callback: (value) => `${value} μs`
+					}
+				}]
+			}
+		}
+	});
 
 	label = stats.appendChild(document.createElement('label'));
 	label.setAttribute('id', 'delay');
 	label.appendChild(document.createTextNode('event loop delay'));
 
-	xibleEditor.initConsole();
+	//update the usage charts
+	xibleEditor.on('flow.usage', (flows) => {
 
+		//only run this on the loaded flow
+		let flow = flows.find((flow) => flow._id === xibleEditor.loadedFlow._id);
+		if (!flow) {
+			return;
+		}
 
+		while (memChart.data.datasets[0].data.length !== memChart.data.labels.length) {
 
+			memChart.data.datasets[0].data.push(null);
+			memChart.data.datasets[1].data.push(null);
+			memChart.data.datasets[2].data.push(null);
 
+			cpuChart.data.datasets[0].data.push(null);
+			delayChart.data.datasets[0].data.push(null);
+
+		}
+
+		if (memChart.data.datasets[0].data.length === memChart.data.labels.length) {
+
+			memChart.data.datasets[0].data.shift();
+			memChart.data.datasets[1].data.shift();
+			memChart.data.datasets[2].data.shift();
+
+			cpuChart.data.datasets[0].data.shift();
+			delayChart.data.datasets[0].data.shift();
+
+		}
+
+		memChart.data.datasets[2].data.push(Math.round(flow.usage.memory.rss / 1024 / 1024));
+		memChart.data.datasets[1].data.push(Math.round(flow.usage.memory.heapTotal / 1024 / 1024));
+		memChart.data.datasets[0].data.push(Math.round(flow.usage.memory.heapUsed / 1024 / 1024));
+		memChart.update(0);
+
+		cpuChart.data.datasets[0].data.push(flow.usage.cpu.percentage);
+		cpuChart.update(0);
+
+		delayChart.data.datasets[0].data.push(flow.usage.delay);
+		delayChart.update(0);
+
+	});
+
+	function resetCharts() {
+
+		while (memChart.data.datasets[0].data.length) {
+
+			memChart.data.datasets[0].data.pop();
+			memChart.data.datasets[1].data.pop();
+			memChart.data.datasets[2].data.pop();
+
+			cpuChart.data.datasets[0].data.pop();
+			delayChart.data.datasets[0].data.pop();
+
+		}
+
+		memChart.update(0);
+		cpuChart.update(0);
+		delayChart.update(0);
+
+	}
+
+	resetCharts();
+
+	//holds the flowlist and editor
 	let flowEditorHolder = this.element.appendChild(document.createElement('div'));
 	flowEditorHolder.setAttribute('id', 'flowEditorHolder');
 
@@ -125,18 +340,8 @@ View.routes.editor = function() {
 	let flowListUl = flowEditorHolder.appendChild(document.createElement('ul'));
 	flowListUl.classList.add('flowList', 'loading');
 
-	//let xibleEditor = View.routes.editor.xibleEditor;
-	//if (!xibleEditor) {
-
-	//}
-	/*
-	subMenuViewHolder.render(new View('xibleSubMenu', {
-		xibleEditor: xibleEditor
-	}));
-	subMenuViewHolder.element.classList.add('open');
-*/
-
-	var wsXible = function() {
+	//keep retrying the connection if it fails
+	let wsXible = function() {
 
 		ws = new WebSocket('wss://10.0.0.20:9601');
 		xibleEditor.initWebSocket(ws);
@@ -157,11 +362,16 @@ View.routes.editor = function() {
 		let li = flowListUl.appendChild(document.createElement('li'));
 		li.setAttribute('data-flowId', flow._id);
 		let a = li.appendChild(document.createElement('a'));
-		a.appendChild(document.createTextNode(flow.name || flow._id));
+		a.appendChild(document.createTextNode(flow._id));
+		a.setAttribute('title', flow._id);
 		if (!flow.runnable) {
 			li.classList.add('notRunnable');
 		}
 		a.onclick = () => {
+
+			mainViewHolder.navigate(`/editor/${flow._id}`, true);
+
+			resetCharts();
 
 			Array.from(document.querySelectorAll('.flowList>li.open')).forEach((li) => {
 				li.classList.remove('open');
@@ -171,6 +381,12 @@ View.routes.editor = function() {
 			xibleEditor.viewFlow(flow);
 
 		};
+
+		//if in path, load it immediately
+		let pathSplit = window.location.pathname.split('/');
+		if (pathSplit[pathSplit.length - 1] === encodeURIComponent(flow._id)) {
+			a.click();
+		}
 
 		if (flow.running) {
 			li.classList.add('started');
@@ -209,19 +425,41 @@ View.routes.editor = function() {
 	let li = flowListUl.appendChild(document.createElement('li'));
 	li.classList.add('add');
 	let a = li.appendChild(document.createElement('a'));
+	a.setAttribute('title', 'Add a flow');
 	a.appendChild(document.createTextNode('+'));
 	a.onclick = () => {
+
+		let flowName = window.prompt('Enter the flow name:');
+
+		if (flowName.substring(0, 1) === '_') {
+
+			window.alert('The flow name may not start with an underscore');
+			return;
+
+		}
+
+		resetCharts();
 
 		Array.from(document.querySelectorAll('.flowList>li.open')).forEach((li) => {
 			li.classList.remove('open');
 		});
 
-		let flow = new XibleEditorFlow();
-		xibleEditor.viewFlow(flow);
-		flow.save().then(() => {
+		let flow = new XibleEditorFlow({
+			_id: flowName
+		});
+		let flowTab = createFlowTab(flow);
+		flowTab.classList.add('open', 'loading');
+		flowTab.firstChild.click();
+
+		flow.save(true).then(() => {
 
 			xibleEditor.flows[flow._id] = flow;
-			createFlowTab(flow).classList.add('open');
+
+			flowTab.addEventListener('animationiteration', () => {
+				flowTab.classList.remove('loading');
+			}, {
+				once: true
+			});
 
 		});
 
@@ -239,7 +477,6 @@ View.routes.editor = function() {
 		}, {
 			once: true
 		});
-
 
 	});
 

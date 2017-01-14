@@ -1,8 +1,10 @@
 const CHART_MAX_TICKS = 60;
 
-class XibleEditor {
+class XibleEditor extends EventEmitter {
 
 	constructor() {
+
+		super();
 
 		this.element = document.createElement('div');
 		this.element.classList.add('xible');
@@ -21,7 +23,6 @@ class XibleEditor {
 		this.enablePan();
 		this.enableHook();
 		this.enableSelection();
-		this.initConsole();
 
 	}
 
@@ -434,19 +435,6 @@ class XibleEditor {
 
 	}
 
-
-	initConsole() {
-
-		this.console = document.getElementById('console');
-
-		if (!this.console) {
-			return;
-		}
-
-		this.initStats();
-
-	}
-
 	setGlobalFromOutput(flow, output) {
 
 		flow.nodes.forEach((node) => {
@@ -507,190 +495,6 @@ class XibleEditor {
 
 			});
 
-		});
-
-	}
-
-	/**
-	 *	Sets up the stat charts
-	 */
-	initStats() {
-
-		if (this.memChart) {
-			this.memChart.destroy();
-		}
-
-		if (this.cpuChart) {
-			//triggers an error? probably a bug
-			//this.cpuChart.destroy();
-		}
-
-		this.memChart = null;
-		this.cpuChart = null;
-		this.delayChart = null;
-
-		if (!this.console) {
-			return;
-		}
-
-		let delayCanvas = document.getElementById('delayChart');
-		this.delayChart = new Chart(delayCanvas, {
-			type: 'line',
-			data: {
-				labels: new Array(CHART_MAX_TICKS),
-				datasets: [{
-					lineTension: 0,
-					pointRadius: 0,
-					backgroundColor: 'purple',
-					borderColor: 'purple',
-					borderWidth: 1,
-					label: 'nanoseconds',
-					data: []
-				}]
-			},
-
-			options: {
-				legend: {
-					display: false
-				},
-				tooltips: {
-					enabled: false
-				},
-				layout: {
-					padding: 0
-				},
-				scales: {
-					xAxes: [{
-						display: false
-					}],
-					yAxes: [{
-						position: 'right',
-						gridLines: {
-							tickMarkLength: 5
-						},
-						ticks: {
-							beginAtZero: true,
-							padding: 2,
-							fontColor: '#666',
-							mirror: true,
-							maxTicksLimit: 4,
-							callback: (value) => `${value} μs`
-						}
-					}]
-				}
-			}
-		});
-
-		let cpuCanvas = document.getElementById('cpuChart');
-		this.cpuChart = new Chart(cpuCanvas, {
-			type: 'line',
-			data: {
-				labels: new Array(CHART_MAX_TICKS),
-				datasets: [{
-					lineTension: 0,
-					pointRadius: 0,
-					backgroundColor: 'rgb(50, 167, 167)',
-					borderColor: 'rgb(50, 167, 167)',
-					borderWidth: 1,
-					label: 'percentage',
-					data: []
-				}]
-			},
-
-			options: {
-				legend: {
-					display: false
-				},
-				tooltips: {
-					enabled: false
-				},
-				layout: {
-					padding: 0
-				},
-				scales: {
-					xAxes: [{
-						display: false
-					}],
-					yAxes: [{
-						position: 'right',
-						gridLines: {
-							tickMarkLength: 5
-						},
-						ticks: {
-							beginAtZero: true,
-							padding: 2,
-							fontColor: '#666',
-							mirror: true,
-							maxTicksLimit: 4,
-							callback: (value) => `${value} %`
-						}
-					}]
-				}
-			}
-		});
-
-		let memCanvas = document.getElementById('memChart');
-		this.memChart = new Chart(memCanvas, {
-			type: 'line',
-			data: {
-				labels: new Array(CHART_MAX_TICKS),
-				datasets: [{
-					lineTension: 0,
-					pointRadius: 0,
-					borderColor: 'rgb(230, 74, 107)',
-					backgroundColor: 'rgb(230, 74, 107)',
-					borderWidth: 1,
-					label: 'heap total',
-					data: []
-				}, {
-					lineTension: 0,
-					pointRadius: 0,
-					borderColor: 'rgb(29, 137, 210)',
-					backgroundColor: 'rgb(29, 137, 210)',
-					borderWidth: 1,
-					label: 'heap used',
-					data: []
-				}, {
-					lineTension: 0,
-					pointRadius: 0,
-					borderColor: 'rgb(230, 181, 61)',
-					backgroundColor: 'rgb(230, 181, 61)',
-					borderWidth: 1,
-					label: 'rss',
-					data: []
-				}]
-			},
-
-			options: {
-				legend: {
-					display: false
-				},
-				tooltips: {
-					enabled: false
-				},
-				layout: {
-					padding: 0
-				},
-				scales: {
-					xAxes: [{
-						display: false
-					}],
-					yAxes: [{
-						position: 'right',
-						gridLines: {
-							tickMarkLength: 5
-						},
-						ticks: {
-							beginAtZero: true,
-							padding: 2,
-							fontColor: '#666',
-							mirror: true,
-							maxTicksLimit: 4,
-							callback: (value) => `${value} MiB`
-						}
-					}]
-				}
-			}
 		});
 
 	}
@@ -800,50 +604,12 @@ class XibleEditor {
 
 			case 'xible.flow.usage':
 
-				if (!this.memChart || !this.cpuChart || !this.delayChart || !this.loadedFlow) {
-					break;
-				}
+				this.emit('flow.usage', json.flows);
 
-				//only run this on the loaded flow
-				let flow = json.flows.find((flow) => flow._id === this.loadedFlow._id);
-				if (!flow) {
-					break;
-				}
-
-				while (this.memChart.data.datasets[0].data.length !== this.memChart.data.labels.length) {
-
-					this.memChart.data.datasets[0].data.push(null);
-					this.memChart.data.datasets[1].data.push(null);
-					this.memChart.data.datasets[2].data.push(null);
-
-					this.cpuChart.data.datasets[0].data.push(null);
-
-					this.delayChart.data.datasets[0].data.push(null);
-
-				}
-
-				if (this.memChart.data.datasets[0].data.length === this.memChart.data.labels.length) {
-
-					this.memChart.data.datasets[0].data.shift();
-					this.memChart.data.datasets[1].data.shift();
-					this.memChart.data.datasets[2].data.shift();
-
-					this.cpuChart.data.datasets[0].data.shift();
-
-					this.delayChart.data.datasets[0].data.shift();
-
-				}
-
-				this.memChart.data.datasets[2].data.push(Math.round(flow.usage.memory.rss / 1024 / 1024));
-				this.memChart.data.datasets[1].data.push(Math.round(flow.usage.memory.heapTotal / 1024 / 1024));
-				this.memChart.data.datasets[0].data.push(Math.round(flow.usage.memory.heapUsed / 1024 / 1024));
-				this.memChart.update(0);
-
-				this.cpuChart.data.datasets[0].data.push(flow.usage.cpu.percentage);
-				this.cpuChart.update(0);
-
-				this.delayChart.data.datasets[0].data.push(flow.usage.delay);
-				this.delayChart.update(0);
+				//emit for every flow
+				json.flows.forEach((flow) => {
+					this.flows[flow._id].emit('usage', flow);
+				});
 
 				break;
 
@@ -1044,9 +810,6 @@ class XibleEditor {
 		this.backgroundLeft = flow.viewState.backgroundLeft;
 		this.backgroundTop = flow.viewState.backgroundTop;
 		this.transform();
-
-		//setup stats
-		this.initStats();
 
 	}
 
