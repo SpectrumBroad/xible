@@ -4,7 +4,7 @@ const flowDebug = debug('xible:flow');
 const cluster = require('cluster');
 const fs = require('fs');
 const path = require('path');
-
+const sanitizePath = require('sanitize-filename');
 
 module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
@@ -174,8 +174,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 				throw new Error(`object containing _id as argument is required`);
 			}
 
-			if (json._id === '_status') {
-				throw new Error(`flow _id cannot be "_status"`);
+			if (json._id !== sanitizePath(json._id)) {
+				throw new Error(`flow _id cannot contain reserved/unsave characters`);
 			}
 
 			this._id = json._id;

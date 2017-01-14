@@ -162,6 +162,10 @@ class XibleEditor extends EventEmitter {
 
 	enableInsertNode() {
 
+		//indicates if the selector was opened above or below the mouse position
+		let openTop = false;
+		let openYPosition = 0; //y position the selector was opened
+
 		//detail div for downloading new nodes
 		let detailDiv = document.body.appendChild(document.createElement('div'));
 		detailDiv.setAttribute('id', 'detailNodeSelector');
@@ -242,6 +246,8 @@ class XibleEditor extends EventEmitter {
 			} else {
 				div.classList.remove('noresults');
 			}
+
+			positionNodeSelector();
 
 		});
 
@@ -373,29 +379,69 @@ class XibleEditor extends EventEmitter {
 
 		});
 
-		function openNodeSelector() {
+		function positionNodeSelector() {
 
-			localUl.querySelectorAll('li').forEach((li) => {
-
-				if (filterInput.value && li.textContent.indexOf(filterInput.value) === -1) {
-					li.classList.add('hidden');
-				} else {
-					li.classList.remove('hidden');
-				}
-
-			});
-
-			div.classList.remove('hidden');
-			div.style.left = event.pageX + 'px';
-			div.style.top = event.pageY + 'px';
-
-			//ensure we are not overflowing the chrome
 			let clientRect = div.getBoundingClientRect();
-			if (clientRect.top + clientRect.height > window.innerHeight) {
-				div.style.top = (event.pageY - clientRect.height) + 'px';
+			if (openTop) {
+				div.style.top = (openYPosition - clientRect.height) + 'px';
+			} else {
+				div.style.top = openYPosition + 'px';
 			}
 
+		}
+
+		function openNodeSelector() {
+
+			openYPosition = event.pageY;
+
+			//unhide and position the nodeselector for the first overflow check
+			div.classList.remove('hidden');
+			div.style.left = event.pageX + 'px';
+			div.style.top = openYPosition + 'px';
+
+			//ensure we are not overflowing the chrome
+			//this needs to be checked with a non-filtered list
+			//otherwise chaning the filter might still overflow
+			let clientRect = div.getBoundingClientRect();
+			openTop = false;
+			if (clientRect.top + clientRect.height > window.innerHeight) {
+				openTop = true;
+			}
+
+			//focus!
+			if (filterInput.value) {
+				filterInput.select();
+			}
 			filterInput.focus();
+
+			//filter the results
+			if (filterInput.value) {
+				Array.from(localUl.querySelectorAll('li')).forEach((li) => {
+
+					if (filterInput.value && li.textContent.indexOf(filterInput.value) === -1) {
+						li.classList.add('hidden');
+					}
+
+				});
+			}
+
+			//reposition
+			if (openTop) {
+				positionNodeSelector();
+			}
+
+		}
+
+		function closeNodeSelector() {
+
+			//unhide all nodes, so the next time the selector opens,
+			//the correct height is checked against the window height and mouse pos
+			Array.from(localUl.querySelectorAll('li.hidden')).forEach((li) => {
+				li.classList.remove('hidden');
+			});
+
+			div.classList.add('hidden');
+			detailDiv.classList.add('hidden');
 
 		}
 
@@ -425,10 +471,7 @@ class XibleEditor extends EventEmitter {
 		document.body.addEventListener('mousedown', (event) => {
 
 			if (!div.classList.contains('hidden') && !div.contains(event.target) && !detailDiv.contains(event.target)) {
-
-				div.classList.add('hidden');
-				detailDiv.classList.add('hidden');
-
+				closeNodeSelector();
 			}
 
 		});

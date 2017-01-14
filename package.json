@@ -33,7 +33,9 @@
     "express": "*",
     "body-parser": "*",
     "spdy": "*",
-    "detective-es6": "*"
+    "sanitize-filename": "*",
+    "detective-es6": "*",
+    "depcheck": "*"
   },
   "devDependencies": {
     "nodemon": "*"

@@ -336,12 +336,43 @@ View.routes.editor = function() {
 	let flowEditorHolder = this.element.appendChild(document.createElement('div'));
 	flowEditorHolder.setAttribute('id', 'flowEditorHolder');
 
+	//zoom and reset
+	let zoomButtons = flowEditorHolder.appendChild(document.createElement('div'));
+	zoomButtons.classList.add('zoomButtons');
+	let zoomOutButton = zoomButtons.appendChild(document.createElement('button'));
+	zoomOutButton.appendChild(document.createTextNode('-'));
+	zoomOutButton.setAttribute('type', 'button');
+	zoomOutButton.onclick = function() {
+
+		xibleEditor.zoom -= 0.1;
+		xibleEditor.transform();
+
+	};
+	let zoomResetButton = zoomButtons.appendChild(document.createElement('button'));
+	zoomResetButton.appendChild(document.createTextNode('O'));
+	zoomResetButton.setAttribute('type', 'button');
+	zoomResetButton.onclick = function() {
+
+		xibleEditor.zoom = 1;
+		xibleEditor.transform();
+
+	};
+	let zoomInButton = zoomButtons.appendChild(document.createElement('button'));
+	zoomInButton.appendChild(document.createTextNode('+'));
+	zoomInButton.setAttribute('type', 'button');
+	zoomInButton.onclick = function() {
+
+		xibleEditor.zoom += 0.1;
+		xibleEditor.transform();
+
+	};
+
 	//create flowlist menu
 	let flowListUl = flowEditorHolder.appendChild(document.createElement('ul'));
 	flowListUl.classList.add('flowList', 'loading');
 
 	//keep retrying the connection if it fails
-	let wsXible = function() {
+	function wsXible() {
 
 		ws = new WebSocket('wss://10.0.0.20:9601');
 		xibleEditor.initWebSocket(ws);
@@ -351,7 +382,7 @@ View.routes.editor = function() {
 			window.setTimeout(wsXible, 1000);
 		});
 
-	};
+	}
 
 	wsXible();
 
@@ -457,6 +488,18 @@ View.routes.editor = function() {
 
 			flowTab.addEventListener('animationiteration', () => {
 				flowTab.classList.remove('loading');
+			}, {
+				once: true
+			});
+
+		}).catch((err) => {
+
+			//TODO: give feedback about what went wrong
+
+			flowTab.classList.add('notRunnable');
+
+			flowTab.addEventListener('animationiteration', () => {
+				flowListUl.removeChild(flowTab);
 			}, {
 				once: true
 			});

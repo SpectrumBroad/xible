@@ -245,6 +245,42 @@ header {
 	flex-direction: column;
 	flex: 1 1 auto;
 	width: 1px;
+	position: relative;
+}
+
+#flowEditorHolder .zoomButtons {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	z-index: 1;
+	padding: 0;
+	margin: 0;
+	font-size: 0.6em;
+	opacity: 0.5;
+	background-color: #181818;
+	box-shadow: 0 0 4px 0 #000;
+	border: 1px solid #000;
+	border-radius: 6px;
+}
+
+#flowEditorHolder .zoomButtons:hover {
+	opacity: 0.9;
+}
+
+#flowEditorHolder .zoomButtons button {
+	margin: 0;
+	padding: 2px;
+	min-width: 20px;
+	border: none;
+	border-right: 1px solid #000;
+	background-color: inherit;
+	color: #ccc;
+	font-size: inherit;
+	cursor: pointer;
+}
+
+#flowEditorHolder .zoomButtons button:last-child {
+	border-right: none;
 }
 
 #console {
@@ -384,7 +420,7 @@ header {
 	background-color: #292929;
 	background-size: 50px 50px;
 	background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
-	font-size:0.7em;
+	font-size: 0.7em;
 }
 
 .xible.panning {
