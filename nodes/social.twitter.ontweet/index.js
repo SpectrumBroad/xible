@@ -54,11 +54,16 @@ module.exports = function(XIBLE) {
 
 				twitters.forEach((twitter) => {
 
-					if(!twitter) {
+					if (!twitter) {
 						return;
 					}
 
-					twitter.stream(type, {'track':NODE.data.track}, (stream) => {
+					let rateLimitStatus;
+					let rateLimitTrack = 0;
+
+					twitter.stream(type, {
+						'track': NODE.data.track
+					}, (stream) => {
 
 						stream.on('data', (data) => {
 
@@ -69,8 +74,32 @@ module.exports = function(XIBLE) {
 
 						});
 
-						stream.on('limit', () => {
-							console.log('ratelimit!');
+						//indicates that we're exceeding the rate limit set on streaming data
+						//TODO: add orange status when this happens, including amount of missed tweets
+						stream.on('limit', (data) => {
+
+							//this data is not in sync, so only apply highest limit
+							if (data.track <= rateLimitTrack) {
+								return;
+							}
+							rateLimitTrack = data.track;
+
+							if (rateLimitStatus) {
+
+								this.updateStatusById(rateLimitStatus, {
+									color: 'orange',
+									message: `Ratelimit; missed ${rateLimitTrack} tweets`
+								});
+
+							} else {
+
+								rateLimitStatus = this.addStatus({
+									color: 'orange',
+									message: `Ratelimit; missed ${rateLimitTrack} tweets`
+								});
+
+							}
+
 						});
 
 						stream.on('error', (tw, tc) => {
@@ -78,11 +107,11 @@ module.exports = function(XIBLE) {
 						});
 
 						stream.on('end', () => {
-console.log('end!');
+							console.log('end!');
 						});
 
 						stream.on('destroy', () => {
-console.log('destroy!');
+							console.log('destroy!');
 						});
 
 					});

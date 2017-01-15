@@ -11,29 +11,33 @@ View.routes.editor = function() {
 	permissionsValidate.innerHTML = 'Validating write permissions';
 	permissionsValidate.classList.add('status', 'loading');
 
-	window.setTimeout(() => {
+	xibleWrapper.Flow.validatePermissions().then((result) => {
 
 		permissionsValidate.addEventListener('animationiteration', () => {
 			permissionsValidate.classList.remove('loading');
-		}, {once: true});
+		}, {
+			once: true
+		});
 
-		permissionsValidate.innerHTML = 'Writing to the flow directory is not possible. Please check the permissions.';
-		permissionsValidate.classList.remove('checking');
-		permissionsValidate.classList.add('alert');
+		if (result) {
 
-	}, 1500);
+			permissionsValidate.innerHTML = 'Write permissions check success.';
+			permissionsValidate.classList.remove('checking');
+			permissionsValidate.classList.add('success');
 
-	window.setTimeout(() => {
+			window.setTimeout(() => {
+				menuHolder.removeChild(permissionsValidate);
+			}, 6000);
 
-		permissionsValidate.innerHTML = 'Success.';
-		permissionsValidate.classList.remove('checking');
-		permissionsValidate.classList.add('success');
+		} else {
 
-	}, 4000);
+			permissionsValidate.innerHTML = 'Writing to the flow path failed. Please check permissions.';
+			permissionsValidate.classList.remove('checking', 'loading');
+			permissionsValidate.classList.add('alert');
 
-	window.setTimeout(() => {
-		menuHolder.removeChild(permissionsValidate);
-	}, 6000);
+		}
+
+	});
 
 	//create menu
 	let buttonSection = menuHolder.appendChild(document.createElement('section'));

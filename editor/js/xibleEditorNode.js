@@ -375,6 +375,29 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 	}
 
+	updateStatusById(statusId, status) {
+
+		if (this.statusEl) {
+
+			let li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
+			if (li) {
+
+				if(status.message) {
+
+					if(li.lastChild) {
+						li.removeChild(li.lastChild);
+					}
+
+					li.appendChild(document.createTextNode(status.message));
+
+				}
+
+			}
+
+		}
+
+	}
+
 	removeStatusById(statusId, timeout) {
 
 		//clear timeout
@@ -389,7 +412,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 		//get and delete li
 		if (this.statusEl) {
 
-			let li = this.statusEl.querySelector('li[data-statusid="' + statusId + '"]');
+			let li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
 			if (li) {
 
 				let fn = () => {

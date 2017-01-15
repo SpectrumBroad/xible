@@ -111,6 +111,29 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		}
 
 		/**
+		 * Validates if writing to the flow path is possible/allowed
+		 * @returns {Promise}  true or false
+		 */
+		static validatePermissions() {
+
+			return new Promise((resolve, reject) => {
+
+				//check if we can write
+				fs.access(this.flowPath, fs.W_OK, function(err) {
+
+					if (err) {
+						return resolve(false);
+					}
+
+					resolve(true);
+
+				});
+
+			});
+
+		}
+
+		/**
 		 *	get all flow statuses
 		 *	@static
 		 *	@return {Object.<String, Boolean>}	statuses

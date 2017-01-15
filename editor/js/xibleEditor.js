@@ -581,6 +581,13 @@ class XibleEditor extends EventEmitter {
 
 				break;
 
+			case 'xible.node.updateStatusById':
+				if (node) {
+					node.updateStatusById(json.status._id, json.status);
+				}
+
+				break;
+
 			case 'xible.node.addProgressBar':
 				if (node) {
 					node.addProgressBar(json.status);

@@ -250,8 +250,6 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		updateProgressBarById(statusId, status) {
 
-			status._id = XIBLE.generateObjectId();
-
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
 				message: {
@@ -265,6 +263,30 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 				}
 			});
+
+			return statusId;
+
+		}
+
+
+		updateStatusById(statusId, status) {
+
+			this.sendProcessMessage({
+				method: "broadcastWebSocket",
+				message: {
+
+					method: "xible.node.updateStatusById",
+					nodeId: this._id,
+					status: {
+						_id: statusId,
+						message: status.message,
+						color: status.color
+					}
+
+				}
+			});
+
+			return statusId;
 
 		}
 

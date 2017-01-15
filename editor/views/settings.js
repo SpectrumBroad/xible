@@ -16,6 +16,9 @@ View.routes.settings = function() {
 	section.innerHTML = '<h1>Editor</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
 
 	section = menuHolder.appendChild(document.createElement('section'));
+	section.innerHTML = '<h1>Registry</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
+
+	section = menuHolder.appendChild(document.createElement('section'));
 	section.innerHTML = '<h1>Enterprise</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
 
 	xibleWrapper.Config.validatePermissions().then((result) => {
@@ -48,6 +51,6 @@ View.routes.settings = function() {
 
 	let div = this.element.appendChild(document.createElement('div'));
 	div.classList.add('inner');
-	div.innerHTML = '<section><h1>Hello</h1><p>This is a test for the later markup.</p></section><section><form><dl><dt>label dt</dt><dd>Matching dd</dd></dl></form></section>';
+	div.innerHTML = `<section><h1>Hello</h1><p>This is a test for the later markup.</p></section><section><form><dl><dt>label dt</dt><dd>Matching dd</dd></dl></form></section>`;
 
 };

@@ -23,7 +23,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			return new Promise((resolve, reject) => {
 
 				//check if we can write
-				fs.access('config.json', fs.W_OK, function(err) {
+				fs.access(XIBLE.configPath, fs.W_OK, function(err) {
 
 					if (err) {
 						return resolve(false);

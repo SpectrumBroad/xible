@@ -760,3 +760,7 @@ header {
 .xible .node>.statuses>li.red:not(.bar)::before, .xible .node>.tracker.red::before {
 	background-color: red;
 }
+
+.xible .node>.statuses>li.orange:not(.bar)::before, .xible .node>.tracker.orange::before {
+	background-color: darkorange;
+}
