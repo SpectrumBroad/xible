@@ -1,11 +1,9 @@
 {
 
-	"webSocketServer": {
-		"port": 9601
-	},
-
 	"webServer": {
-		"port": 9600
+		"port": 9600,
+		"keyPath": "./ssl/ssl.key",
+		"certPath": "./ssl/ssl.crt"
 	},
 
 	"registry": {
@@ -21,6 +19,14 @@
 			"url": "https://registry.xible.io"
 		}
 
+	},
+
+	"nodes": {
+		"path": "./nodes"
+	},
+
+	"flows": {
+		"path": "./flows"
 	},
 
 	"enterprise": {

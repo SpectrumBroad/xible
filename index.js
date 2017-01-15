@@ -11,29 +11,41 @@ const STAT_INTERVAL = 1000; //a value below the broadcast throttle interval (100
 
 const Xible = module.exports = function Xible(obj) {
 
-	const Node = this.Node = require('./app/Node')(this, obj.express, obj.expressApp);
-	const Flow = this.Flow = require('./app/Flow')(this, obj.express, obj.expressApp);
-
 	this.nodes = {};
 	this.flows = {};
+	this.configPath = obj.configPath;
+
+	const Config = this.Config = require('./app/Config')(this, this.express, this.expressApp);
 
 	//host the client nodes
-	if (obj.expressApp) {
-		this.initExpress(obj.express, obj.expressApp);
+	if (cluster.isMaster) {
+
+		this.initWeb();
+
+		//load config again so it can host the xpressAp
+		this.Config = require('./app/Config')(this, this.express, this.expressApp);
+
 	}
 
-	if (obj.webSocketServer) {
-		this.initWebSocket(obj.webSocketServer);
+	//get and load the modules
+	this.Node = require('./app/Node')(this, this.express, this.expressApp);
+	this.Flow = require('./app/Flow')(this, this.express, this.expressApp);
+
+	//ensure catch all routes are loaded last
+	if (this.expressApp) {
+		require('./routes.js')(this, this.expressApp);
 	}
 
 	//get all installed nodes
-	if (obj.nodesPath) {
-		Node.initFromPath(obj.nodesPath, obj.nodeNames);
+	let nodesPath = Config.getValue('nodes.path');
+	if (nodesPath) {
+		this.Node.initFromPath(nodesPath, obj.nodeNames);
 	}
 
 	//get all installed flows
-	if (obj.flowsPath) {
-		Flow.initFromPath(obj.flowsPath, this);
+	let flowPath = Config.getValue('flows.path');
+	if (flowPath && !obj.nodeNames) {
+		this.Flow.initFromPath(flowPath);
 	}
 
 	this.initStats();
@@ -58,21 +70,6 @@ const Xible = module.exports = function Xible(obj) {
 		}, WEB_SOCKET_THROTTLE);
 
 	}
-
-};
-
-
-Xible.prototype.validateConfigPermissions = function() {
-
-	fs.access(__dirname, fs.W_OK, function(err) {
-		if (err) {
-			console.error("can't write");
-			process.exit(1);
-		}
-
-		console.log("can write");
-		process.exit(0);
-	});
 
 };
 
@@ -172,24 +169,87 @@ Xible.generateObjectId = Xible.prototype.generateObjectId = function() {
 };
 
 
-Xible.prototype.initExpress = function(express, expressApp) {
+Xible.prototype.initWeb = function() {
 
-	if (!expressApp) {
-		return;
-	}
+	//setup client requests over https
+	const spdy = require('spdy');
+	const expressDebug = debug('xible:express');
+	const express = this.express = require('express');
+	const bodyParser = require('body-parser');
+	const fs = require('fs');
 
-	require('./routes.js')(this, expressApp);
+	const expressApp = this.expressApp = express();
+	expressApp.use(bodyParser.json());
 
-};
+	//setup default express stuff
+	expressApp.use(function(req, res, next) {
 
+		res.removeHeader('X-Powered-By');
 
-Xible.prototype.initWebSocket = function(webSocketServer) {
+		//disable caching
+		res.header('cache-control', 'private, no-cache, no-store, must-revalidate');
+		res.header('expires', '-1');
+		res.header('pragma', 'no-cache');
 
-	if (!webSocketServer) {
-		return;
-	}
+		//access control
+		res.header('access-control-allow-origin', '*');
+		res.header('access-control-allow-headers', 'x-access-token, content-type');
+		res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
 
-	this.webSocketServer = webSocketServer;
+		expressDebug(`${req.method} ${req.originalUrl}`);
+
+		if ('OPTIONS' === req.method) {
+			return res.status(200).end();
+		}
+
+		//local vars for requests
+		req.locals = {};
+
+		next();
+
+	});
+
+	//editor
+	expressApp.use(express.static('editor', {
+		index: false
+	}));
+
+	//init the webserver
+	let webPort = this.Config.getValue('webServer.port');
+	expressDebug(`starting on port: ${webPort}`);
+
+	const spdyServer = spdy.createServer({
+		key: fs.readFileSync(this.Config.getValue('webServer.keyPath')),
+		cert: fs.readFileSync(this.Config.getValue('webServer.certPath'))
+	}, expressApp).listen(webPort, () => {
+
+		expressDebug(`listening on: ${spdyServer.address().address}:${spdyServer.address().port}`);
+
+		//websocket
+		const wsDebug = debug('xible:websocket');
+		const ws = require('ws'); //uws is buggy right now
+
+		wsDebug(`listening on port: ${webPort}`);
+
+		const webSocketServer = this.webSocketServer = new ws.Server({
+			server: spdyServer
+		});
+
+		webSocketServer.on('connection', (ws) => {
+
+			webSocketDebug('connection');
+
+			ws.on('error', (err) => {
+				webSocketDebug(`error: ${err}`);
+			});
+
+			ws.on('close', () => {
+				webSocketDebug('close');
+			});
+
+		});
+
+	});
 
 };
 
@@ -209,7 +269,6 @@ Xible.prototype.broadcastWebSocket = function(message) {
 	}
 
 	//throttle any message that's not a string
-
 	if (typeof message !== 'string') {
 
 		if (WEB_SOCKET_THROTTLE > 0) {
@@ -222,7 +281,6 @@ Xible.prototype.broadcastWebSocket = function(message) {
 		message = JSON.stringify(message);
 
 	}
-
 
 	this.webSocketServer.clients.forEach((client) => {
 		client.send(message, handleBroadcastWebSocketError);

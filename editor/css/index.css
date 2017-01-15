@@ -31,11 +31,14 @@ html, body {
 	box-sizing: border-box;
 	font-family: robotolight;
 	font-size: 22px;
-	text-align: center;
 }
 
 body {
 	display: flex;
+}
+
+.loading {
+	position: relative;
 }
 
 .loading::after {
@@ -168,11 +171,19 @@ nav>ul>li:last-child>a>span {
 	position: relative;
 	margin: 0;
 	padding: 22px 0;
-	text-align: left;
 	overflow: hidden;
 	box-sizing: border-box;
 	border-bottom: 1px solid #282828;
 	font-size: 0.6em;
+}
+
+#sub p {
+	margin: 12px 5px;
+	font-size: 0.6em;
+}
+
+#sub p:first-of-type {
+	margin-bottom: 0;
 }
 
 #sub section:first-of-type {
@@ -232,7 +243,6 @@ header {
 	color: gold;
 	padding: 0;
 	margin: 10px 16px;
-	text-align: left;
 	text-shadow: 0 1px rgba(0, 0, 0, 1);
 }
 
@@ -255,12 +265,13 @@ header {
 	z-index: 1;
 	padding: 0;
 	margin: 0;
-	font-size: 0.6em;
+	font-size: 1em;
 	opacity: 0.5;
 	background-color: #181818;
-	box-shadow: 0 0 4px 0 #000;
+	box-shadow: 0 0 6px 0 #000;
 	border: 1px solid #000;
 	border-radius: 6px;
+	font-family: dripicons;
 }
 
 #flowEditorHolder .zoomButtons:hover {
@@ -269,7 +280,7 @@ header {
 
 #flowEditorHolder .zoomButtons button {
 	margin: 0;
-	padding: 2px;
+	padding: 2px 4px;
 	min-width: 20px;
 	border: none;
 	border-right: 1px solid #000;
@@ -277,6 +288,7 @@ header {
 	color: #ccc;
 	font-size: inherit;
 	cursor: pointer;
+	font-family: inherit;
 }
 
 #flowEditorHolder .zoomButtons button:last-child {

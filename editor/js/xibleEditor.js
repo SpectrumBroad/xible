@@ -687,8 +687,7 @@ class XibleEditor extends EventEmitter {
 				return;
 			}
 
-			var json = JSON.parse(event.data);
-			this.webSocketMessageHandler(json);
+			this.webSocketMessageHandler(JSON.parse(event.data));
 
 		});
 

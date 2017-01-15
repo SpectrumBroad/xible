@@ -7,7 +7,6 @@
 	background-size: 50px 50px;
 	flex: 1 1 auto;
 	width: 1px;
-	text-align: left;
 	padding: 10px 16px;
 }
 
@@ -39,19 +38,19 @@ main {
 	color: #bbb;
 }
 
-.inner p.status {
-	border: 1px solid rgb(255, 140, 0);
-	background-color: rgba(255, 140, 0, 0.4);
+p.status {
+	border: 1px solid rgba(255, 140, 0, 0.6);
+	background-color: rgba(255, 140, 0, 0.2);
 	padding: 4px;
 	border-radius: 6px;
 }
 
-.inner p.alert, .inner p.error {
-	border: 1px solid rgb(255, 0, 0);
-	background-color: rgba(255, 0, 0, 0.4);
+p.alert, p.error {
+	border: 1px solid rgba(255, 0, 0, 0.6);
+	background-color: rgba(255, 0, 0, 0.2);
 }
 
-.inner p.success {
-	border: 1px solid rgb(0, 255, 0);
-	background-color: rgba(0, 255, 0, 0.4);
+p.success {
+	border: 1px solid rgba(0, 255, 0, 0.6);
+	background-color: rgba(0, 255, 0, 0.2);
 }

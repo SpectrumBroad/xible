@@ -29,15 +29,11 @@
   },
   "dependencies": {
     "uws": "*",
+    "ws": "*",
     "debug": "*",
     "express": "*",
     "body-parser": "*",
     "spdy": "*",
-    "sanitize-filename": "*",
-    "detective-es6": "*",
-    "depcheck": "*"
-  },
-  "devDependencies": {
-    "nodemon": "*"
+    "sanitize-filename": "*"
   }
 }

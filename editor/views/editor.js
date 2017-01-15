@@ -1,11 +1,39 @@
 View.routes.editor = function() {
 
-	let xibleEditor = View.routes.editor.xibleEditor = new XibleEditor();
+	let xibleEditor = new XibleEditor();
 
 	let menuHolder = this.element.appendChild(document.createElement('div'));
 	menuHolder.setAttribute('id', 'sub');
 
 	menuHolder.appendChild(document.createElement('header')).appendChild(document.createTextNode('XIBLE'));
+
+	let permissionsValidate = menuHolder.appendChild(document.createElement('p'));
+	permissionsValidate.innerHTML = 'Validating write permissions';
+	permissionsValidate.classList.add('status', 'loading');
+
+	window.setTimeout(() => {
+
+		permissionsValidate.addEventListener('animationiteration', () => {
+			permissionsValidate.classList.remove('loading');
+		}, {once: true});
+
+		permissionsValidate.innerHTML = 'Writing to the flow directory is not possible. Please check the permissions.';
+		permissionsValidate.classList.remove('checking');
+		permissionsValidate.classList.add('alert');
+
+	}, 1500);
+
+	window.setTimeout(() => {
+
+		permissionsValidate.innerHTML = 'Success.';
+		permissionsValidate.classList.remove('checking');
+		permissionsValidate.classList.add('success');
+
+	}, 4000);
+
+	window.setTimeout(() => {
+		menuHolder.removeChild(permissionsValidate);
+	}, 6000);
 
 	//create menu
 	let buttonSection = menuHolder.appendChild(document.createElement('section'));
@@ -340,8 +368,9 @@ View.routes.editor = function() {
 	let zoomButtons = flowEditorHolder.appendChild(document.createElement('div'));
 	zoomButtons.classList.add('zoomButtons');
 	let zoomOutButton = zoomButtons.appendChild(document.createElement('button'));
-	zoomOutButton.appendChild(document.createTextNode('-'));
+	zoomOutButton.appendChild(document.createTextNode('\ue024'));
 	zoomOutButton.setAttribute('type', 'button');
+	zoomOutButton.setAttribute('title', 'Zoom out');
 	zoomOutButton.onclick = function() {
 
 		xibleEditor.zoom -= 0.1;
@@ -349,8 +378,9 @@ View.routes.editor = function() {
 
 	};
 	let zoomResetButton = zoomButtons.appendChild(document.createElement('button'));
-	zoomResetButton.appendChild(document.createTextNode('O'));
+	zoomResetButton.appendChild(document.createTextNode('\ue01c'));
 	zoomResetButton.setAttribute('type', 'button');
+	zoomResetButton.setAttribute('title', 'Reset zoom');
 	zoomResetButton.onclick = function() {
 
 		xibleEditor.zoom = 1;
@@ -358,8 +388,9 @@ View.routes.editor = function() {
 
 	};
 	let zoomInButton = zoomButtons.appendChild(document.createElement('button'));
-	zoomInButton.appendChild(document.createTextNode('+'));
+	zoomInButton.appendChild(document.createTextNode('\ue035'));
 	zoomInButton.setAttribute('type', 'button');
+	zoomInButton.setAttribute('title', 'Zoom in');
 	zoomInButton.onclick = function() {
 
 		xibleEditor.zoom += 0.1;
@@ -374,12 +405,12 @@ View.routes.editor = function() {
 	//keep retrying the connection if it fails
 	function wsXible() {
 
-		ws = new WebSocket('wss://10.0.0.20:9601');
+		let ws = new WebSocket('wss://10.0.0.20:9600');
 		xibleEditor.initWebSocket(ws);
 
 		//try to reconnect
 		ws.addEventListener('close', (event) => {
-			window.setTimeout(wsXible, 1000);
+			window.setTimeout(wsXible, 2000);
 		});
 
 	}

@@ -44,7 +44,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		 *	@param	{Object}	xible
 		 *	@return {Object.<String, Flow>}	list of flows by their _id
 		 */
-		static initFromPath(flowPath, XIBLE) {
+		static initFromPath(flowPath) {
 
 			flowDebug(`init flows from ${flowPath}`);
 
@@ -97,7 +97,9 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 				if (!flows[flowId]) {
 					delete statuses[flowId];
 				} else if (statuses[flowId]) {
-					flows[flowId].start();
+					flows[flowId].start().catch((err) => {
+						flowDebug(`failed to start "${flowId}": ${err}`);
+					});
 				}
 
 			}
