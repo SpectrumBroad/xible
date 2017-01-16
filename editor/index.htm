@@ -52,6 +52,8 @@
 			port: window.location.port
 
 		});
+		xibleWrapper.autoReconnect();
+		xibleWrapper.connect();
 
 		mainViewHolder = new ViewHolder(document.getElementById('main'));
 		subMenuViewHolder = new ViewHolder(document.getElementById('sub'));

@@ -409,20 +409,14 @@ View.routes.editor = function() {
 	let flowListUl = flowEditorHolder.appendChild(document.createElement('ul'));
 	flowListUl.classList.add('flowList', 'loading');
 
-	//keep retrying the connection if it fails
-	function wsXible() {
-
-		let ws = new WebSocket('wss://10.0.0.20:9600');
-		xibleEditor.initWebSocket(ws);
-
-		//try to reconnect
-		ws.addEventListener('close', (event) => {
-			window.setTimeout(wsXible, 2000);
-		});
-
+	//socket connection
+	if(xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+		xibleEditor.initWebSocket(xibleWrapper.webSocket);
 	}
 
-	wsXible();
+	xibleWrapper.on('open', () => {
+		xibleEditor.initWebSocket(xibleWrapper.webSocket);
+	});
 
 	flowEditorHolder.appendChild(xibleEditor.element);
 
@@ -448,6 +442,13 @@ View.routes.editor = function() {
 			li.classList.add('open');
 
 			xibleEditor.viewFlow(flow);
+
+			//get all persistent websocket messages
+			xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
+				messages.forEach((message) => {
+					xibleEditor.webSocketMessageHandler(message);
+				});
+			});
 
 		};
 

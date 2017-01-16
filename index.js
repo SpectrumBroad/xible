@@ -9,14 +9,15 @@ const cluster = require('cluster');
 const WEB_SOCKET_THROTTLE = 100; //<1 === don't throttle
 const STAT_INTERVAL = 1000; //a value below the broadcast throttle interval (100) won't have any effect
 
-//save statuses so new clients can see statuses that were send earlier than their connection start
-let statuses = {};
-
 const Xible = module.exports = function Xible(obj) {
 
 	this.nodes = {};
 	this.flows = {};
+
 	this.configPath = obj.configPath;
+
+	//save statuses so new clients can see statuses that were send earlier than their connection start
+	this.persistentWebSocketMessages = {};
 
 	const Config = this.Config = require('./app/Config')(this, this.express, this.expressApp);
 
@@ -250,23 +251,6 @@ Xible.prototype.initWeb = function() {
 				webSocketDebug('close');
 			});
 
-			//send out any existing statuses
-			let statusesKeys = Object.keys(statuses);
-			if (!statusesKeys.length) {
-				return;
-			}
-
-			let messages = statusesKeys.map((statusId) => statuses[statusId]);
-
-			client.send(JSON.stringify({
-				method: 'xible.messages',
-				messages: messages
-			}), (err) => {
-				if (err) {
-					webSocketDebug(`error: ${err}`);
-				}
-			});
-
 		});
 
 	});
@@ -291,16 +275,16 @@ Xible.prototype.broadcastWebSocket = function(message) {
 	//throttle any message that's not a string
 	if (typeof message !== 'string') {
 
-		//save some statuses to replay on new connections
+		//save some messages to replay on new connections
 		switch (message.method) {
 
 			case 'xible.node.addStatus':
 
-				statuses[message.status._id] = message;
+				this.persistentWebSocketMessages[message.status._id] = message;
 
 				if (message.status.timeout) {
 					setTimeout(() => {
-						delete statuses[message.status._id];
+						delete this.persistentWebSocketMessages[message.status._id];
 					}, message.status.timeout);
 				}
 
@@ -310,12 +294,12 @@ Xible.prototype.broadcastWebSocket = function(message) {
 
 				let copyMessage = Object.assign({}, message);
 				copyMessage.method = 'xible.node.addStatus';
-				statuses[copyMessage.status._id] = copyMessage;
+				this.persistentWebSocketMessages[copyMessage.status._id] = copyMessage;
 
 				break;
 
 			case 'xible.node.removeStatusById':
-				delete statuses[message.status._id];
+				delete this.persistentWebSocketMessages[message.status._id];
 				break;
 
 		}
