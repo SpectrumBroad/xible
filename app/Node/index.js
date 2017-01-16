@@ -271,19 +271,21 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		updateStatusById(statusId, status) {
 
+			let message = {
+
+				method: "xible.node.updateStatusById",
+				nodeId: this._id,
+				status: {
+					_id: statusId,
+					message: status.message,
+					color: status.color
+				}
+
+			};
+
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
-				message: {
-
-					method: "xible.node.updateStatusById",
-					nodeId: this._id,
-					status: {
-						_id: statusId,
-						message: status.message,
-						color: status.color
-					}
-
-				}
+				message: message
 			});
 
 			return statusId;
@@ -295,16 +297,17 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 			status._id = XIBLE.generateObjectId();
 
+			let message = {
+
+				method: "xible.node.addStatus",
+				nodeId: this._id,
+				status: status
+
+			};
+
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
-				message: {
-
-					method: "xible.node.addStatus",
-					nodeId: this._id,
-					status: status
-
-				}
-
+				message: message
 			});
 
 			return status._id;
@@ -558,7 +561,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 	}
 
-	if(EXPRESS_APP) {
+	if (EXPRESS_APP) {
 		require('./routes.js')(Node, XIBLE, EXPRESS_APP);
 	}
 

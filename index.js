@@ -9,6 +9,9 @@ const cluster = require('cluster');
 const WEB_SOCKET_THROTTLE = 100; //<1 === don't throttle
 const STAT_INTERVAL = 1000; //a value below the broadcast throttle interval (100) won't have any effect
 
+//save statuses so new clients can see statuses that were send earlier than their connection start
+let statuses = {};
+
 const Xible = module.exports = function Xible(obj) {
 
 	this.nodes = {};
@@ -235,16 +238,33 @@ Xible.prototype.initWeb = function() {
 			server: spdyServer
 		});
 
-		webSocketServer.on('connection', (ws) => {
+		webSocketServer.on('connection', (client) => {
 
 			webSocketDebug('connection');
 
-			ws.on('error', (err) => {
+			client.on('error', (err) => {
 				webSocketDebug(`error: ${err}`);
 			});
 
-			ws.on('close', () => {
+			client.on('close', () => {
 				webSocketDebug('close');
+			});
+
+			//send out any existing statuses
+			let statusesKeys = Object.keys(statuses);
+			if (!statusesKeys.length) {
+				return;
+			}
+
+			let messages = statusesKeys.map((statusId) => statuses[statusId]);
+
+			client.send(JSON.stringify({
+				method: 'xible.messages',
+				messages: messages
+			}), (err) => {
+				if (err) {
+					webSocketDebug(`error: ${err}`);
+				}
 			});
 
 		});
@@ -270,6 +290,35 @@ Xible.prototype.broadcastWebSocket = function(message) {
 
 	//throttle any message that's not a string
 	if (typeof message !== 'string') {
+
+		//save some statuses to replay on new connections
+		switch (message.method) {
+
+			case 'xible.node.addStatus':
+
+				statuses[message.status._id] = message;
+
+				if (message.status.timeout) {
+					setTimeout(() => {
+						delete statuses[message.status._id];
+					}, message.status.timeout);
+				}
+
+				break;
+
+			case 'xible.node.updateStatusById':
+
+				let copyMessage = Object.assign({}, message);
+				copyMessage.method = 'xible.node.addStatus';
+				statuses[copyMessage.status._id] = copyMessage;
+
+				break;
+
+			case 'xible.node.removeStatusById':
+				delete statuses[message.status._id];
+				break;
+
+		}
 
 		if (WEB_SOCKET_THROTTLE > 0) {
 

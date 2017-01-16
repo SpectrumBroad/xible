@@ -5,8 +5,11 @@ View.routes.editor = function() {
 	let menuHolder = this.element.appendChild(document.createElement('div'));
 	menuHolder.setAttribute('id', 'sub');
 
-	menuHolder.appendChild(document.createElement('header')).appendChild(document.createTextNode('XIBLE'));
-
+	let header=menuHolder.appendChild(document.createElement('header'));
+	header.appendChild(document.createTextNode('XIBLE'));
+	/*
+	header.appendChild(document.createElement('span')).appendChild(document.createTextNode('ENTERPRISE'));
+*/
 	let permissionsValidate = menuHolder.appendChild(document.createElement('p'));
 	permissionsValidate.innerHTML = 'Validating write permissions';
 	permissionsValidate.classList.add('status', 'loading');
