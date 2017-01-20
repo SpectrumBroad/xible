@@ -20,18 +20,4 @@ module.exports = function(NODE, XIBLE, EXPRESS_APP) {
 
 	});
 
-	//returns a list of online nodes
-	EXPRESS_APP.get('/api/nodes/registry/search', (req, res) => {
-
-		XIBLE_REGISTRY_WRAPPER.Node
-			.searchRegistry(req.body.searchString)
-			.then((nodes) => {
-				res.json(nodes);
-			})
-			.catch((err) => {
-				res.status(500).end();
-			});
-
-	});
-
 };

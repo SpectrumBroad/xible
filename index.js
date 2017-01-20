@@ -34,6 +34,7 @@ const Xible = module.exports = function Xible(obj) {
 	//get and load the modules
 	this.Node = require('./app/Node')(this, this.express, this.expressApp);
 	this.Flow = require('./app/Flow')(this, this.express, this.expressApp);
+	this.Registry = require('./app/Registry')(this, this.express, this.expressApp);
 
 	//ensure catch all routes are loaded last
 	if (this.expressApp) {

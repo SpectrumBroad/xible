@@ -7,9 +7,9 @@ View.routes.editor = function() {
 
 	let header=menuHolder.appendChild(document.createElement('header'));
 	header.appendChild(document.createTextNode('XIBLE'));
-	/*
-	header.appendChild(document.createElement('span')).appendChild(document.createTextNode('ENTERPRISE'));
-*/
+
+	//header.appendChild(document.createElement('span')).appendChild(document.createTextNode('ENTERPRISE'));
+
 	let permissionsValidate = menuHolder.appendChild(document.createElement('p'));
 	permissionsValidate.innerHTML = 'Validating write permissions';
 	permissionsValidate.classList.add('status', 'loading');

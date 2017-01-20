@@ -6,7 +6,7 @@
 	font-size: 13px;
 	font-weight: normal;
 	display: flex;
-	position:relative;
+	position: relative;
 }
 
 .flowList li {
@@ -16,7 +16,7 @@
 	flex: 0 1 auto;
 	cursor: pointer;
 	position: relative;
-	border-left:1px solid #000;
+	border-left: 1px solid #000;
 }
 
 .flowList li a {
@@ -27,6 +27,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	height: 100%;
+	background-color:inherit;
 }
 
 .flowList li.add {
@@ -43,9 +44,11 @@
 	bottom: 0;
 	left: 0;
 	display: block;
-	height: 10px;
+	height: 7px;
 	width: 100%;
+	background-color:inherit;
 	border-bottom: 2px solid lime;
+	z-index:1;
 }
 
 .flowList li.stopping a::before, .flowList li.starting a::before {
@@ -70,6 +73,14 @@
 	left: 50%;
 	bottom: -8px;
 	transform: rotate(45deg) translatex(-50%);
+}
+
+.flowList li.started.open::before {
+	background-color: lime;
+}
+
+.flowList li.stopping.open::before, .flowList li.starting.open::before {
+	background-color: darkorange;
 }
 
 .flowList li:not(.open):hover {

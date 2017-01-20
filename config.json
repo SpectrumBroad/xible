@@ -16,7 +16,7 @@
 		"nodes": {
 			"allowpublish": true,
 			"allowinstall": true,
-			"url": "https://registry.xible.io"
+			"url": "http://10.0.0.51"
 		}
 
 	},
