@@ -60,14 +60,18 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 	//install a node
 	EXPRESS_APP.patch('/api/registry/nodes/:nodeName/install', (req, res) => {
 
-		req.locals.node.getTarbalUrl().then((tarbalUrl) => {
+		req.locals.node.getTarballUrl().then((tarballUrl) => {
+
+			console.log(`${__dirname}/registryTmp/`);
 
 			//fork an npm to install the registry url
-			const fork = require('child_process').fork;
-			let npm = fork(`npm`, ['install', tarbalUrl]);
+			const fork = require('child_process').spawn;
+			const npm = fork(`npm`, ['install', tarballUrl], {
+				cwd: `${__dirname}/../../registryTmp/`
+			});
 
 			npm.on('error', (err) => {
-
+				res.status(500).end();
 			});
 
 			npm.on('exit', (exitCode) => {

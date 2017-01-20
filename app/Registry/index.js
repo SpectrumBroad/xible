@@ -6,7 +6,9 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		url: XIBLE.Config.getValue('registry.nodes.url')
 	});
 
-	require('./routes.js')(xibleRegistry, XIBLE, EXPRESS_APP);
+	if(EXPRESS_APP) {
+		require('./routes.js')(xibleRegistry, XIBLE, EXPRESS_APP);
+	}
 
 	return xibleRegistry;
 
