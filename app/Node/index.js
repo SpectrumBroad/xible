@@ -90,6 +90,11 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			delete nodeCopy._eventsCount;
 			delete nodeCopy.vault;
 
+			//add vault data to the data field
+			if(node.vault) {
+				Object.assign(nodeCopy.data, node.vault.get());
+			}
+
 			//attach stringified listeners to the io's
 			this.nodeIoCopy('inputs', nodeCopy, node);
 			this.nodeIoCopy('outputs', nodeCopy, node);
@@ -228,6 +233,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 					method: "xible.node.addProgressBar",
 					nodeId: this._id,
+					flowId: this.flow._id,
 					status: status
 
 				}
@@ -256,6 +262,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 					method: "xible.node.updateProgressBarById",
 					nodeId: this._id,
+					flowId: this.flow._id,
 					status: {
 						_id: statusId,
 						percentage: status.percentage
@@ -271,21 +278,20 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		updateStatusById(statusId, status) {
 
-			let message = {
-
-				method: "xible.node.updateStatusById",
-				nodeId: this._id,
-				status: {
-					_id: statusId,
-					message: status.message,
-					color: status.color
-				}
-
-			};
-
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
-				message: message
+				message: {
+
+					method: "xible.node.updateStatusById",
+					nodeId: this._id,
+					flowId: this.flow._id,
+					status: {
+						_id: statusId,
+						message: status.message,
+						color: status.color
+					}
+
+				}
 			});
 
 			return statusId;
@@ -297,17 +303,16 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 			status._id = XIBLE.generateObjectId();
 
-			let message = {
-
-				method: "xible.node.addStatus",
-				nodeId: this._id,
-				status: status
-
-			};
-
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
-				message: message
+				message: {
+
+					method: "xible.node.addStatus",
+					nodeId: this._id,
+					flowId: this.flow._id,
+					status: status
+
+				}
 			});
 
 			return status._id;
@@ -327,6 +332,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 					method: "xible.node.removeStatusById",
 					nodeId: this._id,
+					flowId: this.flow._id,
 					status: {
 						_id: statusId,
 						timeout: timeout
@@ -345,7 +351,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 				message: {
 
 					method: "xible.node.removeAllStatuses",
-					nodeId: this._id
+					nodeId: this._id,
+					flowId: this.flow._id
 
 				}
 			});
@@ -361,6 +368,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 					method: "xible.node.setTracker",
 					nodeId: this._id,
+					flowId: this.flow._id,
 					status: status
 
 				}

@@ -266,6 +266,36 @@ function handleBroadcastWebSocketError(err) {
 }
 
 
+Xible.prototype.setPersistentWebSocketMessage = function(message) {
+
+	if (!this.persistentWebSocketMessages[message.flowId]) {
+		this.persistentWebSocketMessages[message.flowId] = {};
+	}
+
+	if (!this.persistentWebSocketMessages[message.flowId][message.nodeId]) {
+		this.persistentWebSocketMessages[message.flowId][message.nodeId] = {};
+	}
+
+	this.persistentWebSocketMessages[message.flowId][message.nodeId][message.status._id] = message;
+
+};
+
+
+Xible.prototype.deletePersistentWebSocketMessage = function(message) {
+
+	if (!this.persistentWebSocketMessages[message.flowId]) {
+		return;
+	}
+
+	if (!this.persistentWebSocketMessages[message.flowId][message.nodeId]) {
+		return;
+	}
+
+	delete this.persistentWebSocketMessages[message.flowId][message.nodeId][message.status._id];
+
+};
+
+
 let broadcastWebSocketMessagesThrottle = [];
 Xible.prototype.broadcastWebSocket = function(message) {
 
@@ -281,11 +311,11 @@ Xible.prototype.broadcastWebSocket = function(message) {
 
 			case 'xible.node.addStatus':
 
-				this.persistentWebSocketMessages[message.status._id] = message;
+				this.setPersistentWebSocketMessage(message);
 
 				if (message.status.timeout) {
 					setTimeout(() => {
-						delete this.persistentWebSocketMessages[message.status._id];
+						this.deletePersistentWebSocketMessage(message);
 					}, message.status.timeout);
 				}
 
@@ -295,12 +325,24 @@ Xible.prototype.broadcastWebSocket = function(message) {
 
 				let copyMessage = Object.assign({}, message);
 				copyMessage.method = 'xible.node.addStatus';
-				this.persistentWebSocketMessages[copyMessage.status._id] = copyMessage;
+				this.setPersistentWebSocketMessage(copyMessage);
 
 				break;
 
 			case 'xible.node.removeStatusById':
-				delete this.persistentWebSocketMessages[message.status._id];
+				this.deletePersistentWebSocketMessage(message);
+				break;
+
+			case 'xible.node.removeAllStatuses':
+				if (this.persistentWebSocketMessages[message.flowId] && this.persistentWebSocketMessages[message.flowId][message.nodeId]) {
+					delete this.persistentWebSocketMessages[message.flowId][message.nodeId];
+				}
+				break;
+
+			case 'xible.flow.removeAllStatuses':
+				if (this.persistentWebSocketMessages[message.flowId]) {
+					delete this.persistentWebSocketMessages[message.flowId];
+				}
 				break;
 
 		}

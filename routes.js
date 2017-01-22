@@ -8,19 +8,9 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 	});
 
+	//send out any existing statuses
 	EXPRESS_APP.get('/api/persistentWebSocketMessages', (req, res) => {
-
-		let messages = XIBLE.persistentWebSocketMessages;
-
-		//send out any existing statuses
-		let messageKeys = Object.keys(messages);
-		if (!messageKeys.length) {
-			return;
-		}
-
-		//map to array and return
-		res.json(messageKeys.map((statusId) => messages[statusId]));
-
+		res.json(XIBLE.persistentWebSocketMessages);
 	});
 
 	EXPRESS_APP.get('*', (req, res, next) => {

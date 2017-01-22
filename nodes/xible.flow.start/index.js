@@ -29,8 +29,7 @@ module.exports = function(XIBLE) {
 					case 'flowNotExist':
 						NODE.addStatus({
 							message: `flow does not exist`,
-							color: 'red',
-							timeout: 5000
+							color: 'red'
 						});
 
 						break;

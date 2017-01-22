@@ -13,6 +13,8 @@ module.exports = function(XIBLE) {
 		let connected = false;
 		NODE.on('init', async(state) => {
 
+			let vaultData = NODE.vault.get();
+
 			//disconnect if already connected
 			let glowExists = !!glow;
 			let properConnection = glow && glow.readyState === GlowWrapper.STATE_OPEN && glow.hostname === NODE.data.host && glow.port === NODE.data.port && glow.token === NODE.data.token;
@@ -20,18 +22,18 @@ module.exports = function(XIBLE) {
 
 				await glow.forceClose();
 
-				glow.hostname = NODE.data.host;
-				glow.port = NODE.data.port;
-				glow.setToken(NODE.data.token);
+				glow.hostname = vaultData.host;
+				glow.port = vaultData.port;
+				glow.setToken(vaultData.token);
 
 			} else if (!glow) {
 
 				//setup connection
 				glow = new GlowWrapper({
 
-					hostname: NODE.data.host,
-					port: NODE.data.port,
-					token: NODE.data.token
+					hostname: vaultData.host,
+					port: vaultData.port,
+					token: vaultData.token
 
 				});
 
@@ -129,7 +131,12 @@ module.exports = function(XIBLE) {
 	XIBLE.addNode('glow', {
 		type: "object",
 		level: 0,
-		description: `Specifies a Glow server.`
+		description: `Specifies a Glow server.`,
+		vault: [
+			'token',
+			'host',
+			'port'
+		]
 	}, constr);
 
 };

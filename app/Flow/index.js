@@ -211,7 +211,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			this.runnable = true;
 
 			//get the nodes
-			json.nodes.forEach(node => {
+			json.nodes.forEach((node) => {
 
 				let nodeConstr = XIBLE.getNodeByName(node.name);
 				let xibleNode;
@@ -219,7 +219,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 				//init a dummy node directly based on the json and ensure the flow is set to unconstructable
 				if (!nodeConstr) {
 
-					flowDebug(`Node '${node.name}' does not exist`);
+					flowDebug(`Node "${node.name}" does not exist`);
 
 					xibleNode = new XIBLE.Node(node);
 					xibleNode.nodeExists = false;
@@ -228,6 +228,25 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 				} else {
 
+					//check for data keys that should be vaulted
+					let nodeVaultKeys = nodeConstr.vault;
+					let nodeVault;
+					if (nodeVaultKeys && Array.isArray(nodeVaultKeys)) {
+
+						nodeVault = {};
+						for (let dataKey in node.data) {
+
+							if (nodeVaultKeys.indexOf(dataKey) > -1) {
+
+								nodeVault[dataKey] = node.data[dataKey];
+								delete node.data[dataKey];
+
+							}
+
+						}
+
+					}
+
 					//init a working node
 					xibleNode = new XIBLE.Node(Object.assign({}, nodeConstr, {
 						_id: node._id,
@@ -235,6 +254,20 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 						left: node.left,
 						top: node.top
 					}));
+
+					if (nodeVault) {
+
+						let xibleNodeVault = xibleNode.vault.get();
+						if (xibleNodeVault) {
+							Object.assign(xibleNodeVault, nodeVault);
+						} else {
+							xibleNodeVault = nodeVault;
+						}
+
+						xibleNode.vault.set(xibleNodeVault);
+
+					}
+
 					if (!xibleNode) {
 						throw new Error(`Could not construct node '${node.name}'`);
 					}
@@ -583,7 +616,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			} else {
 
 				//cancel all output triggers
-				XIBLE.Node.triggerOutput = () => {};
+				XIBLE.Node.prototype.triggerOutput = () => {};
 
 				//set the data accordingly
 				//init all of them
@@ -943,8 +976,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 							//cleanup all open statuses
 							XIBLE.broadcastWebSocket({
-								'method': 'xible.flow.removeAllStatuses',
-								'flowId': this._id
+								method: 'xible.flow.removeAllStatuses',
+								flowId: this._id
 							});
 
 						});
@@ -963,8 +996,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 							//cleanup all open statuses
 							XIBLE.broadcastWebSocket({
-								'method': 'xible.flow.removeAllStatuses',
-								'flowId': this._id
+								method: 'xible.flow.removeAllStatuses',
+								flowId: this._id
 							});
 
 							killTimeout = null;

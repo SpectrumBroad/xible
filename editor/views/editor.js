@@ -183,7 +183,7 @@ View.routes.editor = function() {
 				borderColor: 'rgb(230, 74, 107)',
 				backgroundColor: 'rgb(230, 74, 107)',
 				borderWidth: 1,
-				label: 'heap total',
+				label: 'heap used',
 				data: []
 			}, {
 				lineTension: 0,
@@ -191,7 +191,7 @@ View.routes.editor = function() {
 				borderColor: 'rgb(29, 137, 210)',
 				backgroundColor: 'rgb(29, 137, 210)',
 				borderWidth: 1,
-				label: 'heap used',
+				label: 'heap total',
 				data: []
 			}, {
 				lineTension: 0,
@@ -445,9 +445,19 @@ View.routes.editor = function() {
 
 			//get all persistent websocket messages
 			xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
-				messages.forEach((message) => {
-					xibleEditor.webSocketMessageHandler(message);
-				});
+
+				for(let flowId in messages) {
+
+					for(let nodeId in messages[flowId]) {
+
+						for(let statusId in messages[flowId][nodeId]) {
+							xibleEditor.webSocketMessageHandler(messages[flowId][nodeId][statusId]);
+						}
+
+					}
+
+				}
+
 			});
 
 		};

@@ -6,27 +6,29 @@
 		"certPath": "./ssl/ssl.crt"
 	},
 
-	"registry": {
+	"nodes": {
+		"path": "./nodes",
 
-		"flows": {
-			"allowpublish": true,
-			"allowinstall": true,
-			"url": "https://registry.xible.io"
-		},
-		"nodes": {
+		"registry": {
+			
 			"allowpublish": true,
 			"allowinstall": true,
 			"url": "http://10.0.0.51"
+
 		}
 
 	},
 
-	"nodes": {
-		"path": "./nodes"
-	},
-
 	"flows": {
-		"path": "./flows"
+
+		"path": "./flows",
+
+		"registry": {
+			"allowpublish": true,
+			"allowinstall": true,
+			"url": "https://registry.xible.io"
+		}
+
 	},
 
 	"enterprise": {

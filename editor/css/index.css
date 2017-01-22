@@ -333,19 +333,19 @@ header span {
 }
 
 #heapUsed::before {
-	background-color: rgba(255, 99, 132, 1);
+	background-color: rgb(230, 74, 107);
 }
 
 #heapTotal::before {
-	background-color: rgba(54, 162, 235, 1);
+	background-color: rgb(29, 137, 210);
 }
 
 #rss::before {
-	background-color: rgba(255, 206, 86, 1);
+	background-color: rgb(230, 181, 61);
 }
 
 #cpu::before {
-	background-color: rgba(75, 192, 192, 1);
+	background-color: rgb(50, 167, 167);
 }
 
 #delay::before {

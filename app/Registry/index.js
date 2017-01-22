@@ -3,7 +3,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 	const XibleRegistryWrapper = require('../../../xibleRegistryWrapper');
 
 	let xibleRegistry = new XibleRegistryWrapper({
-		url: XIBLE.Config.getValue('registry.nodes.url')
+		url: XIBLE.Config.getValue('nodes.registry.url')
 	});
 
 	if(EXPRESS_APP) {
