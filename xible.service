@@ -1,0 +1,14 @@
+[Unit]
+Description=xible
+
+[Service]
+ExecStart=/usr/bin/npm start
+Restart=always
+User=root
+Group=root
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/var/node/xible
+
+[Install]
+WantedBy=multi-user.target

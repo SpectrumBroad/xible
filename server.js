@@ -6,15 +6,13 @@ const Xible = require('./index.js');
 
 if (cluster.isMaster) {
 
-	const XibleRegistryWrapper = require('../xibleRegistryWrapper');
-
 	const debug = require('debug');
 	const xibleDebug = debug('xible');
 	xibleDebug(process.versions);
 
-	let xible = new Xible({
+	new Xible({
 		configPath: CONFIG_PATH
-	});
+	}).init();
 
 } else {
 
@@ -59,18 +57,23 @@ if (cluster.isMaster) {
 
 					//setup xible with the nodeNames
 					let xible = new Xible({
-						configPath: CONFIG_PATH,
-						nodeNames: Object.keys(nodeNames)
+						configPath: CONFIG_PATH
 					});
 
-					flow = new xible.Flow();
-					flow.initJson(message.flow);
+					xible.init({
+						nodeNames: Object.keys(nodeNames)
+					}).then(() => {
 
-					if (message.directNodes) {
-						flow.direct(message.directNodes);
-					} else {
-						flow.start();
-					}
+						flow = new xible.Flow();
+						flow.initJson(message.flow);
+
+						if (message.directNodes) {
+							flow.direct(message.directNodes);
+						} else {
+							flow.start();
+						}
+
+					});
 
 				} catch (err) {
 

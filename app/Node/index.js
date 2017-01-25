@@ -91,7 +91,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			delete nodeCopy.vault;
 
 			//add vault data to the data field
-			if(node.vault) {
+			if (node.vault) {
 				Object.assign(nodeCopy.data, node.vault.get());
 			}
 
@@ -105,57 +105,77 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		static initFromPath(path, files) {
 
-			nodeDebug(`init nodes from ${path}`);
+			return new Promise((resolve, reject) => {
 
-			if (!path) {
-				return;
-			}
+				nodeDebug(`init nodes from "${path}"`);
 
-			Node.nodesPath = path;
+				if (!path) {
+					return;
+				}
 
-			if (!Array.isArray(files)) {
-				files = fs.readdirSync(path);
-			}
-			files.forEach((file) => {
+				Node.nodesPath = path;
 
-				let filepath = `${path}/${file}`;
-				let node;
+				if (!Array.isArray(files)) {
+					files = fs.readdirSync(path);
+				}
 
-				if (fs.statSync(filepath).isDirectory()) {
+				let loadedCounter = 0;
+				for (let i = 0; i < files.length; ++i) {
 
-					try {
+					let file = files[i];
 
-						node = require(`${__dirname}/../../${filepath}`);
-						if (typeof node === 'function') {
+					let filepath = `${path}/${file}`;
+					let node;
 
-							node(XIBLE);
+					fs.stat(filepath, (err, stat) => {
 
-							//find client content and host it
-							if (cluster.isMaster && XIBLE.nodes[file]) {
+						if (err) {
+							nodeDebug(`could not init '${file}': ${err}`);
+						}
 
-								let clientFilePath = `${filepath}/editor`;
-								try {
+						if (!err && stat.isDirectory()) {
 
-									if (fs.statSync(`${clientFilePath}/index.htm`).isFile()) {
+							try {
 
-										nodeDebug(`hosting /api/nodes/${file}/editor`);
-										EXPRESS_APP.use(`/api/nodes/${file}/editor`, EXPRESS.static(clientFilePath, {
-											index: false
-										}));
+								node = require(`${__dirname}/../../${filepath}`);
+								if (typeof node === 'function') {
 
-										XIBLE.nodes[file].hostsEditorContent = true;
+									node(XIBLE);
+
+									//find client content and host it
+									if (cluster.isMaster && XIBLE.nodes[file]) {
+
+										let clientFilePath = `${filepath}/editor`;
+										try {
+
+											if (fs.statSync(`${clientFilePath}/index.htm`).isFile()) {
+
+												nodeDebug(`hosting "/api/nodes/${file}/editor"`);
+												EXPRESS_APP.use(`/api/nodes/${file}/editor`, EXPRESS.static(clientFilePath, {
+													index: false
+												}));
+
+												XIBLE.nodes[file].hostsEditorContent = true;
+
+											}
+
+										} catch (err) {}
 
 									}
 
-								} catch (e) {}
+								}
 
+							} catch (err) {
+								nodeDebug(`could not init "${file}": ${err.stack}`);
 							}
 
 						}
 
-					} catch (e) {
-						nodeDebug(`could not init '${file}': ${e.stack}`);
-					}
+						if (++loadedCounter === files.length) {
+							resolve();
+						}
+
+					});
 
 				}
 

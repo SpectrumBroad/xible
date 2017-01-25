@@ -46,11 +46,11 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		 */
 		static initFromPath(flowPath) {
 
-			flowDebug(`init flows from ${flowPath}`);
+			flowDebug(`init flows from "${flowPath}"`);
 
 			if (this.flowPath) {
 
-				flowDebug(`cannot init two flow paths. ${this.flowPath} already init`);
+				flowDebug(`cannot init two flow paths. "${this.flowPath}" already init`);
 				return;
 
 			}
@@ -193,7 +193,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		 */
 		initJson(json) {
 
-			flowDebug(`initJson on ${json._id}`);
+			flowDebug(`initJson on "${json._id}"`);
 
 			if (!json || !json._id) {
 				throw new Error(`object containing _id as argument is required`);
