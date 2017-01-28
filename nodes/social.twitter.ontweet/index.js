@@ -70,7 +70,7 @@ module.exports = function(XIBLE) {
 							state.set(this, {
 								tweet: data
 							});
-							NODE.triggerOutput(triggerOut, state);
+							triggerOut.trigger( state);
 
 						});
 

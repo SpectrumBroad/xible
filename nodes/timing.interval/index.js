@@ -26,7 +26,7 @@ module.exports = function(XIBLE) {
 				updateOverTime: interval,
 				timeout: interval + 700
 			});
-			NODE.triggerOutput(triggerOut, state);
+			triggerOut.trigger( state);
 
 		};
 

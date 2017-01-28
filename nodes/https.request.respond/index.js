@@ -33,7 +33,7 @@ module.exports = function(XIBLE) {
 						if (req && req.res) {
 
 							req.res.status(NODE.data.status || 200).send(ress.join(''));
-							NODE.triggerOutput(doneOut, state);
+							doneOut.trigger( state);
 
 						}
 

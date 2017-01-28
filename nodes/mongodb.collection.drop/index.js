@@ -30,7 +30,7 @@ module.exports = function(XIBLE) {
 					}));
 
 				})
-				.then(() => NODE.triggerOutput(doneOut, state))
+				.then(() => doneOut.trigger( state))
 				.catch((err) => {
 
 					NODE.addStatus({

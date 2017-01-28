@@ -48,7 +48,7 @@ module.exports = function(XIBLE) {
 
 				stack.shift();
 				NODE.removeStatusById(thisStack.statusId, 700);
-				NODE.triggerOutput(doneOut, state);
+				doneOut.trigger( state);
 
 			}
 

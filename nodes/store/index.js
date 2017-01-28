@@ -34,7 +34,7 @@ module.exports = function(XIBLE) {
 					values: vals
 				});
 
-				NODE.triggerOutput(refreshOut, state);
+				refreshOut.trigger( state);
 
 			});
 

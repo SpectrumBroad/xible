@@ -14,6 +14,7 @@ module.exports = function(XIBLE) {
 	function constr(NODE) {
 
 		let triggerIn = NODE.getInputByName('trigger');
+		let doneOut = NODE.getOutputByName('done');
 		triggerIn.on('trigger', (conn, state) => {
 
 			let valueInput = NODE.getInputByName('value');
@@ -21,7 +22,7 @@ module.exports = function(XIBLE) {
 			if (!valueInput.connectors.length) {
 
 				log(NODE.data.value || '', NODE);
-				return NODE.triggerOutput(NODE.getOutputByName('done'), state);
+				return doneOut.trigger(state);
 
 			}
 
@@ -31,7 +32,7 @@ module.exports = function(XIBLE) {
 					log(str, NODE);
 				});
 
-				NODE.triggerOutput(NODE.getOutputByName('done'), state);
+				doneOut.trigger(state);
 
 			});
 

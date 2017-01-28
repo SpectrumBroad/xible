@@ -23,7 +23,7 @@ module.exports = function(XIBLE) {
 				switch (message.method) {
 
 					case 'flowStarted':
-						NODE.triggerOutput(doneOut, state);
+						doneOut.trigger( state);
 						break;
 
 					case 'flowNotExist':

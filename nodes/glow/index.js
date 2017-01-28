@@ -42,7 +42,7 @@ module.exports = function(XIBLE) {
 
 					connected = true;
 
-					NODE.triggerOutput(glowConnected, state);
+					glowConnected.trigger( state);
 
 				});
 
@@ -64,7 +64,7 @@ module.exports = function(XIBLE) {
 					});
 
 					if (connected) {
-						NODE.triggerOutput(glowDisconnected, state);
+						glowDisconnected.trigger( state);
 					}
 
 					connected = false;

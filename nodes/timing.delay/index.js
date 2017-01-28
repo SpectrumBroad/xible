@@ -37,7 +37,7 @@ module.exports = function(XIBLE) {
 						timeout: delay + 700
 					});
 
-					setTimeout(() => NODE.triggerOutput(triggerOut, state), delay);
+					setTimeout(() => triggerOut.trigger( state), delay);
 
 				});
 

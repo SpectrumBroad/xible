@@ -33,7 +33,7 @@ module.exports = function(XIBLE) {
 						return collection.insertMany(documents);
 					}));
 
-				}).then(() => NODE.triggerOutput(doneOut, state));
+				}).then(() => doneOut.trigger( state));
 
 		});
 

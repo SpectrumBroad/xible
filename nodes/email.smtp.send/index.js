@@ -50,7 +50,7 @@ module.exports = function(XIBLE) {
 
           });
 
-          NODE.triggerOutput(doneOut, state);
+          doneOut.trigger( state);
 
         });
 

@@ -34,7 +34,7 @@ module.exports = function(XIBLE) {
 							path: event.path
 						});
 
-						NODE.triggerOutput(triggerOut, state);
+						triggerOut.trigger( state);
 
 					});
 

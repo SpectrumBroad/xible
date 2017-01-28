@@ -72,7 +72,7 @@ module.exports = function(XIBLE) {
 					}));
 
 				}).then(() => {
-					NODE.triggerOutput(triggerOut, state);
+					triggerOut.trigger( state);
 				}).catch((err) => {
 
 					NODE.addStatus({
@@ -81,7 +81,7 @@ module.exports = function(XIBLE) {
 						color: 'red'
 					});
 
-					NODE.triggerOutput(failOut, state);
+					failOut.trigger( state);
 
 				});
 

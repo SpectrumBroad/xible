@@ -25,13 +25,13 @@ module.exports = function(XIBLE) {
 				if (bools.length) {
 
 					if (bools.some(bool => !bool)) {
-						NODE.triggerOutput(elseOut, state);
+						elseOut.trigger( state);
 					} else {
-						NODE.triggerOutput(thenOut, state);
+						thenOut.trigger( state);
 					}
 
 				} else {
-					NODE.triggerOutput(elseOut, state);
+					elseOut.trigger( state);
 				}
 
 			});

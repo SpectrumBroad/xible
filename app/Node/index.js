@@ -401,22 +401,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			return this.inputs.some(input => input.type === type && input.connectors.length);
 		}
 
-
+		//TODO: deprecate
 		triggerOutput(output, state) {
-
-			Node.flowStateCheck(state);
-
-			output.node.emit('triggerout', output);
-
-			let conns = output.connectors;
-			for (let i = 0; i < conns.length; i++) {
-
-				let conn = conns[i];
-				conn.destination.node.emit('trigger');
-				conn.destination.emit('trigger', conn, state.split());
-
-			}
-
+console.log(`DEPRECATED: NODE.triggerOutput(output, state)`);
+			output.trigger(state);
 		}
 
 
@@ -584,6 +572,23 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		constructor() {
 			super(...arguments);
+		}
+
+		trigger(state) {
+
+			Node.flowStateCheck(state);
+
+			this.node.emit('triggerout', this);
+
+			let conns = this.connectors;
+			for (let i = 0; i < conns.length; i++) {
+
+				let conn = conns[i];
+				conn.destination.node.emit('trigger');
+				conn.destination.emit('trigger', conn, state.split());
+
+			}
+
 		}
 
 	}
