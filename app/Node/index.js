@@ -2,7 +2,6 @@ const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
 const nodeDebug = debug('xible:node');
 const path = require('path');
-const cluster = require('cluster');
 const fs = require('fs');
 
 module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
@@ -143,7 +142,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 									node(XIBLE);
 
 									//find client content and host it
-									if (cluster.isMaster && XIBLE.nodes[file]) {
+									if (!XIBLE.child && XIBLE.nodes[file]) {
 
 										let clientFilePath = `${filepath}/editor`;
 										try {
@@ -267,7 +266,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		sendProcessMessage(obj) {
 
-			if (cluster.worker.isConnected()) {
+			if (process.connected) {
 				process.send(obj);
 			}
 

@@ -16,7 +16,7 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 				connectors: flow.json.connectors,
 				viewState: flow.json.viewState,
 				runnable: flow.runnable,
-				running: flow.worker && flow.worker.isConnected()
+				running: flow.worker && flow.worker.connected
 			};
 
 		}

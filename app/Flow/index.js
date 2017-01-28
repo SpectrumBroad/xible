@@ -1,10 +1,10 @@
 const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
 const flowDebug = debug('xible:flow');
-const cluster = require('cluster');
 const fs = require('fs');
 const path = require('path');
 const sanitizePath = require('sanitize-filename');
+const fork = require('child_process').fork;
 
 module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
@@ -359,7 +359,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 			return new Promise((resolve, reject) => {
 
-				if (!cluster.isMaster || !this._id || !Flow.flowPath) {
+				if (XIBLE.child || !this._id || !Flow.flowPath) {
 
 					reject(`not master, no _id or no flowPath specified`);
 					return;
@@ -384,7 +384,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 			return new Promise((resolve, reject) => {
 
-				if (!cluster.isMaster || !this._id || !Flow.flowPath) {
+				if (XIBLE.child || !this._id || !Flow.flowPath) {
 					return reject(`not master, no _id or no flowPath specified`);
 				}
 
@@ -599,7 +599,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		 */
 		direct(nodes) {
 
-			if (cluster.isMaster) {
+			if (!XIBLE.child) {
 
 				//ensure that the flow is running
 				if (this.started && this.directed) {
@@ -715,7 +715,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 				return Promise.reject(`not runnable`);
 			}
 
-			if (cluster.isMaster) {
+			if (!XIBLE.child) {
 
 				if (!this.stopped) {
 					return Promise.reject(`cannot start; flow is not stopped`);
@@ -743,7 +743,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 						this.directed = true;
 					}
 
-					this.worker = cluster.fork();
+					this.worker = fork('./child.js');
 					this.worker.on('message', (message) => {
 
 						let res;
@@ -752,7 +752,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 							case 'init':
 
-								if (this.worker && this.worker.isConnected()) {
+								if(this.worker && this.worker.connected) {
 
 									flowDebug('flow/worker has started');
 									resolve(this);
@@ -786,7 +786,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 								if (flow) {
 
 									flow.forceStart().then(() => {
-										if (this.worker && this.worker.isConnected()) {
+										if (this.worker && this.worker.connected) {
 											this.worker.send({
 												method: "flowStarted",
 												flowId: message.flowId
@@ -912,7 +912,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		 */
 		stop() {
 
-			if (cluster.isMaster) {
+			if (!XIBLE.child) {
 
 				if (!this.started && !this.starting) {
 					return Promise.reject(`cannot stop; flow is not started`);

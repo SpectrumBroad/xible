@@ -11,33 +11,8 @@ module.exports = function(XIBLE) {
 		//we always init so we can visualise connection status
 		//and trigger connected/disconnected events
 		let connected = false;
-		NODE.on('init', async(state) => {
 
-			let vaultData = NODE.vault.get();
-
-			//disconnect if already connected
-			let glowExists = !!glow;
-			let properConnection = glow && glow.readyState === GlowWrapper.STATE_OPEN && glow.hostname === NODE.data.host && glow.port === NODE.data.port && glow.token === NODE.data.token;
-			if (glow && !properConnection) {
-
-				await glow.forceClose();
-
-				glow.hostname = vaultData.host;
-				glow.port = vaultData.port;
-				glow.setToken(vaultData.token);
-
-			} else if (!glow) {
-
-				//setup connection
-				glow = new GlowWrapper({
-
-					hostname: vaultData.host,
-					port: vaultData.port,
-					token: vaultData.token
-
-				});
-
-			}
+		function cont(properConnection, glowExists, state) {
 
 			if (properConnection) {
 				return;
@@ -95,6 +70,46 @@ module.exports = function(XIBLE) {
 					connected = false;
 
 				});
+
+			}
+
+		}
+
+		//NODE.on('init', async(state) => {
+		NODE.on('init', (state) => {
+
+			let vaultData = NODE.vault.get();
+
+			//disconnect if already connected
+			let glowExists = !!glow;
+			let properConnection = glow && glow.readyState === GlowWrapper.STATE_OPEN && glow.hostname === NODE.data.host && glow.port === NODE.data.port && glow.token === NODE.data.token;
+			if (glow && !properConnection) {
+
+				//await glow.forceClose();
+				glow.forceClose().then(() => {
+
+					glow.hostname = vaultData.host;
+					glow.port = vaultData.port;
+					glow.setToken(vaultData.token);
+
+					cont(properConnection, glowExists, state);
+
+				});
+
+				return;
+
+			} else if (!glow) {
+
+				//setup connection
+				glow = new GlowWrapper({
+
+					hostname: vaultData.host,
+					port: vaultData.port,
+					token: vaultData.token
+
+				});
+
+				cont(properConnection, glowExists, state);
 
 			}
 

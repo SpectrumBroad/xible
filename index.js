@@ -1,7 +1,6 @@
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
-const cluster = require('cluster');
 
 //setup debug
 const debug = require('debug');
@@ -25,6 +24,10 @@ class Xible extends EventEmitter {
 
 		super();
 
+		this.child = false;
+		if (obj.child) {
+			this.child = true;
+		}
 		this.nodes = {};
 		this.flows = {};
 
@@ -36,7 +39,7 @@ class Xible extends EventEmitter {
 		const Config = this.Config = require('./app/Config')(this, this.express, this.expressApp);
 
 		//host the client nodes
-		if (cluster.isMaster) {
+		if (!this.child) {
 
 			this.initWeb();
 
@@ -57,7 +60,7 @@ class Xible extends EventEmitter {
 
 		this.initStats();
 
-		if (cluster.isMaster && WEB_SOCKET_THROTTLE > 0) {
+		if (!this.child && WEB_SOCKET_THROTTLE > 0) {
 
 			//throttle broadcast messages
 			setInterval(() => {
@@ -109,7 +112,7 @@ class Xible extends EventEmitter {
 
 	initStats() {
 
-		if (cluster.isMaster) {
+		if (!this.child) {
 
 			//throttle broadcast flow stats every second
 			setInterval(() => {
@@ -151,7 +154,7 @@ class Xible extends EventEmitter {
 				cpuUsageStart = process.cpuUsage();
 				cpuStartTime = process.hrtime();
 
-				if (cluster.worker.isConnected()) {
+				if (process.connected) {
 
 					process.send({
 						method: 'usage',
