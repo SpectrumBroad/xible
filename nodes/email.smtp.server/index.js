@@ -31,7 +31,13 @@ module.exports = function(XIBLE) {
 	XIBLE.addNode('email.smtp.server', {
 		type: "object",
 		level: 0,
-		description: `Defines an email SMTP server.`
+		description: `Defines an email SMTP server.`,
+		vault: [
+			'host',
+			'port',
+			'username',
+			'password'
+		]
 	}, constr);
 
 };

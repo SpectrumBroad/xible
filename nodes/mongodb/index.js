@@ -47,41 +47,41 @@ module.exports = function(XIBLE) {
 				db = connDb;
 				NODE.emit('connected');
 
-        db.on('error', (err) => {
+				db.on('error', (err) => {
 
-          NODE.setTracker({
-            message: err.toString(),
-            color: 'red',
-            timeout: 3000
-          });
+					NODE.setTracker({
+						message: err.toString(),
+						color: 'red',
+						timeout: 3000
+					});
 
-          NODE.removeAllStatuses();
-          NODE.addStatus({
-            message: `disconnected`,
-            color: 'red'
-          });
+					NODE.removeAllStatuses();
+					NODE.addStatus({
+						message: `disconnected`,
+						color: 'red'
+					});
 
-        });
+				});
 
-        db.on('close', (err) => {
+				db.on('close', (err) => {
 
-          if(err) {
+					if (err) {
 
-            NODE.setTracker({
-              message: err.toString(),
-              color: 'red',
-              timeout: 3000
-            });
+						NODE.setTracker({
+							message: err.toString(),
+							color: 'red',
+							timeout: 3000
+						});
 
-          }
+					}
 
-          NODE.removeAllStatuses();
-          NODE.addStatus({
-            message: `disconnected`,
-            color: 'red'
-          });
+					NODE.removeAllStatuses();
+					NODE.addStatus({
+						message: `disconnected`,
+						color: 'red'
+					});
 
-        });
+				});
 
 			});
 
@@ -92,9 +92,10 @@ module.exports = function(XIBLE) {
 	//setup the node definition
 	XIBLE.addNode('mongodb', {
 
-		type: "object",
+		type: 'object',
 		level: 0,
 		description: `A reference to a MongoDB database.`,
+		vault: ['hostname', 'port']
 
 	}, constr);
 
