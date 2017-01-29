@@ -275,6 +275,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		updateProgressBarById(statusId, status) {
 
+			if (!statusId || !status) {
+				return;
+			}
+
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
 				message: {
@@ -296,6 +300,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 
 		updateStatusById(statusId, status) {
+
+			if (!statusId || !status) {
+				return;
+			}
 
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
@@ -319,6 +327,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 
 		addStatus(status) {
+
+			if (!status) {
+				return;
+			}
 
 			status._id = XIBLE.generateObjectId();
 
@@ -344,6 +356,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 
 		removeStatusById(statusId, timeout) {
+
+			if (!statusId) {
+				return;
+			}
 
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
@@ -380,6 +396,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 
 		setTracker(status) {
+
+			if (!status) {
+				return;
+			}
 
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
