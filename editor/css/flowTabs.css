@@ -51,6 +51,10 @@
 	z-index:1;
 }
 
+.flowList li.started.direct a::before {
+	border-bottom-color: #ddd;
+}
+
 .flowList li.stopping a::before, .flowList li.starting a::before {
 	border-bottom-color: darkorange;
 }
@@ -77,6 +81,10 @@
 
 .flowList li.started.open::before {
 	background-color: lime;
+}
+
+.flowList li.started.open.direct::before {
+	background-color: #ddd;
 }
 
 .flowList li.stopping.open::before, .flowList li.starting.open::before {

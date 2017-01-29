@@ -327,13 +327,13 @@ class XibleEditor extends EventEmitter {
 
 			case 'xible.flow.starting':
 
-				this.flows[json.flowId].emit('starting');
+				this.flows[json.flowId].emit('starting', json);
 				//XibleEditorFlow.emit('starting', this.flows[json.flowId]);
 				break;
 
 			case 'xible.flow.started':
 
-				this.flows[json.flowId].emit('started');
+				this.flows[json.flowId].emit('started', json);
 				//XibleEditorFlow.emit('started', this.flows[json.flowId]);
 				break;
 

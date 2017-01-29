@@ -728,7 +728,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 					this.starting = true;
 					XIBLE.broadcastWebSocket({
 						method: 'xible.flow.starting',
-						flowId: this._id
+						flowId: this._id,
+						directed: !!directNodes
 					});
 
 					flowDebug('starting flow from master');
@@ -768,7 +769,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 									XIBLE.broadcastWebSocket({
 										method: 'xible.flow.started',
-										flowId: this._id
+										flowId: this._id,
+										directed: this.directed
 									});
 
 								} else {

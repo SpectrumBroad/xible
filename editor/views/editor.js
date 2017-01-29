@@ -5,7 +5,7 @@ View.routes.editor = function() {
 	let menuHolder = this.element.appendChild(document.createElement('div'));
 	menuHolder.setAttribute('id', 'sub');
 
-	let header=menuHolder.appendChild(document.createElement('header'));
+	let header = menuHolder.appendChild(document.createElement('header'));
 	header.appendChild(document.createTextNode('XIBLE'));
 
 	//header.appendChild(document.createElement('span')).appendChild(document.createTextNode('ENTERPRISE'));
@@ -410,7 +410,7 @@ View.routes.editor = function() {
 	flowListUl.classList.add('flowList', 'loading');
 
 	//socket connection
-	if(xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+	if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
 		xibleEditor.initWebSocket(xibleWrapper.webSocket);
 	}
 
@@ -446,11 +446,11 @@ View.routes.editor = function() {
 			//get all persistent websocket messages
 			xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
 
-				for(let flowId in messages) {
+				for (let flowId in messages) {
 
-					for(let nodeId in messages[flowId]) {
+					for (let nodeId in messages[flowId]) {
 
-						for(let statusId in messages[flowId][nodeId]) {
+						for (let statusId in messages[flowId][nodeId]) {
 							xibleEditor.webSocketMessageHandler(messages[flowId][nodeId][statusId]);
 						}
 
@@ -472,14 +472,30 @@ View.routes.editor = function() {
 			li.classList.add('started');
 		}
 
-		flow.on('started', () => {
+		if (flow.directed) {
+			li.classList.add('direct');
+		}
+
+		flow.on('started', (event) => {
+
+			if(event.directed) {
+				li.classList.add('direct');
+			} else {
+				li.classList.remove('direct');
+			}
 
 			li.classList.remove('notRunnable', 'starting', 'stopping');
 			li.classList.add('started');
 
 		});
 
-		flow.on('starting', () => {
+		flow.on('starting', (event) => {
+
+			if(event.directed) {
+				li.classList.add('direct');
+			} else {
+				li.classList.remove('direct');
+			}
 
 			li.classList.remove('started', 'stopping');
 			li.classList.add('starting');
@@ -488,13 +504,13 @@ View.routes.editor = function() {
 
 		flow.on('stopping', () => {
 
-			li.classList.remove('started', 'starting');
+			li.classList.remove('started', 'starting', 'direct');
 			li.classList.add('stopping');
 
 		});
 
 		flow.on('stopped', () => {
-			li.classList.remove('started', 'starting', 'stopping');
+			li.classList.remove('started', 'starting', 'stopping', 'direct');
 		});
 
 		return li;
