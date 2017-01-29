@@ -330,7 +330,7 @@ class Xible extends EventEmitter {
 			//save some messages to replay on new connections
 			switch (message.method) {
 
-				case 'xible.node.addStatus':
+				case 'xible.node.addStatus': case 'xible.node.setTracker':
 
 					this.setPersistentWebSocketMessage(message);
 
