@@ -244,6 +244,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		addProgressBar(status) {
 
+			if (!status) {
+				throw new Error(`the "status" argument is required`);
+			}
+
 			status._id = XIBLE.generateObjectId();
 
 			this.sendProcessMessage({
@@ -276,7 +280,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		updateProgressBarById(statusId, status) {
 
 			if (!statusId || !status) {
-				return;
+				throw new Error(`the "statusId" and "status" arguments are required`);
 			}
 
 			this.sendProcessMessage({
@@ -302,7 +306,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		updateStatusById(statusId, status) {
 
 			if (!statusId || !status) {
-				return;
+				throw new Error(`the "statusId" and "status" arguments are required`);
 			}
 
 			this.sendProcessMessage({
@@ -329,7 +333,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		addStatus(status) {
 
 			if (!status) {
-				return;
+				throw new Error(`the "status" argument is required`);
 			}
 
 			status._id = XIBLE.generateObjectId();
@@ -358,7 +362,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		removeStatusById(statusId, timeout) {
 
 			if (!statusId) {
-				return;
+				throw new Error(`the "statusId" argument is required`);
 			}
 
 			this.sendProcessMessage({
@@ -398,7 +402,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		setTracker(status) {
 
 			if (!status) {
-				return;
+				throw new Error(`the "status" argument is required`);
 			}
 
 			this.sendProcessMessage({
