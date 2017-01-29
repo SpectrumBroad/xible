@@ -19,16 +19,19 @@ module.exports = function(XIBLE) {
 			//get the glow server
 			glowIn.getValues(state).then((glows) => {
 
-				callback(glows.map((glow) => {
+				Promise.all(glows.map((glow) => {
 
-					if (sceneIn.connectors.length) {
-						return sceneIn.getValues(state)
-							.then((strs) => strs.map((str) => glow.Scene.getByName(str)));
-					} else {
-						return glow.Scene.getByName(NODE.data.value);
-					}
+						if (sceneIn.isConnected()) {
+							return sceneIn.getValues(state)
+								.then((strs) => Promise.all(strs.map((str) => glow.Scene.getByName(str))));
+						} else {
+							return glow.Scene.getByName(NODE.data.value);
+						}
 
-				}));
+					}))
+					.then((scenes) => {
+						callback(scenes);
+					});
 
 			});
 
@@ -39,7 +42,7 @@ module.exports = function(XIBLE) {
 	XIBLE.addNode('glow.scene', {
 		type: "object",
 		level: 0,
-		description: "References a Glow light scene."
+		description: "References a Glow scene."
 	}, constr);
 
 };

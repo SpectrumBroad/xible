@@ -50,7 +50,7 @@ class Xible extends EventEmitter {
 		}
 
 		//get and load the modules
-		this.Node = require('./app/Node')(this, this.express, this.expressApp);
+		Object.assign(this, require('./app/Node')(this, this.express, this.expressApp));
 		this.Flow = require('./app/Flow')(this, this.express, this.expressApp);
 
 		//ensure catch all routes are loaded last

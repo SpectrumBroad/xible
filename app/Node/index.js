@@ -395,18 +395,10 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		}
 
-
 		//returns wheter or not any of the inputs with a certain type has connectors
 		hasConnectedInputsOfType(type) {
 			return this.inputs.some(input => input.type === type && input.connectors.length);
 		}
-
-		//TODO: deprecate
-		triggerOutput(output, state) {
-console.log(`DEPRECATED: NODE.triggerOutput(output, state)`);
-			output.trigger(state);
-		}
-
 
 		static flowStateCheck(state) {
 
@@ -597,7 +589,11 @@ console.log(`DEPRECATED: NODE.triggerOutput(output, state)`);
 		require('./routes.js')(Node, XIBLE, EXPRESS_APP);
 	}
 
-	return Node;
+	return {
+		Node: Node,
+		NodeInput: NodeInput,
+		NodeOutput: NodeOutput
+	};
 
 };
 

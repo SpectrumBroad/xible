@@ -616,7 +616,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			} else {
 
 				//cancel all output triggers
-				XIBLE.Node.prototype.triggerOutput = () => {};
+				XIBLE.NodeOutput.prototype.trigger = () => {};
 
 				//set the data accordingly
 				//init all of them
@@ -752,7 +752,7 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 							case 'init':
 
-								if(this.worker && this.worker.connected) {
+								if (this.worker && this.worker.connected) {
 
 									flowDebug('flow/worker has started');
 									resolve(this);
