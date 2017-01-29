@@ -236,7 +236,7 @@ class XibleEditorNodeSelector {
 			this.xibleEditor.select(editorNode);
 			this.xibleEditor.initDrag(event);
 
-			this.div.classList.add('hidden');
+			this.close();
 
 		});
 
@@ -279,6 +279,14 @@ class XibleEditorNodeSelector {
 
 	open() {
 
+		//unhide all nodes,
+		//so the correct height is checked against the window height and mouse pos
+		//they will be hidden again later on
+		Array.from(this.nodesUl.querySelectorAll('li.hidden')).forEach((li) => {
+			li.classList.remove('hidden');
+		});
+
+		//track the positions where the selector was originally opened
 		this.openXPosition = event.pageX;
 		this.openYPosition = event.pageY;
 
@@ -324,12 +332,6 @@ class XibleEditorNodeSelector {
 	}
 
 	close() {
-
-		//unhide all nodes, so the next time the selector opens,
-		//the correct height is checked against the window height and mouse pos
-		Array.from(this.nodesUl.querySelectorAll('li.hidden')).forEach((li) => {
-			li.classList.remove('hidden');
-		});
 
 		this.div.classList.add('hidden');
 		this.detailDiv.classList.add('hidden');
