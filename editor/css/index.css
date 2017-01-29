@@ -472,6 +472,19 @@ header span {
 	user-select: none;
 }
 
+
+/* double click to add new node */
+
+/* .xible:has(.editor:empty)::before { */
+.xible .editor:empty::before {
+	display: block;
+	content: "Double click anywhere on the canvas to add a node";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
 .xible .editor>.connector {
 	z-index: 1;
 	display: block;
