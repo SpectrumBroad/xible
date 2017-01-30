@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
+module.exports = function(XIBLE, EXPRESS_APP) {
 
 	let config;
 	if (XIBLE.configPath) {
@@ -37,7 +37,11 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		}
 
-		static setValue(path) {
+		static deleteValue(path) {
+
+		}
+
+		static setValue(path, value) {
 
 
 
@@ -63,12 +67,18 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 		}
 
+		static getAll() {
+			return config;
+		}
+
 	}
 
 	if (EXPRESS_APP) {
 		require('./routes.js')(Config, XIBLE, EXPRESS_APP);
 	}
 
-	return Config;
+	return {
+		Config: Config
+	};
 
 };

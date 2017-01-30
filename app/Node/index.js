@@ -4,7 +4,7 @@ const nodeDebug = debug('xible:node');
 const path = require('path');
 const fs = require('fs');
 
-module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
+module.exports = function(XIBLE, EXPRESS_APP) {
 
 	class Node extends EventEmitter {
 
@@ -144,13 +144,15 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 									//find client content and host it
 									if (!XIBLE.child && XIBLE.nodes[file]) {
 
+										const express = require('express');
+
 										let clientFilePath = `${filepath}/editor`;
 										try {
 
 											if (fs.statSync(`${clientFilePath}/index.htm`).isFile()) {
 
 												nodeDebug(`hosting "/api/nodes/${file}/editor"`);
-												EXPRESS_APP.use(`/api/nodes/${file}/editor`, EXPRESS.static(clientFilePath, {
+												EXPRESS_APP.use(`/api/nodes/${file}/editor`, express.static(clientFilePath, {
 													index: false
 												}));
 

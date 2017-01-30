@@ -30,7 +30,7 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 
 	});
 
-	//get a flow by a given id
+	//get a node by a given name
 	EXPRESS_APP.param('nodeName', (req, res, next, nodeName) => {
 
 		req.locals.nodeName = nodeName;
@@ -47,52 +47,21 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 				return res.status(404).end();
 			});
 
-
 	});
 
 	EXPRESS_APP.get('/api/registry/nodes/:nodeName', (req, res) => {
-
 		res.json(req.locals.node);
-
 	});
 
 	//install a node
 	EXPRESS_APP.patch('/api/registry/nodes/:nodeName/install', (req, res) => {
-
-		req.locals.node.getTarballUrl().then((tarballUrl) => {
-
-			console.log(`${__dirname}/registryTmp/`);
-
-			//fork an npm to install the registry url
-			const fork = require('child_process').spawn;
-			const npm = fork(`npm`, ['install', tarballUrl], {
-				cwd: `${__dirname}/../../registryTmp/`
-			});
-
-			npm.on('error', (err) => {
+		req.locals.node.install()
+			.then(() => {
+				res.end();
+			})
+			.catch(() => {
 				res.status(500).end();
 			});
-
-			npm.on('exit', (exitCode) => {
-
-				if (exitCode) {
-					return res.status(500).end();
-				}
-
-				res.end();
-
-			});
-
-			npm.stdout.on('data', (data) => {
-				console.log(data.toString());
-			});
-
-			npm.stderr.on('data', (data) => {
-				console.log(data.toString());
-			});
-
-		});
-
 	});
 
 };

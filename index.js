@@ -5,6 +5,7 @@ const EventEmitter = require('events').EventEmitter;
 //setup debug
 const debug = require('debug');
 const webSocketDebug = debug('xible:webSocket');
+const expressDebug = debug('xible:express');
 
 //config flags
 const WEB_SOCKET_THROTTLE = 100; //<1 === don't throttle
@@ -24,38 +25,44 @@ class Xible extends EventEmitter {
 
 		super();
 
-		this.child = false;
-		if (obj.child) {
-			this.child = true;
-		}
 		this.nodes = {};
 		this.flows = {};
 
 		this.configPath = obj.configPath;
 
-		//save statuses so new clients can see statuses that were send earlier than their connection start
-		this.persistentWebSocketMessages = {};
+		this.child = false;
+		if (obj.child) {
+			this.child = true;
+		}
 
-		const Config = this.Config = require('./app/Config')(this, this.express, this.expressApp);
-
-		//host the client nodes
-		if (!this.child) {
+		let appNames;
+		if (this.child) {
+			appNames = ['Config', 'Flow', 'Node'];
+		} else {
 
 			this.initWeb();
-
-			//load config again so it can host the xpressAp
-			this.Config = require('./app/Config')(this, this.express, this.expressApp);
-			this.Registry = require('./app/Registry')(this, this.express, this.expressApp);
+			this.persistentWebSocketMessages = {};
+			appNames = ['Config', 'Flow', 'Node', 'Registry'];
 
 		}
 
-		//get and load the modules
-		Object.assign(this, require('./app/Node')(this, this.express, this.expressApp));
-		this.Flow = require('./app/Flow')(this, this.express, this.expressApp);
+		appNames.forEach((appName) => {
+			Object.assign(this, require(`./app/${appName}`)(this, this.expressApp));
+		});
 
-		//ensure catch all routes are loaded last
-		if (this.expressApp) {
-			require('./routes.js')(this, this.expressApp);
+	}
+
+	//load nodes and flows
+	init(obj) {
+
+		//get all installed nodes
+		let nodesPath = this.Config.getValue('nodes.path');
+		if (!nodesPath) {
+			throw new Error(`need a "nodes.path" in the configuration to load the installed nodes from`);
+		}
+
+		if (!this.child) {
+			this.startWeb();
 		}
 
 		this.initStats();
@@ -81,15 +88,9 @@ class Xible extends EventEmitter {
 
 		}
 
-	}
-
-	//load nodes and flows
-	init(obj) {
-
-		//get all installed nodes
-		let nodesPath = this.Config.getValue('nodes.path');
-		if (!nodesPath) {
-			throw new Error(`need a "nodes.path" in the configuration to load the installed nodes from`);
+		//ensure catch all routes are loaded last
+		if (this.expressApp) {
+			require('./routes.js')(this, this.expressApp);
 		}
 
 		return this.Node
@@ -205,48 +206,18 @@ class Xible extends EventEmitter {
 		return Xible.generateObjectId();
 	}
 
-	initWeb() {
+	startWeb() {
 
 		//setup client requests over https
 		const spdy = require('spdy');
-		const expressDebug = debug('xible:express');
-		const express = this.express = require('express');
 		const bodyParser = require('body-parser');
 		const fs = require('fs');
 
-		const expressApp = this.expressApp = express();
+		const expressApp = this.expressApp;
 		expressApp.use(bodyParser.json());
 
-		//setup default express stuff
-		expressApp.use(function(req, res, next) {
-
-			res.removeHeader('X-Powered-By');
-
-			//disable caching
-			res.header('cache-control', 'private, no-cache, no-store, must-revalidate');
-			res.header('expires', '-1');
-			res.header('pragma', 'no-cache');
-
-			//access control
-			res.header('access-control-allow-origin', '*');
-			res.header('access-control-allow-headers', 'x-access-token, content-type');
-			res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
-
-			expressDebug(`${req.method} ${req.originalUrl}`);
-
-			if ('OPTIONS' === req.method) {
-				return res.status(200).end();
-			}
-
-			//local vars for requests
-			req.locals = {};
-
-			next();
-
-		});
-
 		//editor
-		expressApp.use(express.static('editor', {
+		expressApp.use(this.express.static('editor', {
 			index: false
 		}));
 
@@ -284,6 +255,41 @@ class Xible extends EventEmitter {
 				});
 
 			});
+
+		});
+
+	}
+
+	initWeb() {
+
+		this.express = require('express');
+		this.expressApp = this.express();
+
+		//setup default express stuff
+		this.expressApp.use((req, res, next) => {
+
+			res.removeHeader('X-Powered-By');
+
+			//disable caching
+			res.header('cache-control', 'private, no-cache, no-store, must-revalidate');
+			res.header('expires', '-1');
+			res.header('pragma', 'no-cache');
+
+			//access control
+			res.header('access-control-allow-origin', '*');
+			res.header('access-control-allow-headers', 'x-access-token, content-type');
+			res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
+
+			expressDebug(`${req.method} ${req.originalUrl}`);
+
+			if ('OPTIONS' === req.method) {
+				return res.status(200).end();
+			}
+
+			//local vars for requests
+			req.locals = {};
+
+			next();
 
 		});
 
@@ -330,7 +336,8 @@ class Xible extends EventEmitter {
 			//save some messages to replay on new connections
 			switch (message.method) {
 
-				case 'xible.node.addStatus': case 'xible.node.setTracker':
+				case 'xible.node.addStatus':
+				case 'xible.node.setTracker':
 
 					this.setPersistentWebSocketMessage(message);
 

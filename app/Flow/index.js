@@ -6,7 +6,7 @@ const path = require('path');
 const sanitizePath = require('sanitize-filename');
 const fork = require('child_process').fork;
 
-module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
+module.exports = function(XIBLE, EXPRESS_APP) {
 
 	//global output caching
 	let globalOutputs = null; //caching
@@ -1084,6 +1084,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		require('./routes.js')(Flow, XIBLE, EXPRESS_APP);
 	}
 
-	return Flow;
+	return {
+		Flow: Flow
+	};
 
 };
