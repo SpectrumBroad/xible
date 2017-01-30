@@ -24,7 +24,7 @@
     "node"
   ],
   "scripts": {
-    "start": "node --harmony server.js",
+    "start": "node server.js",
     "debug": "set DEBUG=\"xible*\";export DEBUG=\"xible*\"; nodemon server.js",
     "inspect": "set DEBUG=\"xible*\";export DEBUG=\"xible*\"; nodemon --inspect server.js"
   },
