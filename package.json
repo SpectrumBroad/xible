@@ -36,6 +36,7 @@
     "express": "*",
     "body-parser": "*",
     "spdy": "*",
-    "sanitize-filename": "*"
+    "sanitize-filename": "*",
+    "fs-extra": "*"
   }
 }
