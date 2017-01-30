@@ -10,6 +10,10 @@ View.routes.editor = function() {
 
 	//header.appendChild(document.createElement('span')).appendChild(document.createTextNode('ENTERPRISE'));
 
+	let connectionLost = menuHolder.appendChild(document.createElement('p'));
+	connectionLost.innerHTML = 'Connection lost';
+	connectionLost.classList.add('status', 'loading', 'alert', 'hidden');
+
 	let permissionsValidate = menuHolder.appendChild(document.createElement('p'));
 	permissionsValidate.innerHTML = 'Validating write permissions';
 	permissionsValidate.classList.add('status', 'loading');
@@ -25,7 +29,6 @@ View.routes.editor = function() {
 		if (result) {
 
 			permissionsValidate.innerHTML = 'Write permissions check success.';
-			permissionsValidate.classList.remove('checking');
 			permissionsValidate.classList.add('success');
 
 			window.setTimeout(() => {
@@ -35,7 +38,6 @@ View.routes.editor = function() {
 		} else {
 
 			permissionsValidate.innerHTML = 'Writing to the flow path failed. Please check permissions.';
-			permissionsValidate.classList.remove('checking', 'loading');
 			permissionsValidate.classList.add('alert');
 
 		}
@@ -409,15 +411,6 @@ View.routes.editor = function() {
 	let flowListUl = flowEditorHolder.appendChild(document.createElement('ul'));
 	flowListUl.classList.add('flowList', 'loading');
 
-	//socket connection
-	if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
-		xibleEditor.initWebSocket(xibleWrapper.webSocket);
-	}
-
-	xibleWrapper.on('open', () => {
-		xibleEditor.initWebSocket(xibleWrapper.webSocket);
-	});
-
 	flowEditorHolder.appendChild(xibleEditor.element);
 
 	function createFlowTab(flow) {
@@ -436,7 +429,7 @@ View.routes.editor = function() {
 
 			resetCharts();
 
-			Array.from(document.querySelectorAll('.flowList>li.open')).forEach((li) => {
+			Array.from(flowListUl.querySelectorAll('li.open')).forEach((li) => {
 				li.classList.remove('open');
 			});
 			li.classList.add('open');
@@ -574,16 +567,63 @@ View.routes.editor = function() {
 	};
 
 	//get all flows and add them
-	xibleEditor.getFlows().then((flows) => {
+	function loadFlows() {
 
-		Object.keys(flows).forEach((id) => {
-			createFlowTab(flows[id]);
+		flowListUl.classList.add('loading');
+
+		//ensure all flows tabs are gone
+		Array.from(flowListUl.querySelectorAll('li:not(.add)')).forEach((li) => {
+			flowListUl.removeChild(li);
 		});
 
-		flowListUl.addEventListener('animationiteration', () => {
-			flowListUl.classList.remove('loading');
+		xibleEditor.getFlows().then((flows) => {
+
+			Object.keys(flows).forEach((id) => {
+				createFlowTab(flows[id]);
+			});
+
+			flowListUl.addEventListener('animationiteration', () => {
+				flowListUl.classList.remove('loading');
+			}, {
+				once: true
+			});
+
+		});
+
+	}
+
+	//socket connection
+	if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+
+		xibleEditor.initWebSocket(xibleWrapper.webSocket);
+		loadFlows();
+
+	} else {
+		connectionLost.classList.remove('hidden');
+	}
+
+	xibleWrapper.on('open', () => {
+
+		connectionLost.addEventListener('animationiteration', () => {
+			connectionLost.classList.add('hidden');
 		}, {
 			once: true
+		});
+
+		//reload the flows
+		loadFlows();
+
+		xibleEditor.initWebSocket(xibleWrapper.webSocket);
+
+	});
+
+	//clear all flow statuses when connection closes
+	xibleWrapper.on('close', () => {
+
+		connectionLost.classList.remove('hidden');
+
+		Array.from(flowListUl.querySelectorAll('li')).forEach((li) => {
+			li.classList.remove('started', 'starting', 'stopping', 'direct');
 		});
 
 	});

@@ -38,6 +38,10 @@ main {
 	color: #bbb;
 }
 
+p.hidden {
+	display: none;
+}
+
 p.status {
 	border: 1px solid rgba(255, 140, 0, 0.6);
 	background-color: rgba(255, 140, 0, 0.2);
