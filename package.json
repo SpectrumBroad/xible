@@ -29,6 +29,7 @@
     "inspect": "set DEBUG=\"xible*\";export DEBUG=\"xible*\"; nodemon --inspect server.js"
   },
   "dependencies": {
+    "nopt": "*",
     "uws": "*",
     "ws": "*",
     "debug": "*",
