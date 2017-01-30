@@ -56,6 +56,11 @@ class XibleEditorNodeSelector {
 		filterInput.setAttribute('placeholder', 'filter nodes');
 		filterInput.addEventListener('input', (event) => {
 
+			//always hide the detail div when typing
+			//this prevents the div to be left hanging at an incosistent position
+			//relative to the main div
+			this.detailDiv.classList.add('hidden');
+
 			let noResults = true;
 			nodesUl.querySelectorAll('li').forEach((li) => {
 
@@ -106,19 +111,37 @@ class XibleEditorNodeSelector {
 				return;
 			}
 
-			xibleWrapper.Node
-				.searchRegistry(filterInput.value)
+			this.detailDiv.classList.add('hidden');
+			searchOnlineButton.classList.add('loading');
+
+			//query the registry
+			xibleWrapper.Registry
+				.searchNodes(filterInput.value)
 				.then((nodes) => {
 
 					let nodeNames = Object.keys(nodes);
+
+					//clear all non-online results
+					if (nodeNames.length) {
+						nodesUl.querySelectorAll('li:not(.online)').forEach((li) => {
+							li.classList.add('hidden');
+						});
+					}
+
+					//add the found nodes
 					nodeNames.forEach((nodeName) => {
+
+						//check if this nodeName doesn't already exist in the list
+						if (nodesUl.querySelector(`li h1[title="${nodeName}"]`)) {
+							return;
+						}
 
 						let li = this.buildNode(nodeName, nodes[nodeName]);
 						li.classList.add('online');
 						li.onclick = (event) => {
 
 							//open the detailed confirmation view
-							detailedNodeView(li, nodeName, nodes[nodeName]);
+							this.detailedNodeView(li, nodeName, nodes[nodeName]);
 
 						};
 						nodesUl.appendChild(li);
@@ -131,9 +154,23 @@ class XibleEditorNodeSelector {
 						div.classList.add('noresults');
 					}
 
+					searchOnlineButton.addEventListener('animationiteration', () => {
+						searchOnlineButton.classList.remove('loading');
+					}, {
+						once: true
+					});
+
 				})
 				.catch((err) => {
+
 					div.classList.add('noresults');
+
+					searchOnlineButton.addEventListener('animationiteration', () => {
+						searchOnlineButton.classList.remove('loading');
+					}, {
+						once: true
+					});
+
 				});
 
 		});
@@ -169,7 +206,7 @@ class XibleEditorNodeSelector {
 
 		});
 
-    this.fill();
+		this.fill();
 
 	}
 
@@ -179,7 +216,14 @@ class XibleEditorNodeSelector {
 
 		this.detailDiv.classList.remove('hidden');
 		this.detailDiv.style.top = this.div.style.top;
-		this.detailDiv.style.left = (parseInt(this.div.style.left) + this.detailDiv.offsetWidth) + 'px';
+		this.detailDiv.style.left = (parseInt(this.div.style.left) + this.div.offsetWidth - parseInt(getComputedStyle(this.detailDiv).borderLeftWidth)) + 'px';
+
+		//check if detailDiv overflows the chrome
+		//if so, position detailDiv on the left side of div
+		let clientRect = this.detailDiv.getBoundingClientRect();
+		if (clientRect.left + clientRect.width > window.innerWidth) {
+			this.detailDiv.style.left = (parseInt(this.div.style.left) - clientRect.width + parseInt(getComputedStyle(this.detailDiv).borderRightWidth)) + 'px';
+		}
 
 		//add the permissions to the list
 		this.detailDivPermissionsUl.innerHTML = '';

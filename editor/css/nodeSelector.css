@@ -13,10 +13,6 @@
 	z-index: 1;
 }
 
-#detailNodeSelector {
-	transform: translatex(-1px);
-}
-
 #nodeSelector>input, #nodeSelector>button, #detailNodeSelector>button {
 	box-sizing: border-box;
 	width: 100%;

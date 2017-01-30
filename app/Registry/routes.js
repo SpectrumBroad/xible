@@ -3,8 +3,7 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 	//returns a list of online nodes
 	EXPRESS_APP.get('/api/registry/nodes', (req, res) => {
 
-		let searchString = req.query.searchString;
-
+		let searchString = req.query.search;
 		if (!searchString) {
 
 			XIBLE_REGISTRY.Node
@@ -21,7 +20,7 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 		}
 
 		XIBLE_REGISTRY.Node
-			.searchRegistry(searchString)
+			.search(searchString)
 			.then((nodes) => {
 				res.json(nodes);
 			})
