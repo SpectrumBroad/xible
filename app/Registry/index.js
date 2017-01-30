@@ -21,64 +21,86 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 					return Promise.reject(err);
 				}
 
-				//fork an npm to install the registry url
-				const fork = require('child_process').spawn;
-				const npm = fork(`npm`, ['install', tarballUrl], {
-					cwd: tmpRegistryDir
-				});
+				//create a package.json so npm knows where the root lies
+				fsExtra.writeFile(`${tmpRegistryDir}/package.json`, '{}', (err) => {
 
-				npm.on('error', (err) => {
-					return Promise.reject(err);
-				});
-
-				npm.on('exit', (exitCode) => {
-
-					if (exitCode) {
-						return Promise.reject(`exited with code: ${exitCode}`);
+					if (err) {
+						return Promise.reject(err);
 					}
 
-					//specify the dir where this node will be installed
-					let nodeDestDir = `${__dirname}/../../nodes/${this.name}`;
+					//fork an npm to install the registry url
+					const fork = require('child_process').spawn;
+					const npm = fork(`npm`, ['install', tarballUrl], {
+						cwd: tmpRegistryDir
+					});
 
-					//remove existing node directory
-					fsExtra.emptyDir(nodeDestDir, (err) => {
+					npm.on('error', (err) => {
+						return Promise.reject(err);
+					});
 
-						if (err) {
-							return Promise.reject(err);
+					npm.on('exit', (exitCode) => {
+
+						if (exitCode) {
+							return Promise.reject(`exited with code: ${exitCode}`);
 						}
 
-						//first move the node itself
-						fsExtra.move(`${tmpRegistryDir}/node_modules/${this.name}`, `${nodeDestDir}/${this.name}`, {true}, (err) => {
+						//specify the dir where this node will be installed
+						let nodeDestDir = `${__dirname}/../../nodes/${this.name}`;
+
+						//remove existing node directory
+						fsExtra.emptyDir(nodeDestDir, (err) => {
 
 							if (err) {
 								return Promise.reject(err);
 							}
 
-							//move the rest of the node_modules
-							fsExtra.move(`${tmpRegistryDir}/node_modules`, `${nodeDestDir}/${this.name}/node_modules`, {true}, (err) => {
+							//first move the node itself
+							fsExtra.move(`${tmpRegistryDir}/node_modules/${this.name}`, nodeDestDir, {
+								overwrite: true
+							}, (err) => {
 
 								if (err) {
 									return Promise.reject(err);
 								}
 
-								Promise.resolve();
+								//move the rest of the node_modules
+								fsExtra.move(`${tmpRegistryDir}/node_modules`, `${nodeDestDir}/node_modules`, {
+									overwrite: true
+								}, (err) => {
+
+									if (err) {
+										return Promise.reject(err);
+									}
+
+									//remove the tmp dir
+									fsExtra.remove(tmpRegistryDir, (err) => {
+
+										if (err) {
+											return Promise.reject(err);
+										}
+
+										Promise.resolve();
+
+									});
+
+								});
 
 							});
 
 						});
 
+						Promise.resolve();
+
 					});
 
-					Promise.resolve();
+					npm.stdout.on('data', (data) => {
+						console.log(data.toString());
+					});
 
-				});
+					npm.stderr.on('data', (data) => {
+						console.log(data.toString());
+					});
 
-				npm.stdout.on('data', (data) => {
-					console.log(data.toString());
-				});
-
-				npm.stderr.on('data', (data) => {
-					console.log(data.toString());
 				});
 
 			});
