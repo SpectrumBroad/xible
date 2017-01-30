@@ -55,13 +55,13 @@ class XibleEditorNode extends xibleWrapper.Node {
 				return;
 			}
 
-			this.editor.loadedFlow.undirect();
+			this.flow.undirect();
 
 			//fetch all related connectors and nodes for the double clicked node
 			let related = XibleEditorNode.getAllInputObjectNodes(this);
 
 			//don't forget about globals
-			related.nodes = related.nodes.concat(this.getAllGlobals());
+			related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
 
 			related.nodes.forEach((node) => {
 

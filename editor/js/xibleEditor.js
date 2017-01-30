@@ -155,7 +155,6 @@ class XibleEditor extends EventEmitter {
 		});
 
 		node.editor = this;
-
 		node.emit('append');
 
 	}
@@ -165,6 +164,13 @@ class XibleEditor extends EventEmitter {
 	}
 
 	setGlobalFromOutput(flow, output) {
+
+		//if we have another global of this type, ignore
+		let globalOutputsByType = flow.getGlobalOutputs().filter((gOutput) => gOutput.type === output.type);
+		if ((!output.global && globalOutputsByType.length) || (output.global && globalOutputsByType.length > 1)) {
+			return;
+		}
+		globalOutputsByType = null;
 
 		flow.nodes.forEach((node) => {
 
@@ -410,8 +416,7 @@ class XibleEditor extends EventEmitter {
 		//FIXME: move this to the XibleFlow def and track all global outputs there
 		let globalTypes = [].concat(...this.loadedFlow.nodes.map((node) => {
 
-			return node.getOutputs()
-				.filter((output) => output.global)
+			return node.getGlobalOutputs()
 				.map((output) => output.type);
 
 		}));
@@ -420,8 +425,15 @@ class XibleEditor extends EventEmitter {
 
 			if (globalTypes.indexOf(input.type) > -1) {
 				input.setGlobal(true);
+			} else {
+				input.setGlobal(false);
 			}
 
+		});
+
+		//global outputs
+		node.getGlobalOutputs().forEach((output) => {
+			this.setGlobalFromOutput(this.loadedFlow, output);
 		});
 
 		globalTypes = null;
@@ -473,6 +485,12 @@ class XibleEditor extends EventEmitter {
 		}
 
 		this.deselect(node);
+
+		//check for globals
+		let globalOutputs = node.getGlobalOutputs();
+		globalOutputs.forEach((output) => {
+			output.setGlobal(false);
+		});
 
 		node.editor = null;
 
