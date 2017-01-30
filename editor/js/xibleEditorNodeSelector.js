@@ -154,6 +154,8 @@ class XibleEditorNodeSelector {
 						div.classList.add('noresults');
 					}
 
+					this.position();
+
 					searchOnlineButton.addEventListener('animationiteration', () => {
 						searchOnlineButton.classList.remove('loading');
 					}, {
@@ -212,8 +214,6 @@ class XibleEditorNodeSelector {
 
 	detailedNodeView(li, nodeName, node) {
 
-		li.classList.add('downloading');
-
 		this.detailDiv.classList.remove('hidden');
 		this.detailDiv.style.top = this.div.style.top;
 		this.detailDiv.style.left = (parseInt(this.div.style.left) + this.div.offsetWidth - parseInt(getComputedStyle(this.detailDiv).borderLeftWidth)) + 'px';
@@ -223,6 +223,15 @@ class XibleEditorNodeSelector {
 		let clientRect = this.detailDiv.getBoundingClientRect();
 		if (clientRect.left + clientRect.width > window.innerWidth) {
 			this.detailDiv.style.left = (parseInt(this.div.style.left) - clientRect.width + parseInt(getComputedStyle(this.detailDiv).borderRightWidth)) + 'px';
+		}
+
+		//also check top
+		//align bottoms together if so
+		if (clientRect.top + clientRect.height > window.innerHeight) {
+
+			let divClientBottom = parseInt(this.div.style.top) + this.div.offsetHeight;
+			this.detailDiv.style.top = (divClientBottom - clientRect.height) + 'px';
+
 		}
 
 		//add the permissions to the list

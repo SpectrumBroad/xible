@@ -125,20 +125,6 @@
 	padding: 12px;
 }
 
-
-/*
-#nodeSelector>ul>li.online.downloading::after, .loading::after {
-	display: block;
-	position: absolute;
-	right: -10px;
-	top: 0;
-	content: "";
-	height:100%;
-	width:10px;
-	background-color:#eee;
-}
-*/
-
 #nodeSelector>ul>li:hover {
 	background-color: #45679E;
 	color: #fff;
