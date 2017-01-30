@@ -35,7 +35,7 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 		}
 
 		var flow = new FLOW();
-		flow.initJson(req.body);
+		flow.initJson(req.body, true);
 		flow.save();
 
 		res.json({
@@ -143,7 +143,7 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 		flow.forceStop().then(() => {
 
 			//init the newly provided json over the existing flow
-			flow.initJson(req.body);
+			flow.initJson(req.body, true);
 
 			//save it to file
 			flow.save().then(() => {

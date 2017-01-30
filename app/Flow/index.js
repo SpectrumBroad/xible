@@ -79,8 +79,8 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 						}
 
-					} catch (e) {
-						flowDebug(`could not init '${filepath}': ${e}`);
+					} catch (err) {
+						flowDebug(`could not init '${filepath}': ${err.stack}`);
 					}
 
 				}
@@ -189,9 +189,9 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 		/**
 		 *	init a flow, including all its nodes and connectors, from a json obj
 		 *	@param	{Object}	json
-		 *	@param	{Boolean}	newFlow	indicates if this is a new flow to be created
+		 *	@param	{Boolean} cleanVault	indicates whether the json data needs vault sanitizing
 		 */
-		initJson(json) {
+		initJson(json, cleanVault) {
 
 			flowDebug(`initJson on "${json._id}"`);
 
@@ -228,43 +228,38 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 				} else {
 
+					//init a working node
+					xibleNode = new XIBLE.Node(Object.assign({}, nodeConstr, {
+						_id: node._id,
+						data: Object.assign({}, node.data),
+						left: node.left,
+						top: node.top
+					}));
+
 					//check for data keys that should be vaulted
-					let nodeVaultKeys = nodeConstr.vault;
-					let nodeVault;
-					if (nodeVaultKeys && Array.isArray(nodeVaultKeys)) {
+					//remove those from the json (the json is used for saving)
+					if (cleanVault) {
 
-						nodeVault = {};
-						for (let dataKey in node.data) {
+						let nodeVaultKeys = nodeConstr.vault;
+						let nodeVaultData = {};
+						if (nodeVaultKeys && Array.isArray(nodeVaultKeys)) {
 
-							if (nodeVaultKeys.indexOf(dataKey) > -1) {
+							for (let dataKey in node.data) {
 
-								nodeVault[dataKey] = node.data[dataKey];
-								delete node.data[dataKey];
+								if (nodeVaultKeys.indexOf(dataKey) > -1) {
+
+									nodeVaultData[dataKey] = node.data[dataKey];
+									delete node.data[dataKey];
+
+								}
 
 							}
 
 						}
 
-					}
-
-					//init a working node
-					xibleNode = new XIBLE.Node(Object.assign({}, nodeConstr, {
-						_id: node._id,
-						data: node.data,
-						left: node.left,
-						top: node.top
-					}));
-
-					if (nodeVault) {
-
-						let xibleNodeVault = xibleNode.vault.get();
-						if (xibleNodeVault) {
-							Object.assign(xibleNodeVault, nodeVault);
-						} else {
-							xibleNodeVault = nodeVault;
+						if (Object.keys(nodeVaultData).length > -1) {
+							xibleNode.vault.set(nodeVaultData);
 						}
-
-						xibleNode.vault.set(xibleNodeVault);
 
 					}
 

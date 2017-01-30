@@ -1,7 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
 const GlowWrapper = require('../../../glowWrapper');
 
-
 module.exports = function(XIBLE) {
 
 	function constr(NODE) {
@@ -78,8 +77,6 @@ module.exports = function(XIBLE) {
 		//NODE.on('init', async(state) => {
 		NODE.on('init', (state) => {
 
-			let vaultData = NODE.vault.get();
-
 			//disconnect if already connected
 			let glowExists = !!glow;
 			let properConnection = glow && glow.readyState === GlowWrapper.STATE_OPEN && glow.hostname === NODE.data.host && glow.port === NODE.data.port && glow.token === NODE.data.token;
@@ -88,9 +85,9 @@ module.exports = function(XIBLE) {
 				//await glow.forceClose();
 				glow.forceClose().then(() => {
 
-					glow.hostname = vaultData.host;
-					glow.port = vaultData.port;
-					glow.setToken(vaultData.token);
+					glow.hostname = NODE.data.host;
+					glow.port = NODE.data.port;
+					glow.setToken(NODE.data.token);
 
 					cont(properConnection, glowExists, state);
 
@@ -103,9 +100,9 @@ module.exports = function(XIBLE) {
 				//setup connection
 				glow = new GlowWrapper({
 
-					hostname: vaultData.host,
-					port: vaultData.port,
-					token: vaultData.token
+					hostname: NODE.data.host,
+					port: NODE.data.port,
+					token: NODE.data.token
 
 				});
 

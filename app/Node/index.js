@@ -45,7 +45,12 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 
 			//vault
 			if (this._id) {
+
 				this.vault = new NodeVault(this);
+
+				//add vault data to the data field
+				Object.assign(this.data, this.vault.get());
+
 			}
 
 			//construct
@@ -88,11 +93,6 @@ module.exports = function(XIBLE, EXPRESS, EXPRESS_APP) {
 			delete nodeCopy._events;
 			delete nodeCopy._eventsCount;
 			delete nodeCopy.vault;
-
-			//add vault data to the data field
-			if (node.vault) {
-				Object.assign(nodeCopy.data, node.vault.get());
-			}
 
 			//attach stringified listeners to the io's
 			this.nodeIoCopy('inputs', nodeCopy, node);
