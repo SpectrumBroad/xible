@@ -362,7 +362,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				}
 
 				flowDebug(`saving ${this._id}`);
-				fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json), () => {
+				fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json, null, '\t'), () => {
 					resolve(this);
 				});
 
