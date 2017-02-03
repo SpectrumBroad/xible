@@ -22,7 +22,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				}
 
 				//create a package.json so npm knows where the root lies
-				fsExtra.writeFile(`${tmpRegistryDir}/package.json`, '{}', (err) => {
+				fsExtra.copy(`package.json`, `${tmpRegistryDir}/package.json`, (err) => {
 
 					if (err) {
 						return Promise.reject(err);
