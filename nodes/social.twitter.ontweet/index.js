@@ -86,14 +86,14 @@ module.exports = function(XIBLE) {
 
 							if (rateLimitStatus) {
 
-								this.updateStatusById(rateLimitStatus, {
+								NODE.updateStatusById(rateLimitStatus, {
 									color: 'orange',
 									message: `ratelimit; missed ${rateLimitTrack} tweets`
 								});
 
 							} else {
 
-								rateLimitStatus = this.addStatus({
+								rateLimitStatus = NODE.addStatus({
 									color: 'orange',
 									message: `ratelimit; missed ${rateLimitTrack} tweets`
 								});

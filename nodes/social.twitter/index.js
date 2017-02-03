@@ -66,11 +66,6 @@ module.exports = function(XIBLE) {
 				res.header('access-control-allow-headers', 'x-access-token, content-type');
 				res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
 
-				NODE.addStatus({
-					message: `${req.method} ${req.originalUrl}`,
-					timeout: 1000
-				});
-
 				if ('OPTIONS' === req.method) {
 					return res.status(200).end();
 				}
@@ -98,11 +93,16 @@ module.exports = function(XIBLE) {
 				});
 
 				tempTwitter.oauth.getOAuthRequestToken({
-					oauth_callback: `https://10.0.0.20:9620/${NODE._id}/auth/callback`
+					oauth_callback: `https://${req.hostname}:9620/${NODE._id}/auth/callback`
 				}, (err, token, tokenSecret, results) => {
 
 					if (err) {
 
+						NODE.addStatus({
+							color: 'red',
+							message: err,
+							timeout: 5000
+						});
 						console.log(err);
 						res.status(500).end();
 						return;
@@ -123,7 +123,6 @@ module.exports = function(XIBLE) {
 
 				});
 
-
 			});
 
 			expressApp.get(`/${NODE._id}/auth/callback`, (req, res) => {
@@ -137,6 +136,11 @@ module.exports = function(XIBLE) {
 
 					if (err) {
 
+						NODE.addStatus({
+							color: 'red',
+							message: err,
+							timeout: 5000
+						});
 						console.log(err);
 						res.status(500).end();
 						return;
