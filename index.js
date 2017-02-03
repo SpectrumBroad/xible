@@ -210,11 +210,9 @@ class Xible extends EventEmitter {
 
 		//setup client requests over https
 		const spdy = require('spdy');
-		const bodyParser = require('body-parser');
 		const fs = require('fs');
 
 		const expressApp = this.expressApp;
-		expressApp.use(bodyParser.json());
 
 		//editor
 		expressApp.use(this.express.static('editor', {
@@ -264,6 +262,7 @@ class Xible extends EventEmitter {
 
 		this.express = require('express');
 		this.expressApp = this.express();
+		this.expressApp.use(require('body-parser').json());
 
 		//setup default express stuff
 		this.expressApp.use((req, res, next) => {
