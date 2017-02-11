@@ -1,4 +1,4 @@
-'use strict';
+'use strict';	/* jshint ignore: line */
 
 const CONFIG_PATH = './config.json';
 const Xible = require('./index.js');

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; /* jshint ignore: line */
 
 const EventEmitter = require('events').EventEmitter;
 
@@ -220,15 +220,13 @@ class Xible extends EventEmitter {
 		}));
 
 		//init the webserver
-		let webPort = this.Config.getValue('webServer.port');
+		let webPort = this.Config.getValue('webServer.port') || 9600;
 		expressDebug(`starting on port: ${webPort}`);
 
-		const spdyServer = spdy.createServer({
-			key: fs.readFileSync(this.Config.getValue('webServer.keyPath')),
-			cert: fs.readFileSync(this.Config.getValue('webServer.certPath'))
-		}, expressApp).listen(webPort, () => {
+		let webServer;
+		let onListen = () => {
 
-			expressDebug(`listening on: ${spdyServer.address().address}:${spdyServer.address().port}`);
+			expressDebug(`listening on: ${webServer.address().address}:${webServer.address().port}`);
 
 			//websocket
 			const wsDebug = debug('xible:websocket');
@@ -237,7 +235,7 @@ class Xible extends EventEmitter {
 			wsDebug(`listening on port: ${webPort}`);
 
 			const webSocketServer = this.webSocketServer = new ws.Server({
-				server: spdyServer
+				server: webServer
 			});
 
 			webSocketServer.on('connection', (client) => {
@@ -254,7 +252,23 @@ class Xible extends EventEmitter {
 
 			});
 
-		});
+		};
+
+		//spdy (https)
+		let keyPath = this.Config.getValue('webServer.keyPath');
+		let keyCert = this.Config.getValue('webServer.certPath');
+		if (keyPath && keyCert) {
+
+			expressDebug(`starting spdy (https)`);
+
+			webServer = spdy.createServer({
+				key: fs.readFileSync(keyPath),
+				cert: fs.readFileSync(keyCert)
+			}, expressApp).listen(webPort, onListen);
+
+		} else {
+			webServer = expressApp.listen(webPort, onListen);
+		}
 
 	}
 
