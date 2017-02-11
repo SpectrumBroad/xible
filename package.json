@@ -30,6 +30,11 @@
     "inspect": "export DEBUG=\"xible*\"; nodemon --inspect server.js",
     "inspect-win": "set DEBUG=xible* & nodemon --inspect server.js"
   },
+  "bin": {
+    "xible": "./cli.js",
+    "xiblepm": "./pmcli.js"
+  },
+  "main": "index.js",
   "engines": {
     "node": ">=7.0.0"
   },
