@@ -4,6 +4,7 @@ const EventEmitter = require('events').EventEmitter;
 
 //setup debug
 const debug = require('debug');
+const xibleDebug = debug('xible');
 const webSocketDebug = debug('xible:webSocket');
 const expressDebug = debug('xible:express');
 
@@ -35,6 +36,10 @@ class Xible extends EventEmitter {
 			this.child = true;
 		}
 
+		if(!this.child) {
+			xibleDebug(process.versions);
+		}
+
 		this.secure = false;
 		this.webPort = null;
 
@@ -57,6 +62,8 @@ class Xible extends EventEmitter {
 
 	//load nodes and flows
 	init(obj) {
+
+		xibleDebug('init');
 
 		//get all installed nodes
 		let nodesPath = this.Config.getValue('nodes.path');
@@ -193,10 +200,6 @@ class Xible extends EventEmitter {
 
 	}
 
-	static checkUsedDeps() {
-		let depcheck = require('depcheck');
-	}
-
 	static generateObjectId() {
 
 		function s4() {
@@ -214,6 +217,8 @@ class Xible extends EventEmitter {
 	}
 
 	startWeb() {
+
+		xibleDebug('startWeb');
 
 		//setup client requests over https
 		const spdy = require('spdy');
@@ -288,6 +293,8 @@ class Xible extends EventEmitter {
 	}
 
 	initWeb() {
+
+		xibleDebug('initWeb');
 
 		this.express = require('express');
 		this.expressApp = this.express();

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';	/* jshint ignore: line */
+
 // windows: running "npm blah" in this folder will invoke WSH, not node.
 /*global WScript*/
 if (typeof WScript !== 'undefined') {
@@ -68,16 +70,16 @@ let cli = {
 			let token = getUserToken();
 
 			if (!token) {
-				return console.log(`You are not logged in. Run "xible user login" or "xible user add" to create a new user.`);
+				return console.log(`You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.`);
 			}
 
 			//verify that we're logged in
 			xible.Registry.User
-				.getUserByToken(token)
+				.getByToken(token)
 				.then((user) => {
 
 					if (!user) {
-						return console.log(`User could not be verified. Please login using "xible user login".`);
+						return console.log(`User could not be verified. Please login using "xiblepm user login".`);
 					}
 
 					//verify if this node had been published before
@@ -344,7 +346,7 @@ function getUserInput(question, pwd) {
 function getStrippedRegistryUrl() {
 
 	//determine the stripped registry url
-	let registryUrl = xible.Config.getValue('nodes.registry.url');
+	let registryUrl = xible.Config.getValue('registry.url');
 	let parsedRegistryUrl = url.parse(registryUrl);
 	delete parsedRegistryUrl.protocol;
 	delete parsedRegistryUrl.auth;
@@ -393,8 +395,11 @@ function printUsage(path) {
 		console.log(`Unrecognized context: "${context}"\n`);
 	}
 
-	console.log(`Usage: xible ${cli[context]?'context':'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
-	console.log('Type: xible <context> help for more help about the specified context.');
+	console.log(`Usage: xiblepm ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
+
+	if(cli[context]) {
+		console.log('Type: xiblepm <context> help for more help about the specified context.');
+	}
 
 }
 

@@ -3,83 +3,134 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 	const XibleRegistryWrapper = require('../../../xibleRegistryWrapper');
 	const fsExtra = require('fs-extra');
 
+	let registryUrl = XIBLE.Config.getValue('registry.url');
+	if (!registryUrl) {
+		throw new Error(`"registry.url" not found in config`);
+	}
+
 	let xibleRegistry = new XibleRegistryWrapper({
-		url: XIBLE.Config.getValue('nodes.registry.url')
+		url: registryUrl
 	});
+
+	//the tmp path for downloading this node
+	const TMP_REGISTRY_DIR = `${__dirname}/../../registryTmp`;
+
+	function cleanUp() {
+
+		return new Promise((resolve, reject) => {
+
+			//remove the tmp dir
+			fsExtra.remove(TMP_REGISTRY_DIR, (err) => {
+
+				if (err) {
+					return reject(err);
+				}
+
+				resolve();
+
+			});
+
+		});
+
+	}
 
 	xibleRegistry.Node.prototype.install = function() {
 
-		return this.getTarballUrl().then((tarballUrl) => {
+		//get the registrydata
+		return this.getRegistryData().then((registryData) => {
 
-			//the tmp path for downloading this node
-			let tmpRegistryDir = `${__dirname}/../../registryTmp`;
+			if (!registryData.name) {
+				return Promise.reject(`No "name" field found in the registry data for node "${this.name}"`);
+			}
 
-			//clean the dir
-			fsExtra.emptyDir(tmpRegistryDir, (err) => {
+			return this.getTarballUrl().then((tarballUrl) => {
 
-				if (err) {
-					return Promise.reject(err);
-				}
+				return new Promise((resolve, reject) => {
 
-				//create a package.json so npm knows where the root lies
-				fsExtra.copy(`package.json`, `${tmpRegistryDir}/package.json`, (err) => {
+					//clean the dir
+					fsExtra.emptyDir(TMP_REGISTRY_DIR, (err) => {
 
-					if (err) {
-						return Promise.reject(err);
-					}
-
-					//fork an npm to install the registry url
-					const fork = require('child_process').spawn;
-					const npm = fork(`npm`, ['install', tarballUrl], {
-						cwd: tmpRegistryDir
-					});
-
-					npm.on('error', (err) => {
-						return Promise.reject(err);
-					});
-
-					npm.on('exit', (exitCode) => {
-
-						if (exitCode) {
-							return Promise.reject(`exited with code: ${exitCode}`);
+						if (err) {
+							return reject(err);
 						}
 
-						//specify the dir where this node will be installed
-						let nodeDestDir = `${__dirname}/../../nodes/${this.name}`;
-
-						//remove existing node directory
-						fsExtra.emptyDir(nodeDestDir, (err) => {
+						//create a package.json so npm knows where the root lies
+						fsExtra.copy(`package.json`, `${TMP_REGISTRY_DIR}/package.json`, (err) => {
 
 							if (err) {
-								return Promise.reject(err);
+								return reject(err);
 							}
 
-							//first move the node itself
-							fsExtra.move(`${tmpRegistryDir}/node_modules/${this.name}`, nodeDestDir, {
-								overwrite: true
-							}, (err) => {
+							//fork an npm to install the registry url
+							const fork = require('child_process').spawn;
+							const npm = fork(`npm`, ['install', tarballUrl], {
+								cwd: TMP_REGISTRY_DIR
+							});
 
-								if (err) {
-									return Promise.reject(err);
+							npm.on('error', (err) => {
+								return reject(err);
+							});
+
+							npm.on('exit', (exitCode) => {
+
+								if (exitCode) {
+									return reject(`exited with code: ${exitCode}`);
 								}
 
-								//move the rest of the node_modules
-								fsExtra.move(`${tmpRegistryDir}/node_modules`, `${nodeDestDir}/node_modules`, {
-									overwrite: true
-								}, (err) => {
+								//specify the dir where this node will be installed
+								let nodeDestDir = `${__dirname}/../../nodes/${this.name}`;
+
+								//remove existing node directory
+								fsExtra.emptyDir(nodeDestDir, (err) => {
 
 									if (err) {
-										return Promise.reject(err);
+										return reject(err);
 									}
 
-									//remove the tmp dir
-									fsExtra.remove(tmpRegistryDir, (err) => {
+									//first move the node itself
+									fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules/${registryData.name}`, nodeDestDir, {
+										overwrite: true
+									}, (err) => {
 
 										if (err) {
-											return Promise.reject(err);
+											return reject(err);
 										}
 
-										Promise.resolve();
+										//check if there's anything left in node_modules
+										fsExtra.readdir(`${TMP_REGISTRY_DIR}/node_modules`, (err, files) => {
+
+											if (err) {
+												return reject(err);
+											}
+
+											if (!files.length) {
+
+												return cleanUp().then(() => {
+													resolve();
+												}).catch((err) => {
+													reject(err);
+												});
+
+											}
+
+											//move the rest of the node_modules
+											fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules`, `${nodeDestDir}/node_modules`, {
+												overwrite: true
+											}, (err) => {
+
+												if (err) {
+													return reject(err);
+												}
+
+												cleanUp().then(() => {
+													resolve();
+												}).catch((err) => {
+													reject(err);
+												});
+
+											});
+
+										});
 
 									});
 
@@ -87,22 +138,28 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 							});
 
+							npm.stdout.on('data', (data) => {
+								console.log(data.toString());
+							});
+
+							npm.stderr.on('data', (data) => {
+								console.log(data.toString());
+							});
+
 						});
 
-						Promise.resolve();
-
-					});
-
-					npm.stdout.on('data', (data) => {
-						console.log(data.toString());
-					});
-
-					npm.stderr.on('data', (data) => {
-						console.log(data.toString());
 					});
 
 				});
 
+			});
+
+		}).catch((err) => {
+
+			return cleanUp().then(() => {
+				return Promise.reject(err);
+			}).catch((newErr) => {
+				return Promise.reject(err);
 			});
 
 		});

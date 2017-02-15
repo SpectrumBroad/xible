@@ -8,11 +8,8 @@
 		"path": "./nodes",
 
 		"registry": {
-
 			"allowpublish": true,
-			"allowinstall": true,
-			"url": "http://10.0.0.51"
-
+			"allowinstall": true
 		}
 
 	},
@@ -22,16 +19,13 @@
 
 		"registry": {
 			"allowpublish": true,
-			"allowinstall": true,
-			"url": "https://registry.xible.io"
+			"allowinstall": true
 		}
 
 	},
 
-	"enterprise": {
-
-		"server": ""
-
+	"registry": {
+		"url": "https://registry.xible.io"
 	}
 
 }
