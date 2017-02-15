@@ -1,0 +1,15 @@
+{
+  "name": "math.round",
+  "type": "object",
+  "description": "Returns the value of a number rounded to the nearest integer.",
+  "inputs": {
+    "number": {
+  		"type": "math.number"
+  	}
+  },
+  "outputs": {
+    "result": {
+  		"type": "math.number"
+  	}
+  }
+}

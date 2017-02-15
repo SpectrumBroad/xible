@@ -1,0 +1,21 @@
+{
+  "name": "if",
+  "type": "action",
+  "description": "Triggers an output based on a condition.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "condition": {
+      "type": "boolean"
+    }
+  },
+  "outputs": {
+    "then": {
+      "type": "trigger"
+    },
+    "else": {
+      "type": "trigger"
+    }
+  }
+}

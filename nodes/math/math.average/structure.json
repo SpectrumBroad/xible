@@ -1,0 +1,15 @@
+{
+  "name": "math.average",
+  "type": "object",
+  "description": "calculates the average of all given numbers",
+  "inputs": {
+    "numbers": {
+      "type": "math.number"
+    }
+  },
+  "outputs": {
+    "number": {
+      "type": "math.number"
+    }
+  }
+}

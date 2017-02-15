@@ -1,119 +1,102 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let twitterIn = NODE.getInputByName('twitter');
 
-		let twitterIn = NODE.addInput('twitter', {
-			type: 'social.twitter'
-		});
+	let triggerOut = NODE.getOutputByName('trigger');
+	let tweetOut = NODE.getOutputByName('tweet');
+	let textOut = NODE.getOutputByName('text');
+	let userNameOut = NODE.getOutputByName('username');
 
-		let triggerOut = NODE.addOutput('trigger', {
-			type: 'trigger'
-		});
+	tweetOut.on('trigger', (conn, state, callback) => {
 
-		let tweetOut = NODE.addOutput('tweet', {
-			type: 'document'
-		});
+		let thisState = state.get(this);
+		callback((thisState && thisState.tweet) || null);
 
-		let textOut = NODE.addOutput('text', {
-			type: 'string'
-		});
+	});
 
-		let userNameOut = NODE.addOutput('username', {
-			type: 'string'
-		});
+	textOut.on('trigger', (conn, state, callback) => {
 
-		tweetOut.on('trigger', (conn, state, callback) => {
+		let thisState = state.get(this);
+		callback((thisState && thisState.tweet && thisState.tweet.text) || null);
 
-			let thisState = state.get(this);
-			callback((thisState && thisState.tweet) || null);
+	});
 
-		});
+	userNameOut.on('trigger', (conn, state, callback) => {
 
-		textOut.on('trigger', (conn, state, callback) => {
+		let thisState = state.get(this);
+		callback((thisState && thisState.tweet && thisState.tweet.user && thisState.tweet.user.screen_name) || null);
 
-			let thisState = state.get(this);
-			callback((thisState && thisState.tweet && thisState.tweet.text) || null);
+	});
 
-		});
+	NODE.on('init', (state) => {
 
-		userNameOut.on('trigger', (conn, state, callback) => {
+		let type = NODE.data.type;
+		if (!type) {
+			return;
+		}
 
-			let thisState = state.get(this);
-			callback((thisState && thisState.tweet && thisState.tweet.user && thisState.tweet.user.screen_name) || null);
+		twitterIn.getValues(state).then((twitters) => {
 
-		});
+			twitters.forEach((twitter) => {
 
-		NODE.on('init', (state) => {
+				if (!twitter) {
+					return;
+				}
 
-			let type = NODE.data.type;
-			if (!type) {
-				return;
-			}
+				let rateLimitStatus;
+				let rateLimitTrack = 0;
 
-			twitterIn.getValues(state).then((twitters) => {
+				twitter.stream(type, {
+					'track': NODE.data.track
+				}, (stream) => {
 
-				twitters.forEach((twitter) => {
+					stream.on('data', (data) => {
 
-					if (!twitter) {
-						return;
-					}
+						state.set(this, {
+							tweet: data
+						});
+						triggerOut.trigger(state);
 
-					let rateLimitStatus;
-					let rateLimitTrack = 0;
+					});
 
-					twitter.stream(type, {
-						'track': NODE.data.track
-					}, (stream) => {
+					//indicates that we're exceeding the rate limit set on streaming data
+					//TODO: add orange status when this happens, including amount of missed tweets
+					stream.on('limit', (data) => {
 
-						stream.on('data', (data) => {
+						//this data is not in sync, so only apply highest limit
+						if (data.track <= rateLimitTrack) {
+							return;
+						}
+						rateLimitTrack = data.track;
 
-							state.set(this, {
-								tweet: data
+						if (rateLimitStatus) {
+
+							NODE.updateStatusById(rateLimitStatus, {
+								color: 'orange',
+								message: `ratelimit; missed ${rateLimitTrack} tweets`
 							});
-							triggerOut.trigger( state);
 
-						});
+						} else {
 
-						//indicates that we're exceeding the rate limit set on streaming data
-						//TODO: add orange status when this happens, including amount of missed tweets
-						stream.on('limit', (data) => {
+							rateLimitStatus = NODE.addStatus({
+								color: 'orange',
+								message: `ratelimit; missed ${rateLimitTrack} tweets`
+							});
 
-							//this data is not in sync, so only apply highest limit
-							if (data.track <= rateLimitTrack) {
-								return;
-							}
-							rateLimitTrack = data.track;
+						}
 
-							if (rateLimitStatus) {
+					});
 
-								NODE.updateStatusById(rateLimitStatus, {
-									color: 'orange',
-									message: `ratelimit; missed ${rateLimitTrack} tweets`
-								});
+					stream.on('error', (tw, tc) => {
+						console.log(tw, tc);
+					});
 
-							} else {
+					stream.on('end', () => {
+						console.log('end!');
+					});
 
-								rateLimitStatus = NODE.addStatus({
-									color: 'orange',
-									message: `ratelimit; missed ${rateLimitTrack} tweets`
-								});
-
-							}
-
-						});
-
-						stream.on('error', (tw, tc) => {
-							console.log(tw, tc);
-						});
-
-						stream.on('end', () => {
-							console.log('end!');
-						});
-
-						stream.on('destroy', () => {
-							console.log('destroy!');
-						});
-
+					stream.on('destroy', () => {
+						console.log('destroy!');
 					});
 
 				});
@@ -122,12 +105,6 @@ module.exports = function(XIBLE) {
 
 		});
 
-	}
-
-	XIBLE.addNode('social.twitter.ontweet', {
-		type: 'event',
-		level: 0,
-		description: `Triggered whenever a tweet comes in on the given search tags.`
-	}, constr);
+	});
 
 };

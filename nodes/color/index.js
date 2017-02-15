@@ -45,46 +45,34 @@ function hsvToRgb(h, s, v) {
 
 }
 
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let colorOut = NODE.getOutputByName('color');
+	/*
+			let hueOut = NODE.addOutput('hue', {
+				type: "color.hue"
+			});
 
-		let colorOut = NODE.addOutput('color', {
-			type: "color.hex"
-		});
-/*
-		let hueOut = NODE.addOutput('hue', {
-			type: "color.hue"
-		});
+			let saturationOut = NODE.addOutput('saturation', {
+				type: "color.saturation"
+			});
 
-		let saturationOut = NODE.addOutput('saturation', {
-			type: "color.saturation"
-		});
+			let brightnessOut = NODE.addOutput('brightness', {
+				type: "color.brightness"
+			});
+	*/
+	colorOut.on('trigger', (conn, state, callback) => {
 
-		let brightnessOut = NODE.addOutput('brightness', {
-			type: "color.brightness"
-		});
-*/
-		colorOut.on('trigger', (conn, state, callback) => {
+		let hex = 'ffffff';
+		if (!isNaN(NODE.data.h) && !isNaN(NODE.data.s) && !isNaN(NODE.data.v)) {
 
-			let hex = 'ffffff';
-			if (!isNaN(NODE.data.h) && !isNaN(NODE.data.s) && !isNaN(NODE.data.v)) {
+			let rgb = hsvToRgb(+NODE.data.h, +NODE.data.s, (+NODE.data.v) / 100);
+			hex = rgbToHex(rgb.r, rgb.g, rgb.b);
 
-				let rgb = hsvToRgb(+NODE.data.h, +NODE.data.s, (+NODE.data.v) / 100);
-				hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+		}
 
-			}
+		callback(hex);
 
-			callback(hex);
-
-		});
-
-	}
-
-	XIBLE.addNode('color', {
-		type: "object",
-		level: 0,
-		description: "Returns a color object."
-	}, constr);
+	});
 
 };

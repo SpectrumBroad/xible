@@ -1,0 +1,15 @@
+{
+  "name": "compare.differ",
+  "type": "object",
+  "description": "Compares all inputs and checks if they differ from eachother.",
+  "inputs": {
+    "values": {
+      "type": null
+    }
+  },
+  "outputs": {
+    "result": {
+  		"type": "boolean"
+  	}
+  }
+}

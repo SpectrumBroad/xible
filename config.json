@@ -1,16 +1,14 @@
 {
 
 	"webServer": {
-		"port": 9600,
-		"keyPath": "./ssl/ssl.key",
-		"certPath": "./ssl/ssl.crt"
+		"port": 9600
 	},
 
 	"nodes": {
 		"path": "./nodes",
 
 		"registry": {
-			
+
 			"allowpublish": true,
 			"allowinstall": true,
 			"url": "http://10.0.0.51"
@@ -20,7 +18,6 @@
 	},
 
 	"flows": {
-
 		"path": "./flows",
 
 		"registry": {

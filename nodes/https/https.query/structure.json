@@ -1,0 +1,15 @@
+{
+  "name": "https.query",
+  "type": "object",
+  "description": "Returns the value of the given querystring field from a HTTP request.",
+  "inputs": {
+    "request": {
+  		"type": "https.request"
+  	}
+  },
+  "outputs": {
+    "value": {
+  		"type": "string"
+  	}
+  }
+}

@@ -1,94 +1,78 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let used = false;
+	let refreshing = false;
+	let values;
 
-		let used = false;
-		let refreshing = false;
-		let values;
+	let refreshIn = NODE.getInputByName('refresh');
+	let valueIn = NODE.getInputByName('value');
 
-		let refreshIn = NODE.addInput('refresh', {
-			type: "trigger"
-		});
+	let refreshOut = NODE.getOutputByName('refreshed');
+	let valueOut = NODE.getOutputByName('value');
 
-		let valueIn = NODE.addInput('value');
+	refreshIn.on('trigger', (conn, state) => {
 
-		let refreshOut = NODE.addOutput('refreshed', {
-			type: "trigger"
-		});
+		//get the input values
+		refreshing = true;
+		valueIn.getValues(state).then(vals => {
 
-		let valueOut = NODE.addOutput('value');
+			//
+			used = true;
+			refreshing = false;
+			values = vals;
 
-		refreshIn.on('trigger', (conn, state) => {
-
-			//get the input values
-			refreshing = true;
-			valueIn.getValues(state).then(vals => {
-
-				//
-				used = true;
-				refreshing = false;
-				values = vals;
-
-				//save the state
-				state.set(this, {
-					values: vals
-				});
-
-				refreshOut.trigger( state);
-
+			//save the state
+			state.set(this, {
+				values: vals
 			});
 
+			refreshOut.trigger(state);
+
 		});
 
-		valueOut.on('trigger', (conn, state, callback) => {
+	});
 
-			//state handling (if refresh complete was used)
-			let thisState = state.get(this);
-			if (thisState) {
+	valueOut.on('trigger', (conn, state, callback) => {
 
-				callback(thisState.values);
-				return;
+		//state handling (if refresh complete was used)
+		let thisState = state.get(this);
+		if (thisState) {
 
-			}
+			callback(thisState.values);
+			return;
 
-			//callback immeditialy if we already have this value(s) in store
-			if (used) {
+		}
 
+		//callback immeditialy if we already have this value(s) in store
+		if (used) {
+
+			callback(values);
+			return;
+
+		}
+
+		//wait to callback when we're currently refreshing the value(s)
+		if (refreshing) {
+
+			valueOut.once('triggerdone', () => {
 				callback(values);
-				return;
-
-			}
-
-			//wait to callback when we're currently refreshing the value(s)
-			if (refreshing) {
-
-				valueOut.once('triggerdone', () => {
-					callback(values);
-				});
-
-				return;
-
-			}
-
-			//perform a refresh of all inputs and return those values
-			refreshing = true;
-			valueIn.getValues(state).then((vals) => {
-
-				values = vals;
-				used = true;
-				refreshing = false;
-				callback(values);
-
 			});
 
+			return;
+
+		}
+
+		//perform a refresh of all inputs and return those values
+		refreshing = true;
+		valueIn.getValues(state).then((vals) => {
+
+			values = vals;
+			used = true;
+			refreshing = false;
+			callback(values);
+
 		});
 
-	}
-
-	XIBLE.addNode('store', {
-		type: "object",
-		level: 0,
-		description: `Stores a value allowing direct re-use.`
-	}, constr);
+	});
 
 };

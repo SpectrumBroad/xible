@@ -1,0 +1,28 @@
+{
+  "name": "glow.light",
+  "type": "object",
+  "description": "References a light registered in Glow.",
+  "inputs": {
+    "glow": {
+      "type": "glow"
+    },
+    "name": {
+  		"type": "string",
+  		"description": "The registered name of the light in Glow. If multiple names are given, multiple lights will be referenced."
+  	}
+  },
+  "outputs": {
+    "light": {
+      "type": "glow.light",
+      "description": "One or more lights to return."
+    },
+    "power": {
+      "type": "boolean",
+      "description": "The current power state of the light."
+    },
+    "color": {
+      "type": "color",
+      "description": "The current color state of the light."
+    }
+  }
+}

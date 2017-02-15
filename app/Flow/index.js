@@ -257,8 +257,8 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 						}
 
-						if (Object.keys(nodeVaultData).length > -1) {
-							xibleNode.vault.set(nodeVaultData);
+						if (Object.keys(nodeVaultData).length) {
+							xibleNode.vault.set(Object.assign(xibleNode.vault.get(), nodeVaultData));
 						}
 
 					}
@@ -758,6 +758,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 									this.worker.send({
 										"method": "start",
 										"flow": this.json,
+										"nodes": XIBLE.nodes,
 										"directNodes": directNodes
 									});
 									this.emit('started');

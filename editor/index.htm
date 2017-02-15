@@ -49,7 +49,8 @@
 		xibleWrapper = new XibleWrapper({
 
 			hostname: window.location.hostname,
-			port: window.location.port
+			port: window.location.port,
+			secure: window.location.protocol === 'https:'
 
 		});
 		xibleWrapper.autoReconnect();

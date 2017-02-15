@@ -1,0 +1,10 @@
+{
+  "name": "timing.epoch",
+  "type": "object",
+  "description": "Returns the amount of milliseconds since Unix epoch. That is, 1 January 1970 00:00:00 UTC.",
+  "outputs": {
+    "msec": {
+      "type": "math.number"
+    }
+  }
+}

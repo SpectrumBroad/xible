@@ -13,6 +13,11 @@
 	z-index: 1;
 }
 
+#detailNodeSelector code {
+	background-color:#000;
+	color:#fff;
+}
+
 #nodeSelector>input, #nodeSelector>button, #detailNodeSelector>button {
 	box-sizing: border-box;
 	width: 100%;

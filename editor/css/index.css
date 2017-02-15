@@ -496,7 +496,7 @@ header span {
 
 .xible .editor>.connector>path {
 	stroke: #fff;
-	stroke-width: 2px;
+	stroke-width: 3px;
 	fill: none;
 	pointer-events: all;
 }

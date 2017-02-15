@@ -1,0 +1,18 @@
+{
+  "name": "math.substract",
+  "type": "object",
+  "description": "Returns a list of all 'a' inputs minus the first 'b' input or the given value.",
+  "inputs": {
+    "a": {
+      "type": "math.number"
+    },
+    "b": {
+      "type": "math.number"
+    }
+  },
+  "outputs": {
+    "result": {
+      "type": "math.number"
+    }
+  }
+}

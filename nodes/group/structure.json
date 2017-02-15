@@ -1,0 +1,19 @@
+{
+  "name": "group",
+  "type": "object",
+  "description": "Groups multiple input values together.",
+  "inputs": {
+    "any": {
+      "type": null,
+  		"singleType": true
+  	}
+  },
+  "outputs": {
+    "grouped": {
+      "type": null
+    },
+    "count": {
+      "type": "math.number"
+    }
+  }
+}

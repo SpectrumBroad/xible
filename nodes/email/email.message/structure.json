@@ -1,0 +1,33 @@
+{
+  "name": "email.message",
+  "type": "object",
+  "description": "Defines an email message.",
+  "inputs": {
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "cc": {
+      "type": "string"
+    },
+    "bcc": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "html": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "message": {
+      "type": "email.message"
+    }
+  }
+}

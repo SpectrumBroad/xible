@@ -1,0 +1,15 @@
+{
+  "name": "math.add",
+  "type": "object",
+  "description": "Sums all the input values together, including the given value.",
+  "inputs": {
+    "values": {
+      "type": "math.number"
+    }
+  },
+  "outputs": {
+    "result": {
+      "type": "math.number"
+    }
+  }
+}

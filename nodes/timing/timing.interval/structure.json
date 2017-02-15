@@ -1,0 +1,21 @@
+{
+  "name": "timing.interval",
+  "type": "action",
+  "description": "Triggers the output in an interval, every given x milliseconds.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "clear": {
+      "type": "trigger"
+    },
+    "msecs": {
+      "type": "math.number"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

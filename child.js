@@ -34,34 +34,39 @@ process.on('message', (message) => {
 
 			try {
 
-				//get the nodenames we need to init
-				let nodeNames = {};
-				message.flow.nodes.forEach((node) => {
-					if (!nodeNames[node.name]) {
-						nodeNames[node.name] = true;
-					}
-				});
-
 				//setup xible with the nodeNames
 				let xible = new Xible({
 					child: true,
 					configPath: CONFIG_PATH
 				});
 
-				xible.init({
-					nodeNames: Object.keys(nodeNames)
-				}).then(() => {
+				//init the proper nodes
+				let structuredNodes = {};
+				for (let i = 0; i < message.flow.nodes.length; ++i) {
 
-					flow = new xible.Flow();
-					flow.initJson(message.flow);
+					let nodeName = message.flow.nodes[i].name;
 
-					if (message.directNodes) {
-						flow.direct(message.directNodes);
-					} else {
-						flow.start();
+					if (structuredNodes[nodeName]) {
+						continue;
 					}
+					structuredNodes[nodeName] = true;
+					xible.addNode(nodeName, message.nodes[nodeName], require(message.nodes[nodeName].path));
 
-				});
+				}
+
+				xible.init()
+					.then(() => {
+
+						flow = new xible.Flow();
+						flow.initJson(message.flow);
+
+						if (message.directNodes) {
+							flow.direct(message.directNodes);
+						} else {
+							flow.start();
+						}
+
+					});
 
 			} catch (err) {
 

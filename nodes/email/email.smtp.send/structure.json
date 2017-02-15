@@ -1,0 +1,21 @@
+{
+  "name": "email.smtp.send",
+  "type": "action",
+  "description": "Sends an email messages to a given smtp server.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "server": {
+      "type": "email.smtp.server"
+    },
+    "message": {
+      "type": "email.message"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

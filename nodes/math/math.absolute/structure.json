@@ -1,0 +1,15 @@
+{
+  "name": "math.absolute",
+  "type": "object",
+  "description": "Returns the absolute value of a number.",
+  "inputs": {
+    "number": {
+  		"type": "math.number"
+  	}
+  },
+  "outputs": {
+    "result": {
+  		"type": "math.number"
+  	}
+  }
+}

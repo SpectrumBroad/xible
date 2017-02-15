@@ -140,8 +140,8 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 		let pathWidth = (pathBounding.width / this.editor.zoom);
 
 		//calc the x/y position of the svg element
-		let left = ((originLeft < destinationLeft ? originLeft : destinationLeft));
-		let top = (originTop < destinationTop ? originTop : destinationTop);
+		let left = originLeft < destinationLeft ? originLeft : destinationLeft;
+		let top = (originTop < destinationTop ? originTop : destinationTop) + 1;
 
 		//apply tension to left position of svg
 		left -= (tension / 2);

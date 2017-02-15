@@ -1,0 +1,18 @@
+{
+  "name": "mongodb.collection",
+  "type": "object",
+  "description": "A reference to a MongoDB collection.",
+  "inputs": {
+    "mongodb": {
+  		"type": "mongodb"
+  	}
+  },
+  "outputs": {
+    "collection": {
+      "type": "mongodb.collection"
+    },
+    "documents": {
+      "type": "document"
+    }
+  }
+}

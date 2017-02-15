@@ -1,53 +1,40 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let anyIn = NODE.getInputByName('any');
+	let boolIn = NODE.getInputByName('condition');
 
-		let anyIn = NODE.addInput('any');
+	let filteredOut = NODE.getOutputByName('filtered');
+	filteredOut.on('trigger', (conn, state, callback) => {
 
-		let boolIn = NODE.addInput('condition', {
-			type: 'boolean'
-		});
+		anyIn.getValues(state).then((values) => {
 
-		let filteredOut = NODE.addOutput('filtered');
-		filteredOut.on('trigger', (conn, state, callback) => {
+			boolIn.getValues(state).then((conditions) => {
 
-			anyIn.getValues(state).then((values) => {
-
-				boolIn.getValues(state).then((conditions) => {
-
-					if (conditions.indexOf(false) === -1) {
-						callback(values);
-					}
-
-				});
+				if (conditions.indexOf(false) === -1) {
+					callback(values);
+				}
 
 			});
 
 		});
 
-		let droppedOut = NODE.addOutput('dropped');
-    droppedOut.on('trigger', (conn, state, callback) => {
+	});
 
-      anyIn.getValues(state).then((values) => {
+	let droppedOut = NODE.getOutputByName('dropped');
+	droppedOut.on('trigger', (conn, state, callback) => {
 
-        boolIn.getValues(state).then((conditions) => {
+		anyIn.getValues(state).then((values) => {
 
-          if (conditions.indexOf(true) === -1) {
-            callback(values);
-          }
+			boolIn.getValues(state).then((conditions) => {
 
-        });
+				if (conditions.indexOf(true) === -1) {
+					callback(values);
+				}
 
-      });
+			});
 
-    });
+		});
 
-	}
-
-	XIBLE.addNode('filter', {
-		type: "object",
-		level: 0,
-		description: `Filters data based on an input condition.`
-	}, constr);
+	});
 
 };

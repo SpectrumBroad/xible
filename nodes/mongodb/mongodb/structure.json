@@ -1,0 +1,11 @@
+{
+	"name": "mongodb",
+	"type": "object",
+	"description": "A reference to a MongoDB database.",
+	"outputs": {
+		"mongodb": {
+			"type": "mongodb"
+		}
+	},
+	"vault": ["hostname", "port"]
+}

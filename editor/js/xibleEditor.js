@@ -193,7 +193,7 @@ class XibleEditor extends EventEmitter {
 		/*
 
 		TODO: should use XibleWrapper.flows.getAll() instead
-				return xibleWrapper.Flows.getAll().then((flows) => {
+				return xibleWrapper.Flow.getAll().then((flows) => {
 
 					Object.keys(flows).forEach((flowId) => {
 
@@ -211,7 +211,7 @@ class XibleEditor extends EventEmitter {
 		*/
 		return new Promise((resolve, reject) => {
 
-			let req = new OoHttpRequest('GET', `https://${xibleWrapper.hostname}:${xibleWrapper.port}/api/flows`);
+			let req = new OoHttpRequest('GET', `http${xibleWrapper.baseUrl}/api/flows`);
 
 			req.toObject(Object).then((flows) => {
 

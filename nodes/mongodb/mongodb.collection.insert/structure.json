@@ -1,0 +1,21 @@
+{
+  "name": "mongodb.collection.insert",
+  "type": "action",
+  "description": "Inserts documents into a MongoDb collection",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "collection": {
+      "type": "mongodb.collection"
+    },
+    "document": {
+      "type": "document"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

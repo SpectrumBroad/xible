@@ -1,0 +1,24 @@
+{
+  "name": "ansible.file",
+  "type": "action",
+  "description": "Sets attributes of files, symlinks, and directories, or removes files/symlinks/directories.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "ansible": {
+      "type": "ansible"
+    },
+    "hostgroup":{
+      "type": "ansible.hostgroup"
+    },
+    "path": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "done": {
+  		"type": "trigger"
+  	}
+  }
+}

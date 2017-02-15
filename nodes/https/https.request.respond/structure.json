@@ -1,0 +1,21 @@
+{
+  "name": "https.request.repond",
+  "type": "action",
+  "description": "Responds to a HTTPS request.",
+  "inputs": {
+    "trigger": {
+  		"type": "trigger"
+  	},
+    "request": {
+  		"type": "https.request"
+  	},
+    "response": {
+  		"type": "string"
+  	}
+  },
+  "outputs": {
+    "done": {
+  		"type": "trigger"
+  	}
+  }
+}

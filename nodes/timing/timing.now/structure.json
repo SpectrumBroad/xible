@@ -1,0 +1,31 @@
+{
+  "name": "timing.now",
+  "type": "object",
+  "description": "Returns a time object representing 'now'.",
+  "outputs": {
+    "fulldate": {
+      "type": "date"
+    },
+    "time": {
+      "type": "time"
+    },
+    "year": {
+      "type": "math.number"
+    },
+    "month": {
+      "type": "math.number"
+    },
+    "date": {
+      "type": "math.number"
+    },
+    "hours": {
+      "type": "math.number"
+    },
+    "minutes": {
+      "type": "math.number"
+    },
+    "seconds": {
+      "type": "math.number"
+    }
+  }
+}

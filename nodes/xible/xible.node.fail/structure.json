@@ -1,0 +1,15 @@
+{
+  "name": "xible.node.fail",
+  "type": "action",
+  "description": "Trigger a node failure event.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

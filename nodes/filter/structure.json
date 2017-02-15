@@ -1,0 +1,21 @@
+{
+  "name": "filter",
+  "type": "object",
+  "description": "Filters data based on an input condition.",
+  "inputs": {
+    "any": {
+      "type": null
+    },
+    "condition": {
+      "type": "boolean"
+    }
+  },
+  "outputs": {
+    "filtered": {
+      "type": null
+    },
+    "dropped": {
+      "type": null
+    }
+  }
+}

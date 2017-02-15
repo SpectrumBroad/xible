@@ -1,0 +1,10 @@
+{
+  "name": "color.temperature",
+  "type": "object",
+  "description": "Returns a color temperature in Kelvin.",
+  "outputs": {
+    "temperature": {
+  		"type": "color.temperature"
+  	}
+  }
+}

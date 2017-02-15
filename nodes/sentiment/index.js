@@ -1,41 +1,26 @@
 const sentiment = require('sentiment');
 
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let stringIn = NODE.getInputByName('string');
 
-		let stringIn = NODE.addInput('string', {
-			type: "string"
-		});
+	let scoreOut = NODE.getOutputByName('score');
+	scoreOut.on('trigger', (conn, state, callback) => {
 
-		let scoreOut = NODE.addOutput('score', {
-			type: "math.number"
-		});
+		stringIn.getValues(state).then((strs) => {
 
-		scoreOut.on('trigger', (conn, state, callback) => {
+			let results;
 
-			stringIn.getValues(state).then((strs) => {
+			if (strs.length) {
+				results = strs.map((str) => sentiment(str).score);
+			} else {
+				results = [];
+			}
 
-				let results;
-
-				if (strs.length) {
-					results = strs.map((str) => sentiment(str).score);
-				} else {
-					results = [];
-				}
-
-				callback(results);
-
-			});
+			callback(results);
 
 		});
 
-	}
-
-	XIBLE.addNode('sentiment', {
-		type: "object",
-		level: 0,
-		description: `Performs sentiment analysis on the input string(s) and returns the corresponding sentiment number. Uses the AFINN-165 wordlist to do so.`
-	}, constr);
+	});
 
 };

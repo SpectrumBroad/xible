@@ -35,6 +35,9 @@ class Xible extends EventEmitter {
 			this.child = true;
 		}
 
+		this.secure = false;
+		this.webPort = null;
+
 		let appNames;
 		if (this.child) {
 			appNames = ['Config', 'Flow', 'Node'];
@@ -88,13 +91,17 @@ class Xible extends EventEmitter {
 
 		}
 
+		if(this.child) {
+			return Promise.resolve();
+		}
+
 		//ensure catch all routes are loaded last
 		if (this.expressApp) {
 			require('./routes.js')(this, this.expressApp);
 		}
 
 		return this.Node
-			.initFromPath(nodesPath, obj && obj.nodeNames)
+			.initFromPath(nodesPath)
 			.then(() => {
 
 				//get all installed flows
@@ -220,13 +227,19 @@ class Xible extends EventEmitter {
 		}));
 
 		//init the webserver
-		let webPort = this.Config.getValue('webServer.port') || 9600;
+		let webPort = this.webPort = this.Config.getValue('webServer.port') || 9600;
 		expressDebug(`starting on port: ${webPort}`);
 
-		let webServer;
-		let onListen = () => {
+		let onListen = (webServer) => {
 
-			expressDebug(`listening on: ${webServer.address().address}:${webServer.address().port}`);
+			let address = webServer.address();
+			let port = address.port;
+
+			expressDebug(`listening on: ${address.address}:${port}`);
+
+			if (this.secure && port === webPort) {
+				return;
+			}
 
 			//websocket
 			const wsDebug = debug('xible:websocket');
@@ -260,15 +273,17 @@ class Xible extends EventEmitter {
 		if (keyPath && keyCert) {
 
 			expressDebug(`starting spdy (https)`);
+			this.secure = true;
 
-			webServer = spdy.createServer({
+			let secureWebServer = spdy.createServer({
 				key: fs.readFileSync(keyPath),
 				cert: fs.readFileSync(keyCert)
-			}, expressApp).listen(webPort, onListen);
+			}, expressApp).listen(webPort + 1, () => onListen(secureWebServer));
 
-		} else {
-			webServer = expressApp.listen(webPort, onListen);
 		}
+
+		expressDebug(`starting plain (http)`);
+		let plainWebServer = expressApp.listen(webPort, () => onListen(plainWebServer));
 
 	}
 
@@ -280,6 +295,11 @@ class Xible extends EventEmitter {
 
 		//setup default express stuff
 		this.expressApp.use((req, res, next) => {
+
+			//check for TLS
+			if (this.secure && !req.secure) {
+				res.redirect(`https://${req.host}:${this.webPort+1}${req.originalUrl}`);
+			}
 
 			res.removeHeader('X-Powered-By');
 
@@ -407,8 +427,8 @@ class Xible extends EventEmitter {
 
 	addNode(name, obj, constructorFunction) {
 
-		if (!name || !obj || (!constructorFunction && !obj.constructorFunction)) {
-			throw new Error('first argument needs to be string, second object, third a constructor function');
+		if (!name || !obj) {
+			throw new Error('first argument needs to be string, second object');
 		}
 
 		//check if a similar node with the same name doesn't already exist

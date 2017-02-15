@@ -1,0 +1,15 @@
+{
+  "name": "variable.name",
+  "type": "object",
+  "description": "Extracts the name from a variable.",
+  "inputs": {
+    "variable": {
+      "type": "variable"
+    }
+  },
+  "outputs": {
+    "name": {
+      "type": "string"
+    }
+  }
+}

@@ -1,55 +1,38 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let docIn = NODE.getInputByName('document');
+	let variableIn = NODE.getInputByName('variable');
 
-		let docIn = NODE.addInput('document', {
-			type: "document"
-		});
+	let docOut = NODE.getOutputByName('document');
 
-		let variableIn = NODE.addInput('variable', {
-			type: "variable"
-		});
+	docOut.on('trigger', (conn, state, callback) => {
 
-		let docOut = NODE.addOutput('document', {
-			type: "document"
-		});
+		Promise.all([docIn.getValues(state), variableIn.getValues(state)]).then(([docs, variables]) => {
 
-		docOut.on('trigger', (conn, state, callback) => {
+			docs.forEach((doc) => {
 
-			Promise.all([docIn.getValues(state), variableIn.getValues(state)]).then(([docs, variables]) => {
+				//copy the document
+				//FIXME: should merge deep
+				doc = Object.assign({}, doc);
 
-				docs.forEach((doc) => {
+				//add/overwrite the new vars
+				variables.forEach((variable) => {
 
-          //copy the document
-          //FIXME: should merge deep
-					doc = Object.assign({}, doc);
+					let val = variable.values;
+					if (val.length === 1) {
+						val = val[0];
+					}
 
-          //add/overwrite the new vars
-					variables.forEach((variable) => {
-
-						let val = variable.values;
-						if (val.length === 1) {
-							val = val[0];
-						}
-
-						doc[variable.name] = val;
-
-					});
-
-					callback(doc);
+					doc[variable.name] = val;
 
 				});
+
+				callback(doc);
 
 			});
 
 		});
 
-	}
-
-	XIBLE.addNode('document.assign', {
-		type: "object",
-		level: 0,
-		description: `Assigns new key/value pairs to an existing document.`
-	}, constr);
+	});
 
 };

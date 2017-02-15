@@ -1,0 +1,15 @@
+{
+  "name": "string.template",
+  "type": "object",
+  "description": "Parses a template string with input variables. Variables can be addressed by their name like so: ${variableName}",
+  "inputs": {
+    "variable": {
+      "type": "variable"
+    }
+  },
+  "outputs": {
+    "result": {
+      "type": "string"
+    }
+  }
+}

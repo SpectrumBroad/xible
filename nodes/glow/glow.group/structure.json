@@ -1,0 +1,18 @@
+{
+  "name": "glow.group",
+  "type": "object",
+  "description": "References a Glow group.",
+  "inputs": {
+    "glow": {
+      "type": "glow"
+    }
+  },
+  "outputs": {
+    "group": {
+      "type": "glow.group"
+    },
+    "devices": {
+      "type": "document"
+    }
+  }
+}

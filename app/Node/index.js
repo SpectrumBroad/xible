@@ -30,7 +30,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			//init inputs
 			this.inputs = {};
 			if (obj.inputs) {
-				for (const name in obj.inputs) {
+				for (let name in obj.inputs) {
 					this.addInput(name, obj.inputs[name]);
 				}
 			}
@@ -38,7 +38,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			//init outputs
 			this.outputs = {};
 			if (obj.outputs) {
-				for (const name in obj.outputs) {
+				for (let name in obj.outputs) {
 					this.addOutput(name, obj.outputs[name]);
 				}
 			}
@@ -55,7 +55,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			//construct
 			if (obj.constructorFunction) {
-				obj.constructorFunction.call(this, this);
+
+				this.constructorFunction = obj.constructorFunction;
+				this.constructorFunction.call(this, this);
+
 			}
 
 		}
@@ -102,81 +105,152 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		static initFromPath(path, files) {
+		static getStructures(structuresPath, files) {
+
+			if (!Array.isArray(files)) {
+				files = fs.readdirSync(structuresPath);
+			}
 
 			return new Promise((resolve, reject) => {
 
-				nodeDebug(`init nodes from "${path}"`);
-
-				if (!path) {
-					return;
-				}
-
-				Node.nodesPath = path;
-
-				if (!Array.isArray(files)) {
-					files = fs.readdirSync(path);
-				}
-
+				let structures = {};
 				let loadedCounter = 0;
+
+				if (!files.length) {
+					resolve(structures);
+				}
+
+				function checkAndResolve() {
+
+					if (++loadedCounter === files.length) {
+						resolve(structures);
+					}
+
+				}
+
 				for (let i = 0; i < files.length; ++i) {
 
-					let file = files[i];
+					if (files[i] === 'node_modules') {
 
-					let filepath = `${path}/${file}`;
-					let node;
+						checkAndResolve();
+						continue;
 
-					fs.stat(filepath, (err, stat) => {
+					}
+
+					let normalizedPath = path.resolve(structuresPath, files[i]);
+					fs.stat(normalizedPath, (err, stat) => {
 
 						if (err) {
-							nodeDebug(`could not init '${file}': ${err}`);
-						}
 
-						if (!err && stat.isDirectory()) {
-
-							try {
-
-								node = require(`${__dirname}/../../${filepath}`);
-								if (typeof node === 'function') {
-
-									node(XIBLE);
-
-									//find client content and host it
-									if (!XIBLE.child && XIBLE.nodes[file]) {
-
-										const express = require('express');
-
-										let clientFilePath = `${filepath}/editor`;
-										try {
-
-											if (fs.statSync(`${clientFilePath}/index.htm`).isFile()) {
-
-												nodeDebug(`hosting "/api/nodes/${file}/editor"`);
-												EXPRESS_APP.use(`/api/nodes/${file}/editor`, express.static(clientFilePath, {
-													index: false
-												}));
-
-												XIBLE.nodes[file].hostsEditorContent = true;
-
-											}
-
-										} catch (err) {}
-
-									}
-
-								}
-
-							} catch (err) {
-								nodeDebug(`could not init "${file}": ${err.stack}`);
-							}
+							nodeDebug(`Could not stat "${normalizedPath}": ${err}`);
+							return checkAndResolve();
 
 						}
 
-						if (++loadedCounter === files.length) {
-							resolve();
+						if (!stat.isDirectory()) {
+							return checkAndResolve();
 						}
+
+						this.getStructure(normalizedPath)
+							.then((structure) => {
+
+								structures[structure.name] = structure;
+								checkAndResolve();
+
+							}).catch((err) => {
+
+								//process subdirs instead
+								this.getStructures(normalizedPath)
+									.then((nestedStructures) => {
+
+										if (!Object.keys(nestedStructures).length) {
+											return nodeDebug(err);
+										}
+
+										Object.assign(structures, nestedStructures);
+										checkAndResolve();
+
+									});
+
+							});
 
 					});
+
+				}
+
+			});
+
+		}
+
+		static getStructure(filepath) {
+
+			return new Promise((resolve, reject) => {
+
+				let structure;
+
+				//check for structure.json
+				fs.access(`${filepath}/structure.json`, fs.constants.R_OK, (err) => {
+
+					if (err) {
+						return reject(`Could not access "${filepath}/structure.json": ${err}`);
+					}
+
+					try {
+
+						structure = require(`${filepath}/structure.json`);
+						structure.path = filepath;
+
+					} catch (err) {
+						return reject(`Could not require "${filepath}/structure.json": ${err}`);
+					}
+
+					//check for editor contents
+					fs.stat(`${filepath}/editor`, (err, stat) => {
+
+						if (err) {
+							return resolve(structure);
+						}
+
+						if (stat.isDirectory()) {
+							structure.editorContentPath = `${filepath}/editor`;
+						}
+
+						return resolve(structure);
+
+					});
+
+				});
+
+			});
+
+		}
+
+		static initFromPath(path, files) {
+
+			let EXPRESS;
+			if (!XIBLE.child) {
+				EXPRESS = require('express');
+			}
+
+			return this.getStructures(path, files).then((structures) => {
+
+				for (let nodeName in structures) {
+
+					let structure = structures[nodeName];
+
+					XIBLE.addNode(nodeName, structure);
+
+					//host editor contents if applicable
+					if (structure.editorContentPath && !XIBLE.child) {
+
+						structure.hostsEditorContent = true;
+
+						nodeDebug(`hosting "/api/nodes/${nodeName}/editor"`);
+						EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, EXPRESS.static(structure.editorContentPath, {
+							index: false
+						}));
+
+					}
 
 				}
 
@@ -418,6 +492,18 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				}
 			});
+
+		}
+
+		fail(err, state) {
+
+			if (typeof err !== 'string') {
+				throw new Error(`"err" argument of Node.fail(state, err) must be of type "string"`);
+			}
+
+			if (this.flow) {
+				this.flow.emit('fail', this, err, state);
+			}
 
 		}
 
@@ -677,9 +763,8 @@ class MainVault {
 			return;
 		}
 
-		if (!vault) {
-			this.init();
-		}
+		//always get fresh contents
+		this.init();
 
 		vault[node._id] = obj;
 		this.save();
@@ -696,7 +781,11 @@ class NodeVault {
 	}
 
 	set(obj) {
+
+		//also update the data property on the node
+		Object.assign(this.node.data, obj);
 		return MainVault.set(this.node, obj);
+
 	}
 
 	get() {

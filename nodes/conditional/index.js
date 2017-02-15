@@ -1,44 +1,30 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let conditionIn = NODE.getInputByName('condition');
+	let trueIn = NODE.getInputByName('if true');
+	let falseIn = NODE.getInputByName('if false');
 
-		let conditionIn = NODE.addInput('condition', {
-			type: "boolean"
-		});
+	let valueOut = NODE.getOutputByName('value');
+	valueOut.on('trigger', (conn, state, callback) => {
 
-		let trueIn = NODE.addInput('if true');
+		conditionIn.getValues(state).then((bools) => {
 
-		let falseIn = NODE.addInput('if false');
+			if (bools.length) {
 
-		let valueOut = NODE.addOutput('value');
-		valueOut.on('trigger', (conn, state, callback) => {
-
-			conditionIn.getValues(state).then((bools) => {
-
-				if (bools.length) {
-
-					let input;
-					if (bools.some(bool => !bool)) {
-						input = falseIn;
-					} else {
-						input = trueIn;
-					}
-					input.getValues(state).then((values) => callback(values));
-
+				let input;
+				if (bools.some(bool => !bool)) {
+					input = falseIn;
 				} else {
-					callback(null);
+					input = trueIn;
 				}
+				input.getValues(state).then((values) => callback(values));
 
-			});
+			} else {
+				callback(null);
+			}
 
 		});
 
-	}
-
-	XIBLE.addNode('conditional', {
-		type: "object",
-		level: 0,
-		description: `Return the selected value(s) based on the condition.`
-	}, constr);
+	});
 
 };

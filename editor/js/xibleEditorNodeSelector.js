@@ -19,20 +19,28 @@ class XibleEditorNodeSelector {
 		detailDiv.classList.add('hidden');
 		let detailDivSub = detailDiv.appendChild(document.createElement('div'));
 
-		//check if this is maintained by spectrumbroad
-		detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('maintained'));
-		detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('Spectrumbroad maintains this node.'));
+		detailDivSub.innerHTML = `<h1>instructions</h1><p>For now, please use the command line <code>xiblepm install &lt;nodename&gt;</code> to install this node.</p>`;
 
-		//permissions in detailDiv
-		detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Permissions'));
-		detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('This node requires the following permissions;'));
-		let detailDivPermissionsUl = this.detailDivPermissionsUl = detailDivSub.appendChild(document.createElement('ul'));
+		/*
+				//check if this is maintained by spectrumbroad
+				detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('maintained'));
+				detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('Spectrumbroad maintains this node.'));
 
-		let detailConfirmButton = detailDiv.appendChild(document.createElement('button'));
+				//permissions in detailDiv
+				detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Permissions'));
+				detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('This node requires the following permissions;'));
+				let detailDivPermissionsUl = this.detailDivPermissionsUl = detailDivSub.appendChild(document.createElement('ul'));
+		*/
+		let detailConfirmButton = this.detailConfirmButton = detailDiv.appendChild(document.createElement('button'));
 		detailConfirmButton.appendChild(document.createTextNode('Confirm'));
 		detailConfirmButton.setAttribute('type', 'button');
 		detailConfirmButton.onclick = () => {
-			detailDiv.classList.add('hidden');
+
+			return this.close();
+
+			detailConfirmButton.disabled = true;
+			detailConfirmButton.classList.add('loading');
+
 		};
 
 		let detailCancelButton = detailDiv.appendChild(document.createElement('button'));
@@ -101,7 +109,7 @@ class XibleEditorNodeSelector {
 		div.appendChild(nodesUl);
 
 		//create a search online button
-		let searchOnlineButton = div.appendChild(document.createElement('button'));
+		let searchOnlineButton = this.searchOnlineButton = div.appendChild(document.createElement('button'));
 		searchOnlineButton.setAttribute('type', 'button');
 		searchOnlineButton.appendChild(document.createTextNode('search online'));
 		searchOnlineButton.setAttribute('title', 'Search xible.io for nodes matching your filter');
@@ -214,6 +222,7 @@ class XibleEditorNodeSelector {
 
 	detailedNodeView(li, nodeName, node) {
 
+		this.detailConfirmButton.disabled = false;
 		this.detailDiv.classList.remove('hidden');
 		this.detailDiv.style.top = this.div.style.top;
 		this.detailDiv.style.left = (parseInt(this.div.style.left) + this.div.offsetWidth - parseInt(getComputedStyle(this.detailDiv).borderLeftWidth)) + 'px';
@@ -298,8 +307,8 @@ class XibleEditorNodeSelector {
 	fill() {
 
 		//get the installed nodes
-		let req = new OoHttpRequest('GET', `https://${xibleWrapper.hostname}:${xibleWrapper.port}/api/nodes`);
-		req.toObject(Object).then((nodes) => {
+		let req = new OoHttpRequest('GET', `http${xibleWrapper.baseUrl}/api/nodes`);
+		req.toJson().then((nodes) => {
 
 			Object.keys(nodes).forEach((nodeName) => {
 
@@ -388,6 +397,9 @@ class XibleEditorNodeSelector {
 
 		this.div.classList.add('hidden');
 		this.detailDiv.classList.add('hidden');
+
+		this.detailConfirmButton.classList.remove('loading');
+		this.searchOnlineButton.classList.remove('loading');
 
 	}
 

@@ -471,7 +471,7 @@ View.routes.editor = function() {
 
 		flow.on('started', (event) => {
 
-			if(event.directed) {
+			if (event.directed) {
 				li.classList.add('direct');
 			} else {
 				li.classList.remove('direct');
@@ -484,7 +484,7 @@ View.routes.editor = function() {
 
 		flow.on('starting', (event) => {
 
-			if(event.directed) {
+			if (event.directed) {
 				li.classList.add('direct');
 			} else {
 				li.classList.remove('direct');

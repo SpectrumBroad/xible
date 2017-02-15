@@ -1,0 +1,15 @@
+{
+  "name": "glow.mediaplayer.onstop",
+  "type": "event",
+  "description": "Triggered whenever a mediaplayer connected through Glow stops.",
+  "inputs": {
+    "glow": {
+  		"type": "glow"
+  	}
+  },
+  "outputs": {
+    "trigger": {
+  		"type": "trigger"
+  	}
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "math.number",
+  "type": "object",
+  "description": "Defines a number.",
+  "outputs": {
+    "number": {
+      "type": "math.number"
+    }
+  }
+}

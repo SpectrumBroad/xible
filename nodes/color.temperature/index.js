@@ -1,22 +1,9 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let tempOut = NODE.getOutputByName('temperature');
 
-		let tempOut = NODE.addOutput('temperature', {
-			type: "color.temperature"
-		});
-
-		tempOut.on('trigger', (conn, state, callback) => {
-			callback(NODE.data.temp);
-		});
-
-	}
-
-	XIBLE.addNode('color.temperature', {
-		type: "object",
-		level: 0,
-		groups: ["basics"],
-		description: "Returns a color temperature in Kelvin.",
-	}, constr);
+	tempOut.on('trigger', (conn, state, callback) => {
+		callback(NODE.data.temp);
+	});
 
 };

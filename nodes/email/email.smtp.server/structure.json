@@ -1,0 +1,16 @@
+{
+  "name": "email.smtp.server",
+  "type": "object",
+  "description": "Defines an email SMTP server.",
+  "outputs": {
+    "server": {
+  		"type": "email.smtp.server"
+  	}
+  },
+  "vault": [
+    "host",
+    "port",
+    "username",
+    "password"
+  ]
+}

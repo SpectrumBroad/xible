@@ -1,0 +1,11 @@
+{
+  "name": "social.twitter",
+  "type": "object",
+  "description": "Connects to Twitter given certain credentials.",
+  "outputs": {
+    "twitter": {
+      "type": "social.twitter"
+    }
+  },
+  "vault": ["oAuthAccessToken", "oAuthAccessTokenSecret", "screenName"]
+}

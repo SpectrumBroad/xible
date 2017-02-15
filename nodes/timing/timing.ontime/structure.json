@@ -1,0 +1,30 @@
+{
+  "name": "timing.ontime",
+  "type": "event",
+  "description": "Triggered when the given time hits.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    }
+  },
+  "outputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "condition": {
+      "type": "boolean"
+    },
+    "time": {
+      "type": "time"
+    },
+    "hours": {
+      "type": "math.number"
+    },
+    "minutes": {
+      "type": "math.number"
+    },
+    "seconds": {
+      "type": "math.number"
+    }
+  }
+}

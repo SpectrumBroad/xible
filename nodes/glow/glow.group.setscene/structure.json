@@ -1,0 +1,22 @@
+{
+  "name": "glow.group.setscene",
+  "type": "action",
+  "description": "Assigns a scene to a Glow group.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "group": {
+      "type": "glow.group"
+    },
+    "scene": {
+      "type": "glow.scene",
+      "maxConnectors": 1
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

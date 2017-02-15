@@ -1,0 +1,15 @@
+{
+  "name": "cast",
+  "type": "object",
+  "description": "Change data type into another.",
+  "inputs": {
+    "values": {
+      "type": null
+    }
+  },
+  "outputs": {
+    "result": {
+      "type": "string"
+    }
+  }
+}

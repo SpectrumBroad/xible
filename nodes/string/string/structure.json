@@ -1,0 +1,15 @@
+{
+  "name": "string",
+  "type": "object",
+  "description": "A string representation.",
+  "inputs": {
+    "concat": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "result": {
+      "type": "string"
+    }
+  }
+}

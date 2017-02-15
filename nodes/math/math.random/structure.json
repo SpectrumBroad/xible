@@ -1,0 +1,10 @@
+{
+  "name": "math.random",
+  "type": "object",
+  "description": "Returns a pseudo-random floating point number from 0 to 1, but not including 1.",
+  "outputs": {
+    "number": {
+			"type": "math.number"
+		}
+  }
+}

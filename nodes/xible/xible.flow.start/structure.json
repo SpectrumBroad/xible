@@ -1,0 +1,15 @@
+{
+  "name": "xible.flow.start",
+  "type": "action",
+  "description": "Starts another flow.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

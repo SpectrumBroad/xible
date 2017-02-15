@@ -1,0 +1,18 @@
+{
+	"name": "math.multiply",
+	"type": "object",
+	"description": "Returns a list of values for each multiplicand times the first multiplier input or the given multiplier.",
+	"inputs": {
+		"multiplicand": {
+			"type": "math.number"
+		},
+		"multiplier": {
+			"type": "math.number"
+		}
+	},
+	"outputs": {
+		"result": {
+			"type": "math.number"
+		}
+	}
+}

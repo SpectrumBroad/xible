@@ -1,0 +1,24 @@
+{
+  "name": "glow.switch",
+  "type": "object",
+  "description": "References a switch registered in Glow.",
+  "inputs": {
+    "glow": {
+      "type": "glow"
+    },
+    "name": {
+      "type": "string",
+      "description": "The registered name of the switch in Glow. If multiple names are given, multiple switches will be referenced."
+    }
+  },
+  "outputs": {
+    "switch": {
+      "type": "glow.switch",
+      "description": "One or more switches to return."
+    },
+    "switched": {
+      "type": "boolean",
+      "description": "The current switch state of the switch."
+    }
+  }
+}

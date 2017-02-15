@@ -1,0 +1,15 @@
+{
+  "name": "document.stringify",
+  "type": "object",
+  "description": "Converts a document into a JSON string.",
+  "inputs": {
+    "document": {
+  		"type": "document"
+  	}
+  },
+  "outputs": {
+    "json": {
+  		"type": "string"
+  	}
+  }
+}

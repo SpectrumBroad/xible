@@ -1,0 +1,21 @@
+{
+  "name": "store",
+  "type": "object",
+  "description": "Stores one or multiple values allowing direct re-use.",
+  "inputs": {
+    "refresh": {
+      "type": "trigger"
+    },
+    "value": {
+      "type": null
+    }
+  },
+  "outputs": {
+    "refreshed": {
+      "type": "trigger"
+    },
+    "value": {
+      "type": null
+    }
+  }
+}

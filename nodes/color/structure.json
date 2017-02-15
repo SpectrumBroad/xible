@@ -1,0 +1,10 @@
+{
+	"name": "color",
+	"type": "object",
+	"description": "Returns a color object.",
+	"outputs": {
+		"color": {
+			"type": "color.hex"
+		}
+	}
+}

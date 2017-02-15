@@ -1,49 +1,28 @@
-module.exports = function(XIBLE) {
+module.exports = function(NODE) {
 
-	function constr(NODE) {
+	let triggerIn = NODE.getInputByName('trigger');
+	let conditionIn = NODE.getInputByName('condition');
+	let thenOut = NODE.getOutputByName('then');
+	let elseOut = NODE.getOutputByName('else');
 
-		let triggerIn = NODE.addInput('trigger', {
-			type: "trigger"
-		});
+	triggerIn.on('trigger', (conn, state) => {
 
-		let conditionIn = NODE.addInput('condition', {
-			type: "boolean"
-		});
+		conditionIn.getValues(state).then((bools) => {
 
-		let thenOut = NODE.addOutput('then', {
-			type: "trigger"
-		});
+			if (bools.length) {
 
-		let elseOut = NODE.addOutput('else', {
-			type: "trigger"
-		});
-
-		triggerIn.on('trigger', (conn, state) => {
-
-			conditionIn.getValues(state).then((bools) => {
-
-				if (bools.length) {
-
-					if (bools.some(bool => !bool)) {
-						elseOut.trigger( state);
-					} else {
-						thenOut.trigger( state);
-					}
-
+				if (bools.some(bool => !bool)) {
+					elseOut.trigger(state);
 				} else {
-					elseOut.trigger( state);
+					thenOut.trigger(state);
 				}
 
-			});
+			} else {
+				elseOut.trigger(state);
+			}
 
 		});
 
-	}
-
-	XIBLE.addNode('if', {
-		type: "action",
-		level: 0,
-		description: `Triggers an output based on a condition.`
-	}, constr);
+	});
 
 };

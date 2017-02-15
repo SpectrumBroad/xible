@@ -1,0 +1,21 @@
+{
+  "name": "glow",
+  "type": "object",
+  "description": "Specifies a Glow server.",
+  "outputs": {
+    "connected": {
+  		"type": "trigger"
+  	},
+    "disconnected": {
+      "type": "trigger"
+    },
+    "glow": {
+      "type": "glow"
+    }
+  },
+  "vault": [
+    "token",
+    "host",
+    "port"
+  ]
+}

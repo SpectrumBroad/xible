@@ -1,0 +1,21 @@
+{
+  "name": "conditional",
+  "type": "object",
+  "description": "Return the selected value(s) based on the condition.",
+  "inputs": {
+    "condition": {
+      "type": "boolean"
+    },
+    "if true": {
+      "type": null
+    },
+    "if false": {
+      "type": null
+    }
+  },
+  "outputs": {
+    "value": {
+      "type": null
+    }
+  }
+}

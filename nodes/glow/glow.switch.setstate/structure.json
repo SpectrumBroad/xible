@@ -1,0 +1,21 @@
+{
+  "name": "glow.switch.setstate",
+  "type": "action",
+  "description": "Toggles a switch registrered in Glow.",
+  "inputs": {
+    "trigger": {
+  		"type": "trigger"
+  	},
+    "switch": {
+      "type": "glow.switch"
+    },
+    "state": {
+      "type": "boolean"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

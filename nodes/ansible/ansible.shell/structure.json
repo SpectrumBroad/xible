@@ -1,0 +1,24 @@
+{
+  "name": "ansible.shell",
+  "type": "action",
+  "description": "Runs the given command through a shell on the remote node.",
+  "inputs": {
+    "trigger": {
+  		"type": "trigger"
+  	},
+    "ansible": {
+  		"type": "ansible"
+  	},
+    "hostgroup": {
+  		"type": "ansible.hostgroup"
+  	},
+    "command": {
+  		"type": "string"
+  	}
+  },
+  "outputs": {
+    "done": {
+  		"type": "trigger"
+  	}
+  }
+}
