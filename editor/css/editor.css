@@ -38,6 +38,8 @@
 	font-size: inherit;
 	cursor: pointer;
 	font-family: inherit;
+	display: block;
+	float:left;
 }
 
 #flowEditorHolder .zoomButtons button:last-child {

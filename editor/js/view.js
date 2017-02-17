@@ -35,7 +35,7 @@ class View {
 						viewScriptNode.onload = () => {
 
 							if (typeof View.routes[this.name] === 'function') {
-								View.routes[this.name].call(this);
+								View.routes[this.name].call(this, this.element);
 							}
 
 						};
@@ -52,8 +52,10 @@ class View {
 				req.send();
 
 			} else {
-				View.routes[viewName].call(this);
+
+				View.routes[this.name].call(this, this.element);
 				resolve(this);
+
 			}
 
 		});

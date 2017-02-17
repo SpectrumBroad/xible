@@ -1,6 +1,6 @@
-View.routes.welcome = function() {
+View.routes.welcome = function(EL) {
 
-  this.element.innerHTML = `
+  EL.innerHTML = `
 		<div id="sub">
 			<header>XIBLE</header>
     </div>

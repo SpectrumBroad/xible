@@ -1,6 +1,6 @@
-View.routes.settings = function() {
+View.routes.settings = function(EL) {
 
-	this.element.innerHTML = `
+	EL.innerHTML = `
 		<div id="sub">
 			<header>XIBLE</header>
 			<p id="validateWritePermissions" class="status loading">Validating write permissions</p>

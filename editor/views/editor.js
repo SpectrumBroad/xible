@@ -1,6 +1,6 @@
-View.routes.editor = function() {
+View.routes.editor = function(EL) {
 
-	this.element.innerHTML = `
+	EL.innerHTML = `
 		<div id="sub">
 			<header>XIBLE<!--<span>ENTERPRISE</span>--></header>
 			<p class="status loading alert hidden">Connection lost</p>
@@ -28,6 +28,14 @@ View.routes.editor = function() {
 
 				</div>
 			</section>
+		</div>
+		<div id="flowEditorHolder">
+			<div class="zoomButtons">
+				<button id="zoomOutButton" type="button" title="Zoom out">&#xe024;</button>
+				<button id="zoomResetButton" type="button" title="Reset zoom">&#xe01c;</button>
+				<button id="zoomInButton" type="button" title="Zoom in">&#xe035;</button>
+			</div>
+			<ul id="flowList" class="flowList loading"></ul>
 		</div>
 	`;
 
@@ -335,48 +343,30 @@ View.routes.editor = function() {
 	resetCharts();
 
 	//holds the flowlist and editor
-	let flowEditorHolder = this.element.appendChild(document.createElement('div'));
-	flowEditorHolder.setAttribute('id', 'flowEditorHolder');
+	let flowEditorHolder = document.getElementById('flowEditorHolder');
 
 	//zoom and reset
-	let zoomButtons = flowEditorHolder.appendChild(document.createElement('div'));
-	zoomButtons.classList.add('zoomButtons');
-	let zoomOutButton = zoomButtons.appendChild(document.createElement('button'));
-	zoomOutButton.appendChild(document.createTextNode('\ue024'));
-	zoomOutButton.setAttribute('type', 'button');
-	zoomOutButton.setAttribute('title', 'Zoom out');
-	zoomOutButton.onclick = function() {
+	document.getElementById('zoomOutButton').onclick = function() {
 
 		xibleEditor.zoom -= 0.1;
 		xibleEditor.transform();
 
 	};
-	let zoomResetButton = zoomButtons.appendChild(document.createElement('button'));
-	zoomResetButton.appendChild(document.createTextNode('\ue01c'));
-	zoomResetButton.setAttribute('type', 'button');
-	zoomResetButton.setAttribute('title', 'Reset zoom');
-	zoomResetButton.onclick = function() {
+	document.getElementById('zoomResetButton').onclick = function() {
 
 		xibleEditor.zoom = 1;
 		xibleEditor.transform();
 
 	};
-	let zoomInButton = zoomButtons.appendChild(document.createElement('button'));
-	zoomInButton.appendChild(document.createTextNode('\ue035'));
-	zoomInButton.setAttribute('type', 'button');
-	zoomInButton.setAttribute('title', 'Zoom in');
-	zoomInButton.onclick = function() {
+	document.getElementById('zoomInButton').onclick = function() {
 
 		xibleEditor.zoom += 0.1;
 		xibleEditor.transform();
 
 	};
 
-	//create flowlist menu
-	let flowListUl = flowEditorHolder.appendChild(document.createElement('ul'));
-	flowListUl.classList.add('flowList', 'loading');
-
-	flowEditorHolder.appendChild(xibleEditor.element);
+	//add the flow names to the flow tab list
+	let flowListUl = document.getElementById('flowList');
 
 	function createFlowTab(flow) {
 
@@ -555,6 +545,9 @@ View.routes.editor = function() {
 		});
 
 	}
+
+	//add the xibleEditor to the view
+	flowEditorHolder.appendChild(xibleEditor.element);
 
 	//socket connection
 	if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {

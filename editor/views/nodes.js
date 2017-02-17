@@ -1,5 +1,5 @@
-View.routes.nodes = function() {
-	this.element.innerHTML = `
+View.routes.nodes = function(EL) {
+	EL.innerHTML = `
     <div id="sub">
       <header>XIBLE</header>
       <section>
