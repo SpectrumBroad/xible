@@ -13,7 +13,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 	});
 
 	//the tmp path for downloading this node
-	const TMP_REGISTRY_DIR = `${__dirname}/../../registryTmp`;
+	const TMP_REGISTRY_DIR = `/tmp/xibleRegistryTmp`;
 
 	function cleanUp() {
 
@@ -35,6 +35,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 	}
 
 	xibleRegistry.Node.prototype.install = function() {
+
+		let nodePath = XIBLE.Config.getValue('nodes.path');
+		if (!nodePath) {
+			return Promise.reject(`no "nodes.path" configured`);
+		}
+		nodePath = XIBLE.resolvePath(nodePath);
 
 		//get the registrydata
 		return this.getRegistryData().then((registryData) => {
@@ -78,7 +84,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 								}
 
 								//specify the dir where this node will be installed
-								let nodeDestDir = `${__dirname}/../../nodes/${this.name}`;
+								let nodeDestDir = `${nodePath}/${this.name}`;
 
 								//remove existing node directory
 								fsExtra.emptyDir(nodeDestDir, (err) => {

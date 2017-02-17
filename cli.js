@@ -23,7 +23,7 @@ console.log(`XIBLE\n`);
 process.env.DEBUG = 'xible*';
 
 //get a xible instance
-const CONFIG_PATH = './config.json';
+const CONFIG_PATH = `~/.xible/config.json`;
 const Xible = require('./index.js');
 let xible = new Xible({
 	configPath: CONFIG_PATH

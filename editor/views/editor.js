@@ -3,7 +3,7 @@ View.routes.editor = function(EL) {
 	EL.innerHTML = `
 		<div id="sub">
 			<header>XIBLE<!--<span>ENTERPRISE</span>--></header>
-			<p class="status loading alert hidden">Connection lost</p>
+			<p id="connectionLost" class="status loading alert hidden">Connection lost</p>
 			<p id="validateWritePermissions" class="status loading">Validating write permissions</p>
 			<section class="buttons">
 				<button type="button" id="xibleFlowDeployButton">Deploy</button>

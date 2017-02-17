@@ -25,10 +25,10 @@
   ],
   "scripts": {
     "start": "node cli.js server start",
-    "debug": "export DEBUG=\"xible*\"; nodemon server.js",
-    "debug-win": "set DEBUG=xible* & nodemon server.js",
-    "inspect": "export DEBUG=\"xible*\"; nodemon --inspect server.js",
-    "inspect-win": "set DEBUG=xible* & nodemon --inspect server.js"
+    "debug": "export DEBUG=\"xible*\"; nodemon cli.js server start",
+    "debug-win": "set DEBUG=xible* & nodemon cli.js server start",
+    "inspect": "export DEBUG=\"xible*\"; nodemon --inspect cli.js server start",
+    "inspect-win": "set DEBUG=xible* & nodemon --inspect cli.js server start"
   },
   "bin": {
     "xible": "./cli.js",

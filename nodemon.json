@@ -1,6 +1,6 @@
 {
 
-  "ignore": ["flows/*", "vault.json", "cli.js", "config.json"],
+  "ignore": ["flows/*", "vault.json", "config.json"],
   "execMap": {
     "js": "node"
   }

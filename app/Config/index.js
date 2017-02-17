@@ -1,10 +1,63 @@
-const fs = require('fs');
+const fsExtra = require('fs-extra');
+const debug = require('debug');
+const configDebug = debug('xible:config');
 
-module.exports = function(XIBLE, EXPRESS_APP) {
+const DEFAULT_PATH = `${__dirname}/../../config.json`;
+
+module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
+
+	function createConfig(path) {
+
+		configDebug(`creating "${path}"`);
+
+		try {
+
+			fsExtra.copySync(DEFAULT_PATH, path);
+			return true;
+
+		} catch (err) {
+			configDebug(`could not create "${path}": ${err}`);
+		}
+
+		return false;
+
+	}
+
+	let loadTries = -1;
+	function loadConfig(path) {
+
+		configDebug(`loading "${path}"`);
+
+		++loadTries;
+
+		let configContents;
+		try {
+
+			configContents = fsExtra.readFileSync(path, {
+				encoding: 'utf8'
+			});
+
+		} catch (err) {
+
+			configDebug(`error reading "${path}": ${err}`);
+
+			if (!loadTries && createConfig(path)) {
+				return loadConfig(path);
+			} else {
+				throw new Error(`failed to load config`);
+			}
+
+		}
+
+		return JSON.parse(configContents);
+
+	}
 
 	let config;
-	if (XIBLE.configPath) {
-		config = require(`../../${XIBLE.configPath}`);
+	if (CONFIG_OBJ) {
+		config = CONFIG_OBJ;
+	} else if (XIBLE.configPath) {
+		config = loadConfig(XIBLE.configPath);
 	} else {
 		throw new Error(`need a configPath`);
 	}
@@ -23,7 +76,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			return new Promise((resolve, reject) => {
 
 				//check if we can write
-				fs.access(XIBLE.configPath, fs.W_OK, function(err) {
+				fsExtra.access(XIBLE.configPath, fsExtra.W_OK, (err) => {
 
 					if (err) {
 						return resolve(false);
@@ -42,8 +95,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		}
 
 		static setValue(path, value) {
-
-
 
 		}
 

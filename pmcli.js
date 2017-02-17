@@ -26,7 +26,7 @@ const url = require('url');
 const readline = require('readline');
 
 //get a xible instance
-const CONFIG_PATH = './config.json';
+const CONFIG_PATH = `~/.xible/config.json`;
 const Xible = require('./index.js');
 let xible = new Xible({
 	configPath: CONFIG_PATH

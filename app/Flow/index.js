@@ -47,21 +47,37 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		static initFromPath(flowPath) {
 
 			flowDebug(`init flows from "${flowPath}"`);
-
 			if (this.flowPath) {
 
-				flowDebug(`cannot init two flow paths. "${this.flowPath}" already init`);
+				flowDebug(`cannot init multiple flow paths. "${this.flowPath}" already init`);
 				return;
 
 			}
+			this.flowPath = flowPath;
 
-			Flow.flowPath = flowPath;
+			//check that flowPath exists
+			if (!fs.existsSync(flowPath)) {
+
+				flowDebug(`creating "${flowPath}"`);
+				fs.mkdirSync(flowPath);
+
+			}
 
 			//will hold the flows by their _id
 			let flows = {};
 
 			//get the files in the flowPath
-			fs.readdirSync(flowPath).forEach((file) => {
+			let files;
+			try {
+				files = fs.readdirSync(flowPath);
+			} catch (err) {
+
+				flowDebug(`could not readdir "${flowPath}": ${err}`);
+				files = [];
+
+			}
+
+			files.forEach((file) => {
 
 				let filepath = flowPath + '/' + file;
 
@@ -119,7 +135,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			return new Promise((resolve, reject) => {
 
 				//check if we can write
-				fs.access(this.flowPath, fs.W_OK, function(err) {
+				fs.access(this.flowPath, fs.W_OK, (err) => {
 
 					if (err) {
 						return resolve(false);
@@ -757,6 +773,8 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 									this.started = true;
 									this.worker.send({
 										"method": "start",
+										"configPath": XIBLE.configPath,
+										"config": XIBLE.Config.getAll(),
 										"flow": this.json,
 										"nodes": XIBLE.nodes,
 										"directNodes": directNodes

@@ -1,6 +1,5 @@
-'use strict';
+'use strict';	/* jshint ignore: line */
 
-const CONFIG_PATH = './config.json';
 const Xible = require('./index.js');
 
 let flow;
@@ -36,9 +35,8 @@ process.on('message', (message) => {
 
 				//setup xible with the nodeNames
 				let xible = new Xible({
-					child: true,
-					configPath: CONFIG_PATH
-				});
+					child: true
+				}, message.config);
 
 				//init the proper nodes
 				let structuredNodes = {};

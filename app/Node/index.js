@@ -108,7 +108,16 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		static getStructures(structuresPath, files) {
 
 			if (!Array.isArray(files)) {
-				files = fs.readdirSync(structuresPath);
+
+				try {
+					files = fs.readdirSync(structuresPath);
+				} catch (err) {
+
+					nodeDebug(`could not readdir "${structuresPath}": ${err}`);
+					files = [];
+
+				}
+
 			}
 
 			return new Promise((resolve, reject) => {
@@ -138,7 +147,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 					}
 
 					let normalizedPath = path.resolve(structuresPath, files[i]);
-					fs.stat(normalizedPath, (err, stat) => {
+					fs.stat(normalizedPath, (err, stat) => { /* jshint ignore: line*/
 
 						if (err) {
 
@@ -225,14 +234,31 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		static initFromPath(path, files) {
+		static initFromPath(nodePath, files) {
+
+			nodeDebug(`init nodes from "${nodePath}"`);
+			if (this.nodePath) {
+
+				nodeDebug(`cannot init multiple node paths. "${this.nodePath}" already init`);
+				return;
+
+			}
+			this.nodePath = nodePath;
+
+			//check that nodePath exists
+			if (!fs.existsSync(nodePath)) {
+
+				nodeDebug(`creating "${nodePath}"`);
+				fs.mkdirSync(nodePath);
+
+			}
 
 			let EXPRESS;
 			if (!XIBLE.child) {
 				EXPRESS = require('express');
 			}
 
-			return this.getStructures(path, files).then((structures) => {
+			return this.getStructures(nodePath, files).then((structures) => {
 
 				for (let nodeName in structures) {
 
@@ -642,7 +668,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 					let conn = conns[i];
 
 					//trigger the input
-					conn.origin.emit('trigger', conn, state, (value) => {
+					conn.origin.emit('trigger', conn, state, (value) => { /* jshint ignore: line */
 
 						//let everyone know that the trigger is done
 						conn.origin.emit('triggerdone');
@@ -701,6 +727,95 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		require('./routes.js')(Node, XIBLE, EXPRESS_APP);
 	}
 
+	//TODO: encryption on the vault
+	const vaultDebug = debug('xible:vault');
+	let vault;
+	let vaultPath = XIBLE.Config.getValue('vault.path');
+	if (!vaultPath) {
+		throw new Error(`no "vault.path" configured`);
+	}
+	vaultPath = XIBLE.resolvePath(vaultPath);
+
+	class MainVault {
+
+		static init() {
+
+			//create the vault if it doesn't exist
+			if (!fs.existsSync(vaultPath)) {
+
+				vaultDebug(`creating new`);
+				fs.writeFileSync(vaultPath, '{}');
+
+			}
+
+			try {
+				vault = JSON.parse(fs.readFileSync(vaultPath));
+			} catch (err) {
+				vaultDebug(`could not open "${vaultPath}"`);
+			}
+
+		}
+
+		static save() {
+
+			try {
+				fs.writeFileSync(vaultPath, JSON.stringify(vault));
+			} catch (e) {
+				vaultDebug(`could not save "${vaultPath}"`);
+			}
+
+		}
+
+		static get(node) {
+
+			if (!node || !node._id) {
+				return;
+			}
+
+			if (!vault) {
+				this.init();
+			}
+
+			return vault[node._id];
+
+		}
+
+		static set(node, obj) {
+
+			if (!node || !node._id) {
+				return;
+			}
+
+			//always get fresh contents
+			this.init();
+
+			vault[node._id] = obj;
+			this.save();
+
+		}
+
+	}
+
+	class NodeVault {
+
+		constructor(node) {
+			this.node = node;
+		}
+
+		set(obj) {
+
+			//also update the data property on the node
+			Object.assign(this.node.data, obj);
+			return MainVault.set(this.node, obj);
+
+		}
+
+		get() {
+			return MainVault.get(this.node);
+		}
+
+	}
+
 	return {
 		Node: Node,
 		NodeInput: NodeInput,
@@ -708,88 +823,3 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 	};
 
 };
-
-
-//TODO: encryption on the vault
-const vaultDebug = debug('xible:vault');
-let vault;
-class MainVault {
-
-	static init() {
-
-		//create the vault if it doesn't exist
-		if (!fs.existsSync(`vault.json`)) {
-
-			vaultDebug(`creating new`);
-			fs.writeFileSync(`vault.json`, '{}');
-
-		}
-
-		try {
-			vault = JSON.parse(fs.readFileSync(`vault.json`));
-		} catch (err) {
-			vaultDebug(`could not open vault.json`);
-		}
-
-	}
-
-	static save() {
-
-		try {
-			fs.writeFileSync(`vault.json`, JSON.stringify(vault));
-		} catch (e) {
-			vaultDebug(`could not save vault.json`);
-		}
-
-	}
-
-	static get(node) {
-
-		if (!node || !node._id) {
-			return;
-		}
-
-		if (!vault) {
-			this.init();
-		}
-
-		return vault[node._id];
-
-	}
-
-	static set(node, obj) {
-
-		if (!node || !node._id) {
-			return;
-		}
-
-		//always get fresh contents
-		this.init();
-
-		vault[node._id] = obj;
-		this.save();
-
-	}
-
-}
-
-
-class NodeVault {
-
-	constructor(node) {
-		this.node = node;
-	}
-
-	set(obj) {
-
-		//also update the data property on the node
-		Object.assign(this.node.data, obj);
-		return MainVault.set(this.node, obj);
-
-	}
-
-	get() {
-		return MainVault.get(this.node);
-	}
-
-}

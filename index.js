@@ -1,6 +1,7 @@
 'use strict'; /* jshint ignore: line */
 
 const EventEmitter = require('events').EventEmitter;
+const os = require('os');
 
 //setup debug
 const debug = require('debug');
@@ -22,21 +23,23 @@ let broadcastWebSocketMessagesThrottle = [];
 
 class Xible extends EventEmitter {
 
-	constructor(obj) {
+	constructor(obj, configObj) {
 
 		super();
 
 		this.nodes = {};
 		this.flows = {};
 
-		this.configPath = obj.configPath;
+		if(typeof obj.configPath === 'string') {
+			this.configPath = this.resolvePath(obj.configPath);
+		}
 
 		this.child = false;
 		if (obj.child) {
 			this.child = true;
 		}
 
-		if(!this.child) {
+		if (!this.child) {
 			xibleDebug(process.versions);
 		}
 
@@ -55,7 +58,7 @@ class Xible extends EventEmitter {
 		}
 
 		appNames.forEach((appName) => {
-			Object.assign(this, require(`./app/${appName}`)(this, this.expressApp));
+			Object.assign(this, require(`./app/${appName}`)(this, this.expressApp, (appName === 'Config' && configObj ? configObj : undefined)));
 		});
 
 	}
@@ -98,7 +101,7 @@ class Xible extends EventEmitter {
 
 		}
 
-		if(this.child) {
+		if (this.child) {
 			return Promise.resolve();
 		}
 
@@ -108,7 +111,7 @@ class Xible extends EventEmitter {
 		}
 
 		return this.Node
-			.initFromPath(nodesPath)
+			.initFromPath(this.resolvePath(nodesPath))
 			.then(() => {
 
 				//get all installed flows
@@ -116,7 +119,7 @@ class Xible extends EventEmitter {
 
 					let flowPath = this.Config.getValue('flows.path');
 					if (flowPath) {
-						this.Flow.initFromPath(flowPath);
+						this.Flow.initFromPath(this.resolvePath(flowPath));
 					}
 
 				}
@@ -190,6 +193,10 @@ class Xible extends EventEmitter {
 
 		}
 
+	}
+
+	resolvePath(path) {
+		return path.replace(/^~/, os.homedir());
 	}
 
 	static getNativeModules() {
