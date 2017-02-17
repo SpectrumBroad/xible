@@ -80,7 +80,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						}
 
 					} catch (err) {
-						flowDebug(`could not init '${filepath}': ${err.stack}`);
+						flowDebug(`could not init "${filepath}": ${err.stack}`);
 					}
 
 				}
@@ -156,7 +156,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				flowDebug(`found ${Object.keys(statuses).length} statuses`);
 
 			} catch (err) {
-				flowDebug(`${this.flowPath}/_status.json cannot be opened: ${err}`);
+				flowDebug(`"${this.flowPath}/_status.json" cannot be opened: ${err}`);
 			}
 
 			this._statuses = statuses;

@@ -2,6 +2,7 @@ class View {
 
 	constructor(viewName, props) {
 
+		this.name = viewName;
 		this.element = document.createElement('div');
 		this.element.classList.add('view');
 		this.style = this.element.style;
@@ -10,13 +11,16 @@ class View {
 		this.element.view = this;
 		this.properties = props || {};
 
-		//load the view by its name from the views
-		if (viewName) {
+	}
 
-			if (!View.routes[viewName]) {
+	init() {
+
+		return new Promise((resolve, reject) => {
+
+			if (!View.routes[this.name]) {
 
 				//get the complete view url
-				let url = `views/${viewName}.js`;
+				let url = `views/${this.name}.js`;
 
 				//check if the view actually exists using HttpRequest, so we have error handling
 				let req = new XMLHttpRequest();
@@ -30,13 +34,17 @@ class View {
 						viewScriptNode.setAttribute('src', url);
 						viewScriptNode.onload = () => {
 
-							if (typeof View.routes[viewName] === 'function') {
-								View.routes[viewName].call(this);
+							if (typeof View.routes[this.name] === 'function') {
+								View.routes[this.name].call(this);
 							}
 
 						};
 						document.head.appendChild(viewScriptNode);
 
+						resolve(this);
+
+					} else {
+						reject(req.status);
 					}
 
 				};
@@ -45,9 +53,10 @@ class View {
 
 			} else {
 				View.routes[viewName].call(this);
+				resolve(this);
 			}
 
-		}
+		});
 
 	}
 
@@ -78,9 +87,11 @@ class ViewHolder { //extends EventEmitter
 	navigate(path, nonav) {
 
 		let deepIndex = 0;
+		/*
 		if (this.parentViewHolder) {
 			deepIndex = this.parentViewHolder.navigate(path, nonav);
 		}
+		*/
 
 		history.pushState(null, path, path);
 		if (!nonav) {
@@ -88,12 +99,14 @@ class ViewHolder { //extends EventEmitter
 			this.purge();
 
 			let paths = path.substring(1).split('/');
-			this.render(new View(paths[deepIndex], this.getParams()));
+			let view = new View(paths[deepIndex], this.getParams());
+			this.render(view);
+
+			return view.init();
 
 		}
 
-		//always return false so this fn can easily be used in a onclick
-		return false;
+		return Promise.resolve(this);
 
 	}
 
@@ -101,11 +114,10 @@ class ViewHolder { //extends EventEmitter
 
 		let path = window.location.pathname;
 		if (!path || path === '/') {
-			return false;
+			return Promise.reject('already root');
 		}
 
-		this.navigate(path);
-		return true;
+		return this.navigate(path);
 
 	}
 

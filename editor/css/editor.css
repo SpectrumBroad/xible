@@ -1,0 +1,533 @@
+
+#flowEditorHolder {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	width: 1px;
+	position: relative;
+}
+
+#flowEditorHolder .zoomButtons {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	z-index: 1;
+	padding: 0;
+	margin: 0;
+	font-size: 1em;
+	opacity: 0.5;
+	background-color: #181818;
+	box-shadow: 0 0 6px 0 #000;
+	border: 1px solid #000;
+	border-radius: 6px;
+	font-family: dripicons;
+}
+
+#flowEditorHolder .zoomButtons:hover {
+	opacity: 0.9;
+}
+
+#flowEditorHolder .zoomButtons button {
+	margin: 0;
+	padding: 2px 4px;
+	min-width: 20px;
+	border: none;
+	border-right: 1px solid #000;
+	background-color: inherit;
+	color: #ccc;
+	font-size: inherit;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+#flowEditorHolder .zoomButtons button:last-child {
+	border-right: none;
+}
+
+#console {
+	width: 100%;
+}
+
+#console>.stats {
+	width: 100%;
+	height: 200px;
+}
+
+#console>.stats>canvas {
+	display: block;
+	width: 100%;
+	height: 50%;
+}
+
+#console>.stats>label {
+	display: block;
+	float: left;
+	position: relative;
+	font-size: 0.8em;
+	margin: 4px;
+}
+
+#console>.stats>label::before {
+	margin: 3px 4px 4px;
+	display: block;
+	float: left;
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+}
+
+#heapUsed::before {
+	background-color: rgb(230, 74, 107);
+}
+
+#heapTotal::before {
+	background-color: rgb(29, 137, 210);
+}
+
+#rss::before {
+	background-color: rgb(230, 181, 61);
+}
+
+#cpu::before {
+	background-color: rgb(50, 167, 167);
+}
+
+#delay::before {
+	background-color: purple;
+}
+
+#sub section.buttons {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.buttons button {
+	-webkit-appearance: none;
+	appearance: none;
+	color: #fff;
+	font-weight: bold;
+	border: none;
+	background-color: #282828;
+	padding: 10px;
+	cursor: pointer;
+	display: block;
+	border-radius: 4px;
+	margin: 10px;
+	min-width: 30%;
+	flex: 1 1 0;
+}
+
+.buttons button:hover {
+	background-color: #383838;
+}
+
+.buttons button:active, .buttons button:focus {
+	-webkit-appearance: none;
+	appearance: none;
+	outline: 0;
+	border: 2px solid #45679E;
+	padding: 8px;
+}
+
+.buttons button::before {
+	font-family: awesome;
+	display: block;
+	content: "\f04b";
+	margin-bottom: 6px;
+}
+
+#xibleFlowDeployButton {
+	flex: 0 1 100%;
+}
+
+#xibleFlowStartButton {
+	clear: left;
+}
+
+#xibleFlowDeployButton::before {
+	content: "\f063";
+}
+
+#xibleFlowStartButton::before {
+	content: "\f04b";
+}
+
+#xibleFlowStopButton::before {
+	content: "\f04d";
+}
+
+#xibleFlowSaveButton::before {
+	content: "\f019";
+}
+
+#xibleFlowDeleteButton::before {
+	content: "\f014";
+}
+
+.nodeList {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.xible {
+	box-shadow: 0 0 6px 0 rgba(0, 0, 0, 1);
+	border-top-left-radius: 4px;
+	position: relative;
+	flex: 1 1 100%;
+	overflow: hidden;
+	background-color: #292929;
+	background-size: 50px 50px;
+	background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+	font-size: 0.7em;
+}
+
+.xible.panning {
+	cursor: all-scroll;
+}
+
+.xible.panning * {
+	cursor: all-scroll !important;
+}
+
+
+/* area selector */
+
+.xible .area {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 2px solid #45679E;
+	background-color: rgba(255, 255, 255, 0.07);
+	z-index: 10;
+}
+
+.xible .editor {
+	transform-origin: 0 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+
+/* double click to add new node */
+
+/* .xible:has(.editor:empty)::before { */
+.xible .editor:empty::before {
+	display: block;
+	content: "Click the \"+\" button in the left top corner to create a new flow.";
+	white-space: pre;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.xible[data-flow] .editor:empty::before {
+	content: "Double click anywhere on the canvas to add a node.\A Hold down the scroll wheel to move around.";
+}
+
+.xible .editor>.connector {
+	z-index: 1;
+	display: block;
+	position: absolute;
+	-webkit-filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 2px #000);
+	filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 2px #000);
+	pointer-events: none;
+}
+
+.xible .editor>.connector>path {
+	stroke: #fff;
+	stroke-width: 3px;
+	fill: none;
+	pointer-events: all;
+}
+
+
+/*
+.xible .editor>.connector.selected {
+	z-index:2;
+}
+*/
+
+.xible .editor>.connector.selected>path {
+	stroke: gold;
+}
+
+.xible .editor>.connector.nodirect {
+	opacity: 0.1;
+}
+
+.xible .editor>.connector.splice>path {
+	stroke-dasharray: 10, 10;
+}
+
+.xible .node {
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+	position: absolute;
+	background-color: rgb(30, 30, 30);
+	width: 200px;
+	min-height: 10px;
+	border-radius: 6px;
+	color: #fff;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	z-index: 2;
+	border: 2px solid #000;
+	text-align: center;
+}
+
+.xible .node.fail {
+	border: 2px solid #f00;
+	background-color: rgba(255, 0, 0, 0.3);
+	box-shadow: 0 0 10px 4px rgba(255, 0, 0, 0.4);
+}
+
+.xible .node.splice {
+	background-color: rgba(30, 30, 30, 0.6);
+}
+
+.xible .node.splice * {
+	opacity: 0.6;
+}
+
+.xible .node.selected {
+	border-color: gold;
+	z-index: 3;
+}
+
+.xible .node.nodirect {
+	opacity: 0.2;
+}
+
+.xible .node>h1 {
+	font-size: 1em;
+	font-weight: bold;
+	background-color: #373737;
+	margin: 0;
+	padding: 2px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	cursor: pointer;
+	overflow: hidden;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.xible .node.fail>h1 {
+	background-color: rgba(255, 0, 0, 0.3);
+}
+
+.xible .node>.io {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.xible .node>.io>ul {
+	width: 50%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	min-height: 10px;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+}
+
+.xible .node>.io>ul.input {
+	text-align: left;
+}
+
+.xible .node>.io>ul.output {
+	top: 0;
+	text-align: right;
+}
+
+.xible .node>.io>ul>li {
+	display: block;
+	padding: 0 2px;
+	border-width: 0;
+	cursor: default;
+	white-space: nowrap;
+	position: relative;
+}
+
+.xible .node>.io>ul>li>div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.xible .node>.io>.input>li {
+	border-left: 3px solid #000;
+}
+
+.xible .node>.io>.output>li {
+	border-right: 3px solid #000;
+}
+
+.xible .node>.io>ul>.global::after {
+	display: block;
+	content: "";
+	width: 30px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	right: 0;
+	transform: translateX(35px);
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+	pointer-events: none;
+}
+
+.xible .node>.io>.input>.global::after {
+	left: 0;
+	right: auto;
+	transform: translateX(-35px);
+	background-image: linear-gradient(to left, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+}
+
+.xible .node>.io>ul>.math\.number {
+	border-color: red;
+}
+
+.xible .node>.io>ul>.trigger {
+	border-color: white;
+}
+
+.xible .node>.io>ul>.glow\.light {
+	border-color: green;
+}
+
+.xible .node>.io>ul>.glow\.scene {
+	border-color: blue;
+}
+
+.xible .node>.io>ul>.boolean {
+	border-color: purple;
+}
+
+.xible .node>.io>ul>.string {
+	border-color: yellow;
+}
+
+.xible .node>.content {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 3px 6px 6px;
+	clear: left;
+	position: relative;
+	text-align: left;
+	/* overflow: hidden; */
+}
+
+
+/*
+.xible .node>.content {
+	padding: 3px 6px 6px;
+}
+
+.xible .node>.content:has(> [style*="display:none"]) { {
+	display:none;
+}
+*/
+
+
+/*
+.xible .node>.content>[style*="none"] + :not([style*="none"]) {
+	margin-bottom:6px;
+}
+*/
+
+.xible .node>.statuses, .xible .node>.tracker {
+	box-sizing: border-box;
+	position: absolute;
+	color: #fff;
+	width: 100%;
+	font-size: 0.9em;
+	text-align: left;
+}
+
+.xible .node>.tracker {
+	top: 0;
+	padding: 2px;
+	margin: -1px 0 0 0;
+	overflow: hidden;
+	transform: translatey(-100%);
+	background-image: linear-gradient(to top, rgba(0, 0, 0, .3), rgba(0, 0, 0, .3) 70%, transparent);
+}
+
+.xible .node>.statuses {
+	top: 100%;
+	padding: 0;
+	margin: 1px 0 0 0;
+	list-style-type: none;
+}
+
+.xible .node>.statuses>li {
+	padding: 2px;
+	display: block;
+	overflow: hidden;
+	background-color: rgba(0, 0, 0, .3);
+	border-bottom: 1px dotted #444;
+	box-sizing: border-box;
+}
+
+.xible .node>.statuses>li.bar>.holder {
+	margin: 2px;
+	padding: 1px;
+	box-sizing: border-box;
+	width: calc( 100% - 4px);
+	height: 4px;
+	background-color: rgba(0, 0, 0, .6);
+	border-radius: 4px;
+}
+
+.xible .node>.statuses>li.bar>.holder>div {
+	background-color: #00ff00;
+	box-sizing: border-box;
+	height: 2px;
+	border-radius: 2px;
+	width: 0;
+}
+
+.xible .node>.statuses>li:last-child {
+	border-bottom: none;
+	background-color: transparent;
+	background-image: linear-gradient(to bottom, rgba(0, 0, 0, .3), rgba(0, 0, 0, .3) 70%, transparent);
+}
+
+.xible .node>.statuses>li:not(.bar)::before, .xible .node>.tracker::before {
+	display: block;
+	content: '';
+	margin: 3px 8px 2px 2px;
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+	background-color: silver;
+	float: left;
+}
+
+.xible .node>.statuses>li.green:not(.bar)::before, .xible .node>.tracker.green::before {
+	background-color: lime;
+}
+
+.xible .node>.statuses>li.blue:not(.bar)::before, .xible .node>.tracker.blue::before {
+	background-color: darkturquoise;
+}
+
+.xible .node>.statuses>li.red:not(.bar)::before, .xible .node>.tracker.red::before {
+	background-color: red;
+}
+
+.xible .node>.statuses>li.orange:not(.bar)::before, .xible .node>.tracker.orange::before {
+	background-color: darkorange;
+}

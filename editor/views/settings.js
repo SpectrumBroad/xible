@@ -1,26 +1,65 @@
 View.routes.settings = function() {
 
-	let menuHolder = this.element.appendChild(document.createElement('div'));
-	menuHolder.setAttribute('id', 'sub');
+	this.element.innerHTML = `
+		<div id="sub">
+			<header>XIBLE</header>
+			<p id="validateWritePermissions" class="status loading">Validating write permissions</p>
+			<section>
+				<h1>General</h1>
+				<ul>
+					<li><a href="#">test</a></li>
+					<li><a href="#">test 2</a></li>
+				</ul>
+			</section>
+			<section>
+				<h1>Editor</h1>
+				<ul>
+					<li><a href="#">test</a></li>
+					<li><a href="#">test 2</a></li>
+				</ul>
+			</section>
+			<section>
+				<h1>Security</h1>
+				<ul>
+					<li><a href="#">Users</a></li>
+					<li><a href="#">Groups</a></li>
+					<li><a href="#">Permissions</a></li>
+					<li><a href="#">Tokens</a></li>
+				</ul>
+			</section>
+			<section>
+				<h1>Registry</h1>
+				<ul>
+					<li><a href="#">General</a></li>
+					<li><a href="#">Nodes</a></li>
+					<li><a href="#">Flows</a></li>
+				</ul>
+			</section>
+			<section>
+				<h1>Enterprise</h1>
+				<ul>
+					<li><a href="#">General</a></li>
+				</ul>
+			</section>
+		</div>
+		<div class="inner">
+			<section>
+				<h1>Hello</h1>
+				<p>This is a test for the later markup.</p>
+			</section>
+			<section>
+				<form>
+					<dl>
+						<dt>label dt</dt>
+						<dd>Matching dd</dd>
+					</dl>
+				</form>
+			</section>
+		</div>
+	`;
 
-	menuHolder.appendChild(document.createElement('header')).appendChild(document.createTextNode('XIBLE'));
-
-	let permissionsValidate = menuHolder.appendChild(document.createElement('p'));
-	permissionsValidate.innerHTML = 'Validating write permissions';
-	permissionsValidate.classList.add('status', 'loading');
-
-	let section = menuHolder.appendChild(document.createElement('section'));
-	section.innerHTML = '<h1>General</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
-
-	section = menuHolder.appendChild(document.createElement('section'));
-	section.innerHTML = '<h1>Editor</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
-
-	section = menuHolder.appendChild(document.createElement('section'));
-	section.innerHTML = '<h1>Registry</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
-
-	section = menuHolder.appendChild(document.createElement('section'));
-	section.innerHTML = '<h1>Enterprise</h1><ul><li><a href="#">test</a></li><li><a href="#">test 2</a></li><li><a href="#">test</a></li><li><a href="#">test 2</a></li></ul>';
-
+	//validate if the config can be altered
+	let permissionsValidate = document.getElementById('validateWritePermissions');
 	xibleWrapper.Config.validatePermissions().then((result) => {
 
 		permissionsValidate.addEventListener('animationiteration', () => {
@@ -36,7 +75,7 @@ View.routes.settings = function() {
 			permissionsValidate.classList.add('success');
 
 			window.setTimeout(() => {
-				menuHolder.removeChild(permissionsValidate);
+				permissionsValidate.parentNode.removeChild(permissionsValidate);
 			}, 6000);
 
 		} else {
@@ -48,9 +87,5 @@ View.routes.settings = function() {
 		}
 
 	});
-
-	let div = this.element.appendChild(document.createElement('div'));
-	div.classList.add('inner');
-	div.innerHTML = `<section><h1>Hello</h1><p>This is a test for the later markup.</p></section><section><form><dl><dt>label dt</dt><dd>Matching dd</dd></dl></form></section>`;
 
 };

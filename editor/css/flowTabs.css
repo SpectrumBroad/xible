@@ -12,6 +12,7 @@
 .flowList li {
 	display: block;
 	box-sizing: border-box;
+	text-align: center;
 	min-width: 0;
 	flex: 0 1 auto;
 	cursor: pointer;
@@ -27,7 +28,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	height: 100%;
-	background-color:inherit;
+	background-color: inherit;
 }
 
 .flowList li.add {
@@ -46,9 +47,9 @@
 	display: block;
 	height: 7px;
 	width: 100%;
-	background-color:inherit;
+	background-color: inherit;
 	border-bottom: 2px solid lime;
-	z-index:1;
+	z-index: 1;
 }
 
 .flowList li.started.direct a::before {

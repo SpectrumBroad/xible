@@ -13,6 +13,11 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		res.json(XIBLE.persistentWebSocketMessages);
 	});
 
+	//non existing views
+	EXPRESS_APP.get('/views/*.js', (req, res, next) => {
+		res.status(404).end();
+	});
+
 	EXPRESS_APP.get('*', (req, res, next) => {
 
 		//node editor content hosting

@@ -8,22 +8,18 @@
 	<base href="/">
 
 	<link rel="stylesheet" href="css/index.css" type="text/css" />
+	<link rel="stylesheet" href="css/main.css" type="text/css" />
+
+	<!-- editor related css files -->
+	<link rel="stylesheet" href="css/editor.css" type="text/css" />
 	<link rel="stylesheet" href="css/describe.css" type="text/css" />
 	<link rel="stylesheet" href="css/flowTabs.css" type="text/css" />
 	<link rel="stylesheet" href="css/nodeSelector.css" type="text/css" />
-	<link rel="stylesheet" href="css/main.css" type="text/css" />
 
-	<script src="js/oohttprequest.js"></script>
 	<script src="js/EventEmitter.min.js"></script>
 	<script src="js/xibleWrapper.js"></script>
 	<script src="js/Chart.min.js"></script>
 	<script src="js/view.js"></script>
-
-	<!-- <script src="js/ShadowDOM.min.js"></script> -->
-
-	<script>
-		OoHttpRequest.defaults.headers['content-type'] = 'application/json';
-	</script>
 
 </head>
 
@@ -33,9 +29,9 @@
 
 		<ul>
 
-			<li><a href="/flows" onclick="return mainViewHolder.navigate('/flows');"><span>&#xe059;</span>Flows</a></li>
-			<li><a href="/nodes" onclick="return mainViewHolder.navigate('/nodes');"><span>&#xe044;</span>Nodes</a></li>
-			<li><a href="/settings" onclick="return mainViewHolder.navigate('/settings');"><span>S</span>Settings</a></li>
+<!--			<li><a href="/flows" onclick="return mainViewHolder.navigate('/flows');"><span>&#xe059;</span>Flows</a></li> -->
+<!--			<li><a href="/nodes" onclick="return mainViewHolder.navigate('/nodes');"><span>&#xe044;</span>Nodes</a></li> -->
+<!--			<li><a href="/settings" onclick="return mainViewHolder.navigate('/settings');"><span>S</span>Settings</a></li> -->
 			<li><a href="/editor" onclick="return mainViewHolder.navigate('/editor');"><span>&#xe029;</span>Editor</a></li>
 
 		</ul>
@@ -57,12 +53,11 @@
 		xibleWrapper.connect();
 
 		mainViewHolder = new ViewHolder(document.getElementById('main'));
-		subMenuViewHolder = new ViewHolder(document.getElementById('sub'));
 
 		mainViewHolder.hookNavHandler();
-		if (!mainViewHolder.loadNav()) {
+		mainViewHolder.loadNav().catch(() => {
 			mainViewHolder.navigate('/welcome');
-		}
+		});
 	</script>
 
 	<script src="js/xibleEditorNode.js"></script>

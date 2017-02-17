@@ -1,23 +1,41 @@
 View.routes.editor = function() {
 
+	this.element.innerHTML = `
+		<div id="sub">
+			<header>XIBLE<!--<span>ENTERPRISE</span>--></header>
+			<p class="status loading alert hidden">Connection lost</p>
+			<p id="validateWritePermissions" class="status loading">Validating write permissions</p>
+			<section class="buttons">
+				<button type="button" id="xibleFlowDeployButton">Deploy</button>
+				<button type="button" id="xibleFlowStartButton">Start</button>
+				<button type="button" id="xibleFlowStopButton">Stop</button>
+				<button type="button" id="xibleFlowSaveButton">Save</button>
+				<button type="button" id="xibleFlowDeleteButton">Delete</button>
+			</section>
+			<section id="console">
+				<div class="stats">
+
+					<canvas id="cpuChart"></canvas>
+					<label id="cpu">cpu</label>
+
+					<canvas id="memChart"></canvas>
+					<label id="rss">rss</label>
+					<label id="heapTotal">heap total</label>
+					<label id="heapUsed">heap used</label>
+
+					<canvas id="delayChart"></canvas>
+					<label id="delay">event loop delay</label>
+
+				</div>
+			</section>
+		</div>
+	`;
+
 	let xibleEditor = new XibleEditor();
+	let connectionLost = document.getElementById('connectionLost');
+	let permissionsValidate = document.getElementById('validateWritePermissions');
 
-	let menuHolder = this.element.appendChild(document.createElement('div'));
-	menuHolder.setAttribute('id', 'sub');
-
-	let header = menuHolder.appendChild(document.createElement('header'));
-	header.appendChild(document.createTextNode('XIBLE'));
-
-	//header.appendChild(document.createElement('span')).appendChild(document.createTextNode('ENTERPRISE'));
-
-	let connectionLost = menuHolder.appendChild(document.createElement('p'));
-	connectionLost.innerHTML = 'Connection lost';
-	connectionLost.classList.add('status', 'loading', 'alert', 'hidden');
-
-	let permissionsValidate = menuHolder.appendChild(document.createElement('p'));
-	permissionsValidate.innerHTML = 'Validating write permissions';
-	permissionsValidate.classList.add('status', 'loading');
-
+	//validate if the flows can be altered
 	xibleWrapper.Flow.validatePermissions().then((result) => {
 
 		permissionsValidate.addEventListener('animationiteration', () => {
@@ -32,7 +50,7 @@ View.routes.editor = function() {
 			permissionsValidate.classList.add('success');
 
 			window.setTimeout(() => {
-				menuHolder.removeChild(permissionsValidate);
+				permissionsValidate.parentNode.removeChild(permissionsValidate);
 			}, 6000);
 
 		} else {
@@ -44,58 +62,37 @@ View.routes.editor = function() {
 
 	});
 
-	//create menu
-	let buttonSection = menuHolder.appendChild(document.createElement('section'));
-	buttonSection.classList.add('buttons');
-
+	//hook buttons
 	//deploy
-	var button = buttonSection.appendChild(document.createElement('button'));
-	button.appendChild(document.createTextNode('Deploy'));
-	button.setAttribute('type', 'button');
-	button.setAttribute('id', 'xibleFlowDeployButton');
-	button.onclick = function() {
-		xibleEditor.loadedFlow.save().then((flow) => flow.start());
+	document.getElementById('xibleFlowDeployButton').onclick = function() {
+		xibleEditor.loadedFlow
+			.save()
+			.then((flow) => flow.start());
 	};
 
 	//start
-	button = buttonSection.appendChild(document.createElement('button'));
-	button.appendChild(document.createTextNode('Start'));
-	button.setAttribute('type', 'button');
-	button.setAttribute('id', 'xibleFlowStartButton');
-	button.onclick = function() {
+	document.getElementById('xibleFlowStartButton').onclick = function() {
 		xibleEditor.loadedFlow.start();
 	};
 
 	//stop
-	button = buttonSection.appendChild(document.createElement('button'));
-	button.appendChild(document.createTextNode('Stop'));
-	button.setAttribute('type', 'button');
-	button.setAttribute('id', 'xibleFlowStopButton');
-	button.onclick = function() {
+	document.getElementById('xibleFlowStopButton').onclick = function() {
 		xibleEditor.loadedFlow.stop();
 	};
 
 	//save
-	button = buttonSection.appendChild(document.createElement('button'));
-	button.appendChild(document.createTextNode('Save'));
-	button.setAttribute('type', 'button');
-	button.setAttribute('id', 'xibleFlowSaveButton');
-	button.onclick = function() {
+	document.getElementById('xibleFlowSaveButton').onclick = function() {
 		xibleEditor.loadedFlow.save();
 	};
 
 	//delete
-	button = buttonSection.appendChild(document.createElement('button'));
-	button.appendChild(document.createTextNode('Delete'));
-	button.setAttribute('type', 'button');
-	button.setAttribute('id', 'xibleFlowDeleteButton');
-	button.onclick = function() {
+	document.getElementById('xibleFlowDeleteButton').onclick = function() {
 
 		if (!xibleEditor.loadedFlow) {
 			return;
 		}
 
-		if (window.confirm(`Are you sure you wan't to permanently delete flow ${xibleEditor.loadedFlow._id}?`)) {
+		if (window.confirm(`Are you sure you wan't to permanently delete flow "${xibleEditor.loadedFlow._id}"?`)) {
 
 			xibleEditor.loadedFlow.delete();
 
@@ -108,19 +105,8 @@ View.routes.editor = function() {
 
 	};
 
-	//console
-	//create console
-	let cons = document.createElement('section');
-	cons.setAttribute('id', 'console');
-	menuHolder.appendChild(cons);
-
-	//statistics holder
-	let stats = cons.appendChild(document.createElement('div'));
-	stats.classList.add('stats');
-
 	//cpu chart
-	let cpuCanvas = stats.appendChild(document.createElement('canvas'));
-	cpuCanvas.setAttribute('id', 'cpuChart');
+	let cpuCanvas = document.getElementById('cpuChart');
 	let cpuChart = new Chart(cpuCanvas, {
 		type: 'line',
 		data: {
@@ -168,13 +154,9 @@ View.routes.editor = function() {
 		}
 	});
 
-	let label = stats.appendChild(document.createElement('label'));
-	label.setAttribute('id', 'cpu');
-	label.appendChild(document.createTextNode('cpu'));
 
 	//memory chart
-	let memCanvas = stats.appendChild(document.createElement('canvas'));
-	memCanvas.setAttribute('id', 'memChart');
+	let memCanvas = document.getElementById('memChart');
 	let memChart = new Chart(memCanvas, {
 		type: 'line',
 		data: {
@@ -238,21 +220,8 @@ View.routes.editor = function() {
 		}
 	});
 
-	label = stats.appendChild(document.createElement('label'));
-	label.setAttribute('id', 'rss');
-	label.appendChild(document.createTextNode('rss'));
-
-	label = stats.appendChild(document.createElement('label'));
-	label.setAttribute('id', 'heapTotal');
-	label.appendChild(document.createTextNode('heap total'));
-
-	label = stats.appendChild(document.createElement('label'));
-	label.setAttribute('id', 'heapUsed');
-	label.appendChild(document.createTextNode('heap used'));
-
 	//delay chart
-	let delayCanvas = stats.appendChild(document.createElement('canvas'));
-	delayCanvas.setAttribute('id', 'delayChart');
+	let delayCanvas = document.getElementById('delayChart');
 	let delayChart = new Chart(delayCanvas, {
 		type: 'line',
 		data: {
@@ -299,10 +268,6 @@ View.routes.editor = function() {
 			}
 		}
 	});
-
-	label = stats.appendChild(document.createElement('label'));
-	label.setAttribute('id', 'delay');
-	label.appendChild(document.createTextNode('event loop delay'));
 
 	//update the usage charts
 	xibleEditor.on('flow.usage', (flows) => {
@@ -519,7 +484,6 @@ View.routes.editor = function() {
 	a.onclick = () => {
 
 		let flowName = window.prompt('Enter the flow name:');
-
 		if (flowName.substring(0, 1) === '_') {
 
 			window.alert('The flow name may not start with an underscore');

@@ -211,7 +211,7 @@ class XibleEditor extends EventEmitter {
 		*/
 		return new Promise((resolve, reject) => {
 
-			let req = new OoHttpRequest('GET', `http${xibleWrapper.baseUrl}/api/flows`);
+			let req = xibleWrapper.httpRequestBase.request('GET', `http${xibleWrapper.baseUrl}/api/flows`);
 
 			req.toObject(Object).then((flows) => {
 
@@ -544,6 +544,7 @@ class XibleEditor extends EventEmitter {
 
 		flow.editor = this;
 		this.loadedFlow = flow;
+		this.element.setAttribute('data-flow', flow._id);
 
 		//setup the nodes
 		flow.nodes.forEach((node) => {

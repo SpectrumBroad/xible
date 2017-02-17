@@ -62,6 +62,8 @@ let cli = {
 	node: {
 		publish: function() {
 
+			return console.log(`Not implemented yet`);
+
 			if (!ARG) {
 				return console.log(`The node name argument is required.`);
 			}
