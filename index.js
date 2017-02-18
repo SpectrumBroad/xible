@@ -30,7 +30,7 @@ class Xible extends EventEmitter {
 		this.nodes = {};
 		this.flows = {};
 
-		if(typeof obj.configPath === 'string') {
+		if (typeof obj.configPath === 'string') {
 			this.configPath = this.resolvePath(obj.configPath);
 		}
 
@@ -57,9 +57,9 @@ class Xible extends EventEmitter {
 
 		}
 
-		appNames.forEach((appName) => {
-			Object.assign(this, require(`./app/${appName}`)(this, this.expressApp, (appName === 'Config' && configObj ? configObj : undefined)));
-		});
+		for (let i = 0; i < appNames.length; ++i) {
+			Object.assign(this, require(`./app/${appNames[i]}`)(this, this.expressApp, (appNames[i] === 'Config' && configObj ? configObj : undefined)));
+		}
 
 	}
 
