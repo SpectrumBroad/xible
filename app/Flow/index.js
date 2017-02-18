@@ -197,7 +197,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			try {
 				fs.writeFileSync(`${this.flowPath}/_status.json`, JSON.stringify(statuses));
 			} catch (err) {
-				flowDebug(`error saving status to file: ${err}`);
+				flowDebug(`error saving status to "${this.flowPath}/_status.json": ${err}`);
 			}
 
 		}
@@ -291,7 +291,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 					if (!xibleNode.inputs[name]) {
 
-						flowDebug(`Node '${node.name}' does not have input '${name}'`);
+						flowDebug(`Node "${node.name}" does not have input "${name}"`);
 
 						xibleNode.addInput(name, node.inputs[name]);
 						xibleNode.nodeExists = false;
@@ -307,7 +307,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 					if (!xibleNode.outputs[name]) {
 
-						flowDebug(`Node '${node.name}' does not have output '${name}'`);
+						flowDebug(`Node "${node.name}" does not have output "${name}"`);
 
 						xibleNode.addOutput(name, node.outputs[name]);
 						xibleNode.nodeExists = false;
@@ -377,7 +377,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				}
 
-				flowDebug(`saving ${this._id}`);
+				flowDebug(`saving "${this._id}"`);
 				fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json, null, '\t'), () => {
 					resolve(this);
 				});
@@ -403,7 +403,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 					return reject(`flow is not stopped`);
 				}
 
-				flowDebug(`deleting ${this._id}`);
+				flowDebug(`deleting "${this._id}"`);
 				fs.unlink(`${Flow.flowPath}/${this._id}.json`, () => {
 					resolve(this);
 				});
