@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-'use strict';	/* jshint ignore: line */
+'use strict'; /* jshint ignore: line */
 
 // windows: running "npm blah" in this folder will invoke WSH, not node.
 /*global WScript*/
@@ -22,23 +22,28 @@ console.log(`XIBLE\n`);
 //start with debug logging enabled until we have a 'normal' way of logging
 process.env.DEBUG = 'xible*';
 
-//get a xible instance
-const CONFIG_PATH = `~/.xible/config.json`;
-const Xible = require('./index.js');
-let xible = new Xible({
-	configPath: CONFIG_PATH
-});
-
 //option parsing
 const nopt = require('nopt');
-let knownOpts = {};
-let shortHands = {};
+let knownOpts = {
+	config: String
+};
+let shortHands = {
+	'c': '--config'
+};
 let opts = nopt(knownOpts, shortHands);
 let remain = opts.argv.remain;
 let context = remain.shift() || 'help';
 let command = remain.shift();
 const ARG = remain.shift();
 
+//get a xible instance
+const CONFIG_PATH = opts.config || `~/.xible/config.json`;
+const Xible = require('./index.js');
+let xible = new Xible({
+	configPath: CONFIG_PATH
+});
+
+//cli commands
 let cli = {
 
 	flow: {
@@ -73,7 +78,7 @@ function printUsage(path) {
 
 	console.log(`Usage: xible ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
 
-	if(cli[context]) {
+	if (cli[context]) {
 		console.log('Type: xible <context> help for more help about the specified context.');
 	}
 }

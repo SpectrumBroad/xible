@@ -25,23 +25,28 @@ const fs = require('fs');
 const url = require('url');
 const readline = require('readline');
 
-//get a xible instance
-const CONFIG_PATH = `~/.xible/config.json`;
-const Xible = require('./index.js');
-let xible = new Xible({
-	configPath: CONFIG_PATH
-});
-
 //option parsing
 const nopt = require('nopt');
-let knownOpts = {};
-let shortHands = {};
+let knownOpts = {
+	config: String
+};
+let shortHands = {
+	'c': '--config'
+};
 let opts = nopt(knownOpts, shortHands);
 let remain = opts.argv.remain;
 let context = remain.shift() || 'help';
 let command = remain.shift();
 const ARG = remain.shift();
 
+//get a xible instance
+const CONFIG_PATH = opts.config || `~/.xible/config.json`;
+const Xible = require('./index.js');
+let xible = new Xible({
+	configPath: CONFIG_PATH
+});
+
+//cli commands
 let cli = {
 
 	flow: {
