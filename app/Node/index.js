@@ -139,7 +139,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				for (let i = 0; i < files.length; ++i) {
 
-					if (files[i] === 'node_modules') {
+					if (files[i] === 'node_modules' || files[i].substring(0, 1) === '.') {
 
 						checkAndResolve();
 						continue;
