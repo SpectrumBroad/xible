@@ -274,7 +274,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						}
 
 						if (Object.keys(nodeVaultData).length) {
-							xibleNode.vault.set(Object.assign(xibleNode.vault.get(), nodeVaultData));
+							xibleNode.vault.set(Object.assign(xibleNode.vault.get()||{}, nodeVaultData));
 						}
 
 					}
