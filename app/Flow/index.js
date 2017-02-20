@@ -755,7 +755,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						this.directed = true;
 					}
 
-					this.worker = fork('./child.js');
+					this.worker = fork(`${__dirname}/../../child.js`);
 					this.worker.on('message', (message) => {
 
 						let res;

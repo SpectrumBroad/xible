@@ -111,7 +111,7 @@ class Xible extends EventEmitter {
 		}
 
 		return Promise.all([
-			this.Node.initFromPath('./nodes'),
+			this.Node.initFromPath(`${__dirname}/nodes`),
 			this.Node.initFromPath(this.resolvePath(nodesPath))
 		]).then(() => {
 
