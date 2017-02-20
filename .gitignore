@@ -15,4 +15,3 @@ nodes/*
 !nodes/conditional
 ssl/
 docs/
-editor/js/xibleWrapper.js
