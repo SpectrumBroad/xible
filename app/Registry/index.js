@@ -61,7 +61,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						}
 
 						//create a package.json so npm knows where the root lies
-						fsExtra.copy(`${__dirname}/../../package.json`, `${TMP_REGISTRY_DIR}/package.json`, (err) => {
+						//remove the dependencies from the package so npm doesn't get confused
+						let packageJson = require(`${__dirname}/../../package.json`);
+						delete packageJson.dependencies;
+						delete packageJson.devDependencies;
+
+						//write off package.json
+						fsExtra.writeFile(`${TMP_REGISTRY_DIR}/package.json`, JSON.stringify(packageJson), (err) => {
 
 							if (err) {
 								return reject(err);

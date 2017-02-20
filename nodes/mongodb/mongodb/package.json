@@ -1,8 +1,0 @@
-{
-  "name": "xible-mongodb",
-  "version": "0.0.1",
-  "dependencies": {
-    "mongodb": "*"
-  },
-  "private": true
-}

@@ -1,8 +1,0 @@
-{
-  "name": "xible-smtpserver",
-  "version": "0.0.1",
-  "dependencies": {
-    "nodemailer": "*"
-  },
-  "private": true
-}
