@@ -235,7 +235,7 @@ class Xible extends EventEmitter {
 		const expressApp = this.expressApp;
 
 		//editor
-		expressApp.use(this.express.static('editor', {
+		expressApp.use(this.express.static(`${__dirname}/editor`, {
 			index: false
 		}));
 
