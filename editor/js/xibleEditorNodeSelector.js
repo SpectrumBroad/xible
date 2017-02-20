@@ -389,7 +389,7 @@ class XibleEditorNodeSelector {
 		this.nodesUl.innerHTML = '';
 
 		//get the installed nodes
-		let req = xibleWrapper.httpRequestBase.request('GET', `http${xibleWrapper.baseUrl}/api/nodes`);
+		let req = xibleWrapper.httpBase.request('GET', `http${xibleWrapper.baseUrl}/api/nodes`);
 		return req.toJson().then((nodes) => {
 
 			Object.keys(nodes).forEach((nodeName) => {

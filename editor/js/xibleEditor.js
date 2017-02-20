@@ -211,7 +211,7 @@ class XibleEditor extends EventEmitter {
 		*/
 		return new Promise((resolve, reject) => {
 
-			let req = xibleWrapper.httpRequestBase.request('GET', `http${xibleWrapper.baseUrl}/api/flows`);
+			let req = xibleWrapper.httpBase.request('GET', `http${xibleWrapper.baseUrl}/api/flows`);
 
 			req.toObject(Object).then((flows) => {
 

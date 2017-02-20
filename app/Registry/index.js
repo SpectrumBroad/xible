@@ -1,6 +1,6 @@
 module.exports = function(XIBLE, EXPRESS_APP) {
 
-	const XibleRegistryWrapper = require('../../../xibleRegistryWrapper');
+	const XibleRegistryWrapper = require('xible-registry-wrapper');
 	const fsExtra = require('fs-extra');
 
 	let registryUrl = XIBLE.Config.getValue('registry.url');

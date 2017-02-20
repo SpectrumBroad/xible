@@ -2,7 +2,7 @@
   "name": "xible",
   "version": "0.0.1",
   "description": "xible",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "homepage": "https://xible.io",
   "author": {
     "name": "Stefan de Jong"
@@ -39,6 +39,7 @@
     "node": ">=7.0.0"
   },
   "dependencies": {
+    "xible-registry-wrapper": "*",
     "nopt": "*",
     "uws": "*",
     "ws": "*",
