@@ -237,13 +237,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		static initFromPath(nodePath, files) {
 
 			nodeDebug(`init nodes from "${nodePath}"`);
-			if (this.nodePath) {
-
-				nodeDebug(`cannot init multiple node paths. "${this.nodePath}" already init`);
-				return;
-
-			}
-			this.nodePath = nodePath;
 
 			//check that nodePath exists
 			if (!fs.existsSync(nodePath)) {
@@ -263,7 +256,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				for (let nodeName in structures) {
 
 					let structure = structures[nodeName];
-
 					XIBLE.addNode(nodeName, structure);
 
 					//host editor contents if applicable

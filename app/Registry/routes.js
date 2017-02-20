@@ -1,15 +1,15 @@
 module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 
 	//returns a list of online nodes
-	EXPRESS_APP.get('/api/registry/nodes', (req, res) => {
+	EXPRESS_APP.get('/api/registry/nodepacks', (req, res) => {
 
 		let searchString = req.query.search;
 		if (!searchString) {
 
-			XIBLE_REGISTRY.Node
+			XIBLE_REGISTRY.NodePack
 				.getAll()
-				.then((nodes) => {
-					res.json(nodes);
+				.then((nodePacks) => {
+					res.json(nodePacks);
 				})
 				.catch((err) => {
 					res.status(500).end();
@@ -19,10 +19,10 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 
 		}
 
-		XIBLE_REGISTRY.Node
+		XIBLE_REGISTRY.NodePack
 			.search(searchString)
-			.then((nodes) => {
-				res.json(nodes);
+			.then((nodePacks) => {
+				res.json(nodePacks);
 			})
 			.catch((err) => {
 				res.status(500).end();
@@ -31,15 +31,15 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 	});
 
 	//get a node by a given name
-	EXPRESS_APP.param('nodeName', (req, res, next, nodeName) => {
+	EXPRESS_APP.param('nodePackName', (req, res, next, nodePackName) => {
 
-		req.locals.nodeName = nodeName;
+		req.locals.nodePackName = nodePackName;
 
-		XIBLE_REGISTRY.Node
-			.getByName(nodeName)
-			.then((node) => {
+		XIBLE_REGISTRY.NodePack
+			.getByName(nodePackName)
+			.then((nodePack) => {
 
-				req.locals.node = node;
+				req.locals.nodePack = nodePack;
 				next();
 
 			})
@@ -49,18 +49,21 @@ module.exports = function(XIBLE_REGISTRY, XIBLE, EXPRESS_APP) {
 
 	});
 
-	EXPRESS_APP.get('/api/registry/nodes/:nodeName', (req, res) => {
-		res.json(req.locals.node);
+	EXPRESS_APP.get('/api/registry/nodepacks/:nodePackName', (req, res) => {
+		res.json(req.locals.nodePack);
 	});
 
 	//install a node
-	EXPRESS_APP.patch('/api/registry/nodes/:nodeName/install', (req, res) => {
-		req.locals.node.install()
+	EXPRESS_APP.patch('/api/registry/nodepacks/:nodePackName/install', (req, res) => {
+		req.locals.nodePack.install()
 			.then(() => {
 				res.end();
 			})
-			.catch(() => {
+			.catch((err) => {
+
+				console.log(err);
 				res.status(500).end();
+
 			});
 	});
 

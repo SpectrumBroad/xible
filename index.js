@@ -110,9 +110,10 @@ class Xible extends EventEmitter {
 			require('./routes.js')(this, this.expressApp);
 		}
 
-		return this.Node
-			.initFromPath(this.resolvePath(nodesPath))
-			.then(() => {
+		return Promise.all([
+			this.Node.initFromPath('./nodes'),
+			this.Node.initFromPath(this.resolvePath(nodesPath))
+		]).then(() => {
 
 				//get all installed flows
 				if (!obj || !obj.nodeNames) {

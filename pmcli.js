@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-'use strict';	/* jshint ignore: line */
+'use strict'; /* jshint ignore: line */
 
 // windows: running "npm blah" in this folder will invoke WSH, not node.
 /*global WScript*/
@@ -64,13 +64,15 @@ let cli = {
 		}
 	},
 
-	node: {
+	nodepack: {
 		publish: function() {
 
 			return console.log(`Not implemented yet`);
 
+			//find package.json and use that name
+
 			if (!ARG) {
-				return console.log(`The node name argument is required.`);
+				return console.log(`The nodepack name argument is required.`);
 			}
 
 			//verify that we have a token
@@ -90,20 +92,20 @@ let cli = {
 					}
 
 					//verify if this node had been published before
-					xible.Registry.Node
+					xible.Registry.NodePack
 						.getByName(ARG)
-						.then((node) => {
+						.then((nodePack) => {
 
 							//verify that whoami equals the remote user
 							//xible registry will verify this also
-							if (node && node.user.name !== user.name) {
-								return console.log(`Node "${node.name}" was previously published by "${node.user.name}". You are currently logged in as "${user.name}".`);
+							if (nodePack && nodePack.publishUserName !== user.name) {
+								return console.log(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
 							}
 
 							//publish
-							xible.Registry.Node
+							xible.Registry.NodePack
 								.publish(ARG)
-								.then((node) => {
+								.then((nodePack) => {
 									console.log(`Published.`);
 								})
 								.catch((err) => {
@@ -117,26 +119,16 @@ let cli = {
 		},
 		install: function() {
 
-			xible.Registry.Node
+			xible.Registry.NodePack
 				.getByName(ARG)
-				.then((node) => node.install())
+				.then((nodePack) => nodePack.install())
 				.catch((err) => {
 					console.log(err);
 				});
 
 		},
 		remove: function() {
-
-			xible
-				.getNodeByName(ARG)
-				.then((node) => {
-
-					if (node) {
-						console.log(`Sorry: not implemented yet.`);
-					}
-
-				});
-
+			console.log(`Sorry: not implemented yet.`);
 		},
 		search: function() {
 
@@ -179,7 +171,7 @@ let cli = {
 
 		},
 		list: function() {
-			console.log(xible.Config.getAll());
+			console.log(JSON.stringify(xible.Config.getAll(), null, '\t'));
 		}
 	},
 
@@ -251,9 +243,9 @@ let cli = {
 			getUserInput(`Enter your username: `)
 				.then((userName) => {
 
-					if(!userName) {
+					if (!userName) {
 						return Promise.reject(`You need a username.`);
-					}else if(!/^[a-zA-Z0-9_-]{3,}$/.test(userName)) {
+					} else if (!/^[a-zA-Z0-9_-]{3,}$/.test(userName)) {
 						return Promise.reject(`Your username may only contain upper and lower case letters, numbers, an underscore and a dash.\nIt must also be at least 3 characters long.`);
 					}
 
@@ -265,7 +257,7 @@ let cli = {
 
 					if (!emailAddress) {
 						return Promise.reject(`You need an email address.`);
-					} else if(!/^.+@.+\..+$/.test(emailAddress)) {
+					} else if (!/^.+@.+\..+$/.test(emailAddress)) {
 						return Promise.reject(`You need a valid email address.`);
 					}
 
@@ -404,7 +396,7 @@ function printUsage(path) {
 
 	console.log(`Usage: xiblepm ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
 
-	if(cli[context]) {
+	if (cli[context]) {
 		console.log('Type: xiblepm <context> help for more help about the specified context.');
 	}
 

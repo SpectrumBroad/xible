@@ -34,7 +34,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 	}
 
-	xibleRegistry.Node.prototype.install = function() {
+	xibleRegistry.NodePack.prototype.install = function() {
 
 		let nodePath = XIBLE.Config.getValue('nodes.path');
 		if (!nodePath) {
@@ -111,11 +111,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 											if (!files.length) {
 
-												return cleanUp().then(() => {
-													resolve();
-												}).catch((err) => {
-													reject(err);
-												});
+												return XIBLE.Node
+													.initFromPath(nodeDestDir)
+													.then(() => cleanUp())
+													.then(() => resolve())
+													.catch((err) => {
+														reject(err);
+													});
 
 											}
 
@@ -128,11 +130,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 													return reject(err);
 												}
 
-												cleanUp().then(() => {
-													resolve();
-												}).catch((err) => {
-													reject(err);
-												});
+												XIBLE.Node
+													.initFromPath(nodeDestDir)
+													.then(() => cleanUp())
+													.then(() => resolve())
+													.catch((err) => {
+														reject(err);
+													});
 
 											});
 

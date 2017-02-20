@@ -17,37 +17,15 @@ class XibleEditorNodeSelector {
 		let detailDiv = this.detailDiv = document.body.appendChild(document.createElement('div'));
 		detailDiv.setAttribute('id', 'detailNodeSelector');
 		detailDiv.classList.add('hidden');
-		let detailDivSub = detailDiv.appendChild(document.createElement('div'));
+		detailDiv.innerHTML = `
+			<div id="nodePackSub"></div>
+			<button id="nodePackConfirmButton" type="button">Confirm</button>
+			<button id="nodePackCancelButton" type="button" class="cancel">Cancel</button>
+		`;
 
-		detailDivSub.innerHTML = `<h1>instructions</h1><p>For now, please use the command line <code>xiblepm install &lt;nodename&gt;</code> to install this node.</p>`;
-
-		/*
-				//check if this is maintained by spectrumbroad
-				detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('maintained'));
-				detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('Spectrumbroad maintains this node.'));
-
-				//permissions in detailDiv
-				detailDivSub.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Permissions'));
-				detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode('This node requires the following permissions;'));
-				let detailDivPermissionsUl = this.detailDivPermissionsUl = detailDivSub.appendChild(document.createElement('ul'));
-		*/
-		let detailConfirmButton = this.detailConfirmButton = detailDiv.appendChild(document.createElement('button'));
-		detailConfirmButton.appendChild(document.createTextNode('Confirm'));
-		detailConfirmButton.setAttribute('type', 'button');
-		detailConfirmButton.onclick = () => {
-
-			return this.close();
-
-			detailConfirmButton.disabled = true;
-			detailConfirmButton.classList.add('loading');
-
-		};
-
-		let detailCancelButton = detailDiv.appendChild(document.createElement('button'));
-		detailCancelButton.appendChild(document.createTextNode('Cancel'));
-		detailCancelButton.classList.add('cancel');
-		detailCancelButton.setAttribute('type', 'button');
-		detailCancelButton.onclick = () => {
+		this.detailDivSub = document.getElementById('nodePackSub');
+		this.detailConfirmButton = document.getElementById('nodePackConfirmButton');
+		document.getElementById('nodePackCancelButton').onclick = () => {
 			this.close();
 		};
 
@@ -69,31 +47,14 @@ class XibleEditorNodeSelector {
 			//relative to the main div
 			this.detailDiv.classList.add('hidden');
 
+			let filterInputValue = filterInput.value.toLowerCase();
+			let searchWords = this.getSearchWords();
+
 			let noResults = true;
 			nodesUl.querySelectorAll('li').forEach((li) => {
-
-				let filterInputValue = filterInput.value.toLowerCase();
-				let vals = filterInputValue.replace(/[\W_]+/g, ' ').split(' ');
-				let textContent = li.textContent.toLowerCase();
-
-				li.classList.remove('headerMatchExact', 'headerMatchPartial');
-				if (!filterInput.value || vals.every((val) => textContent.indexOf(val) > -1)) {
-
-					//specify more relevant search results
-					let headerTextContent = li.firstChild.textContent.toLowerCase();
-					if (headerTextContent === filterInputValue) {
-						li.classList.add('headerMatchExact');
-					} else if (vals.every((val) => headerTextContent.indexOf(val) > -1)) {
-						li.classList.add('headerMatchPartial');
-					}
-
-					li.classList.remove('hidden');
+				if (this.setListVisibility(li, filterInputValue, searchWords)) {
 					noResults = false;
-
-				} else {
-					li.classList.add('hidden');
 				}
-
 			});
 
 			if (noResults) {
@@ -119,47 +80,67 @@ class XibleEditorNodeSelector {
 				return;
 			}
 
+			let filterInputValue = filterInput.value.toLowerCase();
+			let searchWords = this.getSearchWords();
+
 			this.detailDiv.classList.add('hidden');
 			searchOnlineButton.classList.add('loading');
 
 			//query the registry
 			xibleWrapper.Registry
-				.searchNodes(filterInput.value)
-				.then((nodes) => {
-
-					let nodeNames = Object.keys(nodes);
+				.searchNodePacks(filterInput.value)
+				.then((nodePacks) => {
 
 					//clear all non-online results
-					if (nodeNames.length) {
+					let foundResults = !!Object.keys(nodePacks).length;
+					if (foundResults) {
+
 						nodesUl.querySelectorAll('li:not(.online)').forEach((li) => {
 							li.classList.add('hidden');
 						});
-					}
 
-					//add the found nodes
-					nodeNames.forEach((nodeName) => {
-
-						//check if this nodeName doesn't already exist in the list
-						if (nodesUl.querySelector(`li h1[title="${nodeName}"]`)) {
-							return;
-						}
-
-						let li = this.buildNode(nodeName, nodes[nodeName]);
-						li.classList.add('online');
-						li.onclick = (event) => {
-
-							//open the detailed confirmation view
-							this.detailedNodeView(li, nodeName, nodes[nodeName]);
-
-						};
-						nodesUl.appendChild(li);
-
-					});
-
-					if (nodeNames.length) {
 						div.classList.remove('noresults');
+
 					} else {
 						div.classList.add('noresults');
+					}
+
+					//print the li's belonging to the found nodePacks
+					let noResults = true;
+					for (let nodePackName in nodePacks) {
+
+						let nodePack = nodePacks[nodePackName];
+						for (let i = 0; i < nodePack.nodes.length; ++i) {
+
+							//check if this nodeName doesn't already exist in the list
+							let nodeName = nodePack.nodes[i].name;
+							if (nodesUl.querySelector(`li h1[title="${nodeName}"]`)) {
+								continue;
+							}
+
+							let li = this.buildNode(nodeName, nodePack.nodes[i]);
+							li.classList.add('online');
+							li.onclick = (event) => {
+
+								//open the detailed confirmation view
+								this.detailedNodeView(li, nodePack, nodeName);
+
+							};
+							nodesUl.appendChild(li);
+
+							//ensure only those li's are visible that match the search criteria
+							if (this.setListVisibility(li, filterInputValue, searchWords)) {
+								noResults = false;
+							}
+
+						}
+
+					}
+
+					if (noResults) {
+						div.classList.add('noresults');
+					} else {
+						div.classList.remove('noresults');
 					}
 
 					this.position();
@@ -220,9 +201,90 @@ class XibleEditorNodeSelector {
 
 	}
 
-	detailedNodeView(li, nodeName, node) {
+	getSearchWords() {
+		return this.filterInput.value.toLowerCase().replace(/[\W_]+/g, ' ').split(' ');
+	}
 
+	/**
+	 *	Changes the visibility on a node in the list, based on the search conditions
+	 *	@param {HTMLElement} li
+	 *	@param {String} filterInputValue the search value
+	 *	@param {String[]} searchWords the search keywords
+	 *	@returns {Boolean} visible or no
+	 */
+	setListVisibility(li, filterInputValue, searchWords) {
+
+		let textContent = li.textContent.toLowerCase();
+
+		li.classList.remove('headerMatchExact', 'headerMatchPartial');
+		if (!filterInputValue || searchWords.every((searchWord) => textContent.indexOf(searchWord) > -1)) {
+
+			//specify more relevant search results
+			let headerTextContent = li.firstChild.textContent.toLowerCase();
+			if (headerTextContent === filterInputValue) {
+				li.classList.add('headerMatchExact');
+			} else if (searchWords.every((searchWord) => headerTextContent.indexOf(searchWord) > -1)) {
+				li.classList.add('headerMatchPartial');
+			}
+
+			li.classList.remove('hidden');
+			return true;
+
+		}
+
+		li.classList.add('hidden');
+		return false;
+
+	}
+
+	detailedNodeView(li, nodePack, nodeName) {
+
+		//set confirm button action
 		this.detailConfirmButton.disabled = false;
+		this.detailConfirmButton.onclick = () => {
+
+			this.detailConfirmButton.disabled = true;
+			this.detailConfirmButton.classList.add('loading');
+			li.classList.add('loading');
+
+			xibleWrapper.Registry
+				.installNodePackByName(nodePack.name)
+				.then(() => {
+
+					this.detailConfirmButton.disabled = false;
+					this.detailConfirmButton.classList.remove('loading');
+
+					this.detailDiv.classList.add('hidden');
+
+					//track all nodeNames currently visible
+					let visibleNodeNames = Array.from(this.nodesUl
+							.querySelectorAll(`li:not(.hidden) h1`))
+						.map((header) => header.getAttribute('title'));
+
+					//refill
+					this.fill().then(() => {
+
+						//hide all items
+						Array.from(this.nodesUl.querySelectorAll('li')).forEach((li) => {
+							li.classList.add('hidden');
+						});
+
+						//make items visible that were so before
+						visibleNodeNames.forEach((nodeName) => {
+
+							let h1 = this.nodesUl.querySelector(`li h1[title="${nodeName}"]`);
+							if (h1) {
+								h1.parentNode.classList.remove('hidden');
+							}
+
+						});
+
+					});
+
+				});
+
+		};
+
 		this.detailDiv.classList.remove('hidden');
 		this.detailDiv.style.top = this.div.style.top;
 		this.detailDiv.style.left = (parseInt(this.div.style.left) + this.div.offsetWidth - parseInt(getComputedStyle(this.detailDiv).borderLeftWidth)) + 'px';
@@ -243,11 +305,29 @@ class XibleEditorNodeSelector {
 
 		}
 
-		//add the permissions to the list
-		this.detailDivPermissionsUl.innerHTML = '';
-		this.detailDivPermissionsUl.appendChild(document.createElement('li')).appendChild(document.createTextNode('filesystem'));
-		this.detailDivPermissionsUl.appendChild(document.createElement('li')).appendChild(document.createTextNode('network'));
-		this.detailDivPermissionsUl.appendChild(document.createElement('li')).appendChild(document.createTextNode('process'));
+		//fill data
+		this.detailDivSub.innerHTML = `
+			<section>
+				<h1>${nodeName}</h1>
+				<p>This node is part of nodepack "${nodePack.name}". By installing, all contents of this nodepack will be installed.</p>
+			</section>
+			<section>
+				<h1>publish user</h1>
+				<p>This node pack is published by user "${nodePack.publishUserName}"</p>
+			</section>
+			<section>
+				<h1>nodes</h1>
+				<ul>
+					${nodePack.nodes
+						.map((node) => `<li>${node.name}</li>`)
+						.join('')}
+				</ul>
+			</section>
+			<section>
+				<h1>own risk</h1>
+				<p>Installation and usage of these nodes is at your own risk.</p>
+			</section>
+		`;
 
 	}
 
@@ -306,9 +386,11 @@ class XibleEditorNodeSelector {
 
 	fill() {
 
+		this.nodesUl.innerHTML = '';
+
 		//get the installed nodes
 		let req = xibleWrapper.httpRequestBase.request('GET', `http${xibleWrapper.baseUrl}/api/nodes`);
-		req.toJson().then((nodes) => {
+		return req.toJson().then((nodes) => {
 
 			Object.keys(nodes).forEach((nodeName) => {
 

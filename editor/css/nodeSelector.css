@@ -149,11 +149,11 @@
 	white-space: nowrap;
 }
 
-#detailNodeSelector h1 {
+#detailNodeSelector section {
 	margin: 8px 0 0;
 }
 
-#detailNodeSelector h1:first-child {
+#detailNodeSelector section:first-child {
 	margin: 0;
 }
 
