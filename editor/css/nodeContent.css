@@ -11,10 +11,6 @@ input, button, select {
 	font-family: robotothin;
 	padding: 1px;
 	margin: 0;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
