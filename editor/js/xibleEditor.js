@@ -423,7 +423,7 @@ class XibleEditor extends EventEmitter {
 
 		node.getInputs().forEach((input) => {
 
-			if (globalTypes.indexOf(input.type) > -1) {
+			if (globalTypes.indexOf(input.type) > -1 && !input.connectors.length) {
 				input.setGlobal(true);
 			} else {
 				input.setGlobal(false);
