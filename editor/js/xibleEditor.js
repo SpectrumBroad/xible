@@ -801,6 +801,8 @@ class XibleEditor extends EventEmitter {
 
 			}
 
+			event.preventDefault();
+
 		});
 
 	}
@@ -901,8 +903,9 @@ class XibleEditor extends EventEmitter {
 					this.select(node);
 				}
 
-
 			}
+
+			event.preventDefault();
 
 		});
 
