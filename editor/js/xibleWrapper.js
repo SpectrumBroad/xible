@@ -1247,7 +1247,7 @@ class XibleWrapper extends EventEmitter {
 
 module.exports = XibleWrapper;
 
-},{"./Config.js":1,"./Connector.js":2,"./Flow.js":3,"./Input.js":4,"./Io.js":5,"./Node.js":6,"./Output.js":7,"./Registry.js":8,"events":11,"oohttp":12,"ws":14}],10:[function(require,module,exports){
+},{"./Config.js":1,"./Connector.js":2,"./Flow.js":3,"./Input.js":4,"./Io.js":5,"./Node.js":6,"./Output.js":7,"./Registry.js":8,"events":11,"oohttp":12,"ws":13}],10:[function(require,module,exports){
 
 },{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -1554,18 +1554,44 @@ function isUndefined(arg) {
 }
 
 },{}],12:[function(require,module,exports){
-(function (process){
 'use strict';
-
-const TIMEOUT = 5000;
 
 // node specific imports required to handle https requests
 let https, http, url;
-if (!process.browser) {
+if (typeof window === 'undefined') {
 
 	https = require('https');
 	http = require('http');
 	url = require('url');
+
+}
+
+/**
+ * returns the byte length of an utf-8 encoded string
+ * from http://stackoverflow.com/questions/5515869/string-length-in-bytes-in-javascript
+ * @param {String} str the string to calculate the byte length of
+ * @returns {Number} the bytelength
+ */
+function utf8ByteLength(str) {
+
+	let s = str.length;
+	for (let i = str.length - 1; i >= 0; i--) {
+
+		let code = str.charCodeAt(i);
+		if (code > 0x7f && code <= 0x7ff) {
+			s++;
+		} else if (code > 0x7ff && code <= 0xffff) {
+			s += 2;
+		}
+
+		//trail surrogate
+		if (code >= 0xDC00 && code <= 0xDFFF) {
+			i--;
+		}
+
+	}
+
+	return s;
 
 }
 
@@ -1574,6 +1600,9 @@ class Base {
 	constructor(obj) {
 
 		this.headers = {};
+		this.rejectUnauthorized = null;
+		this.timeout = null;
+		this.autoContentLength = null;
 
 		if (obj) {
 			Object.assign(this, obj);
@@ -1584,7 +1613,12 @@ class Base {
 	request(url, method) {
 
 		let req = new Request(url, method);
-		req.headers = this.headers;
+
+		Object.assign(req.headers, this.headers);
+		req.rejectUnauthorized = this.rejectUnauthorized;
+		req.timeout = this.timeout;
+		req.autoContentLength = this.autoContentLength;
+
 		return req;
 
 	}
@@ -1633,7 +1667,7 @@ class Request {
 	toString(data) {
 
 		return this.send(data).then((data) => {
-			return "" + data;
+			return '' + data;
 		});
 
 	}
@@ -1653,7 +1687,7 @@ class Request {
 			//setup a xmlhttprequest to handle the http request
 			let req = new XMLHttpRequest();
 			req.open(this.method || Request.defaults.method, this.url);
-			req.timeout = TIMEOUT;
+			req.timeout = this.timeout || Request.defaults.timeout;
 
 			//set the headers
 			let headers = Object.assign({}, Request.defaults.headers, this.headers);
@@ -1674,7 +1708,10 @@ class Request {
 				if (req.status >= 200 && req.status < 300) {
 					resolve(req.responseText);
 				} else {
-					reject(req.status);
+					reject({
+						statusCode: req.status,
+						data: req.responseText
+					});
 				}
 
 			};
@@ -1692,6 +1729,7 @@ class Request {
 			let options = url.parse(this.url);
 			options.method = this.method || Request.defaults.method;
 			options.headers = Object.assign({}, Request.defaults.headers, this.headers);
+			options.rejectUnauthorized = typeof this.rejectUnauthorized === 'boolean' ? this.rejectUnauthorized : Request.defaults.rejectUnauthorized;
 
 			let protocolName = options.protocol.substring(0, options.protocol.length - 1).toLowerCase();
 			if (protocolName !== 'http' && protocolName !== 'https') {
@@ -1711,14 +1749,17 @@ class Request {
 					if (res.statusCode >= 200 && res.statusCode < 300) {
 						resolve(data);
 					} else {
-						reject(res.statusCode);
+						reject({
+							statusCode: res.statusCode,
+							data: data
+						});
 					}
 
 				});
 
 			});
 
-			req.setTimeout(TIMEOUT, () => {
+			req.setTimeout(this.timeout || Request.defaults.timeout, () => {
 				req.abort();
 			});
 
@@ -1743,13 +1784,39 @@ class Request {
 	send(data) {
 
 		if (data && typeof data !== 'string') {
-			data = JSON.stringify(data);
+
+			let contentType = this.headers['content-type'] || Request.defaults.headers['content-type'];
+			if (contentType === 'application/json') {
+				data = JSON.stringify(data);
+			} else {
+
+				let dataStr = '';
+				for (let name in data) {
+
+					if (dataStr.length) {
+						dataStr += '&';
+					}
+					dataStr += `${encodeURIComponent(name)}=${encodeURIComponent(data[name])}`;
+
+				}
+				data = dataStr;
+
+			}
+
 		}
 
-		if (process.browser) {
-			return this.sendBrowser(data);
-		} else {
+		//auto setting of content-length header
+		if (data && !this.headers['content-length'] &&
+			((typeof this.autoContentLength !== 'boolean' && Request.defaults.autoContentLength === true) ||
+				this.autoContentLength === true)
+		) {
+			this.headers['content-length'] = utf8ByteLength(data);
+		}
+
+		if (typeof window === 'undefined') {
 			return this.sendNode(data);
+		} else {
+			return this.sendBrowser(data);
 		}
 
 	}
@@ -1760,195 +1827,18 @@ Request.defaults = {
 	headers: {
 		'content-type': 'application/json'
 	},
-	method: 'GET'
+	method: 'GET',
+	timeout: 5000,
+	rejectUnauthorized: true,
+	autoContentLength: false
 };
 
-module.exports = {Request: Request, Base: Base};
-
-}).call(this,require('_process'))
-},{"_process":13,"http":10,"https":10,"url":10}],13:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
+module.exports = {
+	Request: Request,
+	Base: Base
 };
 
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],14:[function(require,module,exports){
+},{"http":10,"https":10,"url":10}],13:[function(require,module,exports){
 (function (global){
 module.exports = global.WebSocket;
 
