@@ -938,7 +938,7 @@ class XibleEditor extends EventEmitter {
 		});
 
 		//mouseup
-		document.body.addEventListener('mouseup', e => {
+		document.body.addEventListener('mouseup', (event) => {
 
 			if (!this.loadedFlow) {
 				return;
@@ -948,7 +948,7 @@ class XibleEditor extends EventEmitter {
 			if (!window.nodeDragListener || !window.nodeDragHasFired) {
 
 				//deselect
-				if ((e.target === this.element.firstChild || e.target === this.element) && !e.ctrlKey && e.button === 0) {
+				if ((event.target === this.element.firstChild || event.target === this.element) && !event.ctrlKey && event.button === 0) {
 					this.deselect();
 				}
 
@@ -1004,7 +1004,7 @@ class XibleEditor extends EventEmitter {
 						selOutput = selOutputs[0];
 					} else {
 
-						selOutput = selNode.outputs.find(output => {
+						selOutput = selNode.outputs.find((output) => {
 							return output.type !== 'trigger';
 						});
 
