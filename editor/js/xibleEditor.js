@@ -172,9 +172,9 @@ class XibleEditor extends EventEmitter {
 		}
 		globalOutputsByType = null;
 
-		flow.nodes.forEach((node) => {
+		for (let i = 0; i < flow.nodes.length; ++i) {
 
-			node.getInputs().forEach((input) => {
+			flow.nodes[i].getInputs().forEach((input) => {
 
 				if (input.type === output.type && !input.connectors.length) {
 					input.setGlobal(output.global);
@@ -182,7 +182,7 @@ class XibleEditor extends EventEmitter {
 
 			});
 
-		});
+		}
 
 	}
 
@@ -215,7 +215,7 @@ class XibleEditor extends EventEmitter {
 
 			req.toObject(Object).then((flows) => {
 
-				Object.keys(flows).forEach((flowId) => {
+				for (let flowId in flows) {
 
 					let flow = new XibleEditorFlow(flows[flowId]);
 					this.flows[flowId] = flow;
@@ -223,7 +223,7 @@ class XibleEditor extends EventEmitter {
 					//set global appropriately when it's changed
 					flow.on('global', (output) => this.setGlobalFromOutput(flow, output));
 
-				});
+				}
 
 				resolve(this.flows);
 
@@ -488,9 +488,9 @@ class XibleEditor extends EventEmitter {
 
 		//check for globals
 		let globalOutputs = node.getGlobalOutputs();
-		globalOutputs.forEach((output) => {
-			output.setGlobal(false);
-		});
+		for (let i = 0; i < globalOutputs.length; ++i) {
+			globalOutputs[i].setGlobal(false);
+		}
 
 		node.editor = null;
 
@@ -619,7 +619,10 @@ class XibleEditor extends EventEmitter {
 
 		}
 
-		this.selection.forEach((sel) => sel.element.classList.remove('selected'));
+		for (let i = 0; i < this.selection.length; ++i) {
+			this.selection[i].element.classList.remove('selected');
+		}
+
 		this.selection = [];
 
 	}
@@ -742,15 +745,13 @@ class XibleEditor extends EventEmitter {
 			initPageY = event.pageY;
 
 			//update position of each of the selection items that cares
-			var i = 0;
-			this.selection.forEach((sel) => {
+			for (let i = 0; i < this.selection.length; ++i) {
 
+				let sel = this.selection[i];
 				if (typeof(sel.setPosition) === 'function') {
 					sel.setPosition(sel.left + relativePageX, sel.top + relativePageY);
-					i++;
 				}
-
-			});
+			}
 
 			//check if the selection is hovering a connector that it could be part of
 			if (this.selection.length === 1 && this.selection[0] instanceof XibleEditorNode) {
@@ -888,8 +889,9 @@ class XibleEditor extends EventEmitter {
 			this.deselect();
 
 			//check what nodes fall within the selection
-			this.loadedFlow.nodes.forEach((node) => {
+			for (let i = 0; i < this.loadedFlow.nodes.length; ++i) {
 
+				let node = this.loadedFlow.nodes[i];
 				var nodeBounding = node.element.getBoundingClientRect();
 				var nodeLeftAvg = nodeBounding.left + nodeBounding.width / 2;
 				var nodeTopAvg = nodeBounding.top + nodeBounding.height / 2;
@@ -899,7 +901,8 @@ class XibleEditor extends EventEmitter {
 					this.select(node);
 				}
 
-			});
+
+			}
 
 		});
 
