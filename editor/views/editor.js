@@ -576,8 +576,18 @@ View.routes.editor = function(EL) {
 
 	xibleWrapper.on('open', () => {
 
+		connectionLost.innerHTML='Connection re-established';
+		connectionLost.classList.remove('alert');
+		connectionLost.classList.add('success');
+
 		connectionLost.addEventListener('animationiteration', () => {
-			connectionLost.classList.add('hidden');
+
+			//ensure the connection is indeed still open
+			//by the time we want to remove the connectionLost message
+			if(xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+				connectionLost.classList.add('hidden');
+			}
+
 		}, {
 			once: true
 		});
@@ -592,7 +602,9 @@ View.routes.editor = function(EL) {
 	//clear all flow statuses when connection closes
 	xibleWrapper.on('close', () => {
 
-		connectionLost.classList.remove('hidden');
+		connectionLost.innerHTML='Connection lost';
+		connectionLost.classList.add('alert');
+		connectionLost.classList.remove('hidden', 'success');
 
 		Array.from(flowListUl.querySelectorAll('li')).forEach((li) => {
 			li.classList.remove('started', 'starting', 'stopping', 'direct');
