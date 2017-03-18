@@ -76,11 +76,11 @@ let cli = {
 			exec('systemctl enable xible.service', (err, stdout, stderr) => {
 
 				if (err) {
-					console.log('' + stderr);
+					return console.log(`Failed to enable service: ${err}`);
 				}
 
 				console.log('' + stdout);
-				console.log('service enabled.');
+				console.log('Service enabled. Xible will now automatically start at boot.');
 
 			});
 
@@ -93,11 +93,11 @@ let cli = {
 			exec('systemctl disable xible.service', (err, stdout, stderr) => {
 
 				if (err) {
-					console.log('' + stderr);
+					return console.log(`Failed to disable service: ${err}`);
 				}
 
 				console.log('' + stdout);
-				console.log('service disabled.');
+				console.log('Service disabled.');
 
 			});
 
