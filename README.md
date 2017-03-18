@@ -16,3 +16,5 @@ To automatically start XIBLE on boot;
 
 ## Browser support
 The browser based graphical editor which comes with XIBLE is currently only supported by the Google Chrome browser; versions 53 and up.
+
+Other browsers may work, but some editor functionality is unavailable if Shadow DOM v1 is not implemented. It will be possible to start, stop and delete flows, but deploying and saving is disabled. Also, the detail settings of nodes are not visible.
