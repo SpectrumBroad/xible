@@ -35,6 +35,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 		}
 
 		this.statusTimeouts = {};
+		this.statusEl = null;
 
 		//selection handlers
 		this.element.addEventListener('mousedown', (event) => {
@@ -348,7 +349,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 			return;
 		}
 
-		var ul = this.statusEl;
+		let ul = this.statusEl;
 		if (!ul) {
 
 			ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
@@ -356,7 +357,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 		}
 
-		var li = ul.appendChild(document.createElement('li'));
+		let li = ul.appendChild(document.createElement('li'));
 		li.setAttribute('data-statusid', status._id);
 
 		if (status.color) {
@@ -377,20 +378,20 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 	updateStatusById(statusId, status) {
 
-		if (this.statusEl) {
+		if (!this.statusEl) {
+			return;
+		}
 
-			let li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
-			if (li) {
+		let li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
+		if (li) {
 
-				if(status.message) {
+			if (status.message) {
 
-					if(li.lastChild) {
-						li.removeChild(li.lastChild);
-					}
-
-					li.appendChild(document.createTextNode(status.message));
-
+				if (li.lastChild) {
+					li.removeChild(li.lastChild);
 				}
+
+				li.appendChild(document.createTextNode(status.message));
 
 			}
 
@@ -447,7 +448,10 @@ class XibleEditorNode extends xibleWrapper.Node {
 		//destroy the el
 		if (this.statusEl) {
 
-			this.statusEl.parentNode.removeChild(this.statusEl);
+			if(this.statusEl.parentNode) {
+				this.statusEl.parentNode.removeChild(this.statusEl);
+			}
+			
 			this.statusEl = null;
 
 		}
