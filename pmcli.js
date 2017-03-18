@@ -67,54 +67,86 @@ let cli = {
 	nodepack: {
 		publish: function() {
 
-			return console.log(`Not implemented yet`);
-
 			//find package.json and use that name
+			//let packageJson=require(`package.json`);
+			fs.readFile('package.json', (err, data) => {
 
-			if (!ARG) {
-				return console.log(`The nodepack name argument is required.`);
-			}
+				if (err) {
+					return console.log(`Could not read "package.json": ${err}`);
+				}
 
-			//verify that we have a token
-			let token = getUserToken();
+				//check that we have json
+				let packageJson;
+				let nodePackName;
+				try {
+					packageJson = JSON.parse(data);
+				} catch (err) {
+					return console.log(`Could not parse "package.json": ${err}`);
+				}
 
-			if (!token) {
-				return console.log(`You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.`);
-			}
+				//verify that we have a name
+				nodePackName = packageJson.name;
+				if (!nodePackName) {
+					return console.log(`Could not locate "name" property in "package.json"`);
+				}
 
-			//verify that we're logged in
-			xible.Registry.User
-				.getByToken(token)
-				.then((user) => {
+				//verify that we have a token
+				let token = getUserToken();
 
-					if (!user) {
-						return console.log(`User could not be verified. Please login using "xiblepm user login".`);
-					}
+				if (!token) {
+					return console.log(`You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.`);
+				}
 
-					//verify if this node had been published before
-					xible.Registry.NodePack
-						.getByName(ARG)
-						.then((nodePack) => {
+				//verify that we're logged in
+				xible.Registry.User
+					.getByToken(token)
+					.then((user) => {
 
-							//verify that whoami equals the remote user
-							//xible registry will verify this also
-							if (nodePack && nodePack.publishUserName !== user.name) {
-								return console.log(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
-							}
+						if (!user) {
+							return console.log(`User could not be verified. Please login using "xiblepm user login".`);
+						}
 
-							//publish
-							xible.Registry.NodePack
-								.publish(ARG)
-								.then((nodePack) => {
-									console.log(`Published.`);
-								})
-								.catch((err) => {
-									console.log(err);
-								});
+						//verify if this node had been published before
+						xible.Registry.NodePack
+							.getByName(nodePackName)
+							.then((nodePack) => {
 
-						});
+								if (nodePack) {
+									return console.log(`Nodepack "${nodePack.name}" is already published. For new versions, you only have to "npm publish" your package.`);
+								}
 
-				});
+								//verify that whoami equals the remote user
+								//xible registry will verify this also
+								/*
+								if (nodePack && nodePack.publishUserName !== user.name) {
+									return console.log(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
+								}
+								*/
+
+								//publish
+								xible.Registry.NodePack
+									.publish({
+										name: nodePackName,
+										registry: {
+											url: `https://registry.npmjs.com/${nodePackName}`
+										}
+									}, token)
+									.then((nodePack) => {
+										console.log(`Published nodepack "${nodePack.name}".`);
+									})
+									.catch((err) => {
+										console.log(`Failed to publish nodepack "${nodePack.name}": ${err}`);
+									});
+
+							}).catch((err) => {
+								console.log(`Failed to get nodepack from registry: ${err}`);
+							});
+
+					}).catch((err) => {
+						console.log(`Failed to get user from token: ${err}`);
+					});
+
+			});
 
 		},
 		install: function() {
