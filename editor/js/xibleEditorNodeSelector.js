@@ -171,7 +171,7 @@ class XibleEditorNodeSelector {
 
 			if (this.xibleEditor.loadedFlow && (event.target === this.xibleEditor.element || event.target === this.xibleEditor.element.firstChild)) {
 
-				this.open();
+				this.open(event);
 				event.preventDefault();
 				return false;
 
@@ -183,7 +183,7 @@ class XibleEditorNodeSelector {
 		document.body.addEventListener('dblclick', (event) => {
 
 			if (!event.ctrlKey && this.xibleEditor.loadedFlow && (event.target === this.xibleEditor.element || event.target === this.xibleEditor.element.firstChild)) {
-				this.open();
+				this.open(event);
 			}
 
 		});
@@ -421,7 +421,7 @@ class XibleEditorNodeSelector {
 
 	}
 
-	open() {
+	open(event) {
 
 		//unhide all nodes,
 		//so the correct height is checked against the window height and mouse pos
