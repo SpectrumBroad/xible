@@ -134,6 +134,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			return new Promise((resolve, reject) => {
 
+				if(!this.flowPath) {
+					resolve(false);
+				}
+
 				//check if we can write
 				fs.access(this.flowPath, fs.W_OK, (err) => {
 
