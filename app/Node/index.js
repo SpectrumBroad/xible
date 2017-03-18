@@ -173,7 +173,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 									.then((nestedStructures) => {
 
 										if (!Object.keys(nestedStructures).length) {
-											return nodeDebug(err);
+
+											nodeDebug(err);
+											return checkAndResolve();
+
 										}
 
 										Object.assign(structures, nestedStructures);
