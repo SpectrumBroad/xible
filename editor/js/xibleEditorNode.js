@@ -148,14 +148,17 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 			let div = document.createElement('div');
 			div.classList.add('content');
+
 			let shadow;
-			if (typeof div.attachShadow === 'function') {
-				shadow = div.attachShadow({
-					mode: 'open'
-				});
-			} else {
-				shadow = div.createShadowRoot();
+			//if attachShadow shadow DOM v1) is not supported, simply don't show contents
+			if (typeof div.attachShadow !== 'function') {
+				return;
 			}
+
+			//create the shadow and set the contents including the nodeContent.css
+			shadow = div.attachShadow({
+				mode: 'open'
+			});
 			shadow.innerHTML = `<style>@import url("css/nodeContent.css");</style>${this.editorContent}`;
 
 			//hook an eventlistener to check if the style element has loaded
@@ -451,7 +454,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 			if(this.statusEl.parentNode) {
 				this.statusEl.parentNode.removeChild(this.statusEl);
 			}
-			
+
 			this.statusEl = null;
 
 		}

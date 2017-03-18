@@ -5,6 +5,7 @@ View.routes.editor = function(EL) {
 			<header>XIBLE<!--<span>ENTERPRISE</span>--></header>
 			<p id="connectionLost" class="status loading alert hidden">Connection lost</p>
 			<p id="validateWritePermissions" class="status loading">Validating write permissions</p>
+			<p id="browserSupportAttachShadow" class="status alert hidden">Your browser does not support the necessary features to support this editor.</p>
 			<section class="buttons">
 				<button type="button" id="xibleFlowDeployButton">Deploy</button>
 				<button type="button" id="xibleFlowStartButton">Start</button>
@@ -69,6 +70,20 @@ View.routes.editor = function(EL) {
 		}
 
 	});
+
+	//check if this browser supports attachShadow
+	let browserSupportAttachShadowEl = document.getElementById('browserSupportAttachShadow');
+	let browserSupportAttachShadow = typeof browserSupportAttachShadowEl.attachShadow === 'function';
+
+	if (!browserSupportAttachShadow) {
+
+		browserSupportAttachShadowEl.classList.remove('hidden');
+
+		//disable buttons that require input from content in the browser
+		document.getElementById('xibleFlowDeployButton').disabled = true;
+		document.getElementById('xibleFlowSaveButton').disabled = true;
+
+	}
 
 	//hook buttons
 	//deploy
