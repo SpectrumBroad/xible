@@ -29,9 +29,9 @@
 
 		<ul>
 
-<!--			<li><a href="/flows" onclick="return mainViewHolder.navigate('/flows');"><span>&#xe059;</span>Flows</a></li> -->
-<!--			<li><a href="/nodes" onclick="return mainViewHolder.navigate('/nodes');"><span>&#xe044;</span>Nodes</a></li> -->
-<!--			<li><a href="/settings" onclick="return mainViewHolder.navigate('/settings');"><span>S</span>Settings</a></li> -->
+			<!--			<li><a href="/flows" onclick="return mainViewHolder.navigate('/flows');"><span>&#xe059;</span>Flows</a></li> -->
+			<!--			<li><a href="/nodes" onclick="return mainViewHolder.navigate('/nodes');"><span>&#xe044;</span>Nodes</a></li> -->
+			<!--			<li><a href="/settings" onclick="return mainViewHolder.navigate('/settings');"><span>S</span>Settings</a></li> -->
 			<li><a href="/editor" onclick="return mainViewHolder.navigate('/editor');"><span>&#xe029;</span>Editor</a></li>
 
 		</ul>
@@ -51,20 +51,22 @@
 		});
 		xibleWrapper.autoReconnect();
 		xibleWrapper.connect();
-
-		mainViewHolder = new ViewHolder(document.getElementById('main'));
-
-		mainViewHolder.hookNavHandler();
-		mainViewHolder.loadNav().catch(() => {
-			mainViewHolder.navigate('/welcome');
-		});
 	</script>
 
+	<!-- editor related js files -->
 	<script src="js/xibleEditorNode.js"></script>
 	<script src="js/xibleEditorFlow.js"></script>
 	<script src="js/xibleEditorConnector.js"></script>
 	<script src="js/xibleEditor.js"></script>
 	<script src="js/xibleEditorNodeSelector.js"></script>
+
+	<script>
+		mainViewHolder = new ViewHolder(document.getElementById('main'));
+		mainViewHolder.hookNavHandler();
+		mainViewHolder.loadNav().catch(() => {
+			mainViewHolder.navigate('/welcome');
+		});
+	</script>
 
 </body>
 
