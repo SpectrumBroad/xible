@@ -60,7 +60,47 @@ let cli = {
 	server: {
 
 		install: function() {
-			console.log('Not implemented yet');
+
+			//TODO: support windows
+
+			const fs = require('fs-extra');
+			fs.copySync(`${__dirname}/xible.service`, '/etc/systemd/system/xible.service');
+
+		},
+		enable: function() {
+
+			//TODO: support windows
+
+			this.install();
+			const exec = require('child_process').exec;
+			exec('systemctl enable xible.service', (err, stdout, stderr) => {
+
+				if (err) {
+					console.log('' + stderr);
+				}
+
+				console.log('' + stdout);
+				console.log('service enabled.');
+
+			});
+
+		},
+		disable: function() {
+
+			//TODO: support windows
+
+			const exec = require('child_process').exec;
+			exec('systemctl disable xible.service', (err, stdout, stderr) => {
+
+				if (err) {
+					console.log('' + stderr);
+				}
+
+				console.log('' + stdout);
+				console.log('service disabled.');
+
+			});
+
 		},
 		start: function() {
 			xible.init();

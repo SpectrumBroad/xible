@@ -1,5 +1,6 @@
 [Unit]
 Description=xible
+After=network-online.target
 
 [Service]
 ExecStart=/usr/bin/npm start
