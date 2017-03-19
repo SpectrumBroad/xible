@@ -522,6 +522,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				throw new Error(`"err" argument of Node.fail(state, err) must be of type "string"`);
 			}
 
+			this.setTracker({
+				message: err,
+				color: 'red',
+				timeout: 7000
+			});
+
 			if (this.flow) {
 				this.flow.emit('fail', this, err, state);
 			}
