@@ -62,6 +62,20 @@
 
 	<script>
 		mainViewHolder = new ViewHolder(document.getElementById('main'));
+		mainViewHolder.on('render', (view) => {
+
+			//unselect all buttons from lhs
+			document.querySelectorAll(`body>nav a`)
+				.forEach((a) => a.classList.remove('view'));
+
+			//select the button from lhs
+			let a = document.querySelector(`body>nav a[href="/${view.name}"]`);
+			if (!a) {
+				return;
+			}
+			a.classList.add('view');
+
+		})
 		mainViewHolder.hookNavHandler();
 		mainViewHolder.loadNav().catch(() => {
 			mainViewHolder.navigate('/welcome');

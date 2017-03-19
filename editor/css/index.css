@@ -138,7 +138,7 @@ nav>ul>li>a:hover {
 	background-color: #5b7cb3;
 }
 
-nav>ul>li>a:focus, nav>ul>li>a:target {
+nav>ul>li>a:focus, nav>ul>li>a:target, nav>ul>li>a.view {
 	outline: 0;
 	color: #fff;
 	background-color: #45679E;
