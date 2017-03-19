@@ -76,11 +76,11 @@ class View {
 View.routes = {};
 
 
-class ViewHolder { //extends EventEmitter
+class ViewHolder extends EventEmitter {
 
 	constructor(node) {
 
-		//super();
+		super();
 		this.element = node;
 		this.parentViewHolder = null;
 
@@ -192,7 +192,7 @@ class ViewHolder { //extends EventEmitter
 
 	render(view) {
 
-		//this.emit('render', view);
+		this.emit('render', view);
 		this.element.appendChild(view.element);
 
 	}
@@ -203,7 +203,7 @@ class ViewHolder { //extends EventEmitter
 
 	purge() {
 
-		//this.emit('purge');
+		this.emit('purge');
 		while (this.element.firstChild) {
 			this.element.removeChild(this.element.firstChild);
 		}
@@ -212,7 +212,7 @@ class ViewHolder { //extends EventEmitter
 
 	remove(view) {
 
-		//this.emit('remove', view);
+		this.emit('remove', view);
 		for (let i = 0; i < this.element.childNodes.length; i++) {
 
 			if (this.element.childNodes[i].view === view) {
