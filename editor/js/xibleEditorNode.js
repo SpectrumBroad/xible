@@ -451,7 +451,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 		//destroy the el
 		if (this.statusEl) {
 
-			if(this.statusEl.parentNode) {
+			if (this.statusEl.parentNode) {
 				this.statusEl.parentNode.removeChild(this.statusEl);
 			}
 
@@ -831,61 +831,60 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 			event.stopPropagation();
 
 			//create a dummy action that acts as the input parent while moving
-			window.dummyXibleNode = new XibleEditorNode({
+			this.node.editor.dummyXibleNode = new XibleEditorNode({
 				name: 'dragdummy'
 			});
 
 			//hide the dummy
-			//window.dummyXibleNode.element.style.opacity = 0.5;
-			window.dummyXibleNode.element.style.visibility = 'hidden';
-			window.dummyXibleNode.element.style.zIndex = -1;
+			this.node.editor.dummyXibleNode.element.style.visibility = 'hidden';
+			this.node.editor.dummyXibleNode.element.style.zIndex = -1;
 
 			let outGoing = this instanceof XibleEditorNodeOutput;
 			outGoing = event.shiftKey ? !outGoing : outGoing;
 
 			//create a dummyinput that acts as the connector endpoint
 			if (outGoing) {
-				window.dummyIo = new XibleEditorNodeInput('dummy', {
+				this.node.editor.dummyIo = new XibleEditorNodeInput('dummy', {
 					type: this.type
 				});
-				window.dummyXibleNode.addInput(window.dummyIo);
+				this.node.editor.dummyXibleNode.addInput(this.node.editor.dummyIo);
 			} else {
-				window.dummyIo = new XibleEditorNodeOutput('dummy', {
+				this.node.editor.dummyIo = new XibleEditorNodeOutput('dummy', {
 					type: this.type
 				});
-				window.dummyXibleNode.addOutput(window.dummyIo);
+				this.node.editor.dummyXibleNode.addOutput(this.node.editor.dummyIo);
 			}
 
 			//add the dummy to the editor
-			this.node.editor.addNode(window.dummyXibleNode);
+			this.node.editor.addNode(this.node.editor.dummyXibleNode);
 
 			//get window offsets for viewport
 			let actionsOffset = this.node.editor.getOffsetPosition();
 
 			//set the initial position at the mouse position
-			let left = ((event.pageX - actionsOffset.left - this.node.editor.left) / this.node.editor.zoom) - window.dummyIo.element.offsetLeft - (outGoing ? 0 : window.dummyIo.element.offsetWidth + 2);
-			let top = ((event.pageY - actionsOffset.top - this.node.editor.top) / this.node.editor.zoom) - window.dummyIo.element.offsetTop - (window.dummyIo.element.offsetHeight / 2);
+			let left = ((event.pageX - actionsOffset.left - this.node.editor.left) / this.node.editor.zoom) - this.node.editor.dummyIo.element.offsetLeft - (outGoing ? 0 : this.node.editor.dummyIo.element.offsetWidth + 2);
+			let top = ((event.pageY - actionsOffset.top - this.node.editor.top) / this.node.editor.zoom) - this.node.editor.dummyIo.element.offsetTop - (this.node.editor.dummyIo.element.offsetHeight / 2);
 
-			window.dummyXibleNode.setPosition(left, top);
+			this.node.editor.dummyXibleNode.setPosition(left, top);
 
 			//append the connector
 			if (event.shiftKey) {
 
 				//find selected connectors
 				let selectedConnectors = this.node.editor.selection.filter((sel) => sel instanceof XibleEditorConnector && (sel.origin === this || sel.destination === this));
-				window.dummyXibleConnectors = selectedConnectors.length ? selectedConnectors : this.connectors.slice(0);
+				this.node.editor.dummyXibleConnectors = selectedConnectors.length ? selectedConnectors : this.connectors.slice(0);
 
 				if (outGoing) {
-					window.dummyXibleConnectors.forEach((conn) => conn.setDestination(window.dummyIo));
+					this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setDestination(this.node.editor.dummyIo));
 				} else {
-					window.dummyXibleConnectors.forEach((conn) => conn.setOrigin(window.dummyIo));
+					this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setOrigin(this.node.editor.dummyIo));
 				}
 
 			} else {
 
-				window.dummyXibleConnectors = [this.node.editor.addConnector(new XibleEditorConnector({
-					origin: outGoing ? this : window.dummyIo,
-					destination: outGoing ? window.dummyIo : this,
+				this.node.editor.dummyXibleConnectors = [this.node.editor.addConnector(new XibleEditorConnector({
+					origin: outGoing ? this : this.node.editor.dummyIo,
+					destination: outGoing ? this.node.editor.dummyIo : this,
 					type: this.type
 				}))];
 
@@ -893,12 +892,12 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 
 			//make the dummy action drag
 			this.node.editor.deselect();
-			this.node.editor.select(window.dummyXibleNode);
+			this.node.editor.select(this.node.editor.dummyXibleNode);
 			this.node.editor.initDrag(event);
 
 			//keep track of these for snap ins
-			window.dummyXibleConnectors.originalOrigin = window.dummyXibleConnectors[0].origin;
-			window.dummyXibleConnectors.originalDestination = window.dummyXibleConnectors[0].destination;
+			this.node.editor.dummyXibleConnectors.originalOrigin = this.node.editor.dummyXibleConnectors[0].origin;
+			this.node.editor.dummyXibleConnectors.originalDestination = this.node.editor.dummyXibleConnectors[0].destination;
 
 		});
 
@@ -908,11 +907,15 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 			let outGoing = this instanceof XibleEditorNodeOutput;
 
 			//'this' is the destination
-			if ((outGoing && window.dummyXibleConnectors && this.node !== window.dummyXibleConnectors[0].destination.node && ((!this.type && window.dummyXibleConnectors[0].destination.type !== 'trigger') || (!window.dummyXibleConnectors[0].destination.type && this.type !== 'trigger') || this.type === window.dummyXibleConnectors[0].destination.type)) ||
-				(!outGoing && window.dummyXibleConnectors && this.node !== window.dummyXibleConnectors[0].origin.node && ((!this.type && window.dummyXibleConnectors[0].origin.type !== 'trigger') || (!window.dummyXibleConnectors[0].origin.type && this.type !== 'trigger') || this.type === window.dummyXibleConnectors[0].origin.type))) {
+			if (
+				(outGoing && this.node.editor.dummyXibleConnectors && this.node !== this.node.editor.dummyXibleConnectors[0].destination.node &&
+					((!this.type && this.node.editor.dummyXibleConnectors[0].destination.type !== 'trigger') || (!this.node.editor.dummyXibleConnectors[0].destination.type && this.type !== 'trigger') || this.type === this.node.editor.dummyXibleConnectors[0].destination.type)) ||
+				(!outGoing && this.node.editor.dummyXibleConnectors && this.node !== this.node.editor.dummyXibleConnectors[0].origin.node &&
+					((!this.type && this.node.editor.dummyXibleConnectors[0].origin.type !== 'trigger') || (!this.node.editor.dummyXibleConnectors[0].origin.type && this.type !== 'trigger') || this.type === this.node.editor.dummyXibleConnectors[0].origin.type))
+			) {
 
 				//create the new connectors
-				window.dummyXibleConnectors.forEach((conn) => {
+				this.node.editor.dummyXibleConnectors.forEach((conn) => {
 
 					let newConn = new XibleEditorConnector({
 						origin: outGoing ? this : conn.origin,
@@ -930,8 +933,8 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 				this.node.editor.deselect();
 
 				//destroy the temporary connector & dummyXibleNode
-				window.dummyXibleNode.delete();
-				window.dummyXibleConnectors = window.dummyXibleNode = window.dummyIo = null;
+				this.node.editor.dummyXibleNode.delete();
+				this.node.editor.dummyXibleConnectors = this.node.editor.dummyXibleNode = this.node.editor.dummyIo = null;
 
 			}
 
@@ -940,21 +943,21 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 		//handle snap-to whenever a new connector is hovered over this action
 		el.addEventListener('mouseover', (event) => {
 
-			if (!window.dummyXibleConnectors) {
+			if (!this.node.editor.dummyXibleConnectors) {
 				return;
 			}
 
 			//we don't allow snap-in if the selected connectors or of multiple types
 			//while the input/output only allows a single type to be connected
-			let multiType = window.dummyXibleConnectors.some((conn) => conn.type !== window.dummyXibleConnectors[0].type);
+			let multiType = this.node.editor.dummyXibleConnectors.some((conn) => conn.type !== this.node.editor.dummyXibleConnectors[0].type);
 			if (multiType && this.singleType) {
 				return;
 			}
 
-			if (this instanceof XibleEditorNodeInput && this.node !== window.dummyXibleConnectors[0].origin.node && window.dummyXibleConnectors[0].destination === window.dummyIo && ((!this.type && window.dummyXibleConnectors[0].origin.type !== 'trigger') || (!window.dummyXibleConnectors[0].origin.type && this.type !== 'trigger') || this.type === window.dummyXibleConnectors[0].origin.type)) {
-				window.dummyXibleConnectors.forEach((conn) => conn.setDestination(this));
-			} else if (this instanceof XibleEditorNodeOutput && this.node !== window.dummyXibleConnectors[0].destination.node && window.dummyXibleConnectors[0].origin === window.dummyIo && ((!this.type && window.dummyXibleConnectors[0].destination.type !== 'trigger') || (!window.dummyXibleConnectors[0].destination.type && this.type !== 'trigger') || this.type === window.dummyXibleConnectors[0].destination.type)) {
-				window.dummyXibleConnectors.forEach((conn) => conn.setOrigin(this));
+			if (this instanceof XibleEditorNodeInput && this.node !== this.node.editor.dummyXibleConnectors[0].origin.node && this.node.editor.dummyXibleConnectors[0].destination === this.node.editor.dummyIo && ((!this.type && this.node.editor.dummyXibleConnectors[0].origin.type !== 'trigger') || (!this.node.editor.dummyXibleConnectors[0].origin.type && this.type !== 'trigger') || this.type === this.node.editor.dummyXibleConnectors[0].origin.type)) {
+				this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setDestination(this));
+			} else if (this instanceof XibleEditorNodeOutput && this.node !== this.node.editor.dummyXibleConnectors[0].destination.node && this.node.editor.dummyXibleConnectors[0].origin === this.node.editor.dummyIo && ((!this.type && this.node.editor.dummyXibleConnectors[0].destination.type !== 'trigger') || (!this.node.editor.dummyXibleConnectors[0].destination.type && this.type !== 'trigger') || this.type === this.node.editor.dummyXibleConnectors[0].destination.type)) {
+				this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setOrigin(this));
 			}
 
 		});
@@ -962,10 +965,10 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 		//handle snap-out
 		el.addEventListener('mouseout', (event) => {
 
-			if (this instanceof XibleEditorNodeInput && window.dummyXibleConnectors && window.dummyXibleConnectors[0].destination === this && window.dummyXibleConnectors[0].destination !== window.dummyXibleConnectors.originalDestination) {
-				window.dummyXibleConnectors.forEach((conn) => conn.setDestination(window.dummyIo));
-			} else if (this instanceof XibleEditorNodeOutput && window.dummyXibleConnectors && window.dummyXibleConnectors[0].origin === this && window.dummyXibleConnectors[0].origin !== window.dummyXibleConnectors.originalOrigin) {
-				window.dummyXibleConnectors.forEach((conn) => conn.setOrigin(window.dummyIo));
+			if (this instanceof XibleEditorNodeInput && this.node.editor.dummyXibleConnectors && this.node.editor.dummyXibleConnectors[0].destination === this && this.node.editor.dummyXibleConnectors[0].destination !== this.node.editor.dummyXibleConnectors.originalDestination) {
+				this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setDestination(this.node.editor.dummyIo));
+			} else if (this instanceof XibleEditorNodeOutput && this.node.editor.dummyXibleConnectors && this.node.editor.dummyXibleConnectors[0].origin === this && this.node.editor.dummyXibleConnectors[0].origin !== this.node.editor.dummyXibleConnectors.originalOrigin) {
+				this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setOrigin(this.node.editor.dummyIo));
 			}
 
 		});

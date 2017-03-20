@@ -15,6 +15,14 @@ class XibleEditor extends EventEmitter {
 		this.selection = [];
 		this.copySelection = null;
 
+		this.nodeDragHasFired = false;
+		this.nodeDragListener = null;
+		this.nodeDragSpliceConnector = false;
+
+		this.areaMoveListener = null;
+
+		this.dummyXibleConnectors = this.dummyXibleNode = this.dummyIo = null;
+
 		this.flows = {};
 		this.loadedFlow = null;
 
@@ -647,28 +655,28 @@ class XibleEditor extends EventEmitter {
 			this.selection.push(obj);
 			obj.element.classList.add('selected');
 
-		} else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex === -1 && !window.nodeDragHasFired) {
+		} else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex === -1 && !this.nodeDragHasFired) {
 
 			this.selection.push(obj);
 			obj.element.classList.add('selected');
 
-		} else if (!event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !window.nodeDragHasFired) {
+		} else if (!event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
 
 			this.deselect();
 			this.selection.push(obj);
 			obj.element.classList.add('selected');
 
-		} else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !window.nodeDragHasFired) {
+		} else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
 			this.deselect(obj);
 		}
 
 		/*
 
-		if(event.ctrlKey && eevent.type === 'mouseup' && selectionIndex > -1 && window.nodeDragHasFired)
+		if(event.ctrlKey && eevent.type === 'mouseup' && selectionIndex > -1 && this.nodeDragHasFired)
 			duplicate (onmousemove already)
 			selection to duplicates
 
-		if(event.ctrlKey && event.type === 'mouseup' && selectionIndex === -1 && window.nodeDragHasFired)
+		if(event.ctrlKey && event.type === 'mouseup' && selectionIndex === -1 && this.nodeDragHasFired)
 			select (onmousemove already)
 			duplicate (onmousemove already)
 			selection to duplicates
@@ -701,14 +709,14 @@ class XibleEditor extends EventEmitter {
 	initDrag(event) {
 
 		//exit if we're already dragging
-		if (window.nodeDragListener || !this.selection.length) {
+		if (this.nodeDragListener || !this.selection.length) {
 			return;
 		}
 
 		//init the start positions of the drag
 		let initPageX = event.pageX;
 		let initPageY = event.pageY;
-		window.nodeDragHasFired = false;
+		this.nodeDragHasFired = false;
 
 		//get all the connectors for the selected node
 		//so we can check if we are not splicing a connector for the selected node
@@ -726,7 +734,7 @@ class XibleEditor extends EventEmitter {
 		}
 
 		//catch the mousemove event
-		document.body.addEventListener('mousemove', window.nodeDragListener = (event) => {
+		document.body.addEventListener('mousemove', this.nodeDragListener = (event) => {
 
 			//check if mouse actually moved
 			//see crbug.com/327114
@@ -734,7 +742,7 @@ class XibleEditor extends EventEmitter {
 				return;
 			}
 
-			window.nodeDragHasFired = true;
+			this.nodeDragHasFired = true;
 
 			//check how much we moved since the initial mousedown event
 			let relativePageX = (event.pageX - initPageX) / this.zoom;
@@ -760,7 +768,7 @@ class XibleEditor extends EventEmitter {
 				let selLeftAvg = selNode.left + (selBounding.width / this.zoom) / 2;
 				let selTopAvg = selNode.top + (selBounding.height / this.zoom) / 2;
 
-				let previousSpliceConnector = window.nodeDragSpliceConnector;
+				let previousSpliceConnector = this.nodeDragSpliceConnector;
 
 				let hasSpliceConnector = this.loadedFlow.connectors.some((connector) => {
 
@@ -777,7 +785,7 @@ class XibleEditor extends EventEmitter {
 						let connBounding = connector.element.getBoundingClientRect();
 						if (Math.abs((connector.left + (connBounding.width / this.zoom) / 2) - selLeftAvg) < 20 && Math.abs((connector.top + (connBounding.height / this.zoom) / 2) - selTopAvg) < 20) {
 
-							window.nodeDragSpliceConnector = connector;
+							this.nodeDragSpliceConnector = connector;
 							connector.element.classList.add('splice');
 							selNode.element.classList.add('splice');
 							return true;
@@ -790,12 +798,12 @@ class XibleEditor extends EventEmitter {
 
 				if (!hasSpliceConnector) {
 
-					window.nodeDragSpliceConnector = null;
+					this.nodeDragSpliceConnector = null;
 					selNode.element.classList.remove('splice');
 
 				}
 
-				if (previousSpliceConnector && (!hasSpliceConnector || previousSpliceConnector !== window.nodeDragSpliceConnector)) {
+				if (previousSpliceConnector && (!hasSpliceConnector || previousSpliceConnector !== this.nodeDragSpliceConnector)) {
 					previousSpliceConnector.element.classList.remove('splice');
 				}
 
@@ -814,7 +822,7 @@ class XibleEditor extends EventEmitter {
 	initAreaSelector(event) {
 
 		//exit if we're already dragging
-		if (window.areaMoveListener) {
+		if (this.areaMoveListener) {
 			return;
 		}
 
@@ -831,7 +839,7 @@ class XibleEditor extends EventEmitter {
 		let areaEl;
 
 		//catch the mousemove event
-		document.body.addEventListener('mousemove', window.areaMoveListener = (event) => {
+		document.body.addEventListener('mousemove', this.areaMoveListener = (event) => {
 
 			if (!this.loadedFlow) {
 				return;
@@ -945,7 +953,7 @@ class XibleEditor extends EventEmitter {
 			}
 
 			//if a drag never started or the mouse position never changed
-			if (!window.nodeDragListener || !window.nodeDragHasFired) {
+			if (!this.nodeDragListener || !this.nodeDragHasFired) {
 
 				//deselect
 				if ((event.target === this.element.firstChild || event.target === this.element) && !event.ctrlKey && event.button === 0) {
@@ -955,10 +963,10 @@ class XibleEditor extends EventEmitter {
 			}
 
 			//complete the selection after an area select
-			if (window.areaMoveListener) {
+			if (this.areaMoveListener) {
 
-				document.body.removeEventListener('mousemove', window.areaMoveListener);
-				window.areaMoveListener = null;
+				document.body.removeEventListener('mousemove', this.areaMoveListener);
+				this.areaMoveListener = null;
 
 				var areaEl = document.querySelector('.xible .area');
 				if (areaEl) {
@@ -967,35 +975,35 @@ class XibleEditor extends EventEmitter {
 
 			}
 
-			if (!window.nodeDragListener) {
+			if (!this.nodeDragListener) {
 				return;
 			}
 
-			document.body.removeEventListener('mousemove', window.nodeDragListener);
-			window.nodeDragListener = null;
+			document.body.removeEventListener('mousemove', this.nodeDragListener);
+			this.nodeDragListener = null;
 
 			//splice a connector
-			if (window.nodeDragSpliceConnector) {
+			if (this.nodeDragSpliceConnector) {
 
 				var selNode = this.selection[0];
-				var origConnectorDestination = window.nodeDragSpliceConnector.destination;
+				var origConnectorDestination = this.nodeDragSpliceConnector.destination;
 
 				selNode.element.classList.remove('splice');
-				window.nodeDragSpliceConnector.element.classList.remove('splice');
+				this.nodeDragSpliceConnector.element.classList.remove('splice');
 
 				//connect the connector to the first input of type of the selected node
-				var selInputs = selNode.getInputsByType(window.nodeDragSpliceConnector.origin.type);
+				var selInputs = selNode.getInputsByType(this.nodeDragSpliceConnector.origin.type);
 				if (!selInputs.length) {
 					selInputs = selNode.getInputsByType(null);
 				}
 				var selInput = selInputs[0];
-				window.nodeDragSpliceConnector.setDestination(selInput);
+				this.nodeDragSpliceConnector.setDestination(selInput);
 
 				//connect a duplicate of the connector to the first output of type of the selected node
 				var dupConn = new XibleEditorConnector();
 				this.loadedFlow.connectors.push(dupConn);
 
-				var selOutputs = selNode.getOutputsByType(window.nodeDragSpliceConnector.origin.type);
+				var selOutputs = selNode.getOutputsByType(this.nodeDragSpliceConnector.origin.type);
 				var selOutput;
 				if (!selOutputs.length) {
 
@@ -1019,7 +1027,7 @@ class XibleEditor extends EventEmitter {
 
 				this.addConnector(dupConn);
 
-				window.nodeDragSpliceConnector = null;
+				this.nodeDragSpliceConnector = null;
 
 			}
 
@@ -1398,14 +1406,14 @@ class XibleEditor extends EventEmitter {
 		//triggered when shuffling completes
 		document.body.addEventListener('mouseup', (event) => {
 
-			if (!window.dummyXibleConnectors || !window.dummyXibleNode) {
+			if (!this.dummyXibleConnectors || !this.dummyXibleNode) {
 				return;
 			}
 
 			//destroy the temporary connector & dummyXibleNode
-			window.dummyXibleNode.delete();
-			window.dummyXibleConnectors.forEach((conn) => conn.delete());
-			window.dummyXibleConnectors = window.dummyXibleNode = window.dummyIo = null;
+			this.dummyXibleNode.delete();
+			this.dummyXibleConnectors.forEach((conn) => conn.delete());
+			this.dummyXibleConnectors = this.dummyXibleNode = this.dummyIo = null;
 
 			//ensure we deselect the dummyXibleNode
 			this.deselect();

@@ -30,7 +30,7 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 
 	filterDuplicateConnectors(type, end) {
 
-		if (!window.dummyXibleConnectors || window.dummyXibleConnectors.indexOf(this) === -1) {
+		if (!this.editor || !this.editor.dummyXibleConnectors || this.editor.dummyXibleConnectors.indexOf(this) === -1) {
 			super.filterDuplicateConnectors(type, end);
 		}
 
