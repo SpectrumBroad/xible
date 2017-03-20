@@ -1305,10 +1305,10 @@ class XibleEditor extends EventEmitter {
 			var relativeMouseTop = (mouseTop - this.top) / this.zoom;
 
 			//in or out
-			if (event.deltaY > 0 && this.zoom >= 0.5) {
-				this.zoom -= 0.1;
+			if (event.deltaY > 0 && this.zoom >= 0.2) {
+				this.zoom = (Math.round(this.zoom * 10) - 1) / 10;
 			} else if (event.deltaY < 0 && this.zoom < 5) {
-				this.zoom += 0.1;
+				this.zoom = (Math.round(this.zoom * 10) + 1) / 10;
 			}
 
 			//update left/top based on cursor position

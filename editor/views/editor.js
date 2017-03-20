@@ -33,6 +33,7 @@ View.routes.editor = function(EL) {
 		<div id="flowEditorHolder">
 			<div class="zoomButtons">
 				<button id="zoomOutButton" type="button" title="Zoom out">&#xe024;</button>
+				<button id="zoomFitButton" type="button" title="Zoom to fit">&gt;</button>
 				<button id="zoomResetButton" type="button" title="Reset zoom">&#xe01c;</button>
 				<button id="zoomInButton" type="button" title="Zoom in">&#xe035;</button>
 			</div>
@@ -363,7 +364,11 @@ View.routes.editor = function(EL) {
 	//zoom and reset
 	document.getElementById('zoomOutButton').onclick = function() {
 
-		xibleEditor.zoom -= 0.1;
+		if (xibleEditor.zoom < 0.2) {
+			return;
+		}
+
+		xibleEditor.zoom = (Math.round(xibleEditor.zoom * 10) - 1) / 10;
 		xibleEditor.transform();
 
 	};
@@ -375,7 +380,84 @@ View.routes.editor = function(EL) {
 	};
 	document.getElementById('zoomInButton').onclick = function() {
 
-		xibleEditor.zoom += 0.1;
+		if (xibleEditor.zoom >= 5) {
+			return;
+		}
+
+		xibleEditor.zoom = (Math.round(xibleEditor.zoom * 10) + 1) / 10;
+		xibleEditor.transform();
+
+	};
+	document.getElementById('zoomFitButton').onclick = function() {
+
+		if (!xibleEditor.loadedFlow.nodes.length) {
+			return;
+		}
+
+		//get the min/max coordinates from the nodes
+		let minLeft, minTop, maxLeft, maxTop;
+		for (let i = 0; i < xibleEditor.loadedFlow.nodes.length; ++i) {
+
+			let node = xibleEditor.loadedFlow.nodes[i];
+			let nodeOffsetWidth = node.element.offsetWidth;
+			let nodeOffsetHeight = node.element.offsetHeight;
+
+			if (!minLeft || node.left < minLeft) {
+				minLeft = node.left;
+			}
+			if (!maxLeft || node.left + nodeOffsetWidth > maxLeft) {
+				maxLeft = node.left + nodeOffsetWidth;
+			}
+			if (!minTop || node.top < minTop) {
+				minTop = node.top;
+			}
+			if (!maxTop || node.top + nodeOffsetHeight > maxTop) {
+				maxTop = node.top + nodeOffsetHeight;
+			}
+
+		}
+
+		//get editor size
+		let xibleEditorBounding = xibleEditor.element.getBoundingClientRect();
+		let xibleEditorWidth = xibleEditorBounding.width;
+		let xibleEditorHeight = xibleEditorBounding.height;
+
+		//add some padding to the found node coordinates;
+		const PADDING = 40;
+		minLeft -= PADDING;
+		maxLeft += PADDING;
+		minTop -= PADDING;
+		maxTop += PADDING;
+
+		//calculate the zoom factor and zoom to the lowest factor
+		let widthZoomFactor = xibleEditorWidth / (maxLeft - minLeft);
+		let heightZoomFactor = xibleEditorHeight / (maxTop - minTop);
+		xibleEditor.zoom = Math.min(widthZoomFactor, heightZoomFactor);
+
+		//set left and top properties for the editor
+		if (widthZoomFactor < heightZoomFactor) {
+
+			//set x
+			xibleEditor.left = xibleEditor.zoom * -minLeft;
+
+			//center y
+			xibleEditor.top = (xibleEditor.zoom * -minTop) +
+				(xibleEditorHeight / 2) -
+				(xibleEditor.zoom * ((maxTop - minTop) / 2));
+
+		} else {
+
+			//center x
+			xibleEditor.left = (xibleEditor.zoom * -minLeft) +
+				(xibleEditorWidth / 2) -
+				(xibleEditor.zoom * ((maxLeft - minLeft) / 2));
+
+			//set y
+			xibleEditor.top = xibleEditor.zoom * -minTop;
+
+		}
+
+		//apply the transormation
 		xibleEditor.transform();
 
 	};
@@ -576,7 +658,7 @@ View.routes.editor = function(EL) {
 
 	xibleWrapper.on('open', () => {
 
-		connectionLost.innerHTML='Connection re-established';
+		connectionLost.innerHTML = 'Connection re-established';
 		connectionLost.classList.remove('alert');
 		connectionLost.classList.add('success');
 
@@ -584,7 +666,7 @@ View.routes.editor = function(EL) {
 
 			//ensure the connection is indeed still open
 			//by the time we want to remove the connectionLost message
-			if(xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+			if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
 				connectionLost.classList.add('hidden');
 			}
 
@@ -602,7 +684,7 @@ View.routes.editor = function(EL) {
 	//clear all flow statuses when connection closes
 	xibleWrapper.on('close', () => {
 
-		connectionLost.innerHTML='Connection lost';
+		connectionLost.innerHTML = 'Connection lost';
 		connectionLost.classList.add('alert');
 		connectionLost.classList.remove('hidden', 'success');
 
