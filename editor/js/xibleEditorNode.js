@@ -454,7 +454,6 @@ class XibleEditorNode extends xibleWrapper.Node {
 			if (this.statusEl.parentNode) {
 				this.statusEl.parentNode.removeChild(this.statusEl);
 			}
-
 			this.statusEl = null;
 
 		}
@@ -472,7 +471,9 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 		if (this.trackerEl) {
 
-			this.trackerEl.parentNode.removeChild(this.trackerEl);
+			if(this.trackerEl.parentNode) {
+				this.trackerEl.parentNode.removeChild(this.trackerEl);
+			}
 			this.trackerEl = null;
 
 		}
