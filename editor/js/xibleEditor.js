@@ -1329,18 +1329,24 @@ class XibleEditor extends EventEmitter {
 
 		this.top = this.left = this.backgroundLeft = this.backgroundTop = 0;
 
-		var mousePanFunction;
+		let mousePanFunction;
 		this.element.addEventListener('mousedown', (event) => {
 
+			//if we are already panning, don't do anything
+			if(mousePanFunction) {
+				return;
+			}
+
+			//we pan on scrollwheel
 			if (event.button === 1) {
 
 				//initial values based on current position
-				var initPageX = event.pageX;
-				var initPageY = event.pageY;
-				var initLeft = this.left;
-				var initTop = this.top;
-				var initBackgroundLeft = this.backgroundLeft;
-				var initBackgroundTop = this.backgroundTop;
+				let initPageX = event.pageX;
+				let initPageY = event.pageY;
+				let initLeft = this.left;
+				let initTop = this.top;
+				let initBackgroundLeft = this.backgroundLeft;
+				let initBackgroundTop = this.backgroundTop;
 
 				this.element.classList.add('panning');
 
@@ -1348,8 +1354,8 @@ class XibleEditor extends EventEmitter {
 				document.body.addEventListener('mousemove', mousePanFunction = (event) => {
 
 					//check how much we moved since the initial mousedown event
-					var relativePageX = event.pageX - initPageX;
-					var relativePageY = event.pageY - initPageY;
+					let relativePageX = event.pageX - initPageX;
+					let relativePageY = event.pageY - initPageY;
 
 					//save the new position
 					this.left = initLeft + relativePageX;
