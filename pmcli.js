@@ -164,7 +164,7 @@ let cli = {
 		},
 		search: function() {
 
-			xible.Registry.Node
+			xible.Registry.NodePack
 				.search(ARG)
 				.then((nodes) => {
 
