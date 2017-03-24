@@ -182,7 +182,7 @@ class XibleEditorNodeSelector {
 		//open the node menu on double click
 		document.body.addEventListener('dblclick', (event) => {
 
-			if (!event.ctrlKey && this.xibleEditor.loadedFlow && (event.target === this.xibleEditor.element || event.target === this.xibleEditor.element.firstChild)) {
+			if (!event.ctrlKey && this.xibleEditor.loadedFlow && this.xibleEditor.browserSupport && (event.target === this.xibleEditor.element || event.target === this.xibleEditor.element.firstChild)) {
 				this.open(event);
 			}
 

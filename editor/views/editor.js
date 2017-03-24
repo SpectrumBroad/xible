@@ -74,9 +74,7 @@ View.routes['/editor'] = function(EL) {
 
 	//check if this browser supports attachShadow
 	let browserSupportAttachShadowEl = document.getElementById('browserSupportAttachShadow');
-	let browserSupportAttachShadow = typeof browserSupportAttachShadowEl.attachShadow === 'function';
-
-	if (!browserSupportAttachShadow) {
+	if (!xibleEditor.browserSupport) {
 
 		browserSupportAttachShadowEl.classList.remove('hidden');
 

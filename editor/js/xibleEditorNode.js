@@ -52,7 +52,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 		//direct handler
 		headerEl.addEventListener('dblclick', (event) => {
 
-			if (!this.editor || this.type !== 'action' || typeof this.element.attachShadow !== 'function') {
+			if (!this.editor || this.type !== 'action' || !this.editor.browserSupport) {
 				return;
 			}
 

@@ -6,11 +6,26 @@ class XibleEditor extends EventEmitter {
 
 		super();
 
+		//stage element
 		this.element = document.createElement('div');
 		this.element.classList.add('xible');
 		this.element.appendChild(document.createElement('div'));
 		this.element.firstChild.classList.add('editor');
 		this.element.firstChild.style.transformOrigin = '0 0';
+
+		//check for browser support
+		this.browserSupportItems = {
+			attachShadow: typeof this.element.attachShadow === 'function'
+		};
+		this.browserSupport = true;
+		for (let item in this.browserSupportItems) {
+			if (!this.browserSupportItems[item]) {
+
+				this.browserSupport = false;
+				break;
+
+			}
+		}
 
 		this.selection = [];
 		this.copySelection = null;
@@ -1341,7 +1356,7 @@ class XibleEditor extends EventEmitter {
 		this.element.addEventListener('mousedown', (event) => {
 
 			//if we are already panning, don't do anything
-			if(mousePanFunction) {
+			if (mousePanFunction) {
 				return;
 			}
 
