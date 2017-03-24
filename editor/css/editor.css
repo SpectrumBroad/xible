@@ -110,6 +110,7 @@
 	appearance: none;
 	color: #fff;
 	font-weight: bold;
+	font-family: inherit;
 	border: none;
 	background-color: #282828;
 	padding: 10px;
@@ -235,7 +236,7 @@
 
 .xible .editor:empty::before {
 	display: block;
-	text-align:center;
+	text-align: center;
 	content: "Click the \"+\" button in the left top corner to create a new flow.";
 	white-space: pre;
 	position: absolute;
@@ -245,7 +246,7 @@
 }
 
 .xible[data-flow] .editor:empty::before {
-	text-align:center;
+	text-align: center;
 	content: "Double click anywhere on the canvas to add a node.\AYou may want to start with a \"xible.flow.onstart\" node.\AHold down the scroll wheel to move around.";
 }
 
