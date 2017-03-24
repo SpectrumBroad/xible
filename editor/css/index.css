@@ -151,7 +151,7 @@ nav>ul>li>a>span {
 	margin-bottom: 6px;
 }
 
-nav>ul>li:last-child>a>span {
+nav>ul>li.editor>a>span {
 	transform: rotate(90deg) translatey(2px);
 }
 
