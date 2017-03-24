@@ -235,6 +235,7 @@
 
 .xible .editor:empty::before {
 	display: block;
+	text-align:center;
 	content: "Click the \"+\" button in the left top corner to create a new flow.";
 	white-space: pre;
 	position: absolute;
@@ -244,7 +245,8 @@
 }
 
 .xible[data-flow] .editor:empty::before {
-	content: "Double click anywhere on the canvas to add a node.\A Hold down the scroll wheel to move around.";
+	text-align:center;
+	content: "Double click anywhere on the canvas to add a node.\AYou may want to start with a \"xible.flow.onstart\" node.\AHold down the scroll wheel to move around.";
 }
 
 .xible .editor>.connector {
