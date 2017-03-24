@@ -8,7 +8,6 @@ View.routes['/settings'] = function(EL) {
 				<h1>General</h1>
 				<ul>
 					<li><a href="/settings/general#webserver" onclick="settingsViewHolder.navigate('/settings/general#webserver'); return false;">Webserver</a></li>
-					<li><a href="#">test 2</a></li>
 				</ul>
 			</section>
 			<section>
@@ -51,7 +50,7 @@ View.routes['/settings'] = function(EL) {
 	settingsViewHolder.on('render', (view) => {
 
 		//unselect all buttons from lhs
-		document.querySelectorAll(`#sub ul a`)
+		Array.from(document.querySelectorAll(`#sub ul a`))
 			.forEach((a) => a.classList.remove('view'));
 
 		//select the button from lhs
