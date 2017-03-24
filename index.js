@@ -313,7 +313,10 @@ class Xible extends EventEmitter {
 
 			//check for TLS
 			if (this.secure && !req.secure) {
+				
 				res.redirect(`https://${req.host}:${this.webPort+1}${req.originalUrl}`);
+				return;
+
 			}
 
 			res.removeHeader('X-Powered-By');
