@@ -509,7 +509,7 @@ View.routes.editor = function(EL) {
 
 		//if in path, load it immediately
 		let pathSplit = window.location.pathname.split('/');
-		if (pathSplit[pathSplit.length - 1] === encodeURIComponent(flow._id)) {
+		if (pathSplit.length > 1 && pathSplit[2] === encodeURIComponent(flow._id)) {
 			a.click();
 		}
 
