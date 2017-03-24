@@ -576,6 +576,11 @@ View.routes.editor = function(EL) {
 			window.alert('The flow name may not start with an underscore');
 			return;
 
+		} else if (/[\/\\:\?<>"]/.test(flowName)) {
+
+			window.alert('The flow name may not contain any of the following characters: /\\:?<>');
+			return;
+
 		}
 
 		resetCharts();
