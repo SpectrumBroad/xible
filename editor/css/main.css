@@ -10,24 +10,31 @@
 	padding: 10px 16px;
 }
 
-.inner>:first-child {
-	margin-top: 0;
-}
-
-.inner>:first-child>:first-child {
+.inner>:first-child, .inner>.view>:first-child, .inner>.view>section>:first-child {
 	margin-top: 0;
 }
 
 .inner h1 {
 	font-family: robotothin;
 	font-weight: normal;
+	font-size: 1.5em;
+}
+
+.inner h2 {
+	font-family: robotothin;
+	font-weight: normal;
+	font-size: 1.2em;
+	margin:20px 0 14px 0;
 }
 
 section {
 	width: 100%;
 	padding: 0;
 	box-sizing: border-box;
-	font-size: 1em;
+}
+
+.inner section dl, .inner section p, .inner section ul, .inner section ol {
+	font-size: 0.7em;
 }
 
 main {
@@ -35,7 +42,7 @@ main {
 	height: 100%;
 	flex: 1 1 auto;
 	background-color: #181818;
-	color: #bbb;
+	color: #ddd;
 }
 
 p.hidden {

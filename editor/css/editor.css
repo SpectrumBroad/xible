@@ -29,6 +29,7 @@
 #flowEditorHolder .zoomButtons button {
 	margin: 0;
 	padding: 2px 4px;
+	width: auto;
 	min-width: 20px;
 	border: none;
 	border-right: 1px solid #000;

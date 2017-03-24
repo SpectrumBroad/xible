@@ -1,4 +1,4 @@
-View.routes.editor = function(EL) {
+View.routes['/editor'] = function(EL) {
 
 	EL.innerHTML = `
 		<div id="sub">

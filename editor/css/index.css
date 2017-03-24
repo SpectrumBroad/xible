@@ -198,7 +198,7 @@ nav>ul>li:last-child>a>span {
 #sub section>h1 {
 	box-sizing: border-box;
 	padding: 8px 10px;
-	color: #fff;
+	color: #ddd;
 	font-size: 1.2em;
 	margin: 0;
 }
@@ -225,6 +225,11 @@ nav>ul>li:last-child>a>span {
 	height: 100%;
 	border-radius: 3px;
 	box-sizing: border-box;
+}
+
+#sub section>ul>li>a:active, #sub section>ul>li>a.view {
+	background-color: #272727;
+	color: #ddd;
 }
 
 #sub section>ul>li>a:hover {

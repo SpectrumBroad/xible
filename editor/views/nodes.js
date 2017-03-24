@@ -1,4 +1,4 @@
-View.routes.nodes = function(EL) {
+View.routes['/nodes'] = function(EL) {
 	EL.innerHTML = `
     <div id="sub">
       <header>XIBLE</header>

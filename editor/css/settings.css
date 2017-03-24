@@ -1,0 +1,46 @@
+#settingsContent .view {
+	flex-direction: column;
+}
+
+#settingsContent section {
+	border-bottom: 1px solid #333;
+}
+
+#settingsContent dl {
+	overflow: auto;
+	margin: 8px 0;
+}
+
+#settingsContent dt {
+	margin: 18px 0 6px;
+	padding: 0;
+}
+
+#settingsContent dt label div {
+	font-size: 0.9em;
+	color: #bbb;
+}
+
+#settingsContent dd {
+	margin: 0 0 18px;
+	padding: 0;
+}
+
+
+/* checkbox */
+
+#settingsContent dt.checkbox {
+	margin: 18px 0 6px;
+	float: left;
+	clear: right;
+}
+
+#settingsContent dd.checkbox {
+	margin: 18px 0 6px;
+	float: left;
+	clear: left;
+}
+
+#settingsContent dd.checkbox span {
+	margin: 3px 8px 0 0;
+}

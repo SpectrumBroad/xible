@@ -2,6 +2,10 @@ class View {
 
 	constructor(viewName, props) {
 
+		if (viewName.substring(0, 1) !== '/') {
+			viewName = `/${viewName}`;
+		}
+
 		this.name = viewName;
 		this.element = document.createElement('div');
 		this.element.classList.add('view');
@@ -20,7 +24,7 @@ class View {
 			if (!View.routes[this.name]) {
 
 				//get the complete view url
-				let url = `views/${this.name}.js`;
+				let url = `views${this.name}.js`;
 
 				//check if the view actually exists using HttpRequest, so we have error handling
 				let req = new XMLHttpRequest();
@@ -78,61 +82,78 @@ View.routes = {};
 
 class ViewHolder extends EventEmitter {
 
-	constructor(node) {
+	constructor(node, rootPath = '/') {
 
 		super();
 		this.element = node;
 		this.parentViewHolder = null;
+		this.rootPath = rootPath;
+		this.rootPaths = ViewHolder.splitPath(rootPath);
+
+	}
+
+	static splitPath(path) {
+
+		let paths = path.split('/');
+		if (paths[paths.length - 1] === '') {
+			paths.pop();
+		}
+		return paths;
 
 	}
 
 	navigate(path, nonav) {
 
-		let deepIndex = 0;
-		/*
-		if (this.parentViewHolder) {
-			deepIndex = this.parentViewHolder.navigate(path, nonav);
-		}
-		*/
-
 		history.pushState(null, path, path);
-		if (!nonav) {
 
-			this.purge();
+		if (nonav) {
+			return Promise.resolve(this);
+		}
 
-			let paths = path.substring(1).split('/');
-			let view = new View(paths[deepIndex], this.getParams());
-			this.render(view);
+		this.purge();
 
-			return view.init();
+		//handle hash by simply removing it
+		//history.pushState already set it correctly in the browser
+		let pathHashIndex = path.indexOf('#');
+		if (pathHashIndex > -1) {
+			path = path.substring(0, pathHashIndex);
+		}
+
+		let paths = ViewHolder.splitPath(path);
+		for (let i = 0; i < this.rootPaths.length; ++i) {
+
+			if (paths.length < i || paths[i] !== this.rootPaths[i]) {
+				return Promise.resolve(this);
+			}
 
 		}
 
-		return Promise.resolve(this);
+		//get and load the view
+		let viewName = paths.slice(0, this.rootPaths.length + 1).join('/');
+		let view = new View(viewName, this.getParams());
+		this.render(view);
+
+		this.emit('navigate', path);
+
+		return view.init();
 
 	}
 
 	loadNav() {
 
-		let path = window.location.pathname;
-		if (!path || path === '/') {
-			return Promise.reject('already root');
+		let path = window.location.pathname || '';
+		let paths = ViewHolder.splitPath(path);
+
+		if (paths.length === this.rootPaths.length) {
+			return Promise.reject('already there');
 		}
 
-		return this.navigate(path);
+		return this.navigate(path + window.location.hash);
 
 	}
 
 	hookNavHandler() {
-
-		window.addEventListener('popstate', (event) => {
-			this.loadNav();
-		});
-
-	}
-
-	hookHashHandler() {
-		window.addEventListener('hashchange', () => this.loadHash());
+		window.addEventListener('popstate', (event) => this.loadNav());
 	}
 
 	getParams(str) {
@@ -168,37 +189,11 @@ class ViewHolder extends EventEmitter {
 
 	}
 
-	loadHash() {
-
-		this.purge();
-
-		if (!window.location.hash) {
-			return false;
-		}
-
-		let hash = window.location.hash.substring(1);
-		let hashParams = hash.split('&');
-		let viewName = hashParams[0];
-
-		//populate the params
-		let viewParams = this.getParams(hash);
-
-		//create and activate the view
-		this.render(new View(viewName, viewParams));
-
-		return true;
-
-	}
-
 	render(view) {
 
 		this.emit('render', view);
 		this.element.appendChild(view.element);
 
-	}
-
-	done(view) {
-		//this.emit('done', view);
 	}
 
 	purge() {

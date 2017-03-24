@@ -9,12 +9,16 @@
 
 	<link rel="stylesheet" href="css/index.css" type="text/css" />
 	<link rel="stylesheet" href="css/main.css" type="text/css" />
+	<link rel="stylesheet" href="css/form.css" type="text/css" />
 
 	<!-- editor related css files -->
 	<link rel="stylesheet" href="css/editor.css" type="text/css" />
 	<link rel="stylesheet" href="css/describe.css" type="text/css" />
 	<link rel="stylesheet" href="css/flowTabs.css" type="text/css" />
 	<link rel="stylesheet" href="css/nodeSelector.css" type="text/css" />
+
+	<!-- settings related css files -->
+	<link rel="stylesheet" href="css/settings.css" type="text/css" />
 
 	<script src="js/EventEmitter.min.js"></script>
 	<script src="js/xibleWrapper.js"></script>
@@ -31,7 +35,7 @@
 
 			<!--			<li><a href="/flows" onclick="mainViewHolder.navigate('/flows'); return false;"><span>&#xe059;</span>Flows</a></li> -->
 			<!--			<li><a href="/nodes" onclick="mainViewHolder.navigate('/nodes'); return false;"><span>&#xe044;</span>Nodes</a></li> -->
-			<!--			<li><a href="/settings" onclick="mainViewHolder.navigate('/settings'); return false;"><span>S</span>Settings</a></li> -->
+			<li><a href="/settings" onclick="mainViewHolder.navigate('/settings'); return false;"><span>S</span>Settings</a></li>
 			<li><a href="/editor" onclick="mainViewHolder.navigate('/editor'); return false;"><span>&#xe029;</span>Editor</a></li>
 
 		</ul>
@@ -69,13 +73,13 @@
 				.forEach((a) => a.classList.remove('view'));
 
 			//select the button from lhs
-			let a = document.querySelector(`body>nav a[href="/${view.name}"]`);
+			let a = document.querySelector(`body>nav a[href="${view.name}"]`);
 			if (!a) {
 				return;
 			}
 			a.classList.add('view');
 
-		})
+		});
 		mainViewHolder.hookNavHandler();
 		mainViewHolder.loadNav().catch(() => {
 			mainViewHolder.navigate('/welcome');

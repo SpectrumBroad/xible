@@ -1,4 +1,4 @@
-View.routes.welcome = function(EL) {
+View.routes['/welcome'] = function(EL) {
 
   EL.innerHTML = `
 		<div id="sub">
