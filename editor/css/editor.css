@@ -20,6 +20,7 @@
 	border: 1px solid #000;
 	border-radius: 6px;
 	font-family: dripicons;
+	transition: opacity ease .2s;
 }
 
 #flowEditorHolder .zoomButtons:hover {
@@ -40,10 +41,16 @@
 	font-family: inherit;
 	display: block;
 	float: left;
+	border-radius: 0;
+}
+
+#flowEditorHolder .zoomButtons button:first-child {
+	border-radius: 6px 0 0 6px;
 }
 
 #flowEditorHolder .zoomButtons button:last-child {
 	border-right: none;
+	border-radius: 0 6px 6px 0;
 }
 
 #console {
