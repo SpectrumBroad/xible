@@ -188,7 +188,16 @@ let cli = {
 
 	config: {
 		set: function() {
-			xible.Config.setValue(ARG, remain.shift());
+
+			let value = remain.shift();
+			if (value === 'true') {
+				value = true;
+			} else if (value === 'false') {
+				value = false;
+			}
+
+			xible.Config.setValue(ARG, value);
+
 		},
 		delete: function() {
 			xible.Config.deleteValue(ARG);
