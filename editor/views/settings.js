@@ -47,18 +47,66 @@ View.routes['/settings'] = function(EL) {
 	`;
 
 	settingsViewHolder = new ViewHolder(document.getElementById('settingsContent'), '/settings');
-	settingsViewHolder.on('render', (view) => {
+	settingsViewHolder.on('load', (view) => {
 
-		//unselect all buttons from lhs
+		//unselect all buttons from #sub
 		Array.from(document.querySelectorAll(`#sub ul a`))
 			.forEach((a) => a.classList.remove('view'));
 
 		//select the button from lhs
 		let a = document.querySelector(`#sub ul a[href*="${window.location.hash}"]`);
-		if (!a) {
-			return;
+		if (a) {
+			a.classList.add('view');
 		}
-		a.classList.add('view');
+
+		//hook event handler on change to save config data immediately
+		Array.from(document.querySelectorAll(`input[data-configpath]`))
+			.forEach((input) => {
+				input.addEventListener('change', () => {
+
+					let value = input.value;
+					switch (input.getAttribute('type')) {
+
+						case 'number':
+
+							value = +value;
+							if (isNaN(value)) {
+								return;
+							}
+
+							break;
+
+						case 'checkbox':
+							value = input.checked;
+							break;
+
+					}
+
+					if (typeof value === 'string' && value.length === 0) {
+
+						xibleWrapper.Config.deleteValue(input.getAttribute('data-configpath'));
+						return;
+
+					}
+
+					xibleWrapper.Config.setValue(input.getAttribute('data-configpath'), value);
+
+				});
+			});
+
+		//set the right data in the data-configpath fields
+		xibleWrapper.Config.getAll().then((config) => {
+			Array.from(document.querySelectorAll(`input[data-configpath]`))
+				.forEach((input) => {
+
+					if(input.getAttribute('type') ===  'checkbox') {
+						input.checked = !!xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+					}
+
+					input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+
+				});
+		});
 
 	});
 	settingsViewHolder.hookNavHandler();
