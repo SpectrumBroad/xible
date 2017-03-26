@@ -25,7 +25,7 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 
 	function saveConfig(path, configContents) {
 
-		configContents = JSON.stringify(configContents);
+		configContents = JSON.stringify(configContents, null, '\t');
 
 		try {
 			fsExtra.writeFileSync(path, configContents);
