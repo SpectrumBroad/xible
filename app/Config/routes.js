@@ -13,7 +13,7 @@ module.exports = function(Config, XIBLE, EXPRESS_APP) {
 		}
 
 		Config.setValue(path, value);
-		res.end();
+		res.json(Config.getAll());
 
 	});
 
@@ -25,7 +25,7 @@ module.exports = function(Config, XIBLE, EXPRESS_APP) {
 		}
 
 		Config.deleteValue(path);
-		res.end();
+		res.json(Config.getAll());
 
 	});
 
