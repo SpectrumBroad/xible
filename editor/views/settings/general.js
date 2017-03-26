@@ -3,12 +3,15 @@ View.routes['/settings/general'] = function(EL) {
 	EL.innerHTML = `
 	<section>
 		<h1>General</h1>
+
+		<p class="warning">
+			Changing any if the values in this section requires a restart of XIBLE.<br/>
+			Also note that after a restart as a consequence of these changes, the web interface may no longer be available on the current URL.
+		</p>
+
 		<section id="webserver">
 			<h2>Webserver</h2>
-			<p class="warning">
-				Changing any if the values in this section requires a restart of XIBLE.<br/>
-				Also note that after a restart as a consequence of these changes, the web interface may no longer be available on the current URL.
-			</p>
+
 			<dl>
 
 				<dt>
@@ -37,6 +40,37 @@ View.routes['/settings/general'] = function(EL) {
 
 			</dl>
 		</section>
+
+		<section id="nodes">
+			<h2>Nodes</h2>
+
+			<dl>
+				<dt>
+					<label for="settingsGeneralNodesPath">
+						Nodes path
+						<div>Path to a SSL certificate file. If configured together with the &quot;SSL key path&quot;, SSL will be enabled and plain HTTP requests redirect to the HTTPS connection.</div>
+					</label>
+				</dt>
+				<dd><input id="settingsGeneralNodesPath" type="text" data-configpath="nodes.path" /></dd>
+			</dl>
+
+		</section>
+
+		<section id="flows">
+			<h2>Flows</h2>
+
+			<dl>
+				<dt>
+					<label for="settingsGeneralFlowsPath">
+						Flows path
+						<div>Path to a SSL certificate file. If configured together with the &quot;SSL key path&quot;, SSL will be enabled and plain HTTP requests redirect to the HTTPS connection.</div>
+					</label>
+				</dt>
+				<dd><input id="settingsGeneralFlowsPath" type="text" data-configpath="flows.path" /></dd>
+			</dl>
+
+		</section>
+
 	</section>
 	`;
 
