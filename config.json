@@ -1,6 +1,6 @@
 {
 
-	"webServer": {
+	"webserver": {
 		"port": 9600
 	},
 

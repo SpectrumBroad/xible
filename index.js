@@ -240,7 +240,7 @@ class Xible extends EventEmitter {
 		}));
 
 		//init the webserver
-		let webPort = this.webPort = this.Config.getValue('webServer.port') || 9600;
+		let webPort = this.webPort = this.Config.getValue('webserver.port') || 9600;
 		expressDebug(`starting on port: ${webPort}`);
 
 		let onListen = (webServer) => {
@@ -281,8 +281,8 @@ class Xible extends EventEmitter {
 		};
 
 		//spdy (https)
-		let keyPath = this.Config.getValue('webServer.keyPath');
-		let keyCert = this.Config.getValue('webServer.certPath');
+		let keyPath = this.Config.getValue('webserver.keypath');
+		let keyCert = this.Config.getValue('webserver.certpath');
 		if (keyPath && keyCert) {
 
 			expressDebug(`starting spdy (https)`);
@@ -313,7 +313,7 @@ class Xible extends EventEmitter {
 
 			//check for TLS
 			if (this.secure && !req.secure) {
-				
+
 				res.redirect(`https://${req.host}:${this.webPort+1}${req.originalUrl}`);
 				return;
 
