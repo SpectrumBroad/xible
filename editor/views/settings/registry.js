@@ -12,7 +12,7 @@ View.routes['/settings/registry'] = function(EL) {
 							<div>Connection URL towards the XIBLE registry. This registry is used for downloading nodepacks and flows.</div>
 						</label>
 					</dt>
-					<dd><input id="settingsRegistryGeneralUrl" type="url" value="https://registry.xible.io" /></dd>
+					<dd><input id="settingsRegistryGeneralUrl" type="url" data-configpath="registry.url" /></dd>
 				</dl>
 			</section>
 			<section id="nodepacks">
@@ -21,7 +21,7 @@ View.routes['/settings/registry'] = function(EL) {
 
 					<dd class="checkbox">
 						<label for="settingsRegistryNodepacksAllowPublish">
-							<input type="checkbox" value="true" id="settingsRegistryNodepacksAllowPublish" />
+							<input type="checkbox" value="true" id="settingsRegistryNodepacksAllowPublish" data-configpath="registry.nodepacks.allowpublish" />
 							<span></span>
 						</label>
 					</dd>
@@ -34,7 +34,7 @@ View.routes['/settings/registry'] = function(EL) {
 
 					<dd class="checkbox">
 						<label for="settingsRegistryNodepacksAllowInstall">
-							<input type="checkbox" value="true" id="settingsRegistryNodepacksAllowInstall" />
+							<input type="checkbox" value="true" id="settingsRegistryNodepacksAllowInstall" data-configpath="registry.nodepacks.allowinstall" />
 							<span></span>
 						</label>
 					</dd>
@@ -53,7 +53,7 @@ View.routes['/settings/registry'] = function(EL) {
 
 					<dd class="checkbox">
 						<label for="settingsRegistryFlowsAllowPublish">
-							<input type="checkbox" value="true" id="settingsRegistryFlowsAllowPublish" />
+							<input type="checkbox" value="true" id="settingsRegistryFlowsAllowPublish" data-configpath="registry.flows.allowpublish" />
 							<span></span>
 						</label>
 					</dd>
@@ -66,7 +66,7 @@ View.routes['/settings/registry'] = function(EL) {
 
 					<dd class="checkbox">
 						<label for="settingsRegistryFlowsAllowInstall">
-							<input type="checkbox" value="true" id="settingsRegistryFlowsAllowInstall" />
+							<input type="checkbox" value="true" id="settingsRegistryFlowsAllowInstall" data-configpath="registry.flows.allowinstall" />
 							<span></span>
 						</label>
 					</dd>
