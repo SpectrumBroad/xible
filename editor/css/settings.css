@@ -11,6 +11,10 @@
 	margin: 8px 0;
 }
 
+#settingsContent dl>*:first-child {
+	margin-top: 0;
+}
+
 #settingsContent dt {
 	margin: 18px 0 6px;
 	padding: 0;
@@ -43,4 +47,8 @@
 
 #settingsContent dd.checkbox span {
 	margin: 3px 8px 0 0;
+}
+
+#settingsContent dd.checkbox:first-child, #settingsContent dd.checkbox:first-child + dt.checkbox {
+	margin: 0 0 6px;
 }
