@@ -34,7 +34,7 @@ class View {
 					if (req.status >= 200 && req.status < 300) {
 
 						//add the node
-						var viewScriptNode = document.createElement('script');
+						let viewScriptNode = document.createElement('script');
 						viewScriptNode.setAttribute('src', url);
 						viewScriptNode.onload = () => {
 
@@ -139,7 +139,7 @@ class ViewHolder extends EventEmitter {
 		return view.init()
 			.then((view) => {
 
-				this.emit('load', path);
+				this.emit('load', view);
 				return view;
 
 			}).catch((err) => {
