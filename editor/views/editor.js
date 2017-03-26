@@ -394,7 +394,7 @@ View.routes['/editor'] = function(EL) {
 	};
 	document.getElementById('zoomFitButton').onclick = function() {
 
-		if (!xibleEditor.loadedFlow.nodes.length) {
+		if (!xibleEditor.loadedFlow || !xibleEditor.loadedFlow.nodes.length) {
 			return;
 		}
 
