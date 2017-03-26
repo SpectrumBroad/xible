@@ -67,6 +67,10 @@ let cli = {
 	nodepack: {
 		publish: function() {
 
+			if(!xible.Config.getValue('registry.nodepacks.allowpublish')) {
+				return console.log(`Your config does not allow to publish nodepacks to the registry`);
+			}
+
 			//find package.json and use that name
 			//let packageJson=require(`package.json`);
 			fs.readFile('package.json', (err, data) => {
@@ -150,6 +154,10 @@ let cli = {
 
 		},
 		install: function() {
+
+			if(!xible.Config.getValue('registry.nodepacks.allowinstall')) {
+				return console.log(`Your config does not allow to install nodepacks from the registry`);
+			}
 
 			xible.Registry.NodePack
 				.getByName(ARG)
