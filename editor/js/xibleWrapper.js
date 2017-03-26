@@ -3,6 +3,13 @@ module.exports = function(XIBLE) {
 
 	class Config {
 
+		static getAll() {
+
+			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/config`);
+			return req.toJson();
+
+		}
+
 		static validatePermissions() {
 
 			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/config/validatePermissions`);
@@ -13,7 +20,7 @@ module.exports = function(XIBLE) {
 		static deleteValue(path) {
 
 			let req = XIBLE.httpBase.request('DELETE', `http${XIBLE.baseUrl}/api/config/value`);
-			return req.send({
+			return req.toJson({
 				path: path
 			});
 
@@ -26,10 +33,37 @@ module.exports = function(XIBLE) {
 			}
 
 			let req = XIBLE.httpBase.request('PUT', `http${XIBLE.baseUrl}/api/config/value`);
-			return req.send({
+			return req.toJson({
 				path: path,
 				value: value
 			});
+
+		}
+
+		static getObjectValueOnPath(obj, path) {
+
+			let pathSplit = path.split('.');
+			let sel = obj;
+
+			for (let i = 0; i < pathSplit.length; ++i) {
+
+				let part = pathSplit[i];
+				if (sel.hasOwnProperty(part)) {
+					sel = sel[part];
+				} else {
+					return null;
+				}
+
+			}
+
+			return sel;
+
+		}
+
+		static getValue(path) {
+
+			return this.getAll()
+				.then((config) => this.getObjectValueOnPath(config, path));
 
 		}
 
