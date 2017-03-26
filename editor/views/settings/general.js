@@ -17,7 +17,7 @@ View.routes['/settings/general'] = function(EL) {
 						<div>The plain-HTTP (non-SSL) port this web interface and the API routes are hosted on. If SSL is enabled, requests from this port are redirected to a secure connection on this port number incremented by 1.<br/>For example, if port 9600 is configured here and SSL is enabled, port 9601 will host the secure connection.</div>
 					</label>
 				</dt>
-				<dd><input id="settingsGeneralWebserverPort" type="number" data-configpath="webserver.port" /></dd>
+				<dd><input id="settingsGeneralWebserverPort" type="number" data-configpath="webserver.port" placeholder="9600" /></dd>
 
 				<dt>
 					<label for="settingsGeneralWebserverKeyPath">
