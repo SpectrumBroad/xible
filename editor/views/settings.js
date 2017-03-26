@@ -10,11 +10,11 @@ View.routes['/settings'] = function(EL) {
 					<li><a href="/settings/general#webserver" onclick="settingsViewHolder.navigate('/settings/general#webserver'); return false;">Webserver</a></li>
 				</ul>
 			</section>
+			<!--
 			<section>
 				<h1>Editor</h1>
 				<ul>
 					<li><a href="/settings/editor#general" onclick="settingsViewHolder.navigate('/settings/editor#general'); return false;">General</a></li>
-					<li><a href="#">test 2</a></li>
 				</ul>
 			</section>
 			<section>
@@ -26,6 +26,7 @@ View.routes['/settings'] = function(EL) {
 					<li><a href="#">Tokens</a></li>
 				</ul>
 			</section>
+			-->
 			<section>
 				<h1>Registry</h1>
 				<ul>
