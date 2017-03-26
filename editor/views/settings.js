@@ -54,7 +54,7 @@ View.routes['/settings'] = function(EL) {
 			.forEach((a) => a.classList.remove('view'));
 
 		//select the button from lhs
-		let a = document.querySelector(`#sub ul a[href*="${window.location.hash}"]`);
+		let a = document.querySelector(`#sub ul a[href*="${window.location.hash}"][href*="${view.name}"]`);
 		if (a) {
 			a.classList.add('view');
 		}
@@ -111,7 +111,7 @@ View.routes['/settings'] = function(EL) {
 	});
 	settingsViewHolder.hookNavHandler();
 	settingsViewHolder.loadNav().catch(() => {
-		mainViewHolder.navigate('/settings/general');
+		mainViewHolder.navigate('/settings/general#webserver');
 	});
 
 	//validate if the config can be altered
