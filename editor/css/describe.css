@@ -18,20 +18,22 @@
 	display: block;
 	right: 0;
 	top: 0;
-  border:0;
-  background-color:rgba(255, 255, 255, .7);
-  padding:20px;
+	border: 0;
+	background-color: rgba(255, 255, 255, .7);
+	padding: 20px;
 	-webkit-appearance: none;
 	appearance: none;
-  font-family:robotothin;
-  font-size:32px;
-  line-height:22px;
-  cursor:pointer;
-  color:#000;
+	font-family: robotothin;
+	font-size: 32px;
+	line-height: 22px;
+	cursor: pointer;
+	color: #000;
+	border-radius: 0;
+	width: auto;
 }
 
 .xible>.describe>button:hover {
-  background-color:rgba(255, 255, 255, 1);
+	background-color: rgba(255, 255, 255, 1);
 }
 
 
