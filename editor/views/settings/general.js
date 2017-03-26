@@ -7,7 +7,7 @@ View.routes['/settings/general'] = function(EL) {
 			<h2>Webserver</h2>
 			<p class="warning">
 				Changing any if the values in this section requires a restart of XIBLE.<br/>
-				Also note that after a restart as a consequence of these changes, the web interface will no longer be available on the current URL.
+				Also note that after a restart as a consequence of these changes, the web interface may no longer be available on the current URL.
 			</p>
 			<dl>
 
