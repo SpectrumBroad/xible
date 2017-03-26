@@ -39,13 +39,16 @@ class View {
 						viewScriptNode.onload = () => {
 
 							if (typeof View.routes[this.name] === 'function') {
+
 								View.routes[this.name].call(this, this.element);
+								resolve(this);
+
+							} else {
+								reject(`No such route: "${this.name}"`);
 							}
 
 						};
 						document.head.appendChild(viewScriptNode);
-
-						resolve(this);
 
 					} else {
 						reject(req.status);
@@ -133,9 +136,18 @@ class ViewHolder extends EventEmitter {
 		let view = new View(viewName, this.getParams());
 		this.render(view);
 
-		this.emit('navigate', path);
+		return view.init()
+			.then((view) => {
 
-		return view.init();
+				this.emit('load', path);
+				return view;
+
+			}).catch((err) => {
+
+				this.emit('error', err);
+				return view;
+
+			});
 
 	}
 
@@ -191,8 +203,8 @@ class ViewHolder extends EventEmitter {
 
 	render(view) {
 
-		this.emit('render', view);
 		this.element.appendChild(view.element);
+		this.emit('render', view);
 
 	}
 
