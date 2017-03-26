@@ -5,23 +5,11 @@
 	},
 
 	"nodes": {
-		"path": "~/.xible/nodes",
-
-		"registry": {
-			"allowpublish": true,
-			"allowinstall": true
-		}
-
+		"path": "~/.xible/nodes"
 	},
 
 	"flows": {
-		"path": "~/.xible/flows",
-
-		"registry": {
-			"allowpublish": true,
-			"allowinstall": true
-		}
-
+		"path": "~/.xible/flows"
 	},
 
 	"vault": {
@@ -29,7 +17,18 @@
 	},
 
 	"registry": {
-		"url": "https://registry.xible.io"
+		"url": "https://registry.xible.io",
+
+		"nodepacks": {
+			"allowpublish": true,
+			"allowinstall": true
+		},
+
+		"flows": {
+			"allowpublish": true,
+			"allowinstall": true
+		}
+
 	}
 
 }
