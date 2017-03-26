@@ -6,6 +6,7 @@ View.routes['/welcome'] = function(EL) {
     </div>
     <div class="inner">
       <section>
+        <h1>Welcome</h1>
         <p>Welcome to your Xible installation.</p>
       </section>
     </div>

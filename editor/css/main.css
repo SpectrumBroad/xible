@@ -11,7 +11,7 @@
 	overflow: auto;
 }
 
-.inner>:first-child, .inner>.view>:first-child, .inner>.view>section>:first-child {
+.inner>:first-child, .inner>section>:first-child, .inner>.view>:first-child, .inner>.view>section>:first-child {
 	margin-top: 0;
 }
 
