@@ -377,6 +377,8 @@ class Xible extends EventEmitter {
 
 	broadcastWebSocket(message) {
 
+		let copyMessage;
+
 		if (!this.webSocketServer) {
 			return;
 		}
@@ -389,6 +391,7 @@ class Xible extends EventEmitter {
 
 				case 'xible.node.addStatus':
 				case 'xible.node.setTracker':
+				case 'xible.node.addProgressBar':
 
 					this.setPersistentWebSocketMessage(message);
 
@@ -400,9 +403,17 @@ class Xible extends EventEmitter {
 
 					break;
 
+				case 'xible.node.updateProgressBarById':
+
+					copyMessage = Object.assign({}, message);
+					copyMessage.method = 'xible.node.addProgressBar';
+					this.setPersistentWebSocketMessage(copyMessage);
+
+					break;
+
 				case 'xible.node.updateStatusById':
 
-					let copyMessage = Object.assign({}, message);
+					copyMessage = Object.assign({}, message);
 					copyMessage.method = 'xible.node.addStatus';
 					this.setPersistentWebSocketMessage(copyMessage);
 

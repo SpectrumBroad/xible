@@ -313,9 +313,15 @@ class XibleEditorNode extends xibleWrapper.Node {
 		statusBarHolder.appendChild(document.createElement('div'));
 
 		if (status.timeout) {
+
+			//check when this progressbar should start (future)
+			//or when it started (past)
+			let startDiff = Date.now() - status.startDate;
+
 			this.statusTimeouts[status._id] = window.setTimeout(() => {
 				this.removeStatusById(status._id);
-			}, status.timeout);
+			}, status.timeout - startDiff);
+
 		}
 
 		this.updateProgressBarById(status._id, status);
@@ -337,8 +343,27 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 			if (status.updateOverTime) {
 
+				//check when this progressbar should start (future)
+				//or when it started (past)
+				let startDiff = Date.now() - status.startDate;
+
+				//max it out
+				if (startDiff > status.updateOverTime) {
+					startDiff = status.updateOverTime;
+				}
+
+				//if this progressbar should have started in the past
+				//calculate where the width should be right now
+				if (startDiff > 0) {
+					bar.style.width = `${startDiff/status.updateOverTime*100}%`;
+				}
+
+				console.log(startDiff);
+				console.log(bar.style.width);
+				console.log(`width ${status.updateOverTime-(startDiff>0?startDiff:0)}ms ${startDiff<0?Math.abs(startDiff):0}ms linear`);
+
 				bar.offsetWidth; /* jshint ignore: line */
-				bar.style.transition = `width ${status.updateOverTime}ms linear`;
+				bar.style.transition = `width ${status.updateOverTime-(startDiff>0?startDiff:0)}ms ${startDiff<0?Math.abs(startDiff):0}ms linear`;
 				bar.style.width = '100%';
 
 			}
@@ -471,7 +496,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 		if (this.trackerEl) {
 
-			if(this.trackerEl.parentNode) {
+			if (this.trackerEl.parentNode) {
 				this.trackerEl.parentNode.removeChild(this.trackerEl);
 			}
 			this.trackerEl = null;

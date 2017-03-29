@@ -347,6 +347,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			status._id = XIBLE.generateObjectId();
 
+			if (!status.startDate) {
+				status.startDate = Date.now();
+			}
+
 			this.sendProcessMessage({
 				method: "broadcastWebSocket",
 				message: {
