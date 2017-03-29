@@ -10,6 +10,7 @@ View.routes['/settings'] = function(EL) {
 					<li><a href="/settings/general#webserver" onclick="settingsViewHolder.navigate('/settings/general#webserver'); return false;">Webserver</a></li>
 					<li><a href="/settings/general#nodes" onclick="settingsViewHolder.navigate('/settings/general#nodes'); return false;">Nodes</a></li>
 					<li><a href="/settings/general#flows" onclick="settingsViewHolder.navigate('/settings/general#flows'); return false;">Flows</a></li>
+					<li><a href="/settings/general#vault" onclick="settingsViewHolder.navigate('/settings/general#vault'); return false;">Vault</a></li>
 				</ul>
 			</section>
 			<!--
