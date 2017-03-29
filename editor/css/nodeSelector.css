@@ -29,6 +29,7 @@
 	transition: background-color 0.1s ease-in;
 	color: inherit;
 	text-align: inherit;
+	border-radius: 0;
 }
 
 #nodeSelector>button, #detailNodeSelector>button {
