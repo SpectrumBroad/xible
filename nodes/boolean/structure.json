@@ -1,0 +1,10 @@
+{
+  "name": "boolean",
+  "type": "object",
+  "description": "A boolean representation.",
+  "outputs": {
+    "result": {
+      "type": "boolean"
+    }
+  }
+}

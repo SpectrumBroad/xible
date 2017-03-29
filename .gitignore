@@ -13,5 +13,6 @@ nodes/*
 !nodes/group
 !nodes/document
 !nodes/conditional
+!nodes/boolean
 ssl/
 docs/
