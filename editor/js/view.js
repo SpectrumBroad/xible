@@ -118,8 +118,12 @@ class ViewHolder extends EventEmitter {
 		//handle hash by simply removing it
 		//history.pushState already set it correctly in the browser
 		let pathHashIndex = path.indexOf('#');
+		let pathHash;
 		if (pathHashIndex > -1) {
+
+			pathHash = path.substring(pathHashIndex);
 			path = path.substring(0, pathHashIndex);
+
 		}
 
 		let paths = ViewHolder.splitPath(path);
@@ -138,6 +142,14 @@ class ViewHolder extends EventEmitter {
 
 		return view.init()
 			.then((view) => {
+
+				//scroll to element with id === hash
+				if (pathHash) {
+					let el = document.getElementById(pathHash.substring(1));
+					if (el) {
+						el.scrollIntoView(true);
+					}
+				}
 
 				this.emit('load', view);
 				return view;
