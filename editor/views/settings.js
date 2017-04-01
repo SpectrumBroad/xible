@@ -115,7 +115,7 @@ View.routes['/settings'] = function(EL) {
 	});
 	settingsViewHolder.hookNavHandler();
 	settingsViewHolder.loadNav().catch(() => {
-		mainViewHolder.navigate('/settings/general#webserver');
+		mainViewHolder.navigate('/settings/general');
 	});
 
 	//validate if the config can be altered
