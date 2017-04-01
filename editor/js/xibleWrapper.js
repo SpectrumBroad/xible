@@ -1185,6 +1185,17 @@ class XibleWrapper extends EventEmitter {
 
 	}
 
+	getServerDate() {
+
+		let req = this.httpBase.request('GET', `http${this.baseUrl}/api/serverDate`);
+		return req.toJson();
+
+	}
+
+	getServerClientDateDifference() {
+		return this.getServerDate().then((epoch) => epoch - Date.now());
+	}
+
 	getPersistentWebSocketMessages() {
 
 		let req = this.httpBase.request('GET', `http${this.baseUrl}/api/persistentWebSocketMessages`);

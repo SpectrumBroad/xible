@@ -316,7 +316,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 			//check when this progressbar should start (future)
 			//or when it started (past)
-			let startDiff = Date.now() - status.startDate;
+			let startDiff = Date.now() - status.startDate + this.editor.serverClientDateDifference;
 
 			this.statusTimeouts[status._id] = window.setTimeout(() => {
 				this.removeStatusById(status._id);
@@ -345,7 +345,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 				//check when this progressbar should start (future)
 				//or when it started (past)
-				let startDiff = Date.now() - status.startDate;
+				let startDiff = Date.now() - status.startDate + this.editor.serverClientDateDifference;
 
 				//max it out
 				if (startDiff > status.updateOverTime) {
@@ -357,10 +357,6 @@ class XibleEditorNode extends xibleWrapper.Node {
 				if (startDiff > 0) {
 					bar.style.width = `${startDiff/status.updateOverTime*100}%`;
 				}
-
-				console.log(startDiff);
-				console.log(bar.style.width);
-				console.log(`width ${status.updateOverTime-(startDiff>0?startDiff:0)}ms ${startDiff<0?Math.abs(startDiff):0}ms linear`);
 
 				bar.offsetWidth; /* jshint ignore: line */
 				bar.style.transition = `width ${status.updateOverTime-(startDiff>0?startDiff:0)}ms ${startDiff<0?Math.abs(startDiff):0}ms linear`;

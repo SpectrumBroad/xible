@@ -41,6 +41,12 @@ class XibleEditor extends EventEmitter {
 		this.flows = {};
 		this.loadedFlow = null;
 
+		//check how far the clocks of server and client are off from eachother
+		//in ms
+		this.serverClientDateDifference = 0;
+		xibleWrapper.getServerClientDateDifference()
+			.then((ms) => this.serverClientDateDifference = ms);
+
 		this.enableNodeSelector();
 		this.enableZoom();
 		this.enablePan();
@@ -197,7 +203,7 @@ class XibleEditor extends EventEmitter {
 
 		for (let i = 0; i < flow.nodes.length; ++i) {
 
-			flow.nodes[i].getInputs().forEach((input) => {
+			flow.nodes[i].getInputs().forEach((input) => { //jshint ignore: line
 
 				if (input.type === output.type && !input.connectors.length) {
 					input.setGlobal(output.global);
@@ -244,7 +250,7 @@ class XibleEditor extends EventEmitter {
 					this.flows[flowId] = flow;
 
 					//set global appropriately when it's changed
-					flow.on('global', (output) => this.setGlobalFromOutput(flow, output));
+					flow.on('global', (output) => this.setGlobalFromOutput(flow, output)); //jshint ignore: line
 
 				}
 

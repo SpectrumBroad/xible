@@ -8,6 +8,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 	});
 
+	EXPRESS_APP.get('/api/serverDate', (req, res) => {
+		res.json(Date.now());
+	});
+
 	//send out any existing statuses
 	EXPRESS_APP.get('/api/persistentWebSocketMessages', (req, res) => {
 		res.json(XIBLE.persistentWebSocketMessages);
