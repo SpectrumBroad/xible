@@ -54,6 +54,9 @@
 			secure: window.location.protocol === 'https:'
 
 		});
+		xibleWrapper.on('error', (err) => {
+			console.log(err);
+		});
 		xibleWrapper.autoReconnect();
 		xibleWrapper.connect();
 	</script>
