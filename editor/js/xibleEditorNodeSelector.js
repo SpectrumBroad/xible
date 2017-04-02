@@ -120,7 +120,7 @@ class XibleEditorNodeSelector {
 
 							let li = this.buildNode(nodeName, nodePack.nodes[i]);
 							li.classList.add('online');
-							li.onclick = (event) => {
+							li.onclick = (event) => { //jshint ignore: line
 
 								//open the detailed confirmation view
 								this.detailedNodeView(li, nodePack, nodeName);
@@ -239,8 +239,17 @@ class XibleEditorNodeSelector {
 
 	detailedNodeView(li, nodePack, nodeName) {
 
+		//disable by default
+		this.detailConfirmButton.disabled = true;
+
+		//check if config allows installing new nodepacks
+		xibleWrapper.Config
+			.getValue('registry.nodepacks.allowinstall')
+			.then((allowInstall) => {
+				this.detailConfirmButton.disabled = !allowInstall;
+			});
+
 		//set confirm button action
-		this.detailConfirmButton.disabled = false;
 		this.detailConfirmButton.onclick = () => {
 
 			this.detailConfirmButton.disabled = true;

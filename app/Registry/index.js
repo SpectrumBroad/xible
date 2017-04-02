@@ -36,6 +36,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 	xibleRegistry.NodePack.prototype.install = function() {
 
+		if(!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
+			return Promise.reject(`Your config does not allow to install nodepacks from the registry`);
+		}
+
 		let nodePath = XIBLE.Config.getValue('nodes.path');
 		if (!nodePath) {
 			return Promise.reject(`no "nodes.path" configured`);
