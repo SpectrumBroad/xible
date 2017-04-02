@@ -166,34 +166,49 @@ class XibleEditorNodeSelector {
 
 		});
 
-		//open the node menu on contextmenu
-		document.body.addEventListener('contextmenu', (event) => {
+		//open the node menu on double click
+		let openOnMouseEvent = (event) => {
 
-			if (this.xibleEditor.loadedFlow && (event.target === this.xibleEditor.element || event.target === this.xibleEditor.element.firstChild)) {
+			if (!event.ctrlKey && XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport && (event.target === XIBLE_EDITOR.element || event.target === XIBLE_EDITOR.element.firstChild)) {
 
 				this.open(event);
 				event.preventDefault();
-				return false;
 
 			}
 
-		});
-
-		//open the node menu on double click
-		document.body.addEventListener('dblclick', (event) => {
-
-			if (!event.ctrlKey && this.xibleEditor.loadedFlow && this.xibleEditor.browserSupport && (event.target === this.xibleEditor.element || event.target === this.xibleEditor.element.firstChild)) {
-				this.open(event);
-			}
-
-		});
+		};
+		this.xibleEditor.element.addEventListener('contextmenu', openOnMouseEvent);
+		this.xibleEditor.element.addEventListener('dblclick', openOnMouseEvent);
 
 		//hide the nodeSelector element if selection moves elsewhere
-		document.body.addEventListener('mousedown', (event) => {
+		let mouseDownEventHandler;
+		document.body.addEventListener('mousedown', mouseDownEventHandler = (event) => {
 
 			if (!div.classList.contains('hidden') && !div.contains(event.target) && !detailDiv.contains(event.target)) {
 				this.close();
 			}
+
+		});
+
+		//clean out elements/handlers hooked to document.body
+		//when this view gets removed
+		mainViewHolder.once('purge', () => {
+
+			if (detailDiv && detailDiv.parentNode) {
+
+				document.body.removeChild(detailDiv);
+				detailDiv = null;
+
+			}
+
+			if (div && div.parentNode) {
+
+				document.body.removeChild(div);
+				div = null;
+
+			}
+
+			document.body.removeEventListener('mousedown', mouseDownEventHandler);
 
 		});
 
