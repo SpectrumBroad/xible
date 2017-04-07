@@ -77,12 +77,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			}
 
-			files.forEach((file) => {
+			for (let i = 0; i < files.length; ++i) {
 
-				let filepath = flowPath + '/' + file;
+				let filepath = `${flowPath}/${files[i]}`;
 
 				//only fetch json files but ignore _status.json
-				if (file.substring(0, 1) !== '_' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
+				if (files[i].substring(0, 1) !== '_' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
 
 					try {
 
@@ -101,7 +101,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				}
 
-			});
+			}
 
 			//start all flows which had status running before
 			//also do some cleaning while we're at it
@@ -134,7 +134,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			return new Promise((resolve, reject) => {
 
-				if(!this.flowPath) {
+				if (!this.flowPath) {
 					resolve(false);
 				}
 
@@ -278,7 +278,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						}
 
 						if (Object.keys(nodeVaultData).length) {
-							xibleNode.vault.set(Object.assign(xibleNode.vault.get()||{}, nodeVaultData));
+							xibleNode.vault.set(Object.assign(xibleNode.vault.get() || {}, nodeVaultData));
 						}
 
 					}
