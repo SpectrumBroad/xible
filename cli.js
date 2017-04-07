@@ -43,16 +43,23 @@ let xible = new Xible({
 	configPath: CONFIG_PATH
 });
 
+function logError(msg, exitCode) {
+
+	console.error(msg);
+	process.exitCode = exitCode || 1;
+
+}
+
 //cli commands
 let cli = {
 
 	flow: {
 
 		start: function() {
-			console.error(`Not implemented yet`);
+			logError(`Not implemented yet`);
 		},
 		stop: function() {
-			console.error(`Not implemented yet`);
+			logError(`Not implemented yet`);
 		}
 
 	},
@@ -76,7 +83,7 @@ let cli = {
 			exec('systemctl enable xible.service', (err, stdout, stderr) => {
 
 				if (err) {
-					return console.error(`Failed to enable service: ${err}`);
+					return logError(`Failed to enable service: ${err}`);
 				}
 
 				console.log('' + stdout);
@@ -93,7 +100,7 @@ let cli = {
 			exec('systemctl disable xible.service', (err, stdout, stderr) => {
 
 				if (err) {
-					return console.error(`Failed to disable service: ${err}`);
+					return logError(`Failed to disable service: ${err}`);
 				}
 
 				console.log('' + stdout);
@@ -113,7 +120,7 @@ let cli = {
 function printUsage(path) {
 
 	if (context !== 'help') {
-		console.error(`Unrecognized context: "${context}"\n`);
+		logError(`Unrecognized context: "${context}"\n`);
 	}
 
 	console.log(`Usage: xible ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
