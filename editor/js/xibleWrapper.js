@@ -587,7 +587,7 @@ module.exports = function(XIBLE) {
 },{"./Connector":2,"./Node":6,"events":11}],4:[function(require,module,exports){
 module.exports = function(XIBLE) {
 
-  const Io = require('./Io.js');
+	const Io = require('./Io.js');
 
 	class Input extends Io {
 
@@ -595,19 +595,19 @@ module.exports = function(XIBLE) {
 			super(...arguments);
 		}
 
-    delete() {
+		delete() {
 
-      super.delete();
+			super.delete();
 
-      if (this.node) {
-        this.node.deleteInput(this);
-      }
+			if (this.node) {
+				this.node.deleteInput(this);
+			}
 
-    }
+		}
 
-  }
+	}
 
-  return Input;
+	return Input;
 
 };
 
@@ -1055,7 +1055,7 @@ module.exports = function(XIBLE) {
 },{"events":11}],7:[function(require,module,exports){
 module.exports = function(XIBLE) {
 
-  const Io = require('./Io.js');
+	const Io = require('./Io.js');
 
 	class Output extends Io {
 
@@ -1063,19 +1063,19 @@ module.exports = function(XIBLE) {
 			super(...arguments);
 		}
 
-    delete() {
+		delete() {
 
-      super.delete();
+			super.delete();
 
-      if (this.node) {
-        this.node.deleteOutput(this);
-      }
+			if (this.node) {
+				this.node.deleteOutput(this);
+			}
 
-    }
+		}
 
-  }
+	}
 
-  return Output;
+	return Output;
 
 };
 
@@ -1084,23 +1084,24 @@ module.exports = function(XIBLE) {
 
 	class Registry {
 
-    static searchNodePacks(searchString) {
+		static searchNodePacks(searchString) {
 
-      let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/registry/nodepacks?search=${encodeURIComponent(searchString)}`);
+			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/registry/nodepacks?search=${encodeURIComponent(searchString)}`);
 			return req.toJson();
 
-    }
+		}
 
 		static installNodePackByName(nodePackName) {
 
 			let req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/registry/nodepacks/${encodeURIComponent(nodePackName)}/install`);
+			req.timeout = 120000; //give this a high timeout because installing may take a while
 			return req.send();
 
 		}
 
-  }
+	}
 
-  return Registry;
+	return Registry;
 
 };
 
@@ -1678,9 +1679,9 @@ class Base {
 
 	}
 
-	request(url, method) {
+	request(method, url) {
 
-		let req = new Request(url, method);
+		let req = new Request(method, url);
 
 		Object.assign(req.headers, this.headers);
 		req.rejectUnauthorized = this.rejectUnauthorized;
@@ -1771,6 +1772,10 @@ class Request {
 				reject(event);
 			};
 
+			req.ontimeout = (event) => {
+				reject(event);
+			};
+
 			req.onload = (event) => {
 
 				if (req.status >= 200 && req.status < 300) {
@@ -1828,7 +1833,10 @@ class Request {
 			});
 
 			req.setTimeout(this.timeout || Request.defaults.timeout, () => {
+
 				req.abort();
+				reject('timeout');
+
 			});
 
 			req.on('error', (err) => {
