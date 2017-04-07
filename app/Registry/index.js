@@ -36,7 +36,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 	xibleRegistry.NodePack.prototype.install = function() {
 
-		if(!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
+		if (!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
 			return Promise.reject(`Your config does not allow to install nodepacks from the registry`);
 		}
 
@@ -96,6 +96,30 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 								//specify the dir where this node will be installed
 								let nodeDestDir = `${nodePath}/${this.name}`;
 
+								//when success, resolve
+								let onSuccess = () => {
+									return XIBLE.Node
+										.initFromPath(nodeDestDir)
+										.then(cleanUp)
+										.then(() => {
+
+											//see if we can/need to reinit flows that are not runnable
+											let flows = XIBLE.getFlows();
+											for(let flowId in flows) {
+
+												if(!flows[flowId].runnable) {
+													flows[flowId].initJson(flows[flowId].json);
+												}
+
+											}
+
+										})
+										.then(resolve)
+										.catch((err) => {
+											reject(err);
+										});
+								};
+
 								//remove existing node directory
 								fsExtra.emptyDir(nodeDestDir, (err) => {
 
@@ -120,15 +144,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 											}
 
 											if (!files.length) {
-
-												return XIBLE.Node
-													.initFromPath(nodeDestDir)
-													.then(() => cleanUp())
-													.then(() => resolve())
-													.catch((err) => {
-														reject(err);
-													});
-
+												return onSuccess();
 											}
 
 											//move the rest of the node_modules
@@ -140,13 +156,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 													return reject(err);
 												}
 
-												XIBLE.Node
-													.initFromPath(nodeDestDir)
-													.then(() => cleanUp())
-													.then(() => resolve())
-													.catch((err) => {
-														reject(err);
-													});
+												return onSuccess();
 
 											});
 
