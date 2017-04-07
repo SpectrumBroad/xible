@@ -1,9 +1,9 @@
 class XibleEditorNodeSelector {
 
 	/**
-	*	create a new nodeSelector
-	* @param {XibleEditor} XIBLE_EDITOR
-	*/
+	 *	create a new nodeSelector
+	 * @param {XibleEditor} XIBLE_EDITOR
+	 */
 	constructor(XIBLE_EDITOR) {
 
 		this.xibleEditor = XIBLE_EDITOR;
@@ -257,11 +257,11 @@ class XibleEditorNodeSelector {
 	}
 
 	/**
-	* opens the detailed node view, for downloading/installing new nodes (/nodepacks)
-	* @param {HTMLLIElement} li the list element from the main nodeSelector
-	* @param {xibleWrapper.NodePack} nodePack
-	* @param {nodeName} nodeName the specific nodeName from the nodePack/li
-	*/
+	 * opens the detailed node view, for downloading/installing new nodes (/nodepacks)
+	 * @param {HTMLLIElement} li the list element from the main nodeSelector
+	 * @param {xibleWrapper.NodePack} nodePack
+	 * @param {nodeName} nodeName the specific nodeName from the nodePack/li
+	 */
 	detailedNodeView(li, nodePack, nodeName) {
 
 		//disable by default
@@ -274,7 +274,7 @@ class XibleEditorNodeSelector {
 
 				this.detailConfirmButton.disabled = !allowInstall;
 
-				if(!allowInstall) {
+				if (!allowInstall) {
 					document.getElementById('nodePackInstallDisabled').classList.remove('hidden');
 				}
 
@@ -296,29 +296,24 @@ class XibleEditorNodeSelector {
 
 					this.detailDiv.classList.add('hidden');
 
-					//track all nodeNames currently visible
-					let visibleNodeNames = Array.from(this.nodesUl
-							.querySelectorAll(`li:not(.hidden) h1`))
-						.map((header) => header.getAttribute('title'));
-
 					//refill
-					this.fill().then(() => {
+					this.fill();
 
-						//hide all items
-						Array.from(this.nodesUl.querySelectorAll('li')).forEach((li) => {
-							li.classList.add('hidden');
-						});
+				})
+				.catch((err) => {
 
-						//make items visible that were so before
-						visibleNodeNames.forEach((nodeName) => {
+					this.detailConfirmButton.disabled = true;
 
-							let h1 = this.nodesUl.querySelector(`li h1[title="${nodeName}"]`);
-							if (h1) {
-								h1.parentNode.classList.remove('hidden');
-							}
+					this.detailDivSub.innerHTML = `<p class="alert">An error occured.</p>`;
+					this.detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode(err));
 
-						});
+					this.detailConfirmButton.addEventListener('animationiteration', () => {
 
+						this.detailConfirmButton.classList.remove('loading');
+						li.classList.remove('loading');
+
+					}, {
+						once: true
 					});
 
 				});
@@ -373,11 +368,11 @@ class XibleEditorNodeSelector {
 	}
 
 	/**
-	* builds a node for the nodeSelector
-	* @param {String} nodeName
-	* @param {xibleWrapper.Node} node
-	* @returns {HTMLLIElement} the created HTML element, an LI
-	*/
+	 * builds a node for the nodeSelector
+	 * @param {String} nodeName
+	 * @param {xibleWrapper.Node} node
+	 * @returns {HTMLLIElement} the created HTML element, an LI
+	 */
 	buildNode(nodeName, node) {
 
 		//list element containing the node heading and description
@@ -412,8 +407,8 @@ class XibleEditorNodeSelector {
 	}
 
 	/**
-	* hooks relevant listeners to a node in the selector
-	*/
+	 * hooks relevant listeners to a node in the selector
+	 */
 	hookNode(li, node) {
 
 		//onmousedown so the user can drag the newly inserted node immediately
@@ -434,10 +429,21 @@ class XibleEditorNodeSelector {
 	}
 
 	/**
-	* Fetches the nodes from xible and places them in the nodeSelector ul
-	* @returns {Promise.<undefined>} resolves when complete
-	*/
+	 * Fetches the nodes from xible and places them in the nodeSelector ul
+	 * Keeps visible state correct if this functions is called multiple times
+	 * @returns {Promise.<undefined>} resolves when complete
+	 */
 	fill() {
+
+		//track all nodeNames currently visible
+		let visibleNodeNames;
+		if (Array.from(this.nodesUl.querySelectorAll(`li.hidden`)).length) {
+
+			visibleNodeNames = Array.from(this.nodesUl
+					.querySelectorAll(`li:not(.hidden) h1`))
+				.map((header) => header.getAttribute('title'));
+
+		}
 
 		this.nodesUl.innerHTML = '';
 
@@ -449,17 +455,32 @@ class XibleEditorNodeSelector {
 
 				let li = this.buildNode(nodeName, nodes[nodeName]);
 				this.hookNode(li, nodes[nodeName]);
+
+				if (visibleNodeNames) {
+					li.classList.add('hidden');
+				}
+
 				this.nodesUl.appendChild(li);
 
 			});
+
+			//make items visible that were so before
+			if (visibleNodeNames) {
+				for (let i = 0; i < visibleNodeNames.length; ++i) {
+					let h1 = this.nodesUl.querySelector(`li h1[title="${visibleNodeNames[i]}"]`);
+					if (h1) {
+						h1.parentNode.classList.remove('hidden');
+					}
+				}
+			}
 
 		});
 
 	}
 
 	/**
-	* Positions the nodeSelector according to some vars indicating where to open
-	*/
+	 * Positions the nodeSelector according to some vars indicating where to open
+	 */
 	position() {
 
 		let clientRect = this.div.getBoundingClientRect();
@@ -478,9 +499,9 @@ class XibleEditorNodeSelector {
 	}
 
 	/**
-	* Opens the main node selector (not the detail one)
-	* @param {MouseEvent} event that triggers the open. Used to set the correct position
-	*/
+	 * Opens the main node selector (not the detail one)
+	 * @param {MouseEvent} event that triggers the open. Used to set the correct position
+	 */
 	open(event) {
 
 		//unhide all nodes,
@@ -536,9 +557,9 @@ class XibleEditorNodeSelector {
 	}
 
 	/**
-	* Closes all the node selectors,
-	* both the main node list and the detail/download view
-	*/
+	 * Closes all the node selectors,
+	 * both the main node list and the detail/download view
+	 */
 	close() {
 
 		this.div.classList.add('hidden');
