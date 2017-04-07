@@ -32,6 +32,14 @@
 	border-radius: 0;
 }
 
+#nodeSelector a, #detailNodeSelector a {
+	color: #45679E;
+}
+
+#nodeSelector a:hover, #detailNodeSelector a:hover {
+	color: #5b7cb3;
+}
+
 #nodeSelector>button, #detailNodeSelector>button {
 	background-color: #45679E;
 	border: 2px solid #000;
@@ -62,6 +70,10 @@
 
 #detailNodeSelector>button.cancel:active {
 	background-color: #333;
+}
+
+#nodeSelector>button:disabled, #detailNodeSelector>button:disabled {
+	background-color: #ccc;
 }
 
 #nodeSelector>input:focus {
@@ -154,7 +166,7 @@
 	margin: 8px 0 0;
 }
 
-#detailNodeSelector section:first-child {
+#detailNodeSelector section:first-of-type {
 	margin: 0;
 }
 
@@ -200,6 +212,11 @@
 #nodeSelector>ul>li>p, #detailNodeSelector p {
 	margin: 8px 0 0 0;
 	padding: 0;
+}
+
+#detailNodeSelector p.status {
+	margin: 0 0 8px;
+	padding: 4px;
 }
 
 #detailNodeSelector>div {

@@ -261,7 +261,13 @@ class XibleEditorNodeSelector {
 		xibleWrapper.Config
 			.getValue('registry.nodepacks.allowinstall')
 			.then((allowInstall) => {
+
 				this.detailConfirmButton.disabled = !allowInstall;
+
+				if(!allowInstall) {
+					document.getElementById('nodePackInstallDisabled').classList.remove('hidden');
+				}
+
 			});
 
 		//set confirm button action
@@ -331,6 +337,7 @@ class XibleEditorNodeSelector {
 
 		//fill data
 		this.detailDivSub.innerHTML = `
+			<p id="nodePackInstallDisabled" class="status alert hidden">Installing nodepacks is disabled <a href="/settings/registry#nodepacks" target="_blank">in settings</a>.</p>
 			<section>
 				<h1>${nodeName}</h1>
 				<p>This node is part of nodepack "${nodePack.name}". By installing, all contents of this nodepack will be installed.</p>
