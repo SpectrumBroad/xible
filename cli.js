@@ -49,10 +49,10 @@ let cli = {
 	flow: {
 
 		start: function() {
-			console.log(`Not implemented yet`);
+			console.error(`Not implemented yet`);
 		},
 		stop: function() {
-			console.log(`Not implemented yet`);
+			console.error(`Not implemented yet`);
 		}
 
 	},
@@ -76,7 +76,7 @@ let cli = {
 			exec('systemctl enable xible.service', (err, stdout, stderr) => {
 
 				if (err) {
-					return console.log(`Failed to enable service: ${err}`);
+					return console.error(`Failed to enable service: ${err}`);
 				}
 
 				console.log('' + stdout);
@@ -93,7 +93,7 @@ let cli = {
 			exec('systemctl disable xible.service', (err, stdout, stderr) => {
 
 				if (err) {
-					return console.log(`Failed to disable service: ${err}`);
+					return console.error(`Failed to disable service: ${err}`);
 				}
 
 				console.log('' + stdout);
@@ -113,7 +113,7 @@ let cli = {
 function printUsage(path) {
 
 	if (context !== 'help') {
-		console.log(`Unrecognized context: "${context}"\n`);
+		console.error(`Unrecognized context: "${context}"\n`);
 	}
 
 	console.log(`Usage: xible ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);

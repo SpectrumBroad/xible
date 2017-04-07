@@ -51,16 +51,16 @@ let cli = {
 
 	flow: {
 		publish: function() {
-			console.log(`Not implemented yet`);
+			console.error(`Not implemented yet`);
 		},
 		install: function() {
-			console.log(`Not implemented yet`);
+			console.error(`Not implemented yet`);
 		},
 		remove: function() {
-			console.log(`Not implemented yet`);
+			console.error(`Not implemented yet`);
 		},
 		search: function() {
-			console.log(`Not implemented yet`);
+			console.error(`Not implemented yet`);
 		}
 	},
 
@@ -68,7 +68,7 @@ let cli = {
 		publish: function() {
 
 			if(!xible.Config.getValue('registry.nodepacks.allowpublish')) {
-				return console.log(`Your config does not allow to publish nodepacks to the registry`);
+				return console.error(`Your config does not allow to publish nodepacks to the registry`);
 			}
 
 			//find package.json and use that name
@@ -76,7 +76,7 @@ let cli = {
 			fs.readFile('package.json', (err, data) => {
 
 				if (err) {
-					return console.log(`Could not read "package.json": ${err}`);
+					return console.error(`Could not read "package.json": ${err}`);
 				}
 
 				//check that we have json
@@ -85,20 +85,20 @@ let cli = {
 				try {
 					packageJson = JSON.parse(data);
 				} catch (err) {
-					return console.log(`Could not parse "package.json": ${err}`);
+					return console.error(`Could not parse "package.json": ${err}`);
 				}
 
 				//verify that we have a name
 				nodePackName = packageJson.name;
 				if (!nodePackName) {
-					return console.log(`Could not locate "name" property in "package.json"`);
+					return console.error(`Could not locate "name" property in "package.json"`);
 				}
 
 				//verify that we have a token
 				let token = getUserToken();
 
 				if (!token) {
-					return console.log(`You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.`);
+					return console.error(`You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.`);
 				}
 
 				//verify that we're logged in
@@ -107,7 +107,7 @@ let cli = {
 					.then((user) => {
 
 						if (!user) {
-							return console.log(`User could not be verified. Please login using "xiblepm user login".`);
+							return console.error(`User could not be verified. Please login using "xiblepm user login".`);
 						}
 
 						//verify if this node had been published before
@@ -117,7 +117,7 @@ let cli = {
 
 								//verify that whoami equals the remote user
 								if (nodePack && nodePack.publishUserName !== user.name) {
-									return console.log(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
+									return console.error(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
 								}
 
 								//publish
@@ -132,15 +132,15 @@ let cli = {
 										console.log(`Published nodepack "${nodePack.name}".`);
 									})
 									.catch((err) => {
-										console.log(`Failed to publish nodepack "${nodePack.name}": ${err}`);
+										console.error(`Failed to publish nodepack "${nodePack.name}": ${err}`);
 									});
 
 							}).catch((err) => {
-								console.log(`Failed to get nodepack from registry: ${err}`);
+								console.error(`Failed to get nodepack from registry: ${err}`);
 							});
 
 					}).catch((err) => {
-						console.log(`Failed to get user from token: ${err}`);
+						console.error(`Failed to get user from token: ${err}`);
 					});
 
 			});
@@ -149,7 +149,7 @@ let cli = {
 		install: function() {
 
 			if(!xible.Config.getValue('registry.nodepacks.allowinstall')) {
-				return console.log(`Your config does not allow to install nodepacks from the registry`);
+				return console.error(`Your config does not allow to install nodepacks from the registry`);
 			}
 
 			xible.Registry.NodePack
@@ -161,7 +161,7 @@ let cli = {
 
 		},
 		remove: function() {
-			console.log(`Sorry: not implemented yet.`);
+			console.error(`Sorry: not implemented yet.`);
 		},
 		search: function() {
 
@@ -181,7 +181,7 @@ let cli = {
 
 				})
 				.catch((err) => {
-					console.log(err);
+					console.error(err);
 				});
 
 		}
@@ -235,7 +235,7 @@ let cli = {
 					console.log(user.name);
 				})
 				.catch((err) => {
-					console.log(err);
+					console.error(err);
 				});
 
 		},
@@ -274,7 +274,7 @@ let cli = {
 
 				})
 				.catch((err) => {
-					console.log(err);
+					console.error(err);
 				});
 
 		},
@@ -337,7 +337,7 @@ let cli = {
 
 				})
 				.catch((err) => {
-					console.log(err);
+					console.error(err);
 				});
 
 		}
@@ -433,7 +433,7 @@ function setUserToken(token) {
 function printUsage(path) {
 
 	if (context !== 'help') {
-		console.log(`Unrecognized context: "${context}"\n`);
+		console.error(`Unrecognized context: "${context}"\n`);
 	}
 
 	console.log(`Usage: xiblepm ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
