@@ -131,12 +131,13 @@
 #nodeSelector>ul>li.online::before {
 	content: "\f019";
 	font-size: 30px;
-	color: #bbb;
+	color: #d8d8d8;
 	box-sizing: border-box;
 	font-family: awesome;
 	display: flex;
 	align-items: center;
 	position: absolute;
+	z-index: -1;
 	right: 0;
 	top: 0;
 	bottom: 0;
