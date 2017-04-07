@@ -686,6 +686,9 @@ View.routes['/editor'] = function(EL) {
 		//reload the flows
 		loadFlows();
 
+		//reload the nodes
+		xibleEditor.nodeSelector.fill();
+
 		xibleEditor.initWebSocket(xibleWrapper.webSocket);
 
 	});
