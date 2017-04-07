@@ -115,17 +115,10 @@ let cli = {
 							.getByName(nodePackName)
 							.then((nodePack) => {
 
-								if (nodePack) {
-									return console.log(`Nodepack "${nodePack.name}" is already published. For new versions, you only have to "npm publish" your package.`);
-								}
-
 								//verify that whoami equals the remote user
-								//xible registry will verify this also
-								/*
 								if (nodePack && nodePack.publishUserName !== user.name) {
 									return console.log(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
 								}
-								*/
 
 								//publish
 								xible.Registry.NodePack
