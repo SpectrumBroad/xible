@@ -1,5 +1,9 @@
 class XibleEditorNodeSelector {
 
+	/**
+	*	create a new nodeSelector
+	* @param {XibleEditor} XIBLE_EDITOR
+	*/
 	constructor(XIBLE_EDITOR) {
 
 		this.xibleEditor = XIBLE_EDITOR;
@@ -252,6 +256,12 @@ class XibleEditorNodeSelector {
 
 	}
 
+	/**
+	* opens the detailed node view, for downloading/installing new nodes (/nodepacks)
+	* @param {HTMLLIElement} li the list element from the main nodeSelector
+	* @param {xibleWrapper.NodePack} nodePack
+	* @param {nodeName} nodeName the specific nodeName from the nodePack/li
+	*/
 	detailedNodeView(li, nodePack, nodeName) {
 
 		//disable by default
@@ -362,6 +372,12 @@ class XibleEditorNodeSelector {
 
 	}
 
+	/**
+	* builds a node for the nodeSelector
+	* @param {String} nodeName
+	* @param {xibleWrapper.Node} node
+	* @returns {HTMLLIElement} the created HTML element, an LI
+	*/
 	buildNode(nodeName, node) {
 
 		//list element containing the node heading and description
@@ -395,10 +411,12 @@ class XibleEditorNodeSelector {
 
 	}
 
-	//add the node
-	//we do this onmousedown so the user can drag immediately
+	/**
+	* hooks relevant listeners to a node in the selector
+	*/
 	hookNode(li, node) {
 
+		//onmousedown so the user can drag the newly inserted node immediately
 		li.addEventListener('mousedown', (event) => {
 
 			let actionsOffset = this.xibleEditor.getOffsetPosition();
@@ -415,6 +433,10 @@ class XibleEditorNodeSelector {
 
 	}
 
+	/**
+	* Fetches the nodes from xible and places them in the nodeSelector ul
+	* @returns {Promise.<undefined>} resolves when complete
+	*/
 	fill() {
 
 		this.nodesUl.innerHTML = '';
@@ -435,6 +457,9 @@ class XibleEditorNodeSelector {
 
 	}
 
+	/**
+	* Positions the nodeSelector according to some vars indicating where to open
+	*/
 	position() {
 
 		let clientRect = this.div.getBoundingClientRect();
@@ -452,6 +477,10 @@ class XibleEditorNodeSelector {
 
 	}
 
+	/**
+	* Opens the main node selector (not the detail one)
+	* @param {MouseEvent} event that triggers the open. Used to set the correct position
+	*/
 	open(event) {
 
 		//unhide all nodes,
@@ -506,6 +535,10 @@ class XibleEditorNodeSelector {
 
 	}
 
+	/**
+	* Closes all the node selectors,
+	* both the main node list and the detail/download view
+	*/
 	close() {
 
 		this.div.classList.add('hidden');
