@@ -81,8 +81,8 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				let filepath = `${flowPath}/${files[i]}`;
 
-				//only fetch json files but ignore _status.json
-				if (files[i].substring(0, 1) !== '_' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
+				//only fetch json files but ignore _status.json and hidden files
+				if (files[i].substring(0, 1) !== '_' && files[i].substring(0, 1) !== '.' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
 
 					try {
 
