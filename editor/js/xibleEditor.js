@@ -562,8 +562,13 @@ class XibleEditor extends EventEmitter {
 			throw new Error(`not a flow`);
 		}
 
-		if (this.loadedFlow) {
+		//don't reload an already loaded flow
+		if(this.loadedFlow && this.loadedFlow._id === flow._id) {
+			return;
+		}
 
+		//unload already loaded flow
+		if (this.loadedFlow) {
 			this.loadedFlow.removeAllStatuses();
 			this.loadedFlow.editor = null;
 		}
