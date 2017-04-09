@@ -138,17 +138,11 @@ let cli = {
 									.then((nodePack) => {
 										console.log(`Published nodepack "${nodePack.name}".`);
 									})
-									.catch((err) => {
-										logError(`Failed to publish nodepack "${nodePack.name}": ${err}`);
-									});
+									.catch((err) => logError(`Failed to publish nodepack "${nodePack.name}": ${err}`));
 
-							}).catch((err) => {
-								logError(`Failed to get nodepack from registry: ${err}`);
-							});
+							}).catch((err) => logError(`Failed to get nodepack from registry: ${err}`));
 
-					}).catch((err) => {
-						logError(`Failed to get user from token: ${err}`);
-					});
+					}).catch((err) => logError(`Failed to get user from token: ${err}`));
 
 			});
 
@@ -161,10 +155,13 @@ let cli = {
 
 			xible.Registry.NodePack
 				.getByName(ARG)
-				.then((nodePack) => nodePack.install())
-				.catch((err) => {
-					console.log(err);
-				});
+				.then((nodePack) => {
+					if(!nodePack) {
+						return logError(`Nodepack "${ARG}" does not exist`);
+					}
+					nodePack.install();
+				})
+				.catch((err) => logError(err));
 
 		},
 		remove: function() {
@@ -187,9 +184,7 @@ let cli = {
 					});
 
 				})
-				.catch((err) => {
-					logError(err);
-				});
+				.catch((err) => logError(err));
 
 		}
 	},
@@ -241,9 +236,7 @@ let cli = {
 				.then((user) => {
 					console.log(user.name);
 				})
-				.catch((err) => {
-					logError(err);
-				});
+				.catch((err) => logError(err));
 
 		},
 		logout: function() {
@@ -280,9 +273,7 @@ let cli = {
 					setUserToken(token);
 
 				})
-				.catch((err) => {
-					logError(err);
-				});
+				.catch((err) => logError(err));
 
 		},
 		add: function() {
@@ -343,9 +334,7 @@ let cli = {
 						});
 
 				})
-				.catch((err) => {
-					logError(err);
-				});
+				.catch((err) => logError(err));
 
 		}
 	}
