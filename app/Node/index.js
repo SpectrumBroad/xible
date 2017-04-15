@@ -617,11 +617,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			//check global outputs
 			if (!conns.length && this.node && this.node.flow) {
-
-				conns = this.node.flow.getGlobalOutputsByType(this.type).map((output) => ({
-					origin: output
-				}));
-
+				conns = this.node.flow.getGlobalOutputsByType(this.type);
 			}
 
 			if (conns.length) {
