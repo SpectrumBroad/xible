@@ -671,9 +671,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		 */
 		forceStart(directNodes) {
 
-			let startFlow = () => {
-				return this.start(directNodes);
-			};
+			let startFlow = () => this.start(directNodes);
 
 			if (this.stopped) {
 				return startFlow();
@@ -696,23 +694,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			} else if (this.starting) {
 
 				return new Promise((resolve, reject) => {
-					this.once('started', () => {
-
-						if (this.started) {
-							this.stop().then(() => {
-
-								if (this.stopped) {
-									resolve(startFlow());
-								} else {
-									resolve(this);
-								}
-
-							});
-						} else {
-							resolve(this);
-						}
-
-					});
+					this.once('started', () => resolve(this));
 				});
 
 			}
@@ -726,6 +708,8 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		 *	@return {Promise}
 		 */
 		start(directNodes) {
+
+			let startTime = process.hrtime();
 
 			if (!this.runnable) {
 				return Promise.reject(`not runnable`);
@@ -771,11 +755,8 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 								if (this.worker && this.worker.connected) {
 
-									flowDebug('flow/worker has started');
-									resolve(this);
+									flowDebug('flow/worker has init');
 
-									this.starting = this.stopped = false;
-									this.started = true;
 									this.worker.send({
 										"method": "start",
 										"configPath": XIBLE.configPath,
@@ -784,20 +765,34 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 										"nodes": XIBLE.nodes,
 										"directNodes": directNodes
 									});
-									this.emit('started');
-
-									XIBLE.broadcastWebSocket({
-										method: 'xible.flow.started',
-										flowId: this._id,
-										directed: this.directed
-									});
 
 								} else {
 
-									flowDebug('flow/worker has started, but no such worker in master');
+									flowDebug('flow/worker has init, but no such worker in master');
 									reject(`no such worker in master`);
 
 								}
+
+								break;
+
+							case 'started':
+
+								this.starting = this.stopped = false;
+								this.started = true;
+
+								flowDebug('flow/worker has started');
+
+								resolve(this);
+								this.emit('started');
+
+								XIBLE.broadcastWebSocket({
+									method: 'xible.flow.started',
+									flowId: this._id,
+									directed: this.directed
+								});
+
+								let startDiff = process.hrtime(startTime);
+								console.log(`${startDiff[0]*1000+(startDiff[1]/1e6)}ms`);
 
 								break;
 
@@ -817,10 +812,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 								} else {
 
-									this.worker.send({
-										method: "flowNotExist",
-										flowId: message.flowId
-									});
+									if (this.worker && this.worker.connected) {
+										this.worker.send({
+											method: "flowNotExist",
+											flowId: message.flowId
+										});
+									}
 
 								}
 
@@ -937,6 +934,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				if (!this.started && !this.starting) {
 					return Promise.reject(`cannot stop; flow is not started`);
+				}
+
+				if (this.stopping) {
+					return Promise.reject(`cannot stop; flow is already stopping`);
 				}
 
 				return new Promise((resolve, reject) => {

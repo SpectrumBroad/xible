@@ -66,6 +66,13 @@ process.on('message', (message) => {
 						flow.start();
 					}
 
+					//inform the master that we actually started
+					if (process.connected) {
+						process.send({
+							method: 'started'
+						});
+					}
+
 				});
 
 			break;
