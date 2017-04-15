@@ -737,6 +737,18 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 
 		}
 
+		//double click for global
+		this.element.addEventListener('dblclick', () => {
+
+			let globalValue = !this.global;
+			if (this instanceof XibleEditorNodeInput && !this.node.flow.getGlobalOutputs().find((gOutput) => gOutput.type === this.type)) {
+				return;
+			}
+
+			this.setGlobal(globalValue);
+
+		});
+
 		//enable mousedown -> mousemove handler for creating new connections
 		this.enableHook();
 
@@ -852,74 +864,103 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 
 			event.stopPropagation();
 
-			//create a dummy action that acts as the input parent while moving
-			this.node.editor.dummyXibleNode = new XibleEditorNode({
-				name: 'dragdummy'
-			});
+			//only start a connector after we moved a little
+			//this prevents picking up double click
+			const initPageX = event.pageX;
+			const initPageY = event.pageY;
 
-			//hide the dummy
-			this.node.editor.dummyXibleNode.element.style.visibility = 'hidden';
-			this.node.editor.dummyXibleNode.element.style.zIndex = -1;
+			let mouseMoveListener;
+			document.addEventListener('mousemove', mouseMoveListener = (event) => {
 
-			let outGoing = this instanceof XibleEditorNodeOutput;
-			outGoing = event.shiftKey ? !outGoing : outGoing;
+				//confirm that we moved
+				let pageX = event.pageX;
+				let pageY = event.pageY;
+				if (Math.abs(pageX - initPageX) > 2 || Math.abs(pageY - initPageY) > 2) {
 
-			//create a dummyinput that acts as the connector endpoint
-			if (outGoing) {
-				this.node.editor.dummyIo = new XibleEditorNodeInput('dummy', {
-					type: this.type
-				});
-				this.node.editor.dummyXibleNode.addInput(this.node.editor.dummyIo);
-			} else {
-				this.node.editor.dummyIo = new XibleEditorNodeOutput('dummy', {
-					type: this.type
-				});
-				this.node.editor.dummyXibleNode.addOutput(this.node.editor.dummyIo);
-			}
+					document.removeEventListener('mousemove', mouseMoveListener);
+					mouseMoveListener = null;
 
-			//add the dummy to the editor
-			this.node.editor.addNode(this.node.editor.dummyXibleNode);
+					//create a dummy action that acts as the input parent while moving
+					this.node.editor.dummyXibleNode = new XibleEditorNode({
+						name: 'dragdummy'
+					});
 
-			//get window offsets for viewport
-			let actionsOffset = this.node.editor.getOffsetPosition();
+					//hide the dummy
+					this.node.editor.dummyXibleNode.element.style.visibility = 'hidden';
+					this.node.editor.dummyXibleNode.element.style.zIndex = -1;
 
-			//set the initial position at the mouse position
-			let left = ((event.pageX - actionsOffset.left - this.node.editor.left) / this.node.editor.zoom) - this.node.editor.dummyIo.element.offsetLeft - (outGoing ? 0 : this.node.editor.dummyIo.element.offsetWidth + 2);
-			let top = ((event.pageY - actionsOffset.top - this.node.editor.top) / this.node.editor.zoom) - this.node.editor.dummyIo.element.offsetTop - (this.node.editor.dummyIo.element.offsetHeight / 2);
+					let outGoing = this instanceof XibleEditorNodeOutput;
+					outGoing = event.shiftKey ? !outGoing : outGoing;
 
-			this.node.editor.dummyXibleNode.setPosition(left, top);
+					//create a dummyinput that acts as the connector endpoint
+					if (outGoing) {
+						this.node.editor.dummyIo = new XibleEditorNodeInput('dummy', {
+							type: this.type
+						});
+						this.node.editor.dummyXibleNode.addInput(this.node.editor.dummyIo);
+					} else {
+						this.node.editor.dummyIo = new XibleEditorNodeOutput('dummy', {
+							type: this.type
+						});
+						this.node.editor.dummyXibleNode.addOutput(this.node.editor.dummyIo);
+					}
 
-			//append the connector
-			if (event.shiftKey) {
+					//add the dummy to the editor
+					this.node.editor.addNode(this.node.editor.dummyXibleNode);
 
-				//find selected connectors
-				let selectedConnectors = this.node.editor.selection.filter((sel) => sel instanceof XibleEditorConnector && (sel.origin === this || sel.destination === this));
-				this.node.editor.dummyXibleConnectors = selectedConnectors.length ? selectedConnectors : this.connectors.slice(0);
+					//get window offsets for viewport
+					let actionsOffset = this.node.editor.getOffsetPosition();
 
-				if (outGoing) {
-					this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setDestination(this.node.editor.dummyIo));
-				} else {
-					this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setOrigin(this.node.editor.dummyIo));
+					//set the initial position at the mouse position
+					let left = ((event.pageX - actionsOffset.left - this.node.editor.left) / this.node.editor.zoom) - this.node.editor.dummyIo.element.offsetLeft - (outGoing ? 0 : this.node.editor.dummyIo.element.offsetWidth + 2);
+					let top = ((event.pageY - actionsOffset.top - this.node.editor.top) / this.node.editor.zoom) - this.node.editor.dummyIo.element.offsetTop - (this.node.editor.dummyIo.element.offsetHeight / 2);
+
+					this.node.editor.dummyXibleNode.setPosition(left, top);
+
+					//append the connector
+					if (event.shiftKey) {
+
+						//find selected connectors
+						let selectedConnectors = this.node.editor.selection.filter((sel) => sel instanceof XibleEditorConnector && (sel.origin === this || sel.destination === this));
+						this.node.editor.dummyXibleConnectors = selectedConnectors.length ? selectedConnectors : this.connectors.slice(0);
+
+						if (outGoing) {
+							this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setDestination(this.node.editor.dummyIo));
+						} else {
+							this.node.editor.dummyXibleConnectors.forEach((conn) => conn.setOrigin(this.node.editor.dummyIo));
+						}
+
+					} else {
+
+						this.node.editor.dummyXibleConnectors = [this.node.editor.addConnector(new XibleEditorConnector({
+							origin: outGoing ? this : this.node.editor.dummyIo,
+							destination: outGoing ? this.node.editor.dummyIo : this,
+							type: this.type
+						}))];
+
+					}
+
+					//make the dummy action drag
+					this.node.editor.deselect();
+					this.node.editor.select(this.node.editor.dummyXibleNode);
+					this.node.editor.initDrag(event);
+
+					//keep track of these for snap ins
+					this.node.editor.dummyXibleConnectors.originalOrigin = this.node.editor.dummyXibleConnectors[0].origin;
+					this.node.editor.dummyXibleConnectors.originalDestination = this.node.editor.dummyXibleConnectors[0].destination;
+
 				}
 
-			} else {
+			});
 
-				this.node.editor.dummyXibleConnectors = [this.node.editor.addConnector(new XibleEditorConnector({
-					origin: outGoing ? this : this.node.editor.dummyIo,
-					destination: outGoing ? this.node.editor.dummyIo : this,
-					type: this.type
-				}))];
-
-			}
-
-			//make the dummy action drag
-			this.node.editor.deselect();
-			this.node.editor.select(this.node.editor.dummyXibleNode);
-			this.node.editor.initDrag(event);
-
-			//keep track of these for snap ins
-			this.node.editor.dummyXibleConnectors.originalOrigin = this.node.editor.dummyXibleConnectors[0].origin;
-			this.node.editor.dummyXibleConnectors.originalDestination = this.node.editor.dummyXibleConnectors[0].destination;
+			document.addEventListener('mouseup', (event) => {
+				if (mouseMoveListener) {
+					document.removeEventListener('mousemove', mouseMoveListener);
+					mouseMoveListener = null;
+				}
+			}, {
+				once: true
+			});
 
 		});
 
@@ -944,7 +985,9 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 						destination: outGoing ? conn.destination : this
 					});
 
-					newConn.destination.setGlobal(false);
+					if(newConn.destination.global) {
+						newConn.destination.setGlobal(undefined);
+					}
 
 					this.node.editor.loadedFlow.connectors.push(newConn);
 					this.node.editor.addConnector(newConn);
@@ -1012,20 +1055,7 @@ class XibleEditorNodeInput extends XibleEditorNodeIo {
 class XibleEditorNodeOutput extends XibleEditorNodeIo {
 
 	constructor(...args) {
-
 		super(...args);
-
-		//double click for global
-		this.element.addEventListener('dblclick', () => {
-
-			if (this.global) {
-				this.setGlobal(false);
-			} else {
-				this.setGlobal(true);
-			}
-
-		});
-
 	}
 
 	setGlobal(global) {

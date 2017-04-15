@@ -573,7 +573,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			this.type = null;
 			this.singleType = false;
 			this.maxConnectors = null;
-			this.global = false;
 			this.node = null;
 			this.description = null;
 
@@ -616,7 +615,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			let conns = this.connectors;
 
 			//check global outputs
-			if (!conns.length && this.node && this.node.flow) {
+			if (!conns.length && this.global && this.node && this.node.flow) {
 				conns = this.node.flow.getGlobalOutputsByType(this.type);
 			}
 
@@ -646,7 +645,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				let conns = this.connectors;
 
 				//add global outputs as a dummy connector to the connector list
-				if (!conns.length) {
+				if (!conns.length && this.global) {
 
 					conns = this.node.flow.getGlobalOutputsByType(this.type).map((output) => ({
 						origin: output

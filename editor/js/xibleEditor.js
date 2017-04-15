@@ -205,8 +205,11 @@ class XibleEditor extends EventEmitter {
 
 			flow.nodes[i].getInputs().forEach((input) => { //jshint ignore: line
 
-				if (input.type === output.type && !input.connectors.length) {
-					input.setGlobal(output.global);
+				if (
+					input.type === output.type && !input.connectors.length &&
+					input.global !== false
+				) {
+					input.setGlobal(output.global ? true : undefined);
 				}
 
 			});
@@ -452,11 +455,11 @@ class XibleEditor extends EventEmitter {
 
 		node.getInputs().forEach((input) => {
 
-			if (globalTypes.indexOf(input.type) > -1 && !input.connectors.length) {
-				input.setGlobal(true);
-			} else {
-				input.setGlobal(false);
+			let globalValue = input.global;
+			if (globalTypes.indexOf(input.type) > -1 && !input.connectors.length && input.global !== false) {
+				globalValue = true;
 			}
+			input.setGlobal(globalValue);
 
 		});
 
@@ -563,7 +566,7 @@ class XibleEditor extends EventEmitter {
 		}
 
 		//don't reload an already loaded flow
-		if(this.loadedFlow && this.loadedFlow._id === flow._id) {
+		if (this.loadedFlow && this.loadedFlow._id === flow._id) {
 			return;
 		}
 

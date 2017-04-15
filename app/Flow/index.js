@@ -304,6 +304,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 					}
 
 					xibleNode.inputs[name]._id = node.inputs[name]._id;
+					xibleNode.inputs[name].global = node.inputs[name].global;
 
 				}
 
