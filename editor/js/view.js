@@ -24,7 +24,7 @@ class View {
 			if (!View.routes[this.name]) {
 
 				//get the complete view url
-				let url = `views${this.name}.js`;
+				let url = `/views${this.name}.js`;
 
 				//check if the view actually exists using HttpRequest, so we have error handling
 				let req = new XMLHttpRequest();
