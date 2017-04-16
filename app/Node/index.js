@@ -1,8 +1,8 @@
 const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
 const nodeDebug = debug('xible:node');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 module.exports = function(XIBLE, EXPRESS_APP) {
 
@@ -546,14 +546,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		static flowStateCheck(state) {
 
 			if (!(state instanceof XIBLE.FlowState)) {
-
-				let e = new Error(`state should be provided and instance of FlowState`);
-				/*
-				let resolvedPath=path.resolve(Node.nodesPath);
-				console.log(e.stack.split('\n').find((line) => line.indexOf(resolvedPath) > -1));
-				*/
-				throw e;
-
+				throw new Error(`state should be provided and instance of FlowState`);
 			}
 
 			return true;

@@ -3,8 +3,8 @@ const debug = require('debug');
 const flowDebug = debug('xible:flow');
 const fs = require('fs');
 const path = require('path');
-const sanitizePath = require('sanitize-filename');
-const fork = require('child_process').fork;
+let sanitizePath;
+let fork;
 
 module.exports = function(XIBLE, EXPRESS_APP) {
 
@@ -219,8 +219,17 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				throw new Error(`object containing _id as argument is required`);
 			}
 
-			if (json._id !== sanitizePath(json._id)) {
-				throw new Error(`flow _id cannot contain reserved/unsave characters`);
+			//only perform this filename check in master for performance reasons
+			if (!XIBLE.child) {
+
+				if (!sanitizePath) {
+					sanitizePath = require('sanitize-filename');
+				}
+
+				if (json._id !== sanitizePath(json._id)) {
+					throw new Error(`flow _id cannot contain reserved/unsave characters`);
+				}
+
 			}
 
 			this._id = json._id;
@@ -231,8 +240,9 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			this.runnable = true;
 
 			//get the nodes
-			json.nodes.forEach((node) => {
+			for (let i = 0; i < json.nodes.length; i += 1) {
 
+				let node = json.nodes[i];
 				let nodeConstr = XIBLE.getNodeByName(node.name);
 				let xibleNode;
 
@@ -264,13 +274,11 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						let nodeVaultData = {};
 						if (nodeVaultKeys && Array.isArray(nodeVaultKeys)) {
 
-							for (let dataKey in node.data) {
+							for (const dataKey in node.data) {
 
 								if (nodeVaultKeys.indexOf(dataKey) > -1) {
-
 									nodeVaultData[dataKey] = node.data[dataKey];
 									delete node.data[dataKey];
-
 								}
 
 							}
@@ -291,7 +299,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				this.addNode(xibleNode);
 
-				for (let name in node.inputs) {
+				for (const name in node.inputs) {
 
 					if (!xibleNode.inputs[name]) {
 
@@ -308,7 +316,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				}
 
-				for (let name in node.outputs) {
+				for (const name in node.outputs) {
 
 					if (!xibleNode.outputs[name]) {
 
@@ -329,38 +337,36 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				if (!xibleNode.nodeExists) {
 
 					xibleNode.editorContent = '';
-					for (let key in xibleNode.data) {
+					for (const key in xibleNode.data) {
 						xibleNode.editorContent += `<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
 					}
 
 				}
 
-			});
+			}
 
 			//get the connectors
-			json.connectors.forEach(connector => {
+			for (let i = 0; i < json.connectors.length; i += 1) {
 
-				var origin = this.getOutputById(connector.origin);
+				let origin = this.getOutputById(json.connectors[i].origin);
 				if (!origin) {
 					throw new Error(`Cannot find output by id '${connector.origin}'`);
 				}
 
-				var destination = this.getInputById(connector.destination);
+				let destination = this.getInputById(json.connectors[i].destination);
 				if (!destination) {
 					throw new Error(`Cannot find input by id '${connector.destination}'`);
 				}
 
-				var xibleConnector = {
-
+				let xibleConnector = {
 					origin: origin,
 					destination: destination
-
 				};
 
 				origin.connectors.push(xibleConnector);
 				destination.connectors.push(xibleConnector);
 
-			});
+			}
 
 			XIBLE.addFlow(this);
 
@@ -709,8 +715,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		 */
 		start(directNodes) {
 
-			let startTime = process.hrtime();
-
 			if (!this.runnable) {
 				return Promise.reject(`not runnable`);
 			}
@@ -720,6 +724,8 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				if (!this.stopped) {
 					return Promise.reject(`cannot start; flow is not stopped`);
 				}
+
+				let startTime = process.hrtime();
 
 				return new Promise((resolve, reject) => {
 
@@ -744,6 +750,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						this.directed = true;
 					}
 
+					if (!fork) {
+						fork = require('child_process').fork;
+					}
+
 					this.worker = fork(`${__dirname}/../../child.js`);
 					this.worker.on('message', (message) => {
 
@@ -755,8 +765,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 								if (this.worker && this.worker.connected) {
 
-									flowDebug('flow/worker has init');
-
 									this.worker.send({
 										"method": "start",
 										"configPath": XIBLE.configPath,
@@ -765,6 +773,9 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 										"nodes": XIBLE.nodes,
 										"directNodes": directNodes
 									});
+
+									let initDiff = process.hrtime(startTime);
+									flowDebug(`flow/worker has init in ${initDiff[0]*1000+(initDiff[1]/1e6)}ms`);
 
 								} else {
 
@@ -780,8 +791,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 								this.starting = this.stopped = false;
 								this.started = true;
 
-								flowDebug('flow/worker has started');
-
 								resolve(this);
 								this.emit('started');
 
@@ -792,7 +801,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 								});
 
 								let startDiff = process.hrtime(startTime);
-								console.log(`${startDiff[0]*1000+(startDiff[1]/1e6)}ms`);
+								flowDebug(`flow/worker has started in ${startDiff[0]*1000+(startDiff[1]/1e6)}ms`);
 
 								break;
 
@@ -872,17 +881,18 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 				flowDebug('starting flow from worker');
 
-				//init any node that wants to
-				this.nodes.forEach((node) => {
-					node.emit('init', new FlowState());
-				});
+				const flowState = new FlowState();
+				//init all nodes
+				for (let i = 0; i < this.nodes.length; i += 1) {
+					this.nodes[i].emit('init', flowState);
+				}
 
 				//trigger all event objects that are listening
-				this.nodes.forEach((node) => {
-					if (node.type === 'event') {
-						node.emit('trigger', new FlowState());
+				for (let i = 0; i < this.nodes.length; i += 1) {
+					if (this.nodes[i].type === 'event') {
+						this.nodes[i].emit('trigger', flowState);
 					}
-				});
+				}
 
 			}
 

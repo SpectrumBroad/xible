@@ -74,13 +74,15 @@ class Xible extends EventEmitter {
 			throw new Error(`need a "nodes.path" in the configuration to load the installed nodes from`);
 		}
 
-		if (!this.child) {
-			this.startWeb();
-		}
-
 		this.initStats();
 
-		if (!this.child && WEB_SOCKET_THROTTLE > 0) {
+		if (this.child) {
+			return Promise.resolve();
+		}
+
+		this.startWeb();
+
+		if (WEB_SOCKET_THROTTLE > 0) {
 
 			//throttle broadcast messages
 			setInterval(() => {
@@ -99,10 +101,6 @@ class Xible extends EventEmitter {
 
 			}, WEB_SOCKET_THROTTLE);
 
-		}
-
-		if (this.child) {
-			return Promise.resolve();
 		}
 
 		//ensure catch all routes are loaded last
@@ -152,47 +150,47 @@ class Xible extends EventEmitter {
 
 			}, STAT_INTERVAL);
 
-		} else {
-
-			//report cpu and memory usage back to master
-			//note that, at least on a raspi 3,
-			//the resolution of cpuUsage is stuck to 1000ms or 1%
-			let cpuUsageStart = process.cpuUsage();
-			let cpuStartTime = process.hrtime();
-
-			setInterval(() => {
-
-				//get values over passed time
-				let cpuUsage = process.cpuUsage(cpuUsageStart);
-				let cpuTime = process.hrtime(cpuStartTime);
-
-				//reset for next loop
-				//this is different from the setImmediate approach for getting event loop delay
-				//because we are using a setInterval, we may get negative delays back
-				//not sure yet if that's correct or not
-				cpuUsageStart = process.cpuUsage();
-				cpuStartTime = process.hrtime();
-
-				if (process.connected) {
-
-					process.send({
-						method: 'usage',
-						usage: {
-							cpu: {
-								user: cpuUsage.user,
-								system: cpuUsage.system,
-								percentage: Math.round(100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1e6))
-							},
-							memory: process.memoryUsage(),
-							delay: Math.round((cpuTime[0] * 1e9 + cpuTime[1] - STAT_INTERVAL * 1e6) / 1000)
-						}
-					});
-
-				}
-
-			}, STAT_INTERVAL).unref();
+			return;
 
 		}
+
+		//report cpu and memory usage back to master
+		//note that, at least on a raspi 3,
+		//the resolution of cpuUsage is stuck to 1000ms or 1%
+		let cpuUsageStart = process.cpuUsage();
+		let cpuStartTime = process.hrtime();
+
+		setInterval(() => {
+
+			//get values over passed time
+			const cpuUsage = process.cpuUsage(cpuUsageStart);
+			const cpuTime = process.hrtime(cpuStartTime);
+
+			//reset for next loop
+			//this is different from the setImmediate approach for getting event loop delay
+			//because we are using a setInterval, we may get negative delays back
+			//not sure yet if that's correct or not
+			cpuUsageStart = process.cpuUsage();
+			cpuStartTime = process.hrtime();
+
+			if (process.connected) {
+
+				process.send({
+					method: 'usage',
+					usage: {
+						cpu: {
+							user: cpuUsage.user,
+							system: cpuUsage.system,
+							percentage: Math.round(100 * ((cpuUsage.user + cpuUsage.system) / 1000) / (cpuTime[0] * 1000 + cpuTime[1] / 1e6))
+						},
+						memory: process.memoryUsage(),
+						delay: Math.round((cpuTime[0] * 1e9 + cpuTime[1] - STAT_INTERVAL * 1e6) / 1000)
+					}
+				});
+
+			}
+
+		}, STAT_INTERVAL);
 
 	}
 

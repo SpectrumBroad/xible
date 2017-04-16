@@ -1,6 +1,6 @@
-const fsExtra = require('fs-extra');
 const debug = require('debug');
 const configDebug = debug('xible:config');
+const fs = require('fs');
 
 const DEFAULT_PATH = `${__dirname}/../../config.json`;
 
@@ -9,6 +9,10 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 	function createConfig(path) {
 
 		configDebug(`creating "${path}"`);
+
+		if(!fsExtra) {
+			fsExtra = require('fs-extra');
+		}
 
 		try {
 
@@ -28,7 +32,7 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 		configContents = JSON.stringify(configContents, null, '\t');
 
 		try {
-			fsExtra.writeFileSync(path, configContents);
+			fs.writeFileSync(path, configContents);
 		} catch (err) {
 
 			configDebug(`failed to write config to "${path}": ${err}`);
@@ -49,7 +53,7 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 		let configContents;
 		try {
 
-			configContents = fsExtra.readFileSync(path, {
+			configContents = fs.readFileSync(path, {
 				encoding: 'utf8'
 			});
 
@@ -95,7 +99,7 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 			return new Promise((resolve, reject) => {
 
 				//check if we can write
-				fsExtra.access(XIBLE.configPath, fsExtra.W_OK, (err) => {
+				fs.access(XIBLE.configPath, fs.W_OK, (err) => {
 
 					if (err) {
 						return resolve(false);
@@ -154,7 +158,7 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 				throw new Error(`Param "value" should be of type "string", "number", "boolean" or "date"`);
 			}
 
-			let pathSplit = path.split('.');
+			const pathSplit = path.split('.');
 			let sel = config;
 
 			for (let i = 0; i < pathSplit.length - 1; ++i) {
@@ -178,12 +182,13 @@ module.exports = function(XIBLE, EXPRESS_APP, CONFIG_OBJ) {
 
 		static getValue(path) {
 
-			let pathSplit = path.split('.');
+			const pathSplit = path.split('.');
 			let sel = config;
 
 			for (let i = 0; i < pathSplit.length; ++i) {
 
 				let part = pathSplit[i];
+				//if(sel[part] !== undefined) {
 				if (sel.hasOwnProperty(part)) {
 					sel = sel[part];
 				} else {

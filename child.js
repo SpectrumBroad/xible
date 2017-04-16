@@ -29,21 +29,21 @@ process.on('message', (message) => {
 		case 'start':
 
 			//setup xible with the nodeNames
-			let xible = new Xible({
+			const xible = new Xible({
 				child: true
 			}, message.config);
 
 			//init the proper nodes
-			let structuredNodes = {};
-			let flowNodes = message.flow.nodes;
-			for (let i = 0; i < flowNodes.length; ++i) {
+			let structuredNodes = new Map();
+			const flowNodes = message.flow.nodes;
+			let nodeName;
+			for (let i = 0; i < flowNodes.length; i += 1) {
 
-				let nodeName = flowNodes[i].name;
-
-				if (structuredNodes[nodeName]) {
+				nodeName = flowNodes[i].name;
+				if (structuredNodes.has(nodeName)) {
 					continue;
 				}
-				structuredNodes[nodeName] = true;
+				structuredNodes.set(nodeName, true);
 
 				//require the actual node and check it was loaded properly
 				let requiredNode = requireNode(message.nodes[nodeName].path);
@@ -53,6 +53,7 @@ process.on('message', (message) => {
 				xible.addNode(nodeName, message.nodes[nodeName], requiredNode);
 
 			}
+			structuredNodes = null;
 
 			xible.init()
 				.then(() => {
