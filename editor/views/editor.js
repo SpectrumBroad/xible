@@ -182,7 +182,6 @@ View.routes['/editor'] = function(EL) {
 		}
 	});
 
-
 	//memory chart
 	let memCanvas = document.getElementById('memChart');
 	let memChart = new Chart(memCanvas, {
