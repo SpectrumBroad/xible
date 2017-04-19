@@ -68,7 +68,8 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 			.then(() => {
 				res.end();
 			})
-			.catch(() => {
+			.catch((err) => {
+				console.error(err);
 				res.status(500).end();
 			});
 
@@ -83,6 +84,7 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 				res.end();
 			})
 			.catch((err) => {
+				console.error(err);
 				res.status(500).end();
 			});
 
