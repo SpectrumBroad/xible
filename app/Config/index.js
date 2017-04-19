@@ -1,6 +1,7 @@
 const debug = require('debug');
 const configDebug = debug('xible:config');
 const fs = require('fs');
+let fsExtra;
 
 const DEFAULT_PATH = `${__dirname}/../../config.json`;
 
