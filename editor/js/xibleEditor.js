@@ -1207,27 +1207,42 @@ class XibleEditor extends EventEmitter {
 
 		let duplicates = this.duplicate(selection);
 
+		//add the nodes
 		duplicates.forEach((dup) => {
 
-			if (dup instanceof XibleEditorNode) {
-
-				//TODO: check if there's already an element at this position (within 20px radius)
-				//reposition if true
-				dup.setPosition(dup.left + 20, dup.top + 20);
-
-				this.loadedFlow.addNode(dup);
-				this.addNode(dup);
-
-			} else {
-
-				//FIXME: currently fails if a connector crosses flows
-				this.loadedFlow.addConnector(dup);
-				this.addConnector(dup);
-
+			if (!(dup instanceof XibleEditorNode)) {
+				return;
 			}
+
+			//TODO: check if there's already an element at this position (within 20px radius)
+			//reposition if true
+			dup.setPosition(dup.left + 20, dup.top + 20);
+
+			this.loadedFlow.addNode(dup);
+			this.addNode(dup);
 
 		});
 
+		//add the connectors
+		duplicates.forEach((dup) => {
+
+			if (!(dup instanceof XibleEditorConnector)) {
+				return;
+			}
+
+			if (
+				this.loadedFlow.nodes.indexOf(dup.origin.node) === -1 ||
+				this.loadedFlow.nodes.indexOf(dup.destination.node) === -1
+			) {
+				return;
+			}
+
+			this.loadedFlow.addConnector(dup);
+			this.addConnector(dup);
+
+		});
+
+		//select the duplicates
 		this.deselect();
 		duplicates.forEach((dup) => this.select(dup));
 
