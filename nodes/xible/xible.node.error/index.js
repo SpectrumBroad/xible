@@ -5,7 +5,9 @@ module.exports = function(NODE) {
 	let triggerIn = NODE.getInputByName('trigger');
 	triggerIn.on('trigger', (conn, state) => {
 
-		conn.origin.node.error(NODE.data.errorMessage || null, state);
+		const err = new Error(NODE.data.errorMessage || 'unspecified');
+		conn.origin.node.error(err, state);
+		
 		doneOut.trigger(state);
 
 	});

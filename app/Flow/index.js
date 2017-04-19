@@ -643,28 +643,32 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				//set the data accordingly
 				//init all of them
 				//and fetch the action nodes
-				let actionNodes = [];
-				nodes.forEach((node) => {
+				const actionNodes = [];
+				const flowState = new FlowState();
+				for (let i = 0; i < nodes.length; i += 1) {
 
-					let realNode = this.getNodeById(node._id);
-					realNode.data = node.data;
+					const realNode = this.getNodeById(nodes[i]._id);
+					if(!realNode) {
+						continue;
+					}
 
-					realNode.emit('init', new FlowState());
+					realNode.data = nodes[i].data;
+					realNode.emit('init', flowState);
 
 					if (realNode.type === 'action') {
 						actionNodes.push(realNode);
 					}
 
-				});
+				}
 
 				//trigger the action nodes
-				actionNodes.forEach((node) => {
-
-					node.getInputs().filter((input) => input.type === 'trigger').forEach((input) => {
-						input.emit('trigger', null, new FlowState());
-					});
-
-				});
+				for (let i = 0; i < actionNodes.length; i += 1) {
+					actionNodes[i].getInputs()
+						.filter((input) => input.type === 'trigger')
+						.forEach((input) => {
+							input.emit('trigger', null, flowState);
+						});
+				}
 
 			}
 
@@ -882,17 +886,22 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				flowDebug('starting flow from worker');
 
 				const flowState = new FlowState();
-				//init all nodes
-				for (let i = 0; i < this.nodes.length; i += 1) {
-					this.nodes[i].emit('init', flowState);
-				}
 
-				//trigger all event objects that are listening
-				for (let i = 0; i < this.nodes.length; i += 1) {
-					if (this.nodes[i].type === 'event') {
-						this.nodes[i].emit('trigger', flowState);
+				process.nextTick(() => {
+					//init all nodes
+					for (let i = 0; i < this.nodes.length; i += 1) {
+						this.nodes[i].emit('init', flowState);
 					}
-				}
+
+					//trigger all event objects that are listening
+					for (let i = 0; i < this.nodes.length; i += 1) {
+						if (this.nodes[i].type === 'event') {
+							this.nodes[i].emit('trigger', flowState);
+						}
+					}
+				});
+
+				return Promise.resolve();
 
 			}
 

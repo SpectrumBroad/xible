@@ -491,20 +491,41 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		error(err, state) {
+		fail(err, state) {
+
+			console.warn('Node.fail() is deprecated. Use Node.error() instead');
 
 			if (typeof err !== 'string') {
 				throw new Error(`"err" argument of Node.error(state, err) must be of type "string"`);
 			}
 
+			this.error(err, state);
+
+		}
+
+		error(err, state) {
+
+			if (!(state instanceof XIBLE.FlowState) && !(err.state instanceof XIBLE.FlowState)) {
+				throw new Error(`state should be provided and instance of FlowState`);
+			}
+
+			if (!(err instanceof Error)) {
+				err = new Error('' + err);
+			}
+
+			if(state) {
+				err.state = state;
+			}
+			err.node = this;
+
 			this.setTracker({
-				message: err,
+				message: err.message,
 				color: 'red',
 				timeout: 7000
 			});
 
 			if (this.flow) {
-				this.flow.emit('error', this, err, state);
+				this.flow.emit('error', err);
 			}
 
 		}

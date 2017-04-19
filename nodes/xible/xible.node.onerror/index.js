@@ -1,14 +1,15 @@
 module.exports = function(NODE) {
 
-	NODE.on('init', () => {
+	NODE.on('init', (state) => {
 
-		NODE.flow.on('error', (node, error, state) => {
+		NODE.flow.on('error', (error) => {
 
-			state.set(NODE, {
+			let errState = error.state || state;
+			errState.set(NODE, {
 				error: error
 			});
 
-			NODE.getOutputByName('trigger').trigger(state);
+			NODE.getOutputByName('trigger').trigger(errState);
 
 		});
 
