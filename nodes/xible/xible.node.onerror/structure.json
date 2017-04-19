@@ -7,7 +7,7 @@
       "type": "trigger"
     },
     "error": {
-      "type": "string"
+      "type": "error"
     }
   }
 }
