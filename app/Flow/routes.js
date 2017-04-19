@@ -6,13 +6,13 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 		let flows = XIBLE.getFlows();
 		let returnFlows = {};
 
-		for (let id in flows) {
+		for (const id in flows) {
 
-			let flow = flows[id];
+			const flow = flows[id];
 
 			returnFlows[id] = {
 				_id: id,
-				nodes: flow.nodes.map((node) => XIBLE.Node.nodeCopy(node)),
+				nodes: flow.nodes,
 				connectors: flow.json.connectors,
 				viewState: flow.json.viewState,
 				runnable: flow.runnable,
@@ -48,18 +48,15 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 	//get a flow by a given id
 	EXPRESS_APP.param('flowId', (req, res, next, id) => {
 
-		XIBLE.getFlowById(id, (flow) => {
+		let flow = XIBLE.getFlowById(id);
 
-			if (flow) {
+		if (!flow) {
+			res.status(404).end();
+			return;
+		}
 
-				req.locals.flow = flow;
-				next();
-
-			} else {
-				res.status(404).end();
-			}
-
-		});
+		req.locals.flow = flow;
+		next();
 
 	});
 
@@ -121,7 +118,7 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 
 		let returnFlow = {
 			_id: req.locals.flow._id,
-			nodes: req.locals.flow.nodes.map((node) => XIBLE.Node.nodeCopy(node)),
+			nodes: req.locals.flow.nodes,
 			connectors: req.locals.flow.json.connectors,
 			viewState: req.locals.flow.json.viewState,
 			runnable: req.locals.flow.runnable

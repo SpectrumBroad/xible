@@ -15,7 +15,6 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			this.name = obj.name;
 			this.type = obj.type; //object, action, trigger (event)
 			this.level = obj.level;
-			this.groups = obj.groups;
 			this.description = obj.description;
 			this.nodeExists = true; //indicates whether this is an existing installed Node
 			this.hostsEditorContent = obj.hostsEditorContent; //indicates whether it has a ./editor/index.htm file
@@ -63,45 +62,17 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		//TODO: clean this
-		static nodeIoCopy(ioName, nodeCopy, node) {
+		toJSON() {
 
-			nodeCopy[ioName] = {};
-			for (let name in node[ioName]) {
-
-				nodeCopy[ioName][name] = Object.assign({}, node[ioName][name]);
-				delete nodeCopy[ioName][name].node;
-				delete nodeCopy[ioName][name]._events;
-				delete nodeCopy[ioName][name]._eventsCount;
-				delete nodeCopy[ioName][name].origin;
-				delete nodeCopy[ioName][name].destination;
-				delete nodeCopy[ioName][name].connectors;
-
-				nodeCopy[ioName][name].listeners = {
-					attach: node[ioName][name].listeners('attach').map((fn) => fn.toString()),
-					detach: node[ioName][name].listeners('detach').map((fn) => fn.toString())
-				};
-
+			const ignore = ['domain', '_events', '_eventsCount', '_maxListeners', 'flow', '_states', 'vault'];
+			let jsonObj = {};
+			for (const key in this) {
+				if (!this.hasOwnProperty(key) || ignore.indexOf(key) > -1) {
+					continue;
+				}
+				jsonObj[key] = this[key];
 			}
-
-		}
-
-		//TODO: clean this
-		static nodeCopy(node) {
-
-			//copy the node so we can mutate it where need be
-			let nodeCopy = Object.assign({}, node);
-			delete nodeCopy.flow;
-			delete nodeCopy._states;
-			delete nodeCopy._events;
-			delete nodeCopy._eventsCount;
-			delete nodeCopy.vault;
-
-			//attach stringified listeners to the io's
-			this.nodeIoCopy('inputs', nodeCopy, node);
-			this.nodeIoCopy('outputs', nodeCopy, node);
-
-			return nodeCopy;
+			return jsonObj;
 
 		}
 
@@ -600,6 +571,20 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			}
 
 			this.connectors = [];
+
+		}
+
+		toJSON() {
+
+			const ignore = ['domain', '_events', '_eventsCount', '_maxListeners', 'node', 'connectors'];
+			let jsonObj = {};
+			for (const key in this) {
+				if (!this.hasOwnProperty(key) || ignore.indexOf(key) > -1) {
+					continue;
+				}
+				jsonObj[key] = this[key];
+			}
+			return jsonObj;
 
 		}
 
