@@ -15,7 +15,9 @@ process.on('unhandledRejection', (reason, p) => {
 			error: reason
 		});
 
-	} else if (flow) {
+	}
+
+	if (flow) {
 		flow.stop();
 	}
 
