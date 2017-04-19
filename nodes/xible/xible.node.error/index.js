@@ -5,7 +5,7 @@ module.exports = function(NODE) {
 	let triggerIn = NODE.getInputByName('trigger');
 	triggerIn.on('trigger', (conn, state) => {
 
-		conn.origin.node.fail(NODE.data.errorMessage || null, state);
+		conn.origin.node.error(NODE.data.errorMessage || null, state);
 		doneOut.trigger(state);
 
 	});

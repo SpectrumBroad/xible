@@ -2,7 +2,7 @@ module.exports = function(NODE) {
 
 	NODE.on('init', () => {
 
-		NODE.flow.on('fail', (node, error, state) => {
+		NODE.flow.on('error', (node, error, state) => {
 
 			state.set(NODE, {
 				error: error

@@ -1,7 +1,7 @@
 {
-  "name": "xible.node.fail",
+  "name": "xible.node.error",
   "type": "action",
-  "description": "Trigger a node failure event.",
+  "description": "Trigger a node error event.",
   "inputs": {
     "trigger": {
       "type": "trigger"

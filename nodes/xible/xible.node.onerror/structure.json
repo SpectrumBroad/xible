@@ -1,7 +1,7 @@
 {
-  "name": "xible.node.onfail",
+  "name": "xible.node.onerror",
   "type": "event",
-  "description": "Triggered whenever a node in the flow fails.",
+  "description": "Triggered whenever a node in the flow triggers an error.",
   "outputs": {
     "trigger": {
       "type": "trigger"

@@ -491,10 +491,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		fail(err, state) {
+		error(err, state) {
 
 			if (typeof err !== 'string') {
-				throw new Error(`"err" argument of Node.fail(state, err) must be of type "string"`);
+				throw new Error(`"err" argument of Node.error(state, err) must be of type "string"`);
 			}
 
 			this.setTracker({
@@ -504,7 +504,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			});
 
 			if (this.flow) {
-				this.flow.emit('fail', this, err, state);
+				this.flow.emit('error', this, err, state);
 			}
 
 		}
