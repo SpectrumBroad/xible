@@ -234,6 +234,9 @@ let cli = {
 			xible.Registry.User
 				.getByToken(token)
 				.then((user) => {
+					if(!user) {
+						return console.log(`Not logged in.`);
+					}
 					console.log(user.name);
 				})
 				.catch((err) => logError(err));
