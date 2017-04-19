@@ -4,6 +4,25 @@ const Xible = require('./index.js');
 
 let flow;
 
+//always stop on unhandled promise rejections
+process.on('unhandledRejection', (reason, p) => {
+
+	console.error(reason);
+	if (process.connected) {
+
+		process.send({
+			method: 'stop',
+			error: reason
+		});
+
+	}
+
+	if (flow) {
+		flow.stop();
+	}
+
+});
+
 //init message handler
 process.on('message', (message) => {
 
