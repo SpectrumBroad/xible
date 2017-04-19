@@ -502,18 +502,12 @@ class Xible extends EventEmitter {
 
 	}
 
-	getFlowById(id, callback) {
-
-		if (typeof callback === 'function') {
-			callback(this.flows[id]);
-		}
-
+	getFlowById(id) {
 		return this.flows[id];
-
 	}
 
-	getFlowByName(name, callback) {
-		return this.getFlowById(name, callback);
+	getFlowByName(name) {
+		return this.getFlowById(name);
 	}
 
 	deleteFlow(flow, callback) {
