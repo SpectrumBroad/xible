@@ -39,7 +39,7 @@
 	color: red;
 }
 
-.flowList li.initializing a::before, .flowList li.initialized a::before, .flowList li.started a::before, .flowList li.stopping a::before, .flowList li.starting a::before {
+.flowList li.initializing a::before, .flowList li.started a::before, .flowList li.stopping a::before, .flowList li.starting a::before {
 	content: "";
 	position: absolute;
 	bottom: 0;
@@ -59,11 +59,11 @@
 .flowList li.stopping a::before, .flowList li.starting a::before, .flowList li.initializing a::before {
 	border-bottom-color: darkorange;
 }
-
+/*
 .flowList li.initialized a::before {
 	border-bottom-color: purple;
 }
-
+*/
 .flowList li.open {
 	background-color: #45679E;
 	z-index: 1;
@@ -91,11 +91,11 @@
 .flowList li.started.open.direct::before {
 	background-color: #ddd;
 }
-
+/*
 .flowList li.initialized.open::before {
 	background-color: purple;
 }
-
+*/
 .flowList li.stopping.open::before, .flowList li.starting.open::before, .flowList li.initializing.open::before {
 	background-color: darkorange;
 }
