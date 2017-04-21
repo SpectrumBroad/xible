@@ -9,7 +9,8 @@
 	},
 
 	"flows": {
-		"path": "~/.xible/flows"
+		"path": "~/.xible/flows",
+		"initlevel": 0
 	},
 
 	"vault": {

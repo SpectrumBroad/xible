@@ -346,35 +346,6 @@ class XibleEditor extends EventEmitter {
 
 				break;
 
-			case 'xible.flow.removeAllStatuses':
-
-				this.flows[json.flowId].removeAllStatuses();
-				break;
-
-			case 'xible.flow.stopped':
-
-				this.flows[json.flowId].emit('stopped');
-				//XibleEditorFlow.emit('stopped', this.flows[json.flowId]);
-				break;
-
-			case 'xible.flow.stopping':
-
-				this.flows[json.flowId].emit('stopping');
-				//XibleEditorFlow.emit('stopping', this.flows[json.flowId]);
-				break;
-
-			case 'xible.flow.starting':
-
-				this.flows[json.flowId].emit('starting', json);
-				//XibleEditorFlow.emit('starting', this.flows[json.flowId]);
-				break;
-
-			case 'xible.flow.started':
-
-				this.flows[json.flowId].emit('started', json);
-				//XibleEditorFlow.emit('started', this.flows[json.flowId]);
-				break;
-
 			case 'xible.flow.usage':
 
 				this.emit('flow.usage', json.flows);

@@ -468,6 +468,44 @@ View.routes['/editor'] = function(EL) {
 	//add the flow names to the flow tab list
 	let flowListUl = document.getElementById('flowList');
 
+	function setFlowTabState(flow, li) {
+
+		li.classList.remove('notRunnable', 'initializing', 'initialized', 'started', 'starting', 'stopped', 'stopping', 'direct');
+
+		if (flow.directed) {
+			li.classList.add('direct');
+		}
+
+		switch (flow.state) {
+
+			case xibleWrapper.Flow.STATE_INITIALIZING:
+				li.classList.add('initializing');
+				break;
+
+			case xibleWrapper.Flow.STATE_INITIALIZED:
+				li.classList.add('initialized');
+				break;
+
+			case xibleWrapper.Flow.STATE_STARTING:
+				li.classList.add('starting');
+				break;
+
+			case xibleWrapper.Flow.STATE_STARTED:
+				li.classList.add('started');
+				break;
+
+			case xibleWrapper.Flow.STATE_STOPPING:
+				li.classList.add('stopping');
+				break;
+
+			case xibleWrapper.Flow.STATE_STOPPED:
+				li.classList.add('stopped');
+				break;
+
+		}
+
+	}
+
 	function createFlowTab(flow) {
 
 		let li = flowListUl.appendChild(document.createElement('li'));
@@ -516,49 +554,30 @@ View.routes['/editor'] = function(EL) {
 			a.click();
 		}
 
-		if (flow.running) {
-			li.classList.add('started');
-		}
+		setFlowTabState(flow, li);
 
-		if (flow.directed) {
-			li.classList.add('direct');
-		}
-
-		flow.on('started', (event) => {
-
-			if (event.directed) {
-				li.classList.add('direct');
-			} else {
-				li.classList.remove('direct');
-			}
-
-			li.classList.remove('notRunnable', 'starting', 'stopping');
-			li.classList.add('started');
-
+		flow.on('initializing', () => {
+			setFlowTabState(flow, li);
 		});
 
-		flow.on('starting', (event) => {
+		flow.on('initialized', () => {
+			setFlowTabState(flow, li);
+		});
 
-			if (event.directed) {
-				li.classList.add('direct');
-			} else {
-				li.classList.remove('direct');
-			}
+		flow.on('started', () => {
+			setFlowTabState(flow, li);
+		});
 
-			li.classList.remove('started', 'stopping');
-			li.classList.add('starting');
-
+		flow.on('starting', () => {
+			setFlowTabState(flow, li);
 		});
 
 		flow.on('stopping', () => {
-
-			li.classList.remove('started', 'starting', 'direct');
-			li.classList.add('stopping');
-
+			setFlowTabState(flow, li);
 		});
 
 		flow.on('stopped', () => {
-			li.classList.remove('started', 'starting', 'stopping', 'direct');
+			setFlowTabState(flow, li);
 		});
 
 		return li;

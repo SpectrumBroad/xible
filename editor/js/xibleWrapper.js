@@ -167,6 +167,8 @@ module.exports = function(XIBLE) {
 	const Connector = require('./Connector')(XIBLE);
 	const Node = require('./Node')(XIBLE);
 
+	XIBLE.setMaxListeners(0);
+
 	class Flow extends EventEmitter {
 
 		constructor(obj) {
@@ -175,7 +177,64 @@ module.exports = function(XIBLE) {
 
 			this._id = null;
 			this.runnable = true;
-			this.running = false;
+			this.state = Flow.STATE_STOPPED;
+
+			XIBLE.on('message', (json) => {
+
+				if (json.flowId !== this._id) {
+					return;
+				}
+
+				switch (json.method) {
+
+					case 'xible.flow.removeAllStatuses':
+						this.removeAllStatuses();
+						this.emit('removeAllStatuses');
+						break;
+
+					case 'xible.flow.initializing':
+						this.state = Flow.STATE_INITIALIZING;
+						this.emit('initializing', json);
+						break;
+
+					case 'xible.flow.initialized':
+						this.state = Flow.STATE_INITIALIZED;
+						this.emit('initialized', json);
+						break;
+
+					case 'xible.flow.starting':
+						this.state = Flow.STATE_STARTING;
+						if (json.directed) {
+							this.directed = true;
+						} else {
+							this.directed = false;
+						}
+						this.emit('starting', json);
+						break;
+
+					case 'xible.flow.started':
+						this.state = Flow.STATE_STARTED;
+						if (json.directed) {
+							this.directed = true;
+						} else {
+							this.directed = false;
+						}
+						this.emit('started', json);
+						break;
+
+					case 'xible.flow.stopping':
+						this.state = Flow.STATE_STOPPING;
+						this.emit('stopping', json);
+						break;
+
+					case 'xible.flow.stopped':
+						this.state = Flow.STATE_STOPPED;
+						this.emit('stopped', json);
+						break;
+
+				}
+
+			});
 
 			if (obj) {
 				Object.assign(this, obj);
@@ -256,6 +315,30 @@ module.exports = function(XIBLE) {
 
 			});
 
+		}
+
+		static get STATE_STOPPED() {
+			return 0;
+		}
+
+		static get STATE_STOPPING() {
+			return 1;
+		}
+
+		static get STATE_INITIALIZING() {
+			return 2;
+		}
+
+		static get STATE_INITIALIZED() {
+			return 3;
+		}
+
+		static get STATE_STARTING() {
+			return 4;
+		}
+
+		static get STATE_STARTED() {
+			return 5;
 		}
 
 		stop() {
@@ -422,7 +505,7 @@ module.exports = function(XIBLE) {
 							dataObject = value;
 							return value;
 
-						}	// jshint ignore: line
+						} // jshint ignore: line
 
 					default:
 
@@ -438,7 +521,7 @@ module.exports = function(XIBLE) {
 
 			//the connectors
 			const CONNECTOR_WHITE_LIST = ['_id', 'origin', 'destination', 'type', 'hidden'];
-			var connectorJson = JSON.stringify(connectors || this.connectors, function(key, value) {
+			const connectorJson = JSON.stringify(connectors || this.connectors, function(key, value) {
 
 				if (key && isNaN(key) && CONNECTOR_WHITE_LIST.indexOf(key) === -1) {
 					return;
@@ -1118,8 +1201,6 @@ const WebSocket = require('ws');
 const OoHttpBase = require('oohttp').Base;
 let EventEmitter = require('events').EventEmitter;
 
-//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 class XibleWrapper extends EventEmitter {
 
 	constructor(obj) {
@@ -1231,10 +1312,22 @@ class XibleWrapper extends EventEmitter {
 			this.emit('error', event);
 		});
 
+		let messageHandler = (json) => {
+
+			if (json.method !== 'xible.messages') {
+				this.emit('message', json);
+				return;
+			}
+
+			json.messages.forEach((message) => {
+				messageHandler(message);
+			});
+
+		}
+
 		ws.addEventListener('message', (event) => {
 
-			this.emit('message', event);
-
+			let json;
 			try {
 
 				/**
@@ -1242,8 +1335,14 @@ class XibleWrapper extends EventEmitter {
 				 *  @event XibleWrapper#json
 				 *  @type {Object}
 				 */
-				this.emit('json', JSON.parse(event.data));
-			} catch (e) {}
+				json = JSON.parse(event.data);
+			} catch (err) {}
+
+			if (!json) {
+				return;
+			}
+
+			messageHandler(json);
 
 		});
 

@@ -16,8 +16,8 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 				connectors: flow.json.connectors,
 				viewState: flow.json.viewState,
 				runnable: flow.runnable,
-				running: flow.worker && flow.worker.connected,
-				directed: flow.directed
+				directed: flow.directed,
+				state: flow.state
 			};
 
 		}
@@ -118,12 +118,16 @@ module.exports = function(FLOW, XIBLE, EXPRESS_APP) {
 	//get an existing flow
 	EXPRESS_APP.get('/api/flows/:flowId', (req, res) => {
 
+		const flow = req.locals.flow;
+
 		let returnFlow = {
-			_id: req.locals.flow._id,
-			nodes: req.locals.flow.nodes,
-			connectors: req.locals.flow.json.connectors,
-			viewState: req.locals.flow.json.viewState,
-			runnable: req.locals.flow.runnable
+			_id: flow._id,
+			nodes: flow.nodes,
+			connectors: flow.json.connectors,
+			viewState: flow.json.viewState,
+			runnable: flow.runnable,
+			directed: flow.directed,
+			state: flow.state
 		};
 
 		res.json(returnFlow);

@@ -3,6 +3,7 @@
 const Xible = require('./index.js');
 
 let flow;
+let xible;
 
 //always stop on unhandled promise rejections
 process.on('unhandledRejection', (reason, p) => {
@@ -28,10 +29,9 @@ process.on('message', (message) => {
 
 	switch (message.method) {
 
-		case 'start':
+		case 'init':
 
-			//setup xible with the nodeNames
-			const xible = new Xible({
+			xible = new Xible({
 				child: true
 			}, message.config);
 
@@ -66,13 +66,43 @@ process.on('message', (message) => {
 					flow = new xible.Flow();
 					flow.initJson(message.flow);
 
-					let returnPromise;
-					if (message.directNodes) {
-						return flow.direct(message.directNodes);
+					//inform the master that we initialized
+					if (process.connected) {
+						process.send({
+							method: 'initialized'
+						});
 					}
-					return flow.start();
 
 				})
+				.catch((err) => {
+
+					console.error(err);
+
+					if (process.connected) {
+						process.send({
+							method: 'stop',
+							error: err
+						});
+					}
+
+					if (flow) {
+						flow.stop();
+					}
+
+				});
+
+			break;
+
+		case 'start':
+
+			let startPromise;
+			if (message.directNodes) {
+				startPromise = flow.direct(message.directNodes);
+			} else {
+				startPromise = flow.start();
+			}
+
+			startPromise
 				.then(() => {
 
 					//inform the master that we actually started
@@ -156,6 +186,6 @@ function requireNode(nodePath) {
 //inform the master we have finished init
 if (process.connected) {
 	process.send({
-		method: 'init'
+		method: 'initializing'
 	});
 }

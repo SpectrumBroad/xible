@@ -73,6 +73,22 @@ View.routes['/settings/general'] = function(EL) {
 					</label>
 				</dt>
 				<dd><input id="settingsGeneralFlowsPath" type="text" data-configpath="flows.path" /></dd>
+
+				<dt>
+					<label for="settingsGeneralFlowsInitLevel">
+						Init level
+						<div>
+							Default initializition level that flows are kept on when they are not active.<br/>
+							The higher the level, the faster flows start. However, they also consume more resources without actually running.
+						</div>
+					</label>
+				</dt>
+				<dd>
+					<select id="settingsGeneralFlowsInitLevel" type="number" data-configpath="flows.initlevel">
+						<option value="0">0 - None</option>
+						<option value="1">1 - Flow</option>
+						<!-- <option value="2">2 - Nodes</option> -->
+					</select>
 			</dl>
 
 		</section>

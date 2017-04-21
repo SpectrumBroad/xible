@@ -38,14 +38,6 @@ View.routes['/settings'] = function(EL) {
 					<li><a href="/settings/registry#flows" onclick="settingsViewHolder.navigate('/settings/registry#flows'); return false;">Flows</a></li>
 				</ul>
 			</section>
-			<!--
-			<section>
-				<h1>Enterprise</h1>
-				<ul>
-					<li><a href="#">General</a></li>
-				</ul>
-			</section>
-			-->
 		</div>
 		<div class="inner" id="settingsContent"></div>
 	`;
@@ -64,7 +56,7 @@ View.routes['/settings'] = function(EL) {
 		}
 
 		//hook event handler on change to save config data immediately
-		Array.from(document.querySelectorAll(`input[data-configpath]`))
+		Array.from(document.querySelectorAll(`input[data-configpath], select[data-configpath]`))
 			.forEach((input) => {
 				input.addEventListener('change', () => {
 
@@ -100,7 +92,7 @@ View.routes['/settings'] = function(EL) {
 
 		//set the right data in the data-configpath fields
 		xibleWrapper.Config.getAll().then((config) => {
-			Array.from(document.querySelectorAll(`input[data-configpath]`))
+			Array.from(document.querySelectorAll(`input[data-configpath], select[data-configpath]`))
 				.forEach((input) => {
 
 					if(input.getAttribute('type') ===  'checkbox') {
