@@ -167,37 +167,43 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		static getStructure(filepath) {
+		/**
+		 * Tries to fetch the structure.json from a directory. Also checks for editor contents.
+		 * @param {String} dirPath Path to the directory containting the structure.json.
+		 * @returns {Promise.<Object>} Promise which resolves after the structure is complete, or cannot be found.
+		 * @private
+		 */
+		static getStructure(dirPath) {
 
 			return new Promise((resolve, reject) => {
 
 				let structure;
 
 				//check for structure.json
-				fs.access(`${filepath}/structure.json`, fs.constants.R_OK, (err) => {
+				fs.access(`${dirPath}/structure.json`, fs.constants.R_OK, (err) => {
 
 					if (err) {
-						return reject(`Could not access "${filepath}/structure.json": ${err}`);
+						return reject(`Could not access "${dirPath}/structure.json": ${err}`);
 					}
 
 					try {
 
-						structure = require(`${filepath}/structure.json`);
-						structure.path = filepath;
+						structure = require(`${dirPath}/structure.json`);
+						structure.path = dirPath;
 
 					} catch (err) {
-						return reject(`Could not require "${filepath}/structure.json": ${err}`);
+						return reject(`Could not require "${dirPath}/structure.json": ${err}`);
 					}
 
 					//check for editor contents
-					fs.stat(`${filepath}/editor`, (err, stat) => {
+					fs.stat(`${dirPath}/editor`, (err, stat) => {
 
 						if (err) {
 							return resolve(structure);
 						}
 
 						if (stat.isDirectory()) {
-							structure.editorContentPath = `${filepath}/editor`;
+							structure.editorContentPath = `${dirPath}/editor`;
 						}
 
 						return resolve(structure);
@@ -211,8 +217,9 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		}
 
 		/**
-		 * Initializes all nodes found in a certain path, recursively, by running getStructures() on that path
+		 * Initializes all nodes found in a certain path, recursively, by running getStructures() on that path, and hosting editor contents if applicable.
 		 * @param {String} nodePath Path to the directory containting the nodes. If the directory does not exist, it will be created.
+		 * @returns {Promise} A Promise which resolves after calling getStructures(), hosting editor contents and adding the result using XIBLE.addNode().
 		 * @private
 		 */
 		static initFromPath(nodePath) {
@@ -349,7 +356,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 		 * @param {Number} [status.percentage=0] The starting point of the progress bar as a percentage. Value can range from 0 to (including) 100.
 		 * @param {Number} [status.updateOverTime] Specifies the time in milliseconds to automatically update the progress bar to 100% from the given percentage value.
 		 * @param {Number} [status.timeout] Timeout in milliseconds after which the progress bar disappears.
-		 * @returns {Number} Returns an identifier as Number, which can be used to update the status of the progress bar through node.updateProgressBarById, or remove the progress bar through removeProgressBarById.
+		 * @returns {Number} Returns an identifier, which can be used to update the status of the progress bar through node.updateProgressBarById, or remove the progress bar through removeProgressBarById.
 		 */
 		addProgressBar(status) {
 
@@ -380,7 +387,11 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		 * Sends a message to the master process from a worker using Node.js process.send().
+		 * @param {Object} obj The object to send.
+		 * @private
+		 */
 		sendProcessMessage(obj) {
 
 			if (process.connected) {
@@ -421,7 +432,14 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		 * Updates the status on an existing status.
+		 * @param {Number} statusId The identifier of the existing status, as returned by addStatus().
+		 * @param {Object} status
+		 * @param {String} status.message Text message to show.
+		 * @param {String} [status.color] Color for the indicator next to the text message. If none provided, the CSS file of the editor decides on a appropriate default color.
+		 * @returns {Number} Returns the given statusId.
+		 */
 		updateStatusById(statusId, status) {
 
 			if (!statusId || !status) {
@@ -448,7 +466,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		 * Adds a status message to a node, visible in the editor.
+		 * @param {Object} status
+		 * @param {String} status.message Text message to show.
+		 * @param {String} [status.color] Color for the indicator next to the text message. If none provided, the CSS file of the editor decides on a appropriate default color.
+		 * @returns {Number} Returns an identifier, which can be used to update the status through node.updateStatusById, or remove it through removeStatusById.
+		 */
 		addStatus(status) {
 
 			if (!status) {
@@ -473,11 +497,20 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		removeProgressBarById() {
-			this.removeStatusById(...arguments);
+		/**
+		* Removes a progress bar referred to by it sidentifier.
+		* @param {Number} statusId Identifier of the progress bar to remove.
+		* @param {Number} [timeout] The amount of time in milliseconds before actually removing the progress bar.
+		*/
+		removeProgressBarById(statusId, timeout) {
+			this.removeStatusById(statusId, timeout);
 		}
 
-
+		/**
+		* Removes a status referred to by it sidentifier.
+		* @param {Number} statusId Identifier of the status to remove.
+		* @param {Number} [timeout] The amount of time in milliseconds before actually removing the status.
+		*/
 		removeStatusById(statusId, timeout) {
 
 			if (!statusId) {
@@ -501,7 +534,9 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		* Removes all statuses and progress bars for a node, immediately.
+		*/
 		removeAllStatuses() {
 
 			this.sendProcessMessage({
@@ -517,7 +552,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		* Overwrites the tracker message. This message is visibleabove a node in the editor, and usually used to show when the node got triggered.
+		* @param {Object} status
+		* @param {String} status.message Text message to show.
+		* @param {String} [status.color] Color for the indicator next to the text message. If none provided, the CSS file of the editor decides on a appropriate default color.
+		*/
 		setTracker(status) {
 
 			if (!status) {
@@ -538,6 +578,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
+		/**
+		* Triggers this.error(), but only allows a string argument as error.
+		* @param {String} err The error message.
+		* @param {FlowState} state Flowstate at point of the failure.
+		* @deprecated Deprecated since version 0.3.0.
+		* @private
+		*/
 		fail(err, state) {
 
 			console.warn('Node.fail() is deprecated. Use Node.error() instead');
@@ -550,6 +597,15 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
+		/**
+		* Raises an error on the node, bubbled to the flow. Calls setTracker() on the node with the error message.
+		* If the flow contains an "error" event listener, the flow will not stop. This behaviour is demonstrated by including a "xible.node.onerror" node in the flow.
+		* Note that throwing an error using "throw" will always stop the flow.
+		* Raising an error in a node should not trigger any outputs.
+		* @param {Error} err An error object to raise.
+		* @param {FlowState} err.state Flowstate at point of the error. Either this or the state argument should be provided.
+		* @param {FlowState} state Flowstate at point of the error. Either this or the err.state argument should be provided.
+		*/
 		error(err, state) {
 
 			if (!(state instanceof XIBLE.FlowState) && !(err.state instanceof XIBLE.FlowState)) {
@@ -579,13 +635,18 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		/**
 		 * Confirms whether the node has any inputs of the given type.
-		 * @param {String|null} type The type you want to check. Null would by 'any' type.
+		 * @param {String|null} type The type you want to check. Null would be "any" type.
 		 * @returns {Boolean} Returns a Boolean; true or false.
 		 */
 		hasConnectedInputsOfType(type) {
 			return this.inputs.some(input => input.type === type && input.connectors.length);
 		}
 
+		/**
+		* Asserts that the given status is a FlowState
+		* @param {FlowState} state
+		* @returns {Boolean} Always returns true if not thrown.
+		*/
 		static flowStateCheck(state) {
 
 			if (!(state instanceof XIBLE.FlowState)) {
