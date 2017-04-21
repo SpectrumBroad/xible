@@ -5,7 +5,7 @@ View.routes['/settings/general'] = function(EL) {
 		<h1>General</h1>
 
 		<p class="warning">
-			Changing any if the values in this section requires a restart of XIBLE.<br/>
+			Changing any of the values in this section requires a restart of XIBLE.<br/>
 			Also note that after a restart as a consequence of these changes, the web interface may no longer be available on the current URL.
 		</p>
 
