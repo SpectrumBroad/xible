@@ -721,8 +721,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				case Flow.STATE_STOPPING:
 					return new Promise((resolve, reject) => {
 						this.once('stopped', () => {
-							console.log('stopping')
-							resolve(startFlow());
+							if(
+								this.state === Flow.STATE_STARTING ||
+								this.state === Flow.STATE_STARTED
+							) {
+								resolve(this);
+							}
+							resolve(this.forceStart(directNodes));
 						});
 					});
 
