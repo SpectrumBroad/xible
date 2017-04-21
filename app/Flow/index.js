@@ -648,7 +648,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				for (let i = 0; i < nodes.length; i += 1) {
 
 					const realNode = this.getNodeById(nodes[i]._id);
-					if(!realNode) {
+					if (!realNode) {
 						continue;
 					}
 
