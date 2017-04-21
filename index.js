@@ -452,7 +452,7 @@ class Xible extends EventEmitter {
 
 	}
 
-	addNode(name, obj, constructorFunction) {
+	addNode(name, obj) {
 
 		if (!name || !obj) {
 			throw new Error('first argument needs to be string, second object');
@@ -465,10 +465,6 @@ class Xible extends EventEmitter {
 
 		if (!obj.name) {
 			obj.name = name;
-		}
-
-		if (!obj.constructorFunction) {
-			obj.constructorFunction = constructorFunction;
 		}
 
 		return (this.nodes[name] = obj);

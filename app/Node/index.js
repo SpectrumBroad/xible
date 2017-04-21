@@ -3,6 +3,7 @@ const debug = require('debug');
 const nodeDebug = debug('xible:node');
 const fs = require('fs');
 const path = require('path');
+let express;
 
 module.exports = function(XIBLE, EXPRESS_APP) {
 
@@ -53,7 +54,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 			}
 
 			//construct
-			if (obj.constructorFunction) {
+			if (XIBLE.child && obj.constructorFunction) {
 
 				this.constructorFunction = obj.constructorFunction;
 				this.constructorFunction.call(this, this);
@@ -76,23 +77,24 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		static getStructures(structuresPath, files) {
+		static getFiles(structuresPath) {
 
-			if (!Array.isArray(files)) {
+			try {
+				return fs.readdirSync(structuresPath);
+			} catch (err) {
 
-				try {
-					files = fs.readdirSync(structuresPath);
-				} catch (err) {
-
-					nodeDebug(`could not readdir "${structuresPath}": ${err}`);
-					files = [];
-
-				}
+				nodeDebug(`could not readdir "${structuresPath}": ${err}`);
+				return [];
 
 			}
 
+		}
+
+		static getStructures(structuresPath) {
+
 			return new Promise((resolve, reject) => {
 
+				let files = this.getFiles(structuresPath);
 				let structures = {};
 				let loadedCounter = 0;
 
@@ -208,7 +210,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		static initFromPath(nodePath, files) {
+		/**
+		 * Initializes all nodes found in a certain path, recursively, by running getStructures() on that path
+		 * @param {String} nodePath Path to the directory containting the nodes. If the directory does not exist, it will be created.
+		 * @private
+		 */
+		static initFromPath(nodePath) {
 
 			nodeDebug(`init nodes from "${nodePath}"`);
 
@@ -220,12 +227,11 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 			}
 
-			let EXPRESS;
-			if (!XIBLE.child) {
-				EXPRESS = require('express');
+			if (!XIBLE.child && !express) {
+				express = require('express');
 			}
 
-			return this.getStructures(nodePath, files).then((structures) => {
+			return this.getStructures(nodePath).then((structures) => {
 
 				for (let nodeName in structures) {
 
@@ -238,7 +244,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 						structure.hostsEditorContent = true;
 
 						nodeDebug(`hosting "/api/nodes/${nodeName}/editor"`);
-						EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, EXPRESS.static(structure.editorContentPath, {
+						EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, express.static(structure.editorContentPath, {
 							index: false
 						}));
 
@@ -250,6 +256,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
+		/**
+		 * Adds a {NodeInput} to the node.
+		 * @param {String} name Name of the input.
+		 * @param {NodeInput} input Input to add.
+		 * @returns {NodeInput} Added input, which equals the given input.
+		 */
 		addInput(name, input) {
 
 			if (!(input instanceof NodeInput)) {
@@ -264,6 +276,12 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
+		/**
+		 * Adds a {NodeOutput} to the node.
+		 * @param {String} name Name of the output.
+		 * @param {NodeOutput} output Output to add.
+		 * @returns {NodeOutput} Added output, which equals the given output.
+		 */
 		addOutput(name, output) {
 
 			if (!(output instanceof NodeOutput)) {
@@ -278,6 +296,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
+		/**
+		 * Returns all inputs attached to this node.
+		 * @returns {NodeInput[]} List of inputs.
+		 */
 		getInputs() {
 
 			let inputs = [];
@@ -288,7 +310,10 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		 * Returns all outputs attached to this node.
+		 * @returns {NodeOutput[]} List of outputs.
+		 */
 		getOutputs() {
 
 			let outputs = [];
@@ -299,17 +324,33 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		 * Returns an input by the given name, or null if it does not exist.
+		 * @param {String} name Name of the input.
+		 * @returns {NodeInput|null} An input, or null if not found.
+		 */
 		getInputByName(name) {
 			return this.inputs[name];
 		}
 
-
+		/**
+		 * Returns an output by the given name, or null if it does not exist.
+		 * @param {String} name Name of the output.
+		 * @returns {NodeOutput|null} An output, or null if not found.
+		 */
 		getOutputByName(name) {
 			return this.outputs[name];
 		}
 
-
+		/**
+		 * Adds a progress bar to the node, visible in the editor.
+		 * @param {Object} status
+		 * @param {String} [status.message] A text message representing the context of the progress bar.
+		 * @param {Number} [status.percentage=0] The starting point of the progress bar as a percentage. Value can range from 0 to (including) 100.
+		 * @param {Number} [status.updateOverTime] Specifies the time in milliseconds to automatically update the progress bar to 100% from the given percentage value.
+		 * @param {Number} [status.timeout] Timeout in milliseconds after which the progress bar disappears.
+		 * @returns {Number} Returns an identifier as Number, which can be used to update the status of the progress bar through node.updateProgressBarById, or remove the progress bar through removeProgressBarById.
+		 */
 		addProgressBar(status) {
 
 			if (!status) {
@@ -348,7 +389,13 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-
+		/**
+		 * Updates the status on an existing progress bar.
+		 * @param {Number} statusId The identifier of the existing progress bar, as returned by addProgressBar().
+		 * @param {Object} status
+		 * @param {Number} status.percentage The point of the progress bar as a percentage. Value can range from 0 to (including) 100.
+		 * @returns {Number} Returns the given statusId.
+		 */
 		updateProgressBarById(statusId, status) {
 
 			if (!statusId || !status) {
@@ -513,7 +560,7 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 				err = new Error('' + err);
 			}
 
-			if(state) {
+			if (state) {
 				err.state = state;
 			}
 			err.node = this;
@@ -530,7 +577,11 @@ module.exports = function(XIBLE, EXPRESS_APP) {
 
 		}
 
-		//returns wheter or not any of the inputs with a certain type has connectors
+		/**
+		 * Confirms whether the node has any inputs of the given type.
+		 * @param {String|null} type The type you want to check. Null would by 'any' type.
+		 * @returns {Boolean} Returns a Boolean; true or false.
+		 */
 		hasConnectedInputsOfType(type) {
 			return this.inputs.some(input => input.type === type && input.connectors.length);
 		}

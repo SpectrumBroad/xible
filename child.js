@@ -47,12 +47,15 @@ process.on('message', (message) => {
 				}
 				structuredNodes.set(nodeName, true);
 
+				let nodeConstr = message.nodes[nodeName];
+
 				//require the actual node and check it was loaded properly
-				let requiredNode = requireNode(message.nodes[nodeName].path);
-				if (!requiredNode) {
-					return;
+				nodeConstr.constructorFunction = requireNode(nodeConstr.path);
+				if (!nodeConstr.constructorFunction) {
+					continue;
 				}
-				xible.addNode(nodeName, message.nodes[nodeName], requiredNode);
+
+				xible.addNode(nodeName, nodeConstr);
 
 			}
 			structuredNodes = null;
