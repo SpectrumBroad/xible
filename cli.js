@@ -1,147 +1,141 @@
 #!/usr/bin/env node
 
-'use strict'; /* jshint ignore: line */
+'use strict';
 
-// windows: running "npm blah" in this folder will invoke WSH, not node.
-/*global WScript*/
+// windows: running "xible x" in this folder will invoke WSH, not node.
+/* global WScript*/
 if (typeof WScript !== 'undefined') {
-	WScript.echo(
-		'npm does not work when run\n' +
-		'with the Windows Scripting Host\n\n' +
-		"'cd' to a different directory,\n" +
-		"or type 'npm.cmd <args>',\n" +
-		"or type 'node npm <args>'."
-	);
-	WScript.quit(1);
-	return;
+  WScript.echo(
+    'npm does not work when run\n' +
+    'with the Windows Scripting Host\n\n' +
+    "'cd' to a different directory,\n" +
+    "or type 'npm.cmd <args>',\n" +
+    "or type 'node npm <args>'."
+  );
+  WScript.quit(1);
+  return;
 }
 
 process.title = 'xible';
-console.log(`XIBLE\n`);
+console.log('XIBLE\n');
 
-//start with debug logging enabled until we have a 'normal' way of logging
+// start with debug logging enabled until we have a 'normal' way of logging
 process.env.DEBUG = 'xible*';
 
-//option parsing
 const nopt = require('nopt');
-let knownOpts = {
-	config: String
+const Xible = require('./index.js');
+
+// option parsing
+const knownOpts = {
+  config: String
 };
-let shortHands = {
-	'c': '--config'
+const shortHands = {
+  c: '--config'
 };
-let opts = nopt(knownOpts, shortHands);
-let remain = opts.argv.remain;
-let context = remain.shift() || 'help';
-let command = remain.shift();
+const opts = nopt(knownOpts, shortHands);
+const remain = opts.argv.remain;
+const context = remain.shift() || 'help';
+const command = remain.shift();
 const ARG = remain.shift();
 
-//get a xible instance
-const CONFIG_PATH = opts.config || `~/.xible/config.json`;
-const Xible = require('./index.js');
-let xible = new Xible({
-	configPath: CONFIG_PATH
+// get a xible instance
+const CONFIG_PATH = opts.config || '~/.xible/config.json';
+const xible = new Xible({
+  configPath: CONFIG_PATH
 });
 
 function logError(msg, exitCode) {
-
-	console.error(msg);
-	process.exitCode = exitCode || 1;
-
+  console.error(msg);
+  process.exitCode = exitCode || 1;
 }
 
-//cli commands
-let cli = {
+// cli commands
+const cli = {
 
-	flow: {
+  flow: {
 
-		start: function() {
-			logError(`Not implemented yet`);
-		},
-		stop: function() {
-			logError(`Not implemented yet`);
-		}
+    start() {
+      logError('Not implemented yet');
+    },
+    stop() {
+      logError('Not implemented yet');
+    }
 
-	},
+  },
 
-	server: {
+  server: {
 
-		install: function() {
+    install() {
+      // TODO: support windows
 
-			//TODO: support windows
+      const fs = require('fs-extra');
+      fs.copySync(`${__dirname}/xible.service`, '/etc/systemd/system/xible.service');
+    },
+    enable() {
+      // TODO: support windows
 
-			const fs = require('fs-extra');
-			fs.copySync(`${__dirname}/xible.service`, '/etc/systemd/system/xible.service');
+      this.install();
+      const exec = require('child_process').exec;
+      exec('systemctl enable xible.service', (err, stdout, stderr) => {
+        if (err) {
+          logError(`Failed to enable service: ${err}`);
+          return;
+        }
 
-		},
-		enable: function() {
+        if (stderr) {
+          console.log(`${stderr}`);
+        }
+        console.log(`${stdout}`);
+        console.log('Service enabled. Xible will now automatically start at boot.');
+      });
+    },
+    disable() {
+      // TODO: support windows
 
-			//TODO: support windows
+      const exec = require('child_process').exec;
+      exec('systemctl disable xible.service', (err, stdout, stderr) => {
+        if (err) {
+          logError(`Failed to disable service: ${err}`);
+          return;
+        }
 
-			this.install();
-			const exec = require('child_process').exec;
-			exec('systemctl enable xible.service', (err, stdout, stderr) => {
+        if (stderr) {
+          console.log(`${stderr}`);
+        }
+        console.log(`${stdout}`);
+        console.log('Service disabled.');
+      });
+    },
+    start() {
+      xible.init();
+    }
 
-				if (err) {
-					return logError(`Failed to enable service: ${err}`);
-				}
-
-				console.log('' + stdout);
-				console.log('Service enabled. Xible will now automatically start at boot.');
-
-			});
-
-		},
-		disable: function() {
-
-			//TODO: support windows
-
-			const exec = require('child_process').exec;
-			exec('systemctl disable xible.service', (err, stdout, stderr) => {
-
-				if (err) {
-					return logError(`Failed to disable service: ${err}`);
-				}
-
-				console.log('' + stdout);
-				console.log('Service disabled.');
-
-			});
-
-		},
-		start: function() {
-			xible.init();
-		}
-
-	}
+  }
 
 };
 
 function printUsage(path) {
+  if (context !== 'help') {
+    logError(`Unrecognized context: "${context}"\n`);
+  }
 
-	if (context !== 'help') {
-		logError(`Unrecognized context: "${context}"\n`);
-	}
+  console.log(`Usage: xible ${cli[context] ? context : '<context>'} <command>\n\nWhere ${cli[context] ? '<command>' : '<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
 
-	console.log(`Usage: xible ${cli[context]?context:'<context>'} <command>\n\nWhere ${cli[context]?'<command>':'<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
-
-	if (cli[context]) {
-		console.log('Type: xible <context> help for more help about the specified context.');
-	}
+  if (cli[context]) {
+    console.log('Type: xible <context> help for more help about the specified context.');
+  }
 }
 
 if (cli[context]) {
-
-	if (!command && typeof cli[context] === 'function') {
-		cli[context]();
-	} else if (command && typeof cli[context][command] === 'function') {
-		cli[context][command](opts);
-	} else {
-		printUsage(cli[context]);
-	}
-
+  if (!command && typeof cli[context] === 'function') {
+    cli[context]();
+  } else if (command && typeof cli[context][command] === 'function') {
+    cli[context][command](opts);
+  } else {
+    printUsage(cli[context]);
+  }
 }
 
 if (!cli[context]) {
-	printUsage(cli);
+  printUsage(cli);
 }

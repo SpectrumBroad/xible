@@ -1,35 +1,38 @@
 {
 
-	"webserver": {
-		"port": 9600
-	},
+  "webserver": {
+    "portnumber": 9600,
+    "ssl": {
+      "portnumber": 9601
+    }
+  },
 
-	"nodes": {
-		"path": "~/.xible/nodes"
-	},
+  "nodes": {
+    "path": "~/.xible/nodes"
+  },
 
-	"flows": {
-		"path": "~/.xible/flows",
-		"initlevel": 0
-	},
+  "flows": {
+    "path": "~/.xible/flows",
+    "initlevel": 0
+  },
 
-	"vault": {
-		"path": "~/.xible/vault.json"
-	},
+  "vault": {
+    "path": "~/.xible/vault.json"
+  },
 
-	"registry": {
-		"url": "https://registry.xible.io",
+  "registry": {
+    "url": "https://registry.xible.io",
 
-		"nodepacks": {
-			"allowpublish": true,
-			"allowinstall": true
-		},
+    "nodepacks": {
+      "allowpublish": true,
+      "allowinstall": true
+    },
 
-		"flows": {
-			"allowpublish": true,
-			"allowinstall": true
-		}
+    "flows": {
+      "allowpublish": true,
+      "allowinstall": true
+    }
 
-	}
+  }
 
 }

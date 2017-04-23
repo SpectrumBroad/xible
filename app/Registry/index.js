@@ -1,207 +1,170 @@
-module.exports = function(XIBLE, EXPRESS_APP) {
+'use strict';
 
-	const XibleRegistryWrapper = require('xible-registry-wrapper');
-	const fsExtra = require('fs-extra');
+module.exports = (XIBLE, EXPRESS_APP) => {
+  const XibleRegistryWrapper = require('xible-registry-wrapper');
+  const fsExtra = require('fs-extra');
 
-	let registryUrl = XIBLE.Config.getValue('registry.url');
-	if (!registryUrl) {
-		throw new Error(`"registry.url" not found in config`);
-	}
+  const registryUrl = XIBLE.Config.getValue('registry.url');
+  if (!registryUrl) {
+    throw new Error('"registry.url" not found in config');
+  }
 
-	let xibleRegistry = new XibleRegistryWrapper({
-		url: registryUrl
-	});
+  const xibleRegistry = new XibleRegistryWrapper({
+    url: registryUrl
+  });
 
-	//the tmp path for downloading this node
-	const TMP_REGISTRY_DIR = `/tmp/xibleRegistryTmp`;
+  // the tmp path for downloading this node
+  const TMP_REGISTRY_DIR = '/tmp/xibleRegistryTmp';
 
-	function cleanUp() {
+  function cleanUp() {
+    return new Promise((resolve, reject) => {
+      // remove the tmp dir
+      fsExtra.remove(TMP_REGISTRY_DIR, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
 
-		return new Promise((resolve, reject) => {
+        resolve();
+      });
+    });
+  }
 
-			//remove the tmp dir
-			fsExtra.remove(TMP_REGISTRY_DIR, (err) => {
+  xibleRegistry.NodePack.prototype.install = function nodePackInstall() {
+    if (!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
+      return Promise.reject('Your config does not allow to install nodepacks from the registry');
+    }
 
-				if (err) {
-					return reject(err);
-				}
+    let nodePath = XIBLE.Config.getValue('nodes.path');
+    if (!nodePath) {
+      return Promise.reject('no "nodes.path" configured');
+    }
+    nodePath = XIBLE.resolvePath(nodePath);
 
-				resolve();
+    // get the registrydata
+    return this.getRegistryData().then((registryData) => {
+      if (!registryData.name) {
+        return Promise.reject(`No "name" field found in the registry data for node "${this.name}"`);
+      }
 
-			});
+      return this.getTarballUrl().then(tarballUrl => new Promise((resolve, reject) => {
+        // clean the dir
+        fsExtra.emptyDir(TMP_REGISTRY_DIR, (err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-		});
+          // create a package.json so npm knows where the root lies
+          // remove the dependencies from the package so npm doesn't get confused
+          const packageJson = require(`${__dirname}/../../package.json`);
+          delete packageJson.dependencies;
+          delete packageJson.devDependencies;
 
-	}
+          // write off package.json
+          fsExtra.writeFile(`${TMP_REGISTRY_DIR}/package.json`, JSON.stringify(packageJson), (createPackageJsonErr) => {
+            if (createPackageJsonErr) {
+              reject(createPackageJsonErr);
+              return;
+            }
 
-	xibleRegistry.NodePack.prototype.install = function() {
+            // fork an npm to install the registry url
+            const fork = require('child_process').spawn;
+            const npm = fork('npm', ['install', tarballUrl], {
+              cwd: TMP_REGISTRY_DIR
+            });
 
-		if (!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
-			return Promise.reject(`Your config does not allow to install nodepacks from the registry`);
-		}
+            npm.on('error', npmErr => reject(npmErr));
 
-		let nodePath = XIBLE.Config.getValue('nodes.path');
-		if (!nodePath) {
-			return Promise.reject(`no "nodes.path" configured`);
-		}
-		nodePath = XIBLE.resolvePath(nodePath);
+            npm.on('exit', (exitCode) => {
+              if (exitCode) {
+                reject(`exited with code: ${exitCode}`);
+                return;
+              }
 
-		//get the registrydata
-		return this.getRegistryData().then((registryData) => {
+              // specify the dir where this node will be installed
+              const nodeDestDir = `${nodePath}/${this.name}`;
 
-			if (!registryData.name) {
-				return Promise.reject(`No "name" field found in the registry data for node "${this.name}"`);
-			}
+              // when success, resolve
+              const onSuccess = () => XIBLE.Node
+                .initFromPath(nodeDestDir)
+                .then(cleanUp)
+                .then(() => {
+                  // see if we can/need to reinit flows that are not runnable
+                  const flows = XIBLE.getFlows();
+                  for (const flowId in flows) {
+                    if (!flows[flowId].runnable) {
+                      flows[flowId].initJson(flows[flowId].json);
+                    }
+                  }
+                })
+                .then(resolve)
+                .catch((onSuccessErr) => {
+                  reject(onSuccessErr);
+                });
 
-			return this.getTarballUrl().then((tarballUrl) => {
+              // remove existing node directory
+              fsExtra.emptyDir(nodeDestDir, (removeExistingNodeErr) => {
+                if (removeExistingNodeErr) {
+                  reject(removeExistingNodeErr);
+                  return;
+                }
 
-				return new Promise((resolve, reject) => {
+                // first move the node itself
+                fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules/${registryData.name}`, nodeDestDir, {
+                  overwrite: true
+                }, (moveNodeErr) => {
+                  if (moveNodeErr) {
+                    reject(moveNodeErr);
+                    return;
+                  }
 
-					//clean the dir
-					fsExtra.emptyDir(TMP_REGISTRY_DIR, (err) => {
+                  // check if there's anything left in node_modules
+                  fsExtra.readdir(`${TMP_REGISTRY_DIR}/node_modules`, (remainingNodeModulesErr, files) => {
+                    if (remainingNodeModulesErr) {
+                      reject(remainingNodeModulesErr);
+                      return;
+                    }
 
-						if (err) {
-							return reject(err);
-						}
+                    if (!files.length) {
+                      onSuccess();
+                      return;
+                    }
 
-						//create a package.json so npm knows where the root lies
-						//remove the dependencies from the package so npm doesn't get confused
-						let packageJson = require(`${__dirname}/../../package.json`);
-						delete packageJson.dependencies;
-						delete packageJson.devDependencies;
+                    // move the rest of the node_modules
+                    fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules`, `${nodeDestDir}/node_modules`, {
+                      overwrite: true
+                    }, (moveNodeModulesErr) => {
+                      if (moveNodeModulesErr) {
+                        reject(moveNodeModulesErr);
+                        return;
+                      }
 
-						//write off package.json
-						fsExtra.writeFile(`${TMP_REGISTRY_DIR}/package.json`, JSON.stringify(packageJson), (err) => {
+                      onSuccess();
+                    });
+                  });
+                });
+              });
+            });
 
-							if (err) {
-								return reject(err);
-							}
+            npm.stdout.on('data', (data) => {
+              console.log(data.toString());
+            });
 
-							//fork an npm to install the registry url
-							const fork = require('child_process').spawn;
-							const npm = fork(`npm`, ['install', tarballUrl], {
-								cwd: TMP_REGISTRY_DIR
-							});
+            npm.stderr.on('data', (data) => {
+              console.log(data.toString());
+            });
+          });
+        });
+      }));
+    }).catch(err => cleanUp().then(() => Promise.reject(err)).catch(() => Promise.reject(err)));
+  };
 
-							npm.on('error', (err) => {
-								return reject(err);
-							});
+  if (EXPRESS_APP) {
+    require('./routes.js')(xibleRegistry, XIBLE, EXPRESS_APP);
+  }
 
-							npm.on('exit', (exitCode) => {
-
-								if (exitCode) {
-									return reject(`exited with code: ${exitCode}`);
-								}
-
-								//specify the dir where this node will be installed
-								let nodeDestDir = `${nodePath}/${this.name}`;
-
-								//when success, resolve
-								let onSuccess = () => {
-									return XIBLE.Node
-										.initFromPath(nodeDestDir)
-										.then(cleanUp)
-										.then(() => {
-
-											//see if we can/need to reinit flows that are not runnable
-											let flows = XIBLE.getFlows();
-											for(let flowId in flows) {
-
-												if(!flows[flowId].runnable) {
-													flows[flowId].initJson(flows[flowId].json);
-												}
-
-											}
-
-										})
-										.then(resolve)
-										.catch((err) => {
-											reject(err);
-										});
-								};
-
-								//remove existing node directory
-								fsExtra.emptyDir(nodeDestDir, (err) => {
-
-									if (err) {
-										return reject(err);
-									}
-
-									//first move the node itself
-									fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules/${registryData.name}`, nodeDestDir, {
-										overwrite: true
-									}, (err) => {
-
-										if (err) {
-											return reject(err);
-										}
-
-										//check if there's anything left in node_modules
-										fsExtra.readdir(`${TMP_REGISTRY_DIR}/node_modules`, (err, files) => {
-
-											if (err) {
-												return reject(err);
-											}
-
-											if (!files.length) {
-												return onSuccess();
-											}
-
-											//move the rest of the node_modules
-											fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules`, `${nodeDestDir}/node_modules`, {
-												overwrite: true
-											}, (err) => {
-
-												if (err) {
-													return reject(err);
-												}
-
-												return onSuccess();
-
-											});
-
-										});
-
-									});
-
-								});
-
-							});
-
-							npm.stdout.on('data', (data) => {
-								console.log(data.toString());
-							});
-
-							npm.stderr.on('data', (data) => {
-								console.log(data.toString());
-							});
-
-						});
-
-					});
-
-				});
-
-			});
-
-		}).catch((err) => {
-
-			return cleanUp().then(() => {
-				return Promise.reject(err);
-			}).catch((newErr) => {
-				return Promise.reject(err);
-			});
-
-		});
-
-	};
-
-	if (EXPRESS_APP) {
-		require('./routes.js')(xibleRegistry, XIBLE, EXPRESS_APP);
-	}
-
-	return {
-		Registry: xibleRegistry
-	};
-
+  return {
+    Registry: xibleRegistry
+  };
 };

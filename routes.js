@@ -1,36 +1,33 @@
-module.exports = function(XIBLE, EXPRESS_APP) {
+'use strict';
 
-	EXPRESS_APP.get('/api/validateFlowPermissions', (req, res) => {
+module.exports = (XIBLE, EXPRESS_APP) => {
+  EXPRESS_APP.get('/api/validateFlowPermissions', (req, res) => {
+    XIBLE.Flow.validatePermissions().then((result) => {
+      res.json(result);
+    });
+  });
 
-		XIBLE.Flow.validatePermissions().then((result) => {
-			res.json(result);
-		});
+  EXPRESS_APP.get('/api/serverDate', (req, res) => {
+    res.json(Date.now());
+  });
 
-	});
+  // send out any existing statuses
+  EXPRESS_APP.get('/api/persistentWebSocketMessages', (req, res) => {
+    res.json(XIBLE.persistentWebSocketMessages);
+  });
 
-	EXPRESS_APP.get('/api/serverDate', (req, res) => {
-		res.json(Date.now());
-	});
+  // non existing views
+  EXPRESS_APP.get('/views/*.js', (req, res) => {
+    res.status(404).end();
+  });
 
-	//send out any existing statuses
-	EXPRESS_APP.get('/api/persistentWebSocketMessages', (req, res) => {
-		res.json(XIBLE.persistentWebSocketMessages);
-	});
+  EXPRESS_APP.get('*', (req, res, next) => {
+    // node editor content hosting
+    if (/^\/api\/nodes\/[^/]+\/editor\//.test(req.path)) {
+      next();
+      return;
+    }
 
-	//non existing views
-	EXPRESS_APP.get('/views/*.js', (req, res, next) => {
-		res.status(404).end();
-	});
-
-	EXPRESS_APP.get('*', (req, res, next) => {
-
-		//node editor content hosting
-		if (/^\/api\/nodes\/[^\/]+\/editor\//.test(req.path)) {
-			return next();
-		}
-
-		res.sendFile(`${__dirname}/editor/index.htm`);
-
-	});
-
+    res.sendFile(`${__dirname}/editor/index.htm`);
+  });
 };

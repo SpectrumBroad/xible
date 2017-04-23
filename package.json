@@ -1,53 +1,59 @@
 {
-	"name": "xible",
-	"version": "0.3.1",
-	"description": "xible",
-	"license": "MIT",
-	"homepage": "https://xible.io",
-	"author": {
-		"name": "Stefan de Jong"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/spectrumbroad/xible"
-	},
-	"bugs": {
-		"url": "https://github.com/spectrumbroad/xible/issues",
-		"email": "bugs@xible.io"
-	},
-	"keywords": [
-		"xible",
-		"visual",
-		"connector",
-		"wire",
-		"programming",
-		"node"
-	],
-	"scripts": {
-		"start": "node cli.js server start",
-		"debug": "export DEBUG=\"xible*\"; nodemon cli.js server start",
-		"debug-win": "set DEBUG=xible* & nodemon cli.js server start",
-		"inspect": "export DEBUG=\"xible*\"; nodemon --inspect cli.js server start",
-		"inspect-win": "set DEBUG=xible* & nodemon --inspect cli.js server start"
-	},
-	"bin": {
-		"xible": "./cli.js",
-		"xiblepm": "./pmcli.js"
-	},
-	"main": "index.js",
-	"engines": {
-		"node": ">=7.0.0"
-	},
-	"dependencies": {
-		"xible-registry-wrapper": "*",
-		"nopt": "*",
-		"uws": "*",
-		"ws": "*",
-		"debug": "*",
-		"express": "*",
-		"body-parser": "*",
-		"spdy": "*",
-		"sanitize-filename": "*",
-		"fs-extra": "*"
-	}
+  "name": "xible",
+  "version": "0.3.1",
+  "description": "xible",
+  "license": "MIT",
+  "homepage": "https://xible.io",
+  "author": {
+    "name": "Stefan de Jong"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spectrumbroad/xible"
+  },
+  "bugs": {
+    "url": "https://github.com/spectrumbroad/xible/issues",
+    "email": "bugs@xible.io"
+  },
+  "keywords": [
+    "xible",
+    "visual",
+    "connector",
+    "wire",
+    "programming",
+    "node"
+  ],
+  "scripts": {
+    "start": "node cli.js server start",
+    "debug": "export DEBUG=\"xible*\"; nodemon cli.js server start",
+    "debug-win": "set DEBUG=xible* & nodemon cli.js server start",
+    "inspect": "export DEBUG=\"xible*\"; nodemon --inspect cli.js server start",
+    "inspect-win": "set DEBUG=xible* & nodemon --inspect cli.js server start"
+  },
+  "bin": {
+    "xible": "./cli.js",
+    "xiblepm": "./pmcli.js"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">=7.0.0"
+  },
+  "dependencies": {
+    "xible-registry-wrapper": "*",
+    "nopt": "*",
+    "ws": "*",
+    "debug": "*",
+    "express": "*",
+    "body-parser": "*",
+    "spdy": "*",
+    "sanitize-filename": "*",
+    "fs-extra": "*"
+  },
+  "devDependencies": {
+    "eslint": "*",
+    "eslint-plugin-import": "*",
+    "eslint-config-airbnb": "*",
+    "eslint-plugin-jsx-a11y": "*",
+    "eslint-plugin-react": "*"
+  }
 }
