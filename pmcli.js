@@ -223,10 +223,9 @@ const cli = {
         .getByName(ARG)
         .then((nodePack) => {
           if (!nodePack) {
-            logError(`Nodepack "${ARG}" does not exist`);
-            return;
+            return Promise.reject(`Nodepack "${ARG}" does not exist`);
           }
-          nodePack.install();
+          return nodePack.install();
         })
         .catch(err => logError(err));
     },
