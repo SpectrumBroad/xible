@@ -11,13 +11,17 @@ let express;
 const nodeDebug = debug('xible:node');
 
 module.exports = (XIBLE, EXPRESS_APP) => {
+  /**
+  * Node class
+  * @extends EventEmitter
+  */
   class Node extends EventEmitter {
 
     constructor(obj) {
       super();
 
       this.name = obj.name;
-      this.type = obj.type
+      this.type = obj.type;
       this.description = obj.description;
       this.nodeExists = true;
       this.hostsEditorContent = obj.hostsEditorContent;
@@ -411,8 +415,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Adds a status message to a node, visible in the editor.
     * @param {Object} status
     * @param {String} status.message Text message to show.
-    * @param {String} [status.color] Color for the indicator next to the text message. If none provided, the CSS file of the editor decides on a appropriate default color.
-    * @returns {Number} Returns an identifier, which can be used to update the status through node.updateStatusById, or remove it through removeStatusById.
+    * @param {String} [status.color] Color for the indicator next to the text message.
+    * If none provided, the CSS file of the editor decides on a appropriate default color.
+    * @returns {Number} Returns an identifier,
+    * which can be used to update the status through node.updateStatusById,
+    * or remove it through removeStatusById.
     */
     addStatus(status) {
       if (!status) {
@@ -439,7 +446,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Removes a progress bar referred to by it sidentifier.
     * @param {Number} statusId Identifier of the progress bar to remove.
-    * @param {Number} [timeout] The amount of time in milliseconds before actually removing the progress bar.
+    * @param {Number} [timeout]
+    * The amount of time in milliseconds before actually removing the progress bar.
     */
     removeProgressBarById(statusId, timeout) {
       this.removeStatusById(statusId, timeout);
@@ -448,7 +456,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Removes a status referred to by it sidentifier.
     * @param {Number} statusId Identifier of the status to remove.
-    * @param {Number} [timeout] The amount of time in milliseconds before actually removing the status.
+    * @param {Number} [timeout]
+    * The amount of time in milliseconds before actually removing the status.
     */
     removeStatusById(statusId, timeout) {
       if (!statusId) {
@@ -488,10 +497,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Overwrites the tracker message. This message is visibleabove a node in the editor, and usually used to show when the node got triggered.
+    * Overwrites the tracker message.
+    * This message is visible above a node in the editor,
+    * and usually used to show when the node got triggered.
     * @param {Object} status
     * @param {String} status.message Text message to show.
-    * @param {String} [status.color] Color for the indicator next to the text message. If none provided, the CSS file of the editor decides on a appropriate default color.
+    * @param {String} [status.color] Color for the indicator next to the text message.
+    * If none provided, the CSS file of the editor decides on a appropriate default color.
     */
     setTracker(status) {
       if (!status) {
@@ -529,13 +541,17 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Raises an error on the node, bubbled to the flow. Calls setTracker() on the node with the error message.
-    * If the flow contains an "error" event listener, the flow will not stop. This behaviour is demonstrated by including a "xible.node.onerror" node in the flow.
+    * Raises an error on the node, bubbled to the flow.
+    * Calls setTracker() on the node with the error message.
+    * If the flow contains an "error" event listener, the flow will not stop.
+    * This behaviour is demonstrated by including a "xible.node.onerror" node in the flow.
     * Note that throwing an error using "throw" will always stop the flow.
     * Raising an error in a node should not trigger any outputs.
     * @param {Error} err An error object to raise.
-    * @param {FlowState} err.state Flowstate at point of the error. Either this or the state argument should be provided.
-    * @param {FlowState} state Flowstate at point of the error. Either this or the err.state argument should be provided.
+    * @param {FlowState} err.state Flowstate at point of the error.
+    * Either this or the state argument should be provided.
+    * @param {FlowState} state Flowstate at point of the error.
+    * Either this or the err.state argument should be provided.
     */
     error(err, state) {
       if (!(state instanceof XIBLE.FlowState) && !(err.state instanceof XIBLE.FlowState)) {
@@ -586,7 +602,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   }
 
-
+  /**
+  * Abstract Node Input/Output class.
+  * @extends EventEmitter
+  */
   class NodeIo extends EventEmitter {
 
     constructor(obj) {
@@ -642,6 +661,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return jsonObj;
     }
 
+    /**
+    * Confirms whether or not the NodeIo is connected. Also checks for global connections.
+    * @returns {Boolean} True if connected, false if not.
+    */
     isConnected() {
       let conns = this.connectors;
 
@@ -659,9 +682,18 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   }
 
-
+  /**
+  * Class for inputs of a Node.
+  * @extends NodeIo
+  */
   class NodeInput extends NodeIo {
 
+    /**
+    * Fetches all input values for this input.
+    * @param {FlowState} state The flowstate at the time of calling.
+    * @returns {Promise.<Array>} An array of all values as returned by the outputs on the other ends of connected connectors or globals.
+    * If any of the outputs returns an array, it will be concatened to the return array, instead of pushed.
+    */
     getValues(state) {
       Node.flowStateCheck(state);
 
@@ -694,11 +726,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             // we only send arrays between nodes
             // we don't add non existant values
             // we concat everything
-            if (typeof value !== 'undefined' && !Array.isArray(value)) {
-              value = [value];
-            }
-            if (typeof value !== 'undefined') {
-              values = values.concat(value);
+            if (value !== undefined) {
+              if (Array.isArray(value)) {
+                values = values.concat(value);
+              } else {
+                values.push(value);
+              }
             }
 
             // all done
@@ -712,9 +745,21 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   }
 
+  /**
+  * Class for outputs of a Node.
+  * @extends NodeIo
+  */
   class NodeOutput extends NodeIo {
 
+    /**
+    * Triggers an output with type === 'trigger'
+    * @param {FlowState} state The flowstate at the time of calling.
+    * @throws {Error} Throws whenever this.type !== 'trigger'.
+    */
     trigger(state) {
+      if (this.type !== 'trigger') {
+        throw new Error('The output must be of type "trigger".');
+      }
       Node.flowStateCheck(state);
 
       this.node.emit('triggerout', this);
