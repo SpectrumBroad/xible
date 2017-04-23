@@ -323,7 +323,7 @@ const cli = {
             return Promise.reject('No token returned.');
           }
 
-          setUserToken(token);
+          return setUserToken(token);
         })
         .catch(err => logError(err));
     },
@@ -371,7 +371,7 @@ const cli = {
                 return Promise.reject('No token returned.');
               }
 
-              setUserToken(token);
+              return setUserToken(token);
             });
         })
         .catch(err => logError(err));
