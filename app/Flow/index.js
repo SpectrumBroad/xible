@@ -817,6 +817,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         this.worker.on('disconnect', () => {
           flowDebug('worker disconnected from master');
           this.usage = null;
+
+          // cleanup all open statuses
+          XIBLE.broadcastWebSocket({
+            method: 'xible.flow.removeAllStatuses',
+            flowId: this._id
+          });
         });
       });
     }
@@ -984,12 +990,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 clearTimeout(killTimeout);
                 killTimeout = null;
               }
-
-              // cleanup all open statuses
-              XIBLE.broadcastWebSocket({
-                method: 'xible.flow.removeAllStatuses',
-                flowId: this._id
-              });
             });
 
             this.worker.send({
