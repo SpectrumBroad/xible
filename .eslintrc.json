@@ -20,7 +20,10 @@
     "default-case": "off",
     "strict": ["error", "global"],
     "no-console": "off",
-    "no-continue": "off"
+    "no-continue": "off",
+    "guard-for-in": "off",
+    "no-restricted-syntax": ["off"],
+    "no-param-reassign": "off"
   },
   "plugins": [
     "import"

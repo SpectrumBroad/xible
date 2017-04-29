@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
@@ -148,7 +150,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Tries to fetch the structure.json from a directory. Also checks for editor contents.
     * @param {String} dirPath Path to the directory containting the structure.json.
-    * @returns {Promise.<Object>} Promise which resolves after the structure is complete, or cannot be found.
+    * @returns {Promise.<Object>} Promise which resolves after the structure is complete,
+    * or cannot be found.
     * @private
     */
     static getStructure(dirPath) {
@@ -188,9 +191,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Initializes all nodes found in a certain path, recursively, by running getStructures() on that path, and hosting editor contents if applicable.
-    * @param {String} nodePath Path to the directory containting the nodes. If the directory does not exist, it will be created.
-    * @returns {Promise} A Promise which resolves after calling getStructures(), hosting editor contents and adding the result using XIBLE.addNode().
+    * Initializes all nodes found in a certain path, recursively,
+    * by running getStructures() on that path, and hosting editor contents if applicable.
+    * @param {String} nodePath Path to the directory containting the nodes.
+    * If the directory does not exist, it will be created.
+    * @returns {Promise} A Promise which resolves after calling getStructures(),
+    * hosting editor contents and adding the result using XIBLE.addNode().
     * @private
     */
     static initFromPath(nodePath) {
@@ -306,10 +312,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Adds a progress bar to the node, visible in the editor.
     * @param {Object} status
     * @param {String} [status.message] A text message representing the context of the progress bar.
-    * @param {Number} [status.percentage=0] The starting point of the progress bar as a percentage. Value can range from 0 to (including) 100.
-    * @param {Number} [status.updateOverTime] Specifies the time in milliseconds to automatically update the progress bar to 100% from the given percentage value.
-    * @param {Number} [status.timeout] Timeout in milliseconds after which the progress bar disappears.
-    * @returns {Number} Returns an identifier, which can be used to update the status of the progress bar through node.updateProgressBarById, or remove the progress bar through removeProgressBarById.
+    * @param {Number} [status.percentage=0] The starting point of the progress bar as a percentage.
+    * Value can range from 0 to (including) 100.
+    * @param {Number} [status.updateOverTime] Specifies the time in milliseconds
+    * to automatically update the progress bar to 100% from the given percentage value.
+    * @param {Number} [status.timeout] Timeout in milliseconds
+    * after which the progress bar disappears.
+    * @returns {Number} Returns an identifier,
+    * which can be used to update the status of the progress bar through node.updateProgressBarById,
+    * or remove the progress bar through removeProgressBarById.
     */
     addProgressBar(status) {
       if (!status) {
@@ -351,9 +362,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Updates the status on an existing progress bar.
-    * @param {Number} statusId The identifier of the existing progress bar, as returned by addProgressBar().
+    * @param {Number} statusId The identifier of the existing progress bar,
+    * as returned by addProgressBar().
     * @param {Object} status
-    * @param {Number} status.percentage The point of the progress bar as a percentage. Value can range from 0 to (including) 100.
+    * @param {Number} status.percentage The point of the progress bar as a percentage.
+    * Value can range from 0 to (including) 100.
     * @returns {Number} Returns the given statusId.
     */
     updateProgressBarById(statusId, status) {
@@ -384,7 +397,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @param {Number} statusId The identifier of the existing status, as returned by addStatus().
     * @param {Object} status
     * @param {String} status.message Text message to show.
-    * @param {String} [status.color] Color for the indicator next to the text message. If none provided, the CSS file of the editor decides on a appropriate default color.
+    * @param {String} [status.color] Color for the indicator next to the text message.
+    * If none provided, the CSS file of the editor decides on a appropriate default color.
     * @returns {Number} Returns the given statusId.
     */
     updateStatusById(statusId, status) {
@@ -691,8 +705,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Fetches all input values for this input.
     * @param {FlowState} state The flowstate at the time of calling.
-    * @returns {Promise.<Array>} An array of all values as returned by the outputs on the other ends of connected connectors or globals.
-    * If any of the outputs returns an array, it will be concatened to the return array, instead of pushed.
+    * @returns {Promise.<Array>} An array of all values
+    * as returned by the outputs on the other ends of connected connectors or globals.
+    * If any of the outputs returns an array,
+    * it will be concatened to the return array, instead of pushed.
     */
     getValues(state) {
       Node.flowStateCheck(state);
