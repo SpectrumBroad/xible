@@ -557,7 +557,7 @@ View.routes['/editor'] = function(EL) {
 
 		setFlowTabState(flow, li);
 
-		flow.on('save', () => {
+		flow.on('loadJson', () => {
 			setFlowTabState(flow, li);
 		});
 
