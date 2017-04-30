@@ -471,6 +471,27 @@ View.routes['/editor'] = function(EL) {
 	//add the flow names to the flow tab list
 	let flowListUl = document.getElementById('flowList');
 
+	// disable some buttons when this flow is notRunnable
+	function setLoadedFlowState(flow) {
+		if(flow !== xibleEditor.loadedFlow) {
+			return;
+		}
+
+		if(!flow.runnable) {
+			document.getElementById('flowNotRunnable').classList.remove('hidden');
+			document.getElementById('xibleFlowStartButton').disabled = true;
+			document.getElementById('xibleFlowStopButton').disabled = true;
+			document.getElementById('xibleFlowDeployButton').disabled = true;
+		} else {
+			document.getElementById('flowNotRunnable').classList.add('hidden');
+			document.getElementById('xibleFlowStartButton').disabled = false;
+			document.getElementById('xibleFlowStopButton').disabled = false;
+			if(xibleEditor.browserSupport) {
+				document.getElementById('xibleFlowDeployButton').disabled = false;
+			}
+		}
+	}
+
 	function setFlowTabState(flow, li) {
 
 		li.classList.remove('notRunnable', 'initializing', 'initialized', 'started', 'starting', 'stopped', 'stopping', 'direct');
@@ -482,6 +503,8 @@ View.routes['/editor'] = function(EL) {
 		if (flow.directed) {
 			li.classList.add('direct');
 		}
+
+		setLoadedFlowState(flow);
 
 		switch (flow.state) {
 
@@ -533,20 +556,7 @@ View.routes['/editor'] = function(EL) {
 
 			xibleEditor.viewFlow(flow);
 
-			// disable some buttons when this flow is notRunnable
-			if(!flow.runnable) {
-				document.getElementById('flowNotRunnable').classList.remove('hidden');
-				document.getElementById('xibleFlowStartButton').disabled = true;
-				document.getElementById('xibleFlowStopButton').disabled = true;
-				document.getElementById('xibleFlowDeployButton').disabled = true;
-			} else {
-				document.getElementById('flowNotRunnable').classList.add('hidden');
-				document.getElementById('xibleFlowStartButton').disabled = false;
-				document.getElementById('xibleFlowStopButton').disabled = false;
-				if(xibleEditor.browserSupport) {
-					document.getElementById('xibleFlowDeployButton').disabled = false;
-				}
-			}
+			setLoadedFlowState(flow);
 
 			//get all persistent websocket messages
 			xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
