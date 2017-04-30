@@ -12,6 +12,9 @@ View.routes['/editor'] = function(EL) {
 			<p id="browserSupportAttachShadow" class="status alert hidden">
 				Your browser does not support the necessary features to enable all editor functionality.
 			</p>
+			<p id="flowNotRunnable" class="status alert hidden">
+				This flow cannot be started because it contains nodes that don't exist in the given configuration.
+			</p>
 			<section class="buttons">
 				<button type="button" id="xibleFlowDeployButton">Deploy</button>
 				<button type="button" id="xibleFlowStartButton">Start</button>
@@ -530,21 +533,30 @@ View.routes['/editor'] = function(EL) {
 
 			xibleEditor.viewFlow(flow);
 
+			// disable some buttons when this flow is notRunnable
+			if(!flow.runnable) {
+				document.getElementById('flowNotRunnable').classList.remove('hidden');
+				document.getElementById('xibleFlowStartButton').disabled = true;
+				document.getElementById('xibleFlowStopButton').disabled = true;
+				document.getElementById('xibleFlowDeployButton').disabled = true;
+			} else {
+				document.getElementById('flowNotRunnable').classList.add('hidden');
+				document.getElementById('xibleFlowStartButton').disabled = false;
+				document.getElementById('xibleFlowStopButton').disabled = false;
+				if(xibleEditor.browserSupport) {
+					document.getElementById('xibleFlowDeployButton').disabled = false;
+				}
+			}
+
 			//get all persistent websocket messages
 			xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
-
 				for (let flowId in messages) {
-
 					for (let nodeId in messages[flowId]) {
-
 						for (let statusId in messages[flowId][nodeId]) {
 							xibleEditor.webSocketMessageHandler(messages[flowId][nodeId][statusId]);
 						}
-
 					}
-
 				}
-
 			});
 
 		};
