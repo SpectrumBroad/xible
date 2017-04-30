@@ -233,7 +233,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         const nodeConstr = XIBLE.getNodeByName(node.name);
         let xibleNode;
 
-        // init a dummy node directly based on the json and ensure the flow is set to unconstructable
+        // init a dummy node directly based on the json
+        // and ensure the flow is set to not runnable
         if (!nodeConstr) {
           flowDebug(`Node "${node.name}" does not exist`);
 
@@ -333,6 +334,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       XIBLE.addFlow(this);
+
+      XIBLE.broadcastWebSocket({
+        method: 'xible.flow.loadJson',
+        runnable: this.runnable,
+        flowId: this._id
+      });
     }
 
     /**
@@ -385,6 +392,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         if (XIBLE) {
           delete XIBLE.flows[this._id];
         }
+
+        XIBLE.broadcastWebSocket({
+          method: 'xible.flow.delete',
+          flowId: this._id
+        });
       });
     }
 

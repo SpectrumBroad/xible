@@ -187,6 +187,11 @@ module.exports = function(XIBLE) {
 
 				switch (json.method) {
 
+					case 'xible.flow.loadJson':
+						this.runnable = json.runnable;
+						this.emit('loadJson');
+						break;
+
 					case 'xible.flow.removeAllStatuses':
 						this.removeAllStatuses();
 						this.emit('removeAllStatuses');
@@ -203,6 +208,7 @@ module.exports = function(XIBLE) {
 						break;
 
 					case 'xible.flow.starting':
+						this.runnable = true;
 						this.state = Flow.STATE_STARTING;
 						if (json.directed) {
 							this.directed = true;
@@ -213,6 +219,7 @@ module.exports = function(XIBLE) {
 						break;
 
 					case 'xible.flow.started':
+						this.runnable = true;
 						this.state = Flow.STATE_STARTED;
 						if (json.directed) {
 							this.directed = true;
@@ -223,6 +230,7 @@ module.exports = function(XIBLE) {
 						break;
 
 					case 'xible.flow.stopping':
+						this.runnable = true;
 						this.state = Flow.STATE_STOPPING;
 						this.emit('stopping', json);
 						break;
@@ -1131,6 +1139,9 @@ module.exports = function(XIBLE) {
 			}
 			return outputs;
 
+		}
+
+		removeAllStatuses() {
 		}
 
 	}

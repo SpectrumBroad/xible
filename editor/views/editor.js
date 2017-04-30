@@ -472,6 +472,10 @@ View.routes['/editor'] = function(EL) {
 
 		li.classList.remove('notRunnable', 'initializing', 'initialized', 'started', 'starting', 'stopped', 'stopping', 'direct');
 
+		if (!flow.runnable) {
+			li.classList.add('notRunnable');
+		}
+
 		if (flow.directed) {
 			li.classList.add('direct');
 		}
@@ -513,9 +517,6 @@ View.routes['/editor'] = function(EL) {
 		let a = li.appendChild(document.createElement('a'));
 		a.appendChild(document.createTextNode(flow._id));
 		a.setAttribute('title', flow._id);
-		if (!flow.runnable) {
-			li.classList.add('notRunnable');
-		}
 		a.onclick = () => {
 
 			mainViewHolder.navigate(`/editor/${flow._id}`, true);
@@ -555,6 +556,10 @@ View.routes['/editor'] = function(EL) {
 		}
 
 		setFlowTabState(flow, li);
+
+		flow.on('save', () => {
+			setFlowTabState(flow, li);
+		});
 
 		flow.on('initializing', () => {
 			setFlowTabState(flow, li);
