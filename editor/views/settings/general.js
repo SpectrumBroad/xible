@@ -77,9 +77,9 @@ View.routes['/settings/general'] = function(EL) {
 
 				<dt>
 					<label for="settingsGeneralFlowsInitLevel">
-						Init level
+						Initialization level
 						<div>
-							Default initializition level that flows are kept on when they are not active.<br/>
+							Default initialization level that flows are kept on when they are not active.<br/>
 							The higher the level, the faster flows start. However, they also consume more resources without actually running.
 						</div>
 					</label>
