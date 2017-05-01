@@ -232,6 +232,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Adds a {NodeInput} to the node.
+    * @private
     * @param {String} name Name of the input.
     * @param {NodeInput} input Input to add.
     * @returns {NodeInput} Added input, which equals the given input.
@@ -250,6 +251,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Adds a {NodeOutput} to the node.
+    * @private
     * @param {String} name Name of the output.
     * @param {NodeOutput} output Output to add.
     * @returns {NodeOutput} Added output, which equals the given output.
