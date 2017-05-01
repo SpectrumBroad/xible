@@ -17,7 +17,6 @@ if (typeof WScript !== 'undefined') {
 }
 
 process.title = 'xible package manager';
-console.log('XIBLE PACKAGE MANAGER\n');
 
 // basic requires
 const os = require('os');

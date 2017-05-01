@@ -17,20 +17,24 @@ if (typeof WScript !== 'undefined') {
 }
 
 process.title = 'xible';
-console.log('XIBLE\n');
 
 // start with debug logging enabled until we have a 'normal' way of logging
 process.env.DEBUG = 'xible*';
 
+const fs = require('fs');
 const nopt = require('nopt');
 const Xible = require('./index.js');
 
 // option parsing
 const knownOpts = {
-  config: String
+  config: String,
+  user: String,
+  group: String
 };
 const shortHands = {
-  c: '--config'
+  c: '--config',
+  u: '--user',
+  g: '--group'
 };
 const opts = nopt(knownOpts, shortHands);
 const remain = opts.argv.remain;
@@ -38,11 +42,8 @@ const context = remain.shift() || 'help';
 const command = remain.shift();
 const ARG = remain.shift();
 
-// get a xible instance
+// get the config path for XIBLE
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
-const xible = new Xible({
-  configPath: CONFIG_PATH
-});
 
 function logError(msg, exitCode) {
   console.error(msg);
@@ -55,61 +56,143 @@ const cli = {
   flow: {
 
     start() {
-      logError('Not implemented yet');
+      return Promise.reject('Not implemented yet');
     },
     stop() {
-      logError('Not implemented yet');
+      return Promise.reject('Not implemented yet');
     }
 
   },
 
-  server: {
-
+  service: {
+    // TODO: support windows
     install() {
-      // TODO: support windows
+      return new Promise((resolve, reject) => {
+        fs.readFile(`${__dirname}/xible.service`, 'utf8', (err, xibleServiceContents) => {
+          if (err) {
+            reject(`Failed to install service: ${err}`);
+            return;
+          }
 
-      const fs = require('fs-extra');
-      fs.copySync(`${__dirname}/xible.service`, '/etc/systemd/system/xible.service');
-    },
-    enable() {
-      // TODO: support windows
+          const user = opts.user || process.env.SUDO_USER || process.env.USER || 'root';
+          const group = opts.group || opts.user || process.env.SUDO_USER || process.env.USER || 'root';
 
-      this.install();
-      const exec = require('child_process').exec;
-      exec('systemctl enable xible.service', (err, stdout, stderr) => {
-        if (err) {
-          logError(`Failed to enable service: ${err}`);
-          return;
-        }
+          // set the user and group for the service
+          xibleServiceContents = xibleServiceContents.replace(/\$user/g, user);
+          xibleServiceContents = xibleServiceContents.replace(/\$group/g, group);
 
-        if (stderr) {
-          console.log(`${stderr}`);
-        }
-        console.log(`${stdout}`);
-        console.log('Service enabled. Xible will now automatically start at boot.');
+          // save the service
+          fs.writeFile('/etc/systemd/system/xible.service', xibleServiceContents, (writeServiceErr) => {
+            if (writeServiceErr) {
+              reject(`Failed to install service: ${writeServiceErr}`);
+              return;
+            }
+            console.log(`Service installed with User="${user}" and Group="${group}".`);
+            resolve();
+          });
+        });
       });
     },
-    disable() {
-      // TODO: support windows
-
-      const exec = require('child_process').exec;
-      exec('systemctl disable xible.service', (err, stdout, stderr) => {
-        if (err) {
-          logError(`Failed to disable service: ${err}`);
-          return;
-        }
-
-        if (stderr) {
-          console.log(`${stderr}`);
-        }
-        console.log(`${stdout}`);
-        console.log('Service disabled.');
+    remove() {
+      return new Promise((resolve, reject) => {
+        fs.unlink('/etc/systemd/system/xible.service', (err) => {
+          if (err) {
+            reject(`Failed to remove service: ${err}`);
+            return;
+          }
+          console.log('Service removed.');
+          resolve();
+        });
       });
     },
     start() {
-      xible.init();
+      return new Promise((resolve, reject) => {
+        const exec = require('child_process').exec;
+        exec('systemctl start xible.service', (err) => {
+          if (err) {
+            reject(`Failed to start service: ${err}`);
+            return;
+          }
+          console.log('Service started.');
+          resolve();
+        });
+      });
+    },
+    stop() {
+      return new Promise((resolve, reject) => {
+        const exec = require('child_process').exec;
+        exec('systemctl stop xible.service', (err) => {
+          if (err) {
+            reject(`Failed to stop service: ${err}`);
+            return;
+          }
+          console.log('Service stopped.');
+          resolve();
+        });
+      });
+    },
+    status() {
+      return new Promise((resolve) => {
+        const exec = require('child_process').exec;
+        exec('systemctl show xible.service -p ActiveState', (err, stdout) => {
+          if (err) {
+            console.log(`Failed to get service status: ${err}`);
+            return;
+          }
+          stdout = `${stdout}`;
+          if (/=inactive/.test(stdout)) {
+            console.log('inactive');
+          } else if (/=active/.test(stdout)) {
+            console.log('active');
+          } else {
+            console.log('unknown');
+          }
+          resolve();
+        });
+      });
+    },
+    enable() {
+      return this.install()
+        .catch(err => Promise.reject(`Failed to enable service: ${err}`))
+        .then(() => new Promise((resolve, reject) => {
+          const exec = require('child_process').exec;
+          exec('systemctl enable xible.service', (err) => {
+            if (err) {
+              reject(`Failed to enable service: ${err}`);
+              return;
+            }
+            console.log('Service enabled. Xible will now automatically start at boot.');
+            resolve();
+          });
+        }));
+    },
+    disable() {
+      return new Promise((resolve, reject) => {
+        const exec = require('child_process').exec;
+        exec('systemctl disable xible.service', (err) => {
+          if (err) {
+            reject(`Failed to disable service: ${err}`);
+            return;
+          }
+          console.log('Service disabled.');
+          resolve();
+        });
+      });
     }
+  },
+  server: {
+    start() {
+      // setup a XIBLE instance
+      const xible = new Xible({
+        configPath: CONFIG_PATH
+      });
 
+      // init
+      return xible.init();
+    }
+  },
+  start() {
+    return this.server.start();
   }
 
 };
@@ -128,9 +211,11 @@ function printUsage(path) {
 
 if (cli[context]) {
   if (!command && typeof cli[context] === 'function') {
-    cli[context]();
+    cli[context]()
+      .catch(err => logError(err));
   } else if (command && typeof cli[context][command] === 'function') {
-    cli[context][command](opts);
+    cli[context][command]()
+      .catch(err => logError(err));
   } else {
     printUsage(cli[context]);
   }
