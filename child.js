@@ -58,7 +58,7 @@ process.on('message', (message) => {
       }, message.config);
 
       // init the proper nodes
-      let structuredNodes = new Map();
+      let structuredNodes = new Set();
       const flowNodes = message.flow.nodes;
       let nodeName;
       for (let i = 0; i < flowNodes.length; i += 1) {
@@ -66,16 +66,14 @@ process.on('message', (message) => {
         if (structuredNodes.has(nodeName)) {
           continue;
         }
-        structuredNodes.set(nodeName, true);
-
-        const nodeConstr = message.nodes[nodeName];
+        structuredNodes.add(nodeName);
 
         // require the actual node and check it was loaded properly
+        const nodeConstr = message.nodes[nodeName];
         nodeConstr.constructorFunction = requireNode(nodeConstr.path);
         if (!nodeConstr.constructorFunction) {
           continue;
         }
-
         xible.addNode(nodeName, nodeConstr);
       }
       structuredNodes = null;
