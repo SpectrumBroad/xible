@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-Nothing notable at the moment.
+### Fixed
+- Installing nodepacks through the editor or via `xiblepm nodepack install` now works on Windows.
 
 ## [0.4.0] - 2017-04-30
 ### Added

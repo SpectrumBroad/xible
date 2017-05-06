@@ -48,7 +48,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       return this.getTarballUrl().then(tarballUrl => new Promise((resolve, reject) => {
-        // clean the dir
+        // check if the tarbalUrl is safe
+        if (encodeURI(tarballUrl) !== tarballUrl) {
+          reject(new Error('Package URL contains potentially unsafe characters'));
+          return;
+        }
+
+        // clean the tmp dir where we will download the npm package
         fsExtra.emptyDir(TMP_REGISTRY_DIR, (err) => {
           if (err) {
             reject(err);
@@ -68,10 +74,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               return;
             }
 
-            // fork an npm to install the registry url
+            // fork npm to install the registry url
             const fork = require('child_process').spawn;
             const npm = fork('npm', ['install', tarballUrl], {
-              cwd: TMP_REGISTRY_DIR
+              cwd: TMP_REGISTRY_DIR,
+              shell: true
             });
 
             npm.on('error', npmErr => reject(npmErr));
