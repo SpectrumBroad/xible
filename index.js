@@ -284,6 +284,8 @@ class Xible extends EventEmitter {
     this.expressApp = this.express();
     this.expressApp.use(require('body-parser').json());
 
+    this.expressApp.disable('x-powered-by');
+
     // setup default express stuff
     this.expressApp.use((req, res, next) => {
       // check for TLS
@@ -292,24 +294,20 @@ class Xible extends EventEmitter {
         return;
       }
 
-      res.removeHeader('X-Powered-By');
-
-      // disable caching
-      res.header('cache-control', 'private, no-cache, no-store, must-revalidate');
-      res.header('expires', '-1');
-      res.header('pragma', 'no-cache');
-
-      // access control
-      res.header('access-control-allow-origin', '*');
-      res.header('access-control-allow-headers', 'x-access-token, content-type');
-      res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
-
       expressDebug(`${req.method} ${req.originalUrl}`);
 
       if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
       }
+
+      // caching
+      res.header('cache-control', 'private, max-age=2');
+
+      // access control
+      // res.header('access-control-allow-origin', '*');
+      // res.header('access-control-allow-headers', 'x-access-token, content-type');
+      // res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
 
       // local vars for requests
       req.locals = {};

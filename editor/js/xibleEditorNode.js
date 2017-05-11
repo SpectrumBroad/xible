@@ -125,11 +125,9 @@ class XibleEditorNode extends xibleWrapper.Node {
 	getAndProcessEditorContent() {
 
 		let proc = () => {
-
 			this.getEditorContent().then((data) => {
 				this.processEditorContent(data);
 			});
-
 		};
 
 		if (this.editor) {
