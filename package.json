@@ -25,10 +25,11 @@
   ],
   "scripts": {
     "start": "node cli.js server start",
-    "debug": "export DEBUG=\"xible*\"; nodemon cli.js server start",
-    "debug-win": "set DEBUG=xible* & nodemon cli.js server start",
-    "inspect": "export DEBUG=\"xible*\"; nodemon --inspect cli.js server start",
-    "inspect-win": "set DEBUG=xible* & nodemon --inspect cli.js server start"
+    "debug": "export DEBUG=\"xible*\"; ./node_modules/.bin/nodemon cli.js server start",
+    "debug-win": "set DEBUG=xible* & ./node_modules/.bin/nodemon cli.js server start",
+    "inspect": "export DEBUG=\"xible*\"; ./node_modules/.bin/nodemon --inspect cli.js server start",
+    "inspect-win": "set DEBUG=xible* & ./node_modules/.bin/nodemon --inspect cli.js server start",
+    "prepublish": "npm shrinkwrap"
   },
   "bin": {
     "xible": "./cli.js",
@@ -53,7 +54,8 @@
     "eslint": "*",
     "eslint-plugin-import": "*",
     "eslint-config-airbnb": "*",
-    "eslint-plugin-jsx-a11y": "*",
-    "eslint-plugin-react": "*"
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "nodemon": "*"
   }
 }
