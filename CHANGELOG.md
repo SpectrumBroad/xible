@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+Nothing notable at the moment.
+
+## [0.4.1] - 2017-05-14
 ### Fixed
 - Installing nodepacks through the editor or via `xiblepm nodepack install` now works on Windows.
 
@@ -28,6 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/SpectrumBroad/xible/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SpectrumBroad/xible/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/SpectrumBroad/xible/compare/v0.3.0...v0.3.1
