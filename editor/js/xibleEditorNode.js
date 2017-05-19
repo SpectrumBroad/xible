@@ -577,56 +577,43 @@ class XibleEditorNode extends xibleWrapper.Node {
 	}
 
 	convenienceOutputValue() {
-
-		let els = Array.from(this.editorContentEl.querySelectorAll('[data-outputvalue]'));
+		const els = Array.from(this.editorContentEl.querySelectorAll('[data-outputvalue]'));
 		els.forEach((el) => {
-
-			let attr = el.getAttribute('data-outputvalue');
-			let type = el.getAttribute('type');
+			const attr = el.getAttribute('data-outputvalue');
+			const type = el.getAttribute('type');
 
 			//set the default value
 			if (this.data[attr]) {
-
 				if (type === 'checkbox' && el.getAttribute('value') === this.data[attr]) {
 					el.checked = true;
 				} else if (el.nodeName === 'SELECT') {
-
 					Array.from(el.querySelectorAll('option')).forEach((option) => {
-
 						if ((option.getAttribute('value') || option.textContent) === this.data[attr]) {
 							option.selected = true;
 						} else {
 							option.selected = false;
 						}
-
 					});
-
 				} else {
 					el.setAttribute('value', this.data[attr]);
 				}
-
 			} else if (typeof this.data[attr] === 'undefined') {
-
 				if (type === 'checkbox') {
 					el.checked = false;
 				} else {
 					this.data[attr] = el.value;
 				}
-
 			}
 
 			switch (type) {
 
 				//hidden inputs don't trigger 'onchange' or 'oninput'
 				case 'hidden':
-
-					let observer = new MutationObserver((mutations) => {
+					const observer = new MutationObserver((mutations) => {
 						mutations.forEach((mutation) => {
-
 							if (mutation.attributeName === 'value') {
 								this.setData(attr, el.value);
 							}
-
 						});
 					});
 
@@ -635,54 +622,41 @@ class XibleEditorNode extends xibleWrapper.Node {
 						childList: false,
 						characterData: false
 					});
-
 					break;
 
 					//checkbox and radio both don't trigger input event
 				case 'checkbox':
 				case 'radio':
-
 					el.addEventListener('change', () => {
-
 						if (el.checked) {
 							this.setData(attr, el.value);
 						} else {
 							this.setData(attr, null);
 						}
-
 					});
-
 					break;
 
 				default:
-
 					el.addEventListener('input', () => {
 						this.setData(attr, el.value);
 					});
-
 					break;
 
 			}
-
 		});
-
 	}
 
 	convenienceHideIfAttached() {
-
-		let els = Array.from(this.editorContentEl.querySelectorAll('[data-hideifattached]'));
+		const els = Array.from(this.editorContentEl.querySelectorAll('[data-hideifattached]'));
 		els.forEach((el) => {
-
-			let attr = el.getAttribute('data-hideifattached');
+			const attr = el.getAttribute('data-hideifattached');
 			let matchArray;
-			let ioArray = [];
+			const ioArray = [];
 
 			let re = /(input|output)\s*\[\s*name\s*=\s*"?(\w*)"?\s*\]/g;
 			while ((matchArray = re.exec(attr))) {
-
 				let io = this[matchArray[1] + 's'][matchArray[2]];
 				if (io) {
-
 					ioArray.push(io);
 
 					if (io.connectors.length) {
@@ -694,19 +668,13 @@ class XibleEditorNode extends xibleWrapper.Node {
 					});
 
 					io.on('detach', () => {
-
 						if (ioArray.every((io) => !io.connectors.length)) {
 							el.style.display = '';
 						}
-
 					});
-
 				}
-
 			}
-
 		});
-
 	}
 
 }
