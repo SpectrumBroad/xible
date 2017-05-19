@@ -2,6 +2,31 @@ class XibleEditorFlow extends xibleWrapper.Flow {
 
 	constructor(obj) {
 		super(obj);
+
+		//set global appropriately when it's changed
+		this.on('global', (output) => {
+			this.setGlobalFromOutput(output);
+		});
+	}
+
+	setGlobalFromOutput(output) {
+		// if we have another global of this type, ignore
+		let globalOutputsByType = this.getGlobalOutputs().filter((gOutput) => gOutput.type === output.type);
+		if ((!output.global && globalOutputsByType.length) || (output.global && globalOutputsByType.length > 1)) {
+			return;
+		}
+		globalOutputsByType = null;
+
+		for (let i = 0; i < this.nodes.length; ++i) {
+			this.nodes[i].getInputs().forEach((input) => {
+				if (
+					input.type === output.type && !input.connectors.length &&
+					input.global !== false
+				) {
+					input.setGlobal(output.global ? true : undefined);
+				}
+			});
+		}
 	}
 
 	initNodes(nodes) {

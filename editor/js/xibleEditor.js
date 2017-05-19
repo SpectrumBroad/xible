@@ -192,32 +192,6 @@ class XibleEditor extends EventEmitter {
 		this.nodeSelector = new XibleEditorNodeSelector(this);
 	}
 
-	setGlobalFromOutput(flow, output) {
-
-		//if we have another global of this type, ignore
-		let globalOutputsByType = flow.getGlobalOutputs().filter((gOutput) => gOutput.type === output.type);
-		if ((!output.global && globalOutputsByType.length) || (output.global && globalOutputsByType.length > 1)) {
-			return;
-		}
-		globalOutputsByType = null;
-
-		for (let i = 0; i < flow.nodes.length; ++i) {
-
-			flow.nodes[i].getInputs().forEach((input) => { //jshint ignore: line
-
-				if (
-					input.type === output.type && !input.connectors.length &&
-					input.global !== false
-				) {
-					input.setGlobal(output.global ? true : undefined);
-				}
-
-			});
-
-		}
-
-	}
-
 	/**
 	 *	Gets the flows from the Xible API
 	 */
@@ -228,13 +202,8 @@ class XibleEditor extends EventEmitter {
 				return xibleWrapper.Flow.getAll().then((flows) => {
 
 					Object.keys(flows).forEach((flowId) => {
-
 						let flow = new XibleEditorFlow(flows[flowId]);
 						this.flows[flowId] = flow;
-
-						//set global appropriately when it's changed
-						flow.on('global', (output) => this.setGlobalFromOutput(flow, output));
-
 					});
 
 					return this.flows;
@@ -242,25 +211,15 @@ class XibleEditor extends EventEmitter {
 				});
 		*/
 		return new Promise((resolve, reject) => {
-
-			let req = xibleWrapper.httpBase.request('GET', `http${xibleWrapper.baseUrl}/api/flows`);
-
+			const req = xibleWrapper.httpBase.request('GET', `http${xibleWrapper.baseUrl}/api/flows`);
 			req.toObject(Object).then((flows) => {
-
 				for (let flowId in flows) {
-
 					let flow = new XibleEditorFlow(flows[flowId]);
 					this.flows[flowId] = flow;
-
-					//set global appropriately when it's changed
-					flow.on('global', (output) => this.setGlobalFromOutput(flow, output)); //jshint ignore: line
-
 				}
 
 				resolve(this.flows);
-
 			});
-
 		});
 
 	}
@@ -436,7 +395,7 @@ class XibleEditor extends EventEmitter {
 
 		//global outputs
 		node.getGlobalOutputs().forEach((output) => {
-			this.setGlobalFromOutput(this.loadedFlow, output);
+			this.loadedFlow.setGlobalFromOutput(output);
 		});
 
 		globalTypes = null;
