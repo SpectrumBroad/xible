@@ -304,11 +304,6 @@ class Xible extends EventEmitter {
       // caching
       res.header('cache-control', 'private, max-age=2');
 
-      // access control
-      // res.header('access-control-allow-origin', '*');
-      // res.header('access-control-allow-headers', 'x-access-token, content-type');
-      // res.header('access-control-allow-methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS,HEAD');
-
       // local vars for requests
       req.locals = {};
 
