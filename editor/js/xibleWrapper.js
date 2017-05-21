@@ -1324,16 +1324,14 @@ class XibleWrapper extends EventEmitter {
 		});
 
 		let messageHandler = (json) => {
-
 			if (json.method !== 'xible.messages') {
 				this.emit('message', json);
 				return;
 			}
 
-			json.messages.forEach((message) => {
-				messageHandler(message);
-			});
-
+			for(let i = 0; i < json.messages.length; i += 1) {
+				messageHandler(json.messages[i]);
+			}
 		}
 
 		ws.addEventListener('message', (event) => {
