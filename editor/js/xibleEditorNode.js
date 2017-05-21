@@ -459,22 +459,19 @@ class XibleEditorNode extends xibleWrapper.Node {
 	removeAllStatuses() {
 
 		//clear all timeouts
-		for (var statusId in this.statusTimeouts) {
-
+		let statusId;
+		for (statusId in this.statusTimeouts) {
 			window.clearTimeout(this.statusTimeouts[statusId]);
 			this.statusTimeouts[statusId] = null;
 			delete this.statusTimeouts[statusId];
-
 		}
 
 		//destroy the el
 		if (this.statusEl) {
-
 			if (this.statusEl.parentNode) {
 				this.statusEl.parentNode.removeChild(this.statusEl);
 			}
 			this.statusEl = null;
-
 		}
 
 	}

@@ -50,7 +50,7 @@ View.routes['/editor'] = function(EL) {
 		</div>
 	`;
 
-	let xibleEditor = new XibleEditor();
+	let xibleEditor = new XibleEditor(xibleWrapper);
 	let connectionLost = document.getElementById('connectionLost');
 	let permissionsValidate = document.getElementById('validateWritePermissions');
 
@@ -560,10 +560,11 @@ View.routes['/editor'] = function(EL) {
 
 			//get all persistent websocket messages
 			xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
-				for (let flowId in messages) {
-					for (let nodeId in messages[flowId]) {
-						for (let statusId in messages[flowId][nodeId]) {
-							xibleEditor.webSocketMessageHandler(messages[flowId][nodeId][statusId]);
+				let flowId, nodeId, statusId;
+				for (flowId in messages) {
+					for (nodeId in messages[flowId]) {
+						for (statusId in messages[flowId][nodeId]) {
+							xibleEditor.messageHandler(messages[flowId][nodeId][statusId]);
 						}
 					}
 				}
@@ -702,10 +703,7 @@ View.routes['/editor'] = function(EL) {
 
 	//socket connection
 	if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
-
-		xibleEditor.initWebSocket(xibleWrapper.webSocket);
 		loadFlows();
-
 	} else {
 		connectionLost.classList.remove('hidden');
 	}
@@ -733,9 +731,6 @@ View.routes['/editor'] = function(EL) {
 
 		//reload the nodes
 		xibleEditor.nodeSelector.fill();
-
-		xibleEditor.initWebSocket(xibleWrapper.webSocket);
-
 	});
 
 	//clear all flow statuses when connection closes

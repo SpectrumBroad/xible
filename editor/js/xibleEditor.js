@@ -2,9 +2,23 @@ const CHART_MAX_TICKS = 60;
 
 class XibleEditor extends EventEmitter {
 
-	constructor() {
+	constructor(xibleWrapper) {
 
 		super();
+
+		this.xibleWrapper = xibleWrapper;
+
+		// remove all editor statuses when connection closes
+		xibleWrapper.on('close', () => {
+			if (!this.loadedFlow) {
+				return;
+			}
+			this.loadedFlow.removeAllStatuses();
+		});
+
+		xibleWrapper.on('message', (message) => {
+			this.messageHandler(message);
+		});
 
 		//stage element
 		this.element = document.createElement('div');
@@ -199,7 +213,7 @@ class XibleEditor extends EventEmitter {
 		/*
 
 		TODO: should use XibleWrapper.flows.getAll() instead
-				return xibleWrapper.Flow.getAll().then((flows) => {
+				return this.xibleWrapper.Flow.getAll().then((flows) => {
 
 					Object.keys(flows).forEach((flowId) => {
 						let flow = new XibleEditorFlow(flows[flowId]);
@@ -211,7 +225,7 @@ class XibleEditor extends EventEmitter {
 				});
 		*/
 		return new Promise((resolve, reject) => {
-			const req = xibleWrapper.httpBase.request('GET', `http${xibleWrapper.baseUrl}/api/flows`);
+			const req = this.xibleWrapper.httpBase.request('GET', `http${this.xibleWrapper.baseUrl}/api/flows`);
 			req.toObject(Object).then((flows) => {
 				for (let flowId in flows) {
 					let flow = new XibleEditorFlow(flows[flowId]);
@@ -225,14 +239,14 @@ class XibleEditor extends EventEmitter {
 	}
 
 	/**
-	 *	Handles a WebSocket message
-	 *	@param {Object}	json	The message Object, the JSON.parse result of WebSocketMessageEvent.data
-	 */
-	webSocketMessageHandler(json) {
+	* Handles a message from xibleWrapper
+	* @param {Object} json The message Object
+	*/
+	messageHandler(json) {
 
-		var node;
-
-		if (json.nodeId) {
+		// get the node for this message
+		let node;
+		if (json.nodeId && this.loadedFlow) {
 			node = this.loadedFlow.getNodeById(json.nodeId);
 			if (!node) {
 				return;
@@ -243,13 +257,6 @@ class XibleEditor extends EventEmitter {
 			return;
 		}
 		switch (json.method) {
-
-			case 'xible.messages':
-
-				json.messages.forEach((message) => {
-					this.webSocketMessageHandler(message);
-				});
-				break;
 
 			case 'xible.removeAllStatuses':
 
@@ -317,39 +324,6 @@ class XibleEditor extends EventEmitter {
 				break;
 
 		}
-
-	}
-
-	/**
-	 *	Sets up message events for a (open) WebSocket
-	 *	@param	{WebSocket}	socket	The WebSocket to listen to
-	 */
-	initWebSocket(socket) {
-
-		if (!socket) {
-			return;
-		}
-
-		socket.addEventListener('close', (event) => {
-
-			if (!this.loadedFlow) {
-				return;
-			}
-
-			//remove all statuses
-			this.loadedFlow.removeAllStatuses();
-
-		});
-
-		socket.addEventListener('message', (event) => {
-
-			if (!this.loadedFlow) {
-				return;
-			}
-
-			this.webSocketMessageHandler(JSON.parse(event.data));
-
-		});
 
 	}
 
