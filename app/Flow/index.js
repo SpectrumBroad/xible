@@ -102,6 +102,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
       }
 
+      return flows;
+    }
+
+    static init(flowPath) {
+      const flows = this.initFromPath(flowPath);
+      
       // start all flows which had status running before
       // also do some cleaning while we're at it
       const statuses = this.getStatuses();
@@ -121,7 +127,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       flowDebug(`cleared ${preStatusesLength - Object.keys(statuses).length} statuses`);
-
       return flows;
     }
 
