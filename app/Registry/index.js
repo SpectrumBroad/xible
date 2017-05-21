@@ -30,6 +30,51 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     });
   }
 
+  /**
+  * Installs a flow from a registry.
+  * @param {String} altName The name to publish the flow with. Defaults to the flow name.
+  * @returns {Promise}
+  */
+  xibleRegistry.Flow.prototype.install = function flowInstall(altName) {
+    if (!XIBLE.Config.getValue('registry.flows.allowinstall')) {
+      return Promise.reject('Your config does not allow to install flows from the registry');
+    }
+
+    let flowPath = XIBLE.Config.getValue('flows.path');
+    if (!flowPath) {
+      return Promise.reject('no "flows.path" configured');
+    }
+    flowPath = XIBLE.resolvePath(flowPath);
+
+    if (altName) {
+      if (!XIBLE.Flow.validateId(altName)) {
+        return Promise.reject('flow _id/name cannot contain reserved/unsave characters');
+      }
+      this._id = altName;
+      this.name = altName;
+    }
+
+    // remove fields specifically for the registry
+    delete this.publishUserName;
+    delete this.publishDate;
+
+    return new Promise((resolve, reject) => {
+      // write
+      const flowDestPath = `${flowPath}/${this._id}.json`;
+      fsExtra.writeFile(flowDestPath, JSON.stringify(this, null, '\t'), (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
+  };
+
+  /**
+  * Installs a nodepack from a registry.
+  * @returns {Promise}
+  */
   xibleRegistry.NodePack.prototype.install = function nodePackInstall() {
     if (!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
       return Promise.reject('Your config does not allow to install nodepacks from the registry');
