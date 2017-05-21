@@ -201,6 +201,18 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
+    * Validates the _id/name of a flow.
+    * @param {String} _id the _id/name of the flow to be validated.
+    * @returns {Boolean}
+    */
+    static validateId(_id) {
+      if (!sanitizePath) {
+        sanitizePath = require('sanitize-filename');
+      }
+      return _id === sanitizePath(_id);
+    }
+
+    /**
     * Init a flow, including all its nodes and connectors, from an object.
     * @param {Object} json
     * @param {String} json._id
@@ -217,12 +229,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       // only perform this filename check in master for performance reasons
       if (!XIBLE.child) {
-        if (!sanitizePath) {
-          sanitizePath = require('sanitize-filename');
-        }
-
-        if (json._id !== sanitizePath(json._id)) {
-          throw new Error('flow _id cannot contain reserved/unsave characters');
+        if (!Flow.validateId(json._id)) {
+          throw new Error('flow _id/name cannot contain reserved/unsave characters');
         }
       }
 
