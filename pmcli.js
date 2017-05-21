@@ -28,10 +28,13 @@ const Xible = require('./index.js');
 
 // option parsing
 const knownOpts = {
-  config: String
+  config: String,
+  altname: String,
+  force: Boolean
 };
 const shortHands = {
-  c: '--config'
+  c: '--config',
+  f: '--force'
 };
 const opts = nopt(knownOpts, shortHands);
 const remain = opts.argv.remain;
@@ -125,114 +128,242 @@ const cli = {
 
   flow: {
     publish() {
-      logError('Not implemented yet');
+      if (!ARG) {
+        return Promise.reject('The flow name must be provided');
+      }
+
+      if (!xible.Config.getValue('registry.flows.allowpublish')) {
+        return Promise.reject('Your config does not allow to publish flows to the registry');
+      }
+
+      let flowPath = xible.Config.getValue('flows.path');
+      if (!flowPath) {
+        return Promise.reject('no "flows.path" configured');
+      }
+      flowPath = xible.resolvePath(flowPath);
+      xible.Flow.initFromPath(flowPath);
+      const flow = xible.getFlowById(ARG);
+      if (!flow) {
+        return Promise.reject(`No such flow "${ARG}"`);
+      }
+
+      let flowJson = flow.json;
+      const altFlowId = opts.altname;
+      if (altFlowId) {
+        if (!xible.Flow.validateId(altFlowId)) {
+          return Promise.reject('flow _id/name cannot contain reserved/unsave characters');
+        }
+        flowJson = Object.assign({}, flowJson);
+        flowJson._id = altFlowId;
+        flowJson.name = altFlowId;
+      }
+
+      // verify that we have a token
+      const token = getUserToken();
+      if (!token) {
+        return Promise.reject('You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.');
+      }
+
+      // verify that we're logged in
+      return xible.Registry.User
+        .getByToken(token)
+        .catch(getUserErr => Promise.reject(`Failed to get user from token: ${getUserErr}`))
+        .then((user) => {
+          if (!user) {
+            return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
+          }
+
+          // verify if this node had been published before
+          return xible.Registry.Flow
+            .getByName(flow._id)
+            .catch(getFlowErr => Promise.reject(`Failed to get flow from registry: ${getFlowErr}`))
+            .then((registryFlow) => {
+              // verify that whoami equals the remote user
+              if (registryFlow && registryFlow.publishUserName !== user.name) {
+                return Promise.reject(`Flow "${registryFlow._id}" was previously published by "${registryFlow.publishUserName}". You are currently logged in as "${user.name}".`);
+              }
+
+              // publish
+              return xible.Registry.Flow
+                .publish(flowJson, token)
+                .catch(publishErr => Promise.reject(`Failed to publish flow "${flow._id}": ${publishErr}`))
+                .then((publishedFlow) => {
+                  console.log(`Published flow "${publishedFlow._id}".`);
+                });
+            });
+        });
     },
     install() {
-      logError('Not implemented yet');
+      if (!ARG) {
+        return Promise.reject('The flow name must be provided');
+      }
+
+      if (!xible.Config.getValue('registry.flows.allowinstall')) {
+        return Promise.reject('Your config does not allow to install flows from the registry');
+      }
+
+      const altFlowId = opts.altname;
+      let flowPath = xible.Config.getValue('flows.path');
+      if (!flowPath) {
+        return Promise.reject('no "flows.path" configured');
+      }
+      flowPath = xible.resolvePath(flowPath);
+      xible.Flow.initFromPath(flowPath);
+      const flow = xible.getFlowById(altFlowId || ARG);
+
+      // check if the flow already exists
+      if (flow && !opts.force) {
+        return Promise.reject('A flow already exists by this name. Provide --force to overwrite.');
+      }
+
+      return xible.Registry.Flow
+        .getByName(ARG)
+        .then((registryFlow) => {
+          if (!registryFlow) {
+            return Promise.reject(`Flow "${ARG}" does not exist`);
+          }
+          return registryFlow.install(altFlowId)
+            .then(() => console.log(`Installed flow "${altFlowId || registryFlow.name}"`));
+        });
     },
     remove() {
-      logError('Not implemented yet');
+      if (!ARG) {
+        return Promise.reject('The flow name must be provided');
+      }
+
+      let flowPath = xible.Config.getValue('flows.path');
+      if (!flowPath) {
+        return Promise.reject('no "flows.path" configured');
+      }
+      flowPath = xible.resolvePath(flowPath);
+      xible.Flow.initFromPath(flowPath);
+      const flow = xible.getFlowById(ARG);
+
+      if (!flow) {
+        return Promise.reject(`Flow "${ARG}" does not exist`);
+      }
+      return flow.delete()
+        .then(() => console.log(`Flow "${ARG}" removed`));
     },
     search() {
-      logError('Not implemented yet');
+      if (!ARG) {
+        return Promise.reject('The search string must be provided');
+      }
+
+      return xible.Registry.Flow
+        .search(ARG)
+        .then((flows) => {
+          Object.keys(flows).forEach((flowName) => {
+            console.log(`${flowName}`);
+          });
+        });
     }
   },
 
   nodepack: {
     publish() {
       if (!xible.Config.getValue('registry.nodepacks.allowpublish')) {
-        logError('Your config does not allow to publish nodepacks to the registry');
-        return;
+        return Promise.reject('Your config does not allow to publish nodepacks to the registry');
       }
 
       // find package.json and use that name
       // let packageJson=require(`package.json`);
-      fs.readFile('package.json', (err, data) => {
-        if (err) {
-          logError(`Could not read "package.json": ${err}`);
-          return;
-        }
+      return new Promise((resolve, reject) => {
+        fs.readFile('package.json', (err, data) => {
+          if (err) {
+            reject(`Could not read "package.json": ${err}`);
+            return;
+          }
 
-        // check that we have json
-        let packageJson;
-        try {
-          packageJson = JSON.parse(data);
-        } catch (parsePackageJsonErr) {
-          logError(`Could not parse "package.json": ${parsePackageJsonErr}`);
-          return;
-        }
+          // check that we have json
+          let packageJson;
+          try {
+            packageJson = JSON.parse(data);
+          } catch (parsePackageJsonErr) {
+            reject(`Could not parse "package.json": ${parsePackageJsonErr}`);
+            return;
+          }
 
-        // verify that we have a name
-        const nodePackName = packageJson.name;
-        if (!nodePackName) {
-          logError('Could not locate "name" property in "package.json"');
-          return;
-        }
+          // verify that we have a name
+          const nodePackName = packageJson.name;
+          if (!nodePackName) {
+            reject('Could not locate "name" property in "package.json"');
+            return;
+          }
 
-        // verify that we have a token
-        const token = getUserToken();
+          // verify that we have a token
+          const token = getUserToken();
+          if (!token) {
+            reject('You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.');
+            return;
+          }
 
-        if (!token) {
-          logError('You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.');
-          return;
-        }
+          // verify that we're logged in
+          xible.Registry.User
+            .getByToken(token)
+            .catch(getUserErr => reject(`Failed to get user from token: ${getUserErr}`))
+            .then((user) => {
+              if (!user) {
+                reject('User could not be verified. Please login using "xiblepm user login".');
+                return;
+              }
 
-        // verify that we're logged in
-        xible.Registry.User
-          .getByToken(token)
-          .then((user) => {
-            if (!user) {
-              logError('User could not be verified. Please login using "xiblepm user login".');
-              return;
-            }
+              // verify if this node had been published before
+              xible.Registry.NodePack
+                .getByName(nodePackName)
+                .catch(getNodePackErr => reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
+                .then((nodePack) => {
+                  // verify that whoami equals the remote user
+                  if (nodePack && nodePack.publishUserName !== user.name) {
+                    reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
+                    return;
+                  }
 
-            // verify if this node had been published before
-            xible.Registry.NodePack
-              .getByName(nodePackName)
-              .then((nodePack) => {
-                // verify that whoami equals the remote user
-                if (nodePack && nodePack.publishUserName !== user.name) {
-                  logError(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
-                  return;
-                }
-
-                // publish
-                xible.Registry.NodePack
-                  .publish({
-                    name: nodePackName,
-                    registry: {
-                      url: `https://registry.npmjs.com/${nodePackName}`
-                    }
-                  }, token)
-                  .then((publishedNodePack) => {
-                    console.log(`Published nodepack "${publishedNodePack.name}".`);
-                  })
-                  .catch(publishErr => logError(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`));
-              }).catch(getNodePackErr => logError(`Failed to get nodepack from registry: ${getNodePackErr}`));
-          }).catch(getUserErr => logError(`Failed to get user from token: ${getUserErr}`));
+                  // publish
+                  xible.Registry.NodePack
+                    .publish({
+                      name: nodePackName,
+                      registry: {
+                        url: `https://registry.npmjs.com/${nodePackName}`
+                      }
+                    }, token)
+                    .catch(publishErr => reject(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`))
+                    .then((publishedNodePack) => {
+                      console.log(`Published nodepack "${publishedNodePack.name}".`);
+                      resolve();
+                    });
+                });
+            });
+        });
       });
     },
     install() {
       if (!xible.Config.getValue('registry.nodepacks.allowinstall')) {
-        logError('Your config does not allow to install nodepacks from the registry');
-        return;
+        return Promise.reject('Your config does not allow to install nodepacks from the registry');
       }
 
-      xible.Registry.NodePack
+      if (!ARG) {
+        return Promise.reject('The nodepack name must be provided');
+      }
+
+      return xible.Registry.NodePack
         .getByName(ARG)
         .then((nodePack) => {
           if (!nodePack) {
             return Promise.reject(`Nodepack "${ARG}" does not exist`);
           }
           return nodePack.install();
-        })
-        .catch(err => logError(err));
+        });
     },
     remove() {
-      logError('Sorry: not implemented yet.');
+      return Promise.reject('Not implemented yet');
     },
     search() {
-      xible.Registry.NodePack
+      if (!ARG) {
+        return Promise.reject('The search string must be provided');
+      }
+
+      return xible.Registry.NodePack
         .search(ARG)
         .then((nodes) => {
           Object.keys(nodes).forEach((nodeName) => {
@@ -242,8 +373,7 @@ const cli = {
                 console.log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
               });
           });
-        })
-        .catch(err => logError(err));
+        });
     }
   },
 
@@ -257,36 +387,40 @@ const cli = {
       }
 
       xible.Config.setValue(ARG, value);
+      return Promise.resolve();
     },
     delete() {
       xible.Config.deleteValue(ARG);
+      return Promise.resolve();
     },
     get() {
       if (!ARG) {
         this.list();
-        return;
+        return Promise.resolve();
       }
 
       console.log(xible.Config.getValue(ARG));
+      return Promise.resolve();
     },
     list() {
       console.log(JSON.stringify(xible.Config.getAll(), null, '\t'));
+      return Promise.resolve();
     }
   },
 
   user: {
     me() {
-      this.whoami();
+      return this.whoami();
     },
     whoami() {
       const token = getUserToken();
 
       if (!token) {
         console.log('Not logged in.');
-        return;
+        return Promise.resolve();
       }
 
-      xible.Registry.User
+      return xible.Registry.User
         .getByToken(token)
         .then((user) => {
           if (!user) {
@@ -294,16 +428,16 @@ const cli = {
             return;
           }
           console.log(user.name);
-        })
-        .catch(err => logError(err));
+        });
     },
     logout() {
       setUserToken(null);
+      return Promise.resolve();
     },
     login() {
       const user = new xible.Registry.User();
 
-      getUserInput('Enter your username: ')
+      return getUserInput('Enter your username: ')
         .then((userName) => {
           user.name = userName;
           return getUserInput('Enter your password: ', true);
@@ -323,13 +457,12 @@ const cli = {
           }
 
           return setUserToken(token);
-        })
-        .catch(err => logError(err));
+        });
     },
     add() {
       const newUser = new xible.Registry.User();
 
-      getUserInput('Enter your username: ')
+      return getUserInput('Enter your username: ')
         .then((userName) => {
           if (!userName) {
             return Promise.reject('You need a username.');
@@ -372,8 +505,7 @@ const cli = {
 
               return setUserToken(token);
             });
-        })
-        .catch(err => logError(err));
+        });
     }
   }
 
@@ -393,9 +525,11 @@ function printUsage(path) {
 
 if (cli[context]) {
   if (!command && typeof cli[context] === 'function') {
-    cli[context]();
+    cli[context]()
+      .catch(err => logError(err));
   } else if (command && typeof cli[context][command] === 'function') {
-    cli[context][command](opts);
+    cli[context][command]()
+      .catch(err => logError(err));
   } else {
     printUsage(cli[context]);
   }
