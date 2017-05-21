@@ -338,12 +338,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
           method: 'xible.node.addProgressBar',
-          nodeId: this._id,
-          flowId: this.flow._id,
           status
-
         }
 
       });
@@ -353,11 +349,20 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Sends a message to the master process from a worker using Node.js process.send().
+    * Hooks up node.id and node.flow.id to the message property of the given obj parameter.
     * @param {Object} obj The object to send.
+    * @param {String} obj.method The method of this message to call in the master process.
+    * @param {Object} obj.message The message to send.
     * @private
     */
     sendProcessMessage(obj) {
       if (process.connected) {
+        if (obj.message) {
+          obj.message.nodeId = this._id;
+          if (this.flow) {
+            obj.message.flowId = this.flow._id;
+          }
+        }
         process.send(obj);
       }
     }
@@ -379,15 +384,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
           method: 'xible.node.updateProgressBarById',
-          nodeId: this._id,
-          flowId: this.flow._id,
           status: {
             _id: statusId,
             percentage: status.percentage
           }
-
         }
       });
 
@@ -411,16 +412,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
           method: 'xible.node.updateStatusById',
-          nodeId: this._id,
-          flowId: this.flow._id,
           status: {
             _id: statusId,
             message: status.message,
             color: status.color
           }
-
         }
       });
 
@@ -447,12 +444,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
           method: 'xible.node.addStatus',
-          nodeId: this._id,
-          flowId: this.flow._id,
           status
-
         }
       });
 
@@ -483,15 +476,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
           method: 'xible.node.removeStatusById',
-          nodeId: this._id,
-          flowId: this.flow._id,
           status: {
             _id: statusId,
             timeout
           }
-
         }
       });
     }
@@ -503,11 +492,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
-          method: 'xible.node.removeAllStatuses',
-          nodeId: this._id,
-          flowId: this.flow._id
-
+          method: 'xible.node.removeAllStatuses'
         }
       });
     }
@@ -529,12 +514,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.sendProcessMessage({
         method: 'broadcastWebSocket',
         message: {
-
           method: 'xible.node.setTracker',
-          nodeId: this._id,
-          flowId: this.flow._id,
           status
-
         }
       });
     }
