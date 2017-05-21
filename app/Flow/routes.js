@@ -11,6 +11,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
       returnFlows[id] = {
         _id: id,
+        name: id,
         nodes: flow.nodes,
         connectors: flow.json.connectors,
         viewState: flow.json.viewState,
@@ -104,6 +105,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
     const returnFlow = {
       _id: flow._id,
+      name: flow._id,
       nodes: flow.nodes,
       connectors: flow.json.connectors,
       viewState: flow.json.viewState,

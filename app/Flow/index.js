@@ -26,6 +26,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     constructor() {
       super();
 
+      this._id = null;
+      this.name = null;
       this.json = null;
       this.nodes = [];
       this.connectors = [];
@@ -33,7 +35,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.runnable = true;
       this.directed = false;
       this.state = Flow.STATE_STOPPED;
-      this._id = XIBLE.generateObjectId();
       this.initLevel = initLevel;
     }
 
@@ -107,7 +108,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     static init(flowPath) {
       const flows = this.initFromPath(flowPath);
-      
+
       // start all flows which had status running before
       // also do some cleaning while we're at it
       const statuses = this.getStatuses();
@@ -226,6 +227,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       this._id = json._id;
+      this.name = this._id;
+      json.name = this.name;
 
       this.json = json;
       this.nodes = [];
