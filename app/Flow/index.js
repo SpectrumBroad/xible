@@ -55,8 +55,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * This will parse all json files except for _status.json into flows.
     * Note that a path cannot be initiated twice because it is used for saveStatuses()
     * @static
-    * @param {String} path
-    * @param {Object} xible
+    * @param {String} path  The path to the directory containing the flows.
     * @return {Object.<String, Flow>} list of flows by their _id
     */
     static initFromPath(flowPath) {
@@ -106,6 +105,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return flows;
     }
 
+    /**
+    * Initializes all flows from a given path, by running them through initFromPath().
+    * Processes the related flow statuses and starts/inits where necessary.
+    * @param {String} flowPath The path to the directory containing the flows.
+    * @return {Object.<String, Flow>} list of flows by their _id
+    * @since 0.5.0
+    */
     static init(flowPath) {
       const flows = this.initFromPath(flowPath);
 
@@ -133,7 +139,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Validates if writing to the flow path is possible/allowed
-    * @returns {Promise}  true or false
+    * @returns {Promise.<Boolean>} true or false
     */
     static validatePermissions() {
       return new Promise((resolve) => {
@@ -154,9 +160,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * get all flow statuses
-    * @static
-    * @return {Object.<String, Boolean>} statuses
+    * Get all flow statuses.
+    * @return {Object.<String, Boolean>} The statuses per flow name.
     */
     static getStatuses() {
       if (!this.flowPath) {
@@ -182,8 +187,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * save statuses
-    * @static
+    * Save the given statuses to the filesystem.
     * @param {Object.<String, Boolean>} statuses
     */
     static saveStatuses(statuses) {
@@ -201,9 +205,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Validates the _id/name of a flow.
-    * @param {String} _id the _id/name of the flow to be validated.
-    * @returns {Boolean}
+    * Validates that the _id/name of a flow does not contain illegal characters.
+    * @param {String} _id The _id/name of the flow to be validated.
+    * @returns {Boolean} Returns a boolean indicating whether the given _id is allowed (true),
+    * or not (false).
+    * @since 0.5.0
     */
     static validateId(_id) {
       if (!sanitizePath) {
@@ -360,8 +366,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Saves a flow to the configured flows directory.
-    * Only works if this is the master thread.
-    * @return {Promise}
+    * Rejects if this is not the master thread.
+    * @return {Promise.<Flow>}
     */
     save() {
       return new Promise((resolve, reject) => {
@@ -379,8 +385,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Deletes a flow from the configured flows directory.
-    * Only works if this is a the master thread.
-    * @return {Promise}
+    * Rejects if this is not the master thread.
+    * @return {Promise.<Flow>}
     */
     delete() {
       return new Promise((resolve, reject) => {
@@ -418,7 +424,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Adds a node to the flow.
-    * @param {Node} node
+    * @param {Node} node The node to add.
     * @return {Node}
     */
     addNode(node) {
@@ -483,8 +489,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Returns a node from a specific flow by the node._id.
-    * @param {Number} id the _id of the node the be found
-    * @return {Node} the found node
+    * @param {Number} id The _id of the node to be found.
+    * @return {Node|undefined} The found node.
     */
     getNodeById(id) {
       return this.nodes.find(node => node._id === id);
