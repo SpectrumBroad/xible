@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.5.0][] - 2017-06-03
 ### Added
 -   All of the command line `xiblepm flow` context functions now work. This means that you can install flows from the registry, and publish flows to the registry. See [the xiblepm documentation](https://xible.io/docs/commandlinetools/xiblepm.htm#xiblepm) for more information.
 
@@ -39,7 +42,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/SpectrumBroad/xible/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/SpectrumBroad/xible/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SpectrumBroad/xible/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/SpectrumBroad/xible/compare/v0.3.0...v0.3.1
