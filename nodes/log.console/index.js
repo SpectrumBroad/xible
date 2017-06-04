@@ -1,39 +1,32 @@
+'use strict';
+
 function log(str, NODE) {
+  console.log(str);
 
-	console.log(str);
-
-	NODE.addStatus({
-		message: str + '',
-		timeout: 3000
-	});
-
+  NODE.addStatus({
+    message: `${str}`,
+    timeout: 3000
+  });
 }
 
-module.exports = function(NODE) {
+module.exports = (NODE) => {
+  const triggerIn = NODE.getInputByName('trigger');
+  const doneOut = NODE.getOutputByName('done');
+  triggerIn.on('trigger', (conn, state) => {
+    const valueInput = NODE.getInputByName('value');
 
-	let triggerIn = NODE.getInputByName('trigger');
-	let doneOut = NODE.getOutputByName('done');
-	triggerIn.on('trigger', (conn, state) => {
+    if (!valueInput.isConnected()) {
+      log(NODE.data.value || '', NODE);
+      doneOut.trigger(state);
+      return;
+    }
 
-		let valueInput = NODE.getInputByName('value');
+    valueInput.getValues(state).then((strs) => {
+      strs.forEach((str) => {
+        log(str, NODE);
+      });
 
-		if (!valueInput.connectors.length) {
-
-			log(NODE.data.value || '', NODE);
-			return doneOut.trigger(state);
-
-		}
-
-		valueInput.getValues(state).then((strs) => {
-
-			strs.forEach(str => {
-				log(str, NODE);
-			});
-
-			doneOut.trigger(state);
-
-		});
-
-	});
-
+      doneOut.trigger(state);
+    });
+  });
 };

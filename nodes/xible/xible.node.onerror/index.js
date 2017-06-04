@@ -1,27 +1,21 @@
-module.exports = function(NODE) {
+'use strict';
 
-	NODE.on('init', (state) => {
+module.exports = (NODE) => {
+  NODE.on('init', (state) => {
+    NODE.flow.on('error', (error) => {
+      const errState = error.state || state;
+      errState.set(NODE, {
+        error
+      });
 
-		NODE.flow.on('error', (error) => {
+      NODE.getOutputByName('trigger').trigger(errState);
+    });
+  });
 
-			let errState = error.state || state;
-			errState.set(NODE, {
-				error: error
-			});
+  NODE.getOutputByName('error').on('trigger', (conn, state, callback) => {
+    const nodeState = state.get(NODE);
+    const error = (nodeState && nodeState.error) || null;
 
-			NODE.getOutputByName('trigger').trigger(errState);
-
-		});
-
-	});
-
-	NODE.getOutputByName('error').on('trigger', (conn, state, callback) => {
-
-		let nodeState = state.get(NODE);
-		let error = (nodeState && nodeState.error) || null;
-
-		callback(error);
-
-	});
-
+    callback(error);
+  });
 };

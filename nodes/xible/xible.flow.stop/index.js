@@ -1,13 +1,11 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let triggerIn = NODE.getInputByName('trigger');
+module.exports = (NODE) => {
+  const triggerIn = NODE.getInputByName('trigger');
 
-	triggerIn.on('trigger', (conn, state) => {
-
-		process.send({
-			method: "stop"
-		});
-
-	});
-
+  triggerIn.on('trigger', (conn, state) => {
+    process.send({
+      method: 'stop'
+    });
+  });
 };

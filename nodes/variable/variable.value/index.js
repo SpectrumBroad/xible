@@ -1,14 +1,12 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let varIn = NODE.getInputByName('variable');
-	let valueOut = NODE.getOutputByName('value');
+module.exports = (NODE) => {
+  const varIn = NODE.getInputByName('variable');
+  const valueOut = NODE.getOutputByName('value');
 
-	valueOut.on('trigger', (conn, state, callback) => {
-
-		varIn.getValues(state).then((variables) => {
-			callback([].concat(...variables.map((variable) => variable.values)));
-		});
-
-	});
-
+  valueOut.on('trigger', (conn, state, callback) => {
+    varIn.getValues(state).then((variables) => {
+      callback([].concat(...variables.map(variable => variable.values)));
+    });
+  });
 };

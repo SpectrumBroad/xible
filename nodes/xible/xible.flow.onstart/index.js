@@ -1,7 +1,7 @@
-module.exports = function(NODE) {
+'use strict';
 
-	NODE.on('trigger', (state) => {
-		NODE.getOutputByName('trigger').trigger(state);
-	});
-
+module.exports = (NODE) => {
+  NODE.on('trigger', (state) => {
+    NODE.getOutputByName('trigger').trigger(state);
+  });
 };

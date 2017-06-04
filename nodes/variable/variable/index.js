@@ -1,24 +1,16 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let used = false;
-	let refreshing = false;
-	let variable;
+module.exports = (NODE) => {
+  const valueIn = NODE.getInputByName('value');
+  const variableOut = NODE.getOutputByName('variable');
 
-	let valueIn = NODE.getInputByName('value');
-	let variableOut = NODE.getOutputByName('variable');
-
-	variableOut.on('trigger', (conn, state, callback) => {
-
-		//perform a refresh of all inputs and return those values
-		valueIn.getValues(state).then((vals) => {
-
-			callback({
-				name: NODE.data.name,
-				values: vals
-			});
-
-		});
-
-	});
-
+  variableOut.on('trigger', (conn, state, callback) => {
+    // perform a refresh of all inputs and return those values
+    valueIn.getValues(state).then((vals) => {
+      callback({
+        name: NODE.data.name,
+        values: vals
+      });
+    });
+  });
 };

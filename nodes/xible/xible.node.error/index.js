@@ -1,15 +1,13 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let doneOut = NODE.getOutputByName('done');
+module.exports = (NODE) => {
+  const doneOut = NODE.getOutputByName('done');
 
-	let triggerIn = NODE.getInputByName('trigger');
-	triggerIn.on('trigger', (conn, state) => {
+  const triggerIn = NODE.getInputByName('trigger');
+  triggerIn.on('trigger', (conn, state) => {
+    const err = new Error(NODE.data.errorMessage || 'unspecified');
+    conn.origin.node.error(err, state);
 
-		const err = new Error(NODE.data.errorMessage || 'unspecified');
-		conn.origin.node.error(err, state);
-		
-		doneOut.trigger(state);
-
-	});
-
+    doneOut.trigger(state);
+  });
 };

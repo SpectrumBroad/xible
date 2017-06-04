@@ -1,49 +1,45 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let triggerIn = NODE.getInputByName('trigger');
-	let doneOut = NODE.getOutputByName('done');
+module.exports = (NODE) => {
+  const triggerIn = NODE.getInputByName('trigger');
+  const doneOut = NODE.getOutputByName('done');
 
-	triggerIn.on('trigger', (conn, state) => {
+  triggerIn.on('trigger', (conn, state) => {
+    const flowId = NODE.data.flowName;
 
-		let flowId = NODE.data.flowName;
+    let messageHandler = (message) => {
+      if (message.flowId !== flowId) {
+        return;
+      }
 
-		let messageHandler = (message) => {
+      switch (message.method) {
 
-			if (message.flowId !== flowId) {
-				return;
-			}
+        case 'flowStarted':
+          doneOut.trigger(state);
+          break;
 
-			switch (message.method) {
+        case 'flowNotExist':
+          NODE.addStatus({
+            message: 'flow does not exist',
+            color: 'red'
+          });
 
-				case 'flowStarted':
-					doneOut.trigger(state);
-					break;
+          break;
 
-				case 'flowNotExist':
-					NODE.addStatus({
-						message: `flow does not exist`,
-						color: 'red'
-					});
+        default:
+          return;
 
-					break;
+      }
 
-				default:
-					return;
+      process.removeListener('message', messageHandler);
+      messageHandler = null;
+    };
 
-			}
+    process.on('message', messageHandler);
 
-			process.removeListener('message', messageHandler);
-			messageHandler = null;
-
-		};
-
-		process.on('message', messageHandler);
-
-		process.send({
-			method: 'startFlowById',
-			flowId: flowId
-		});
-
-	});
-
+    process.send({
+      method: 'startFlowById',
+      flowId
+    });
+  });
 };
