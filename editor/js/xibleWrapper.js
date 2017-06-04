@@ -1,1428 +1,1199 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.XibleWrapper = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = function(XIBLE) {
+'use strict';
 
-	class Config {
+module.exports = (XIBLE) => {
+  class Config {
 
-		static getAll() {
+    static getAll() {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/config`);
+      return req.toJson();
+    }
 
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/config`);
-			return req.toJson();
+    static validatePermissions() {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/config/validatePermissions`);
+      return req.toJson();
+    }
 
-		}
+    static deleteValue(path) {
+      const req = XIBLE.httpBase.request('DELETE', `http${XIBLE.baseUrl}/api/config/value`);
+      return req.toJson({
+        path
+      });
+    }
 
-		static validatePermissions() {
+    static setValue(path, value) {
+      if (['string', 'number', 'boolean', 'date'].indexOf(typeof value) === -1) {
+        throw new Error('Param "value" should be of type "string", "number", "boolean" or "date"');
+      }
 
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/config/validatePermissions`);
-			return req.toJson();
+      const req = XIBLE.httpBase.request('PUT', `http${XIBLE.baseUrl}/api/config/value`);
+      return req.toJson({
+        path,
+        value
+      });
+    }
 
-		}
+    static getObjectValueOnPath(obj, path) {
+      const pathSplit = path.split('.');
+      let sel = obj;
 
-		static deleteValue(path) {
+      for (let i = 0; i < pathSplit.length; i += 1) {
+        const part = pathSplit[i];
+        if (sel.hasOwnProperty(part)) {
+          sel = sel[part];
+        } else {
+          return null;
+        }
+      }
 
-			let req = XIBLE.httpBase.request('DELETE', `http${XIBLE.baseUrl}/api/config/value`);
-			return req.toJson({
-				path: path
-			});
+      return sel;
+    }
 
-		}
+    static getValue(path) {
+      return this.getAll()
+        .then(config => this.getObjectValueOnPath(config, path));
+    }
 
-		static setValue(path, value) {
+  }
 
-			if (['string', 'number', 'boolean', 'date'].indexOf(typeof value) === -1) {
-				throw new Error(`Param "value" should be of type "string", "number", "boolean" or "date"`);
-			}
-
-			let req = XIBLE.httpBase.request('PUT', `http${XIBLE.baseUrl}/api/config/value`);
-			return req.toJson({
-				path: path,
-				value: value
-			});
-
-		}
-
-		static getObjectValueOnPath(obj, path) {
-
-			let pathSplit = path.split('.');
-			let sel = obj;
-
-			for (let i = 0; i < pathSplit.length; ++i) {
-
-				let part = pathSplit[i];
-				if (sel.hasOwnProperty(part)) {
-					sel = sel[part];
-				} else {
-					return null;
-				}
-
-			}
-
-			return sel;
-
-		}
-
-		static getValue(path) {
-
-			return this.getAll()
-				.then((config) => this.getObjectValueOnPath(config, path));
-
-		}
-
-	}
-
-	return Config;
-
+  return Config;
 };
 
 },{}],2:[function(require,module,exports){
-module.exports = function(XIBLE) {
+'use strict';
 
-	class Connector {
+module.exports = (XIBLE) => {
+  class Connector {
 
-		constructor(obj) {
+    constructor(obj) {
+      if (obj) {
+        Object.assign(this, obj);
 
-			if (obj) {
+        this.origin = null;
+        this.destination = null;
+        this.setOrigin(obj.origin);
+        this.setDestination(obj.destination);
 
-				Object.assign(this, obj);
+        if (obj.type) {
+          this.setType(obj.type);
+        }
+      }
+    }
 
-				this.origin = null;
-				this.destination = null;
-				this.setOrigin(obj.origin);
-				this.setDestination(obj.destination);
+    setType(type) {
+      this.type = type;
+    }
 
-				if (obj.type) {
-					this.setType(obj.type);
-				}
+    filterDuplicateConnectors(type, end) {
+      const otherType = (type === 'origin' ? 'destination' : 'origin');
+      end.connectors
+        .filter(conn => conn[otherType] === this[otherType])
+        .forEach(conn => conn.delete());
+    }
 
-			}
+    setEnd(type, end) {
+      // remove from old origin
+      let endConnectorIndex;
+      if (this[type] && (endConnectorIndex = this[type].connectors.indexOf(this)) > -1) {
+        this[type].connectors.splice(endConnectorIndex, 1);
+        this[type].emit('detach', this);
+      }
 
-		}
+      this[type] = end;
+      if (!end) {
+        return null;
+      }
 
-		setType(type) {
-			this.type = type;
-		}
+      this.setType(end.type);
 
-		filterDuplicateConnectors(type, end) {
+      // disallow multiple connectors with same origin and destination
+      this.filterDuplicateConnectors(type, end);
 
-			let otherType = (type === 'origin' ? 'destination' : 'origin');
-			end.connectors
-				.filter((conn) => conn[otherType] === this[otherType])
-				.forEach((conn) => conn.delete());
+      end.connectors.push(this);
 
-		}
+      // trigger attachment functions
+      end.emit('attach', this);
+    }
 
-		setEnd(type, end) {
+    setOrigin(origin) {
+      this.setEnd('origin', origin);
+    }
 
-			//remove from old origin
-			let endConnectorIndex;
-			if (this[type] && (endConnectorIndex = this[type].connectors.indexOf(this)) > -1) {
+    setDestination(destination) {
+      this.setEnd('destination', destination);
+    }
 
-				this[type].connectors.splice(endConnectorIndex, 1);
-				this[type].emit('detach', this);
+    delete() {
+      this.setOrigin(null);
+      this.setDestination(null);
+    }
 
-			}
+  }
 
-			this[type] = end;
-			if (!end) {
-				return null;
-			}
-
-			this.setType(end.type);
-
-			//disallow multiple connectors with same origin and destination
-			this.filterDuplicateConnectors(type, end);
-
-			end.connectors.push(this);
-
-			//trigger attachment functions
-			end.emit('attach', this);
-
-		}
-
-		setOrigin(origin) {
-			this.setEnd('origin', origin);
-		}
-
-		setDestination(destination) {
-			this.setEnd('destination', destination);
-		}
-
-		delete() {
-
-			this.setOrigin(null);
-			this.setDestination(null);
-
-		}
-
-	}
-
-	return Connector;
-
+  return Connector;
 };
 
 },{}],3:[function(require,module,exports){
-module.exports = function(XIBLE) {
-
-	const EventEmitter = require('events').EventEmitter;
-
-	const Connector = require('./Connector')(XIBLE);
-	const Node = require('./Node')(XIBLE);
-
-	XIBLE.setMaxListeners(0);
-
-	class Flow extends EventEmitter {
-
-		constructor(obj) {
-
-			super();
-
-			this._id = null;
-			this.runnable = true;
-			this.state = Flow.STATE_STOPPED;
-
-			XIBLE.on('message', (json) => {
-
-				if (json.flowId !== this._id) {
-					return;
-				}
-
-				switch (json.method) {
-
-					case 'xible.flow.loadJson':
-						this.runnable = json.runnable;
-						this.emit('loadJson');
-						break;
-
-					case 'xible.flow.removeAllStatuses':
-						this.removeAllStatuses();
-						this.emit('removeAllStatuses');
-						break;
-
-					case 'xible.flow.initializing':
-						this.state = Flow.STATE_INITIALIZING;
-						this.emit('initializing', json);
-						break;
-
-					case 'xible.flow.initialized':
-						this.state = Flow.STATE_INITIALIZED;
-						this.emit('initialized', json);
-						break;
-
-					case 'xible.flow.starting':
-						this.runnable = true;
-						this.state = Flow.STATE_STARTING;
-						if (json.directed) {
-							this.directed = true;
-						} else {
-							this.directed = false;
-						}
-						this.emit('starting', json);
-						break;
-
-					case 'xible.flow.started':
-						this.runnable = true;
-						this.state = Flow.STATE_STARTED;
-						if (json.directed) {
-							this.directed = true;
-						} else {
-							this.directed = false;
-						}
-						this.emit('started', json);
-						break;
-
-					case 'xible.flow.stopping':
-						this.runnable = true;
-						this.state = Flow.STATE_STOPPING;
-						this.emit('stopping', json);
-						break;
-
-					case 'xible.flow.stopped':
-						this.state = Flow.STATE_STOPPED;
-						this.emit('stopped', json);
-						break;
-
-				}
-
-			});
-
-			if (obj) {
-				Object.assign(this, obj);
-			}
-
-			this.removeAllListeners();
-
-			//setup viewstate
-			this.viewState = {
-				left: obj && obj.viewState && obj.viewState.left ? obj.viewState.left : 0,
-				top: obj && obj.viewState && obj.viewState.top ? obj.viewState.top : 0,
-				zoom: obj && obj.viewState && obj.viewState.zoom ? obj.viewState.zoom : 1,
-				backgroundLeft: obj && obj.viewState && obj.viewState.backgroundLeft ? obj.viewState.backgroundLeft : 0,
-				backgroundTop: obj && obj.viewState && obj.viewState.backgroundTop ? obj.viewState.backgroundTop : 0
-			};
-
-			//setup nodes
-			if (obj && obj.nodes) {
-				this.initNodes(obj.nodes);
-			} else {
-				this.nodes = [];
-			}
-
-			//setup connectors
-			if (obj && obj.connectors) {
-				this.initConnectors(obj.connectors);
-			} else {
-				this.connectors = [];
-			}
-
-		}
-
-		initNodes(nodes) {
-
-			this.nodes = [];
-			nodes.forEach((node) => this.addNode(new Node(node)));
-
-		}
-
-		initConnectors(connectors) {
-
-			this.connectors = [];
-			connectors.forEach((conn) => {
-
-				conn.origin = this.getOutputById(conn.origin);
-				conn.destination = this.getInputById(conn.destination);
-
-				this.addConnector(new Connector(conn));
-
-			});
-
-		}
-
-		static validatePermissions() {
-
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/validateFlowPermissions`);
-			return req.toJson();
-
-		}
-
-		static getById(id) {
-
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(id)}`);
-			return req.toObject(Flow);
-
-		}
-
-		static getAll() {
-
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/flows`);
-			return req.toObject(Object).then((flows) => {
-
-				Object.keys(flows).forEach((flowId) => {
-					flows[flowId] = new Flow(flows[flowId]);
-				});
-
-				return flows;
-
-			});
-
-		}
-
-		static get STATE_STOPPED() {
-			return 0;
-		}
-
-		static get STATE_STOPPING() {
-			return 1;
-		}
-
-		static get STATE_INITIALIZING() {
-			return 2;
-		}
-
-		static get STATE_INITIALIZED() {
-			return 3;
-		}
-
-		static get STATE_STARTING() {
-			return 4;
-		}
-
-		static get STATE_STARTED() {
-			return 5;
-		}
-
-		stop() {
-
-			this.undirect();
-
-			if (!this._id) {
-				return Promise.reject(`no id`);
-			}
-
-			let req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}/stop`);
-			this.emit('stop');
-
-			return req.send();
-
-		}
-
-		start() {
-
-			this.undirect();
-
-			if (!this._id) {
-				return Promise.reject(`no id`);
-			}
-
-			let req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}/start`);
-			this.emit('start');
-
-			return req.send();
-
-		}
-
-		delete() {
-
-			this.undirect();
-
-			if (!this._id) {
-				return;
-			}
-
-			let req = XIBLE.httpBase.request('DELETE', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}`);
-			this.emit('delete');
-
-			return req.send();
-
-		}
-
-		save(asNew) {
-
-			this.undirect();
-
-			return new Promise((resolve, reject) => {
-
-				let json = this.toJson();
-				let req;
-
-				if (!this._id || asNew) {
-					req = XIBLE.httpBase.request('POST', `http${XIBLE.baseUrl}/api/flows`);
-				} else {
-					req = XIBLE.httpBase.request('PUT', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}`);
-				}
-
-				req.toObject(Object, json).then((json) => {
-
-					this._id = json._id;
-					resolve(this);
-					this.emit('save');
-
-				}).catch((err) => {
-					reject(err);
-				});
-
-			});
-
-		}
-
-		undirect() {
-			this.emit('undirect');
-		}
-
-		direct(related) {
-
-			//throttle
-			if (this._lastPostDirectFunction || this._lastDirectPromise) {
-
-				let hasFunction = !!this._lastPostDirectFunction;
-
-				this._lastPostDirectFunction = () => {
-
-					this.direct(related);
-					this._lastPostDirectFunction = null;
-
-				};
-
-				if (!hasFunction) {
-					this._lastDirectPromise.then(this._lastPostDirectFunction);
-				}
-
-				return;
-
-			}
-
-			//ensure this flow is saved first
-			if (!this._id) {
-				return this.save().then(() => this.direct(related));
-			}
-
-			if (!related) {
-				return Promise.reject(`related argument missing`);
-			}
-
-			this._lastDirectPromise = new Promise((resolve, reject) => {
-
-				let nodes = related.nodes.map((node) => {
-					return {
-						_id: node._id,
-						data: node.data
-					};
-				});
-
-				let req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}/direct`);
-				req.toString(nodes).then((json) => {
-
-					resolve(this);
-					this._lastDirectPromise = null;
-
-					this.emit('direct');
-
-				}).catch((err) => {
-					reject(err);
-				});
-
-			});
-
-			return this._lastDirectPromise;
-
-		}
-
-		//TODO: this functions isn't 'pretty'
-		//more importantly, it can't handle nodes with io's named 'data'
-		toJson(nodes, connectors) {
-
-			//the nodes
-			const NODE_WHITE_LIST = ['_id', 'name', 'type', 'left', 'top', 'inputs', 'outputs', 'hidden', 'global'];
-			var dataObject, inputsObject, outputsObject;
-			var nodeJson = JSON.stringify(nodes || this.nodes, function(key, value) {
-
-				switch (key) {
-
-					case 'inputs':
-
-						inputsObject = value;
-						return value;
-
-					case 'outputs':
-
-						outputsObject = value;
-						return value;
-
-					case 'data':
-
-						if (this !== inputsObject && this !== outputsObject) {
-
-							dataObject = value;
-							return value;
-
-						} // jshint ignore: line
-
-					default:
-
-						if (this !== inputsObject && this !== outputsObject && this !== dataObject && key && isNaN(key) && NODE_WHITE_LIST.indexOf(key) === -1) {
-							return;
-						} else {
-							return value;
-						}
-
-				}
-
-			});
-
-			//the connectors
-			const CONNECTOR_WHITE_LIST = ['_id', 'origin', 'destination', 'type', 'hidden'];
-			const connectorJson = JSON.stringify(connectors || this.connectors, function(key, value) {
-
-				if (key && isNaN(key) && CONNECTOR_WHITE_LIST.indexOf(key) === -1) {
-					return;
-				} else if (value && (key === 'origin' || key === 'destination')) {
-					return value._id;
-				} else {
-					return value;
-				}
-
-			});
-
-			return `{"_id":${JSON.stringify(this._id)},"nodes":${nodeJson},"connectors":${connectorJson},"viewState":${JSON.stringify(this.viewState)}}`;
-
-		}
-
-		/**
-		 *	Sets the viewstate of a flow
-		 *	@param {Object}	viewState
-		 *	@param {Number}	viewState.left
-		 *	@param {Number}	viewState.top
-		 *	@param {Number}	viewState.backgroundLeft
-		 *	@param {Number}	viewState.backgroundTop
-		 *	@param {Number}	viewState.zoom
-		 */
-		setViewState(viewState) {
-			this.viewState = viewState;
-		}
-
-		getNodeById(id) {
-			return this.nodes.find((node) => node._id === id);
-		}
-
-		addConnector(connector) {
-
-			if (connector.flow) {
-				throw new Error(`connector already hooked up to other flow`);
-			}
-
-			this.connectors.push(connector);
-			connector.flow = this;
-			return connector;
-
-		}
-
-		deleteConnector(connector) {
-
-			let index = this.connectors.indexOf(connector);
-			if (index > -1) {
-				this.connectors.splice(index, 1);
-			}
-			connector.flow = null;
-
-		}
-
-		addNode(node) {
-
-			if (node.flow) {
-				throw new Error(`node already hooked up to other flow`);
-			}
-
-			this.nodes.push(node);
-			node.flow = this;
-
-			return node;
-
-		}
-
-		deleteNode(node) {
-
-			let index = this.nodes.indexOf(node);
-			if (index > -1) {
-				this.nodes.splice(index, 1);
-			}
-			node.flow = null;
-
-		}
-
-		getInputById(id) {
-
-			for (let i = 0; i < this.nodes.length; ++i) {
-
-				let node = this.nodes[i];
-				for (let name in node.inputs) {
-
-					if (node.inputs[name]._id === id) {
-						return node.inputs[name];
-					}
-
-				}
-
-			}
-
-		}
-
-		getOutputById(id) {
-
-			for (let i = 0; i < this.nodes.length; ++i) {
-
-				let node = this.nodes[i];
-				for (let name in node.outputs) {
-
-					if (node.outputs[name]._id === id) {
-						return node.outputs[name];
-					}
-
-				}
-
-			}
-
-		}
-
-		/**
-		 *	returns an array of all nodes in this flow that contain at least one global output
-		 *	@returns	{Node[]}	list of nodes
-		 */
-		getGlobalNodes() {
-
-			return this.nodes.filter((node) => {
-				return node.getOutputs().some((output) => output.global);
-			});
-
-		}
-
-		/**
-		 *	returns an array of all outputs in this flow that are global
-		 *	@returns	{Output[]}	list of nodes
-		 */
-		getGlobalOutputs() {
-
-			let globalOutputs = [];
-			for (let i = 0; i < this.nodes.length; ++i) {
-				globalOutputs = globalOutputs.concat(this.nodes[i].getGlobalOutputs());
-			}
-			return globalOutputs;
-
-		}
-
-		removeAllStatuses() {
-			this.nodes.forEach((node) => {
-				node.removeAllStatuses();
-			});
-		}
-
-	}
-
-	return Flow;
-
+'use strict';
+
+module.exports = (XIBLE) => {
+  const EventEmitter = require('events').EventEmitter;
+
+  XIBLE.setMaxListeners(0);
+
+  class Flow extends EventEmitter {
+
+    constructor(obj) {
+      super();
+
+      this._id = null;
+      this.runnable = true;
+      this.state = Flow.STATE_STOPPED;
+
+      XIBLE.on('message', (json) => {
+        if (json.flowId !== this._id) {
+          return;
+        }
+
+        switch (json.method) {
+
+          case 'xible.flow.loadJson':
+            this.runnable = json.runnable;
+            this.emit('loadJson');
+            break;
+
+          case 'xible.flow.removeAllStatuses':
+            this.removeAllStatuses();
+            this.emit('removeAllStatuses');
+            break;
+
+          case 'xible.flow.initializing':
+            this.state = Flow.STATE_INITIALIZING;
+            this.emit('initializing', json);
+            break;
+
+          case 'xible.flow.initialized':
+            this.state = Flow.STATE_INITIALIZED;
+            this.emit('initialized', json);
+            break;
+
+          case 'xible.flow.starting':
+            this.runnable = true;
+            this.state = Flow.STATE_STARTING;
+            if (json.directed) {
+              this.directed = true;
+            } else {
+              this.directed = false;
+            }
+            this.emit('starting', json);
+            break;
+
+          case 'xible.flow.started':
+            this.runnable = true;
+            this.state = Flow.STATE_STARTED;
+            if (json.directed) {
+              this.directed = true;
+            } else {
+              this.directed = false;
+            }
+            this.emit('started', json);
+            break;
+
+          case 'xible.flow.stopping':
+            this.runnable = true;
+            this.state = Flow.STATE_STOPPING;
+            this.emit('stopping', json);
+            break;
+
+          case 'xible.flow.stopped':
+            this.state = Flow.STATE_STOPPED;
+            this.emit('stopped', json);
+            break;
+
+        }
+      });
+
+      if (obj) {
+        Object.assign(this, obj);
+      }
+
+      this.removeAllListeners();
+
+      // setup viewstate
+      this.viewState = {
+        left: obj && obj.viewState && obj.viewState.left ? obj.viewState.left : 0,
+        top: obj && obj.viewState && obj.viewState.top ? obj.viewState.top : 0,
+        zoom: obj && obj.viewState && obj.viewState.zoom ? obj.viewState.zoom : 1,
+        backgroundLeft: obj && obj.viewState &&
+          obj.viewState.backgroundLeft ? obj.viewState.backgroundLeft : 0,
+        backgroundTop: obj && obj.viewState &&
+          obj.viewState.backgroundTop ? obj.viewState.backgroundTop : 0
+      };
+
+      // setup nodes
+      if (obj && obj.nodes) {
+        this.initNodes(obj.nodes);
+      } else {
+        this.nodes = [];
+      }
+
+      // setup connectors
+      if (obj && obj.connectors) {
+        this.initConnectors(obj.connectors);
+      } else {
+        this.connectors = [];
+      }
+    }
+
+    initNodes(nodes) {
+      this.nodes = [];
+      nodes.forEach(node => this.addNode(new XIBLE.Node(node)));
+    }
+
+    initConnectors(connectors) {
+      this.connectors = [];
+      connectors.forEach((conn) => {
+        conn.origin = this.getOutputById(conn.origin);
+        conn.destination = this.getInputById(conn.destination);
+
+        this.addConnector(new XIBLE.Connector(conn));
+      });
+    }
+
+    static validatePermissions() {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/validateFlowPermissions`);
+      return req.toJson();
+    }
+
+    static getById(id) {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(id)}`);
+      return req.toObject(Flow);
+    }
+
+    static getAll() {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/flows`);
+      return req.toObject(Object).then((flows) => {
+        Object.keys(flows).forEach((flowId) => {
+          flows[flowId] = new Flow(flows[flowId]);
+        });
+
+        return flows;
+      });
+    }
+
+    static get STATE_STOPPED() {
+      return 0;
+    }
+
+    static get STATE_STOPPING() {
+      return 1;
+    }
+
+    static get STATE_INITIALIZING() {
+      return 2;
+    }
+
+    static get STATE_INITIALIZED() {
+      return 3;
+    }
+
+    static get STATE_STARTING() {
+      return 4;
+    }
+
+    static get STATE_STARTED() {
+      return 5;
+    }
+
+    stop() {
+      this.undirect();
+
+      if (!this._id) {
+        return Promise.reject('no id');
+      }
+
+      const req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}/stop`);
+      this.emit('stop');
+
+      return req.send();
+    }
+
+    start() {
+      this.undirect();
+
+      if (!this._id) {
+        return Promise.reject('no id');
+      }
+
+      const req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}/start`);
+      this.emit('start');
+
+      return req.send();
+    }
+
+    delete() {
+      this.undirect();
+
+      if (!this._id) {
+        return;
+      }
+
+      const req = XIBLE.httpBase.request('DELETE', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}`);
+      this.emit('delete');
+
+      return req.send();
+    }
+
+    save(asNew) {
+      this.undirect();
+
+      return new Promise((resolve, reject) => {
+        const json = this.toJson();
+        let req;
+
+        if (!this._id || asNew) {
+          req = XIBLE.httpBase.request('POST', `http${XIBLE.baseUrl}/api/flows`);
+        } else {
+          req = XIBLE.httpBase.request('PUT', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}`);
+        }
+
+        req.toObject(Object, json)
+          .then((reqJson) => {
+            this._id = reqJson._id;
+            resolve(this);
+            this.emit('save');
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
+
+    undirect() {
+      this.emit('undirect');
+    }
+
+    direct(related) {
+      // throttle
+      if (this._lastPostDirectFunction || this._lastDirectPromise) {
+        const hasFunction = !!this._lastPostDirectFunction;
+
+        this._lastPostDirectFunction = () => {
+          this.direct(related);
+          this._lastPostDirectFunction = null;
+        };
+
+        if (!hasFunction) {
+          this._lastDirectPromise.then(this._lastPostDirectFunction);
+        }
+
+        return;
+      }
+
+      // ensure this flow is saved first
+      if (!this._id) {
+        return this.save().then(() => this.direct(related));
+      }
+
+      if (!related) {
+        return Promise.reject('related argument missing');
+      }
+
+      this._lastDirectPromise = new Promise((resolve, reject) => {
+        const nodes = related.nodes.map(node => ({
+          _id: node._id,
+          data: node.data
+        }));
+
+        const req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/flows/${encodeURIComponent(this._id)}/direct`);
+        req.toString(nodes)
+          .then((json) => {
+            resolve(this);
+            this._lastDirectPromise = null;
+
+            this.emit('direct');
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+
+      return this._lastDirectPromise;
+    }
+
+    // TODO: this functions isn't 'pretty'
+    // more importantly, it can't handle nodes with io's named 'data'
+    // and it should be toJSON().
+    toJson(nodes, connectors) {
+      // the nodes
+      const NODE_WHITE_LIST = ['_id', 'name', 'type', 'left', 'top', 'inputs', 'outputs', 'hidden', 'global'];
+      let dataObject;
+      let inputsObject;
+      let outputsObject;
+      const nodeJson = JSON.stringify(nodes || this.nodes, function (key, value) {
+        switch (key) {
+
+          case 'inputs':
+
+            inputsObject = value;
+            return value;
+
+          case 'outputs':
+
+            outputsObject = value;
+            return value;
+
+          case 'data':
+
+            if (this !== inputsObject && this !== outputsObject) {
+              dataObject = value;
+              return value;
+            } // jshint ignore: line
+
+          default:
+
+            if (this !== inputsObject && this !== outputsObject && this !== dataObject && key && isNaN(key) && NODE_WHITE_LIST.indexOf(key) === -1) {
+              return;
+            }
+            return value;
+
+
+        }
+      });
+
+      // the connectors
+      const CONNECTOR_WHITE_LIST = ['_id', 'origin', 'destination', 'type', 'hidden'];
+      const connectorJson = JSON.stringify(connectors || this.connectors, (key, value) => {
+        if (key && isNaN(key) && CONNECTOR_WHITE_LIST.indexOf(key) === -1) {
+          return;
+        } else if (value && (key === 'origin' || key === 'destination')) {
+          return value._id;
+        }
+        return value;
+      });
+
+      return `{"_id":${JSON.stringify(this._id)},"nodes":${nodeJson},"connectors":${connectorJson},"viewState":${JSON.stringify(this.viewState)}}`;
+    }
+
+    /**
+    * Sets the viewstate of a flow
+    * @param {Object} viewState
+    * @param {Number} viewState.left
+    * @param {Number} viewState.top
+    * @param {Number} viewState.backgroundLeft
+    * @param {Number} viewState.backgroundTop
+    * @param {Number} viewState.zoom
+    */
+    setViewState(viewState) {
+      this.viewState = viewState;
+    }
+
+    getNodeById(id) {
+      return this.nodes.find(node => node._id === id);
+    }
+
+    addConnector(connector) {
+      if (connector.flow) {
+        throw new Error('connector already hooked up to other flow');
+      }
+
+      this.connectors.push(connector);
+      connector.flow = this;
+      return connector;
+    }
+
+    deleteConnector(connector) {
+      const index = this.connectors.indexOf(connector);
+      if (index > -1) {
+        this.connectors.splice(index, 1);
+      }
+      connector.flow = null;
+    }
+
+    addNode(node) {
+      if (node.flow) {
+        throw new Error('node already hooked up to other flow');
+      }
+
+      this.nodes.push(node);
+      node.flow = this;
+
+      return node;
+    }
+
+    deleteNode(node) {
+      const index = this.nodes.indexOf(node);
+      if (index > -1) {
+        this.nodes.splice(index, 1);
+      }
+      node.flow = null;
+    }
+
+    getInputById(id) {
+      for (let i = 0; i < this.nodes.length; ++i) {
+        const node = this.nodes[i];
+        for (const name in node.inputs) {
+          if (node.inputs[name]._id === id) {
+            return node.inputs[name];
+          }
+        }
+      }
+    }
+
+    getOutputById(id) {
+      for (let i = 0; i < this.nodes.length; ++i) {
+        const node = this.nodes[i];
+        for (const name in node.outputs) {
+          if (node.outputs[name]._id === id) {
+            return node.outputs[name];
+          }
+        }
+      }
+    }
+
+    /**
+    * returns an array of all nodes in this flow that contain at least one global output
+    * @returns {Node[]} list of nodes
+    */
+    getGlobalNodes() {
+      return this.nodes.filter(node => node.getOutputs().some(output => output.global));
+    }
+
+    /**
+    * returns an array of all outputs in this flow that are global
+    * @returns {Output[]} list of nodes
+    */
+    getGlobalOutputs() {
+      let globalOutputs = [];
+      for (let i = 0; i < this.nodes.length; i += 1) {
+        globalOutputs = globalOutputs.concat(this.nodes[i].getGlobalOutputs());
+      }
+      return globalOutputs;
+    }
+
+    removeAllStatuses() {
+      this.nodes.forEach((node) => {
+        node.removeAllStatuses();
+      });
+    }
+
+  }
+
+  return Flow;
 };
 
-},{"./Connector":2,"./Node":6,"events":11}],4:[function(require,module,exports){
-module.exports = function(XIBLE) {
+},{"events":11}],4:[function(require,module,exports){
+'use strict';
 
-	const Io = require('./Io.js');
+module.exports = (XIBLE) => {
+  class Input extends XIBLE.NodeIo {
 
-	class Input extends Io {
+    delete() {
+      super.delete();
 
-		constructor() {
-			super(...arguments);
-		}
+      if (this.node) {
+        this.node.deleteInput(this);
+      }
+    }
 
-		delete() {
+  }
 
-			super.delete();
-
-			if (this.node) {
-				this.node.deleteInput(this);
-			}
-
-		}
-
-	}
-
-	return Input;
-
+  return Input;
 };
 
-},{"./Io.js":5}],5:[function(require,module,exports){
-module.exports = function(XIBLE) {
+},{}],5:[function(require,module,exports){
+'use strict';
 
-	const EventEmitter = require('events').EventEmitter;
-
-	const Input = require('./Input.js');
-	const Output = require('./Output.js');
-
-	class Io extends EventEmitter {
-
-		constructor(name, obj) {
-
-			super();
-
-			if (obj) {
-				Object.assign(this, obj);
-			}
-
-			this.removeAllListeners();
-
-			this.connectors = [];
-
-			if (!this._id) {
-				this._id = XIBLE.generateObjectId();
-			}
-
-			this.setName(name);
-
-			this.setType(this.type);
-
-			if (typeof this.singleType === 'boolean' && obj.singleType && !this.type) {
-				this.setSingleType(this.singleType);
-			}
-
-			if (typeof obj.maxConnectors === 'number') {
-				this.setMaxConnectors(this.maxConnectors);
-			}
-
-			if (this.hidden) {
-				this.hide();
-			}
-
-			if (this.global) {
-				this.setGlobal(true);
-			}
-
-		}
-
-		/**
-		 * If this is set to true, and type===null,
-		 *  it's verified that only one type of connector is hooked up.
-		 *  @param {Boolean}  singleType
-		 */
-		setSingleType(bool) {
-
-			this.singleType = bool;
-
-			//TODO: unhook eventlisteners when changing singleType
-
-			if (this.singleType) {
-
-				this.on('attach', (conn) => {
-
-					let connLoc = conn[this instanceof Input ? 'origin' : 'destination'];
-					if (connLoc.type) {
-						this.setType(connLoc.type);
-					}
-
-				});
-
-				this.on('detach', function() {
-
-					if (!this.connectors.length) {
-						this.setType(null);
-					}
-
-				});
-
-			}
-
-			this.verifyConnectors();
-
-		}
-
-		setGlobal(global) {
-
-			this.global = global;
-			return this;
-
-		}
-
-		setMaxConnectors(max) {
-
-			this.maxConnectors = max;
-			this.verifyConnectors();
-
-			return this;
-
-		}
-
-		setType(type) {
-
-			//set new type
-			this.type = type;
-			this.verifyConnectors();
-
-			return this;
-
-		}
-
-		setName(name) {
-
-			if (!name) {
-				throw new Error(`the 'name' argument is missing`);
-			}
-
-			this.name = name;
-			return this;
-
-		}
-
-		verifyConnectors() {
-
-			//remove connectors if we have too many
-			//always removes the latest added conns
-			if (typeof this.maxConnectors === 'number') {
-
-				while (this.connectors.length > this.maxConnectors) {
-					this.connectors[this.connectors.length - 1].delete();
-				}
-
-			}
-
-			//verify type
-			let checkPlace = this instanceof Input ? 'origin' : 'destination';
-			if (this.type) {
-
-				this.connectors
-					.filter((conn) => conn[checkPlace].type && conn[checkPlace].type !== this.type)
-					.forEach((conn) => conn.delete());
-
-			}
-
-		}
-
-		hide() {
-
-			this.hidden = true;
-			return this;
-
-		}
-
-		unhide() {
-
-			this.hidden = false;
-			return this;
-
-		}
-
-		delete() {
-
-			while (this.connectors.length) {
-				this.connectors[0].delete();
-			}
-
-			if (this.node && this instanceof Input) {
-				delete this.node.inputs[this.name];
-			}
-
-			if (this.node && this instanceof Output) {
-				delete this.node.outputs[this.name];
-			}
-
-		}
-
-	}
-
-	return Io;
-
+module.exports = (XIBLE) => {
+  const EventEmitter = require('events').EventEmitter;
+
+  class Io extends EventEmitter {
+
+    constructor(name, obj) {
+      super();
+
+      if (obj) {
+        Object.assign(this, obj);
+      }
+
+      this.removeAllListeners();
+
+      this.connectors = [];
+
+      if (!this._id) {
+        this._id = XIBLE.generateObjectId();
+      }
+
+      this.setName(name);
+
+      this.setType(this.type);
+
+      if (typeof this.singleType === 'boolean' && obj.singleType && !this.type) {
+        this.setSingleType(this.singleType);
+      }
+
+      if (typeof obj.maxConnectors === 'number') {
+        this.setMaxConnectors(this.maxConnectors);
+      }
+
+      if (this.hidden) {
+        this.hide();
+      }
+
+      if (this.global) {
+        this.setGlobal(true);
+      }
+    }
+
+    /**
+    * If this is set to true, and type===null,
+    * it's verified that only one type of connector is hooked up.
+    * @param {Boolean} singleType
+    */
+    setSingleType(bool) {
+      this.singleType = bool;
+
+      // TODO: unhook eventlisteners when changing singleType
+
+      if (this.singleType) {
+        this.on('attach', (conn) => {
+          const connLoc = conn[this instanceof XIBLE.NodeInput ? 'origin' : 'destination'];
+          if (connLoc.type) {
+            this.setType(connLoc.type);
+          }
+        });
+
+        this.on('detach', () => {
+          if (!this.connectors.length) {
+            this.setType(null);
+          }
+        });
+      }
+
+      this.verifyConnectors();
+    }
+
+    setGlobal(global) {
+      this.global = global;
+      return this;
+    }
+
+    setMaxConnectors(max) {
+      this.maxConnectors = max;
+      this.verifyConnectors();
+
+      return this;
+    }
+
+    setType(type) {
+      // set new type
+      this.type = type;
+      this.verifyConnectors();
+      this.emit('settype', type);
+
+      return this;
+    }
+
+    setName(name) {
+      if (!name) {
+        throw new Error('the \'name\' argument is missing');
+      }
+
+      this.name = name;
+      return this;
+    }
+
+    verifyConnectors() {
+      // remove connectors if we have too many
+      // always removes the latest added conns
+      if (typeof this.maxConnectors === 'number') {
+        while (this.connectors.length > this.maxConnectors) {
+          this.connectors[this.connectors.length - 1].delete();
+        }
+      }
+
+      // verify type
+      const checkPlace = this instanceof XIBLE.NodeInput ? 'origin' : 'destination';
+      if (this.type) {
+        this.connectors
+          .filter(conn => conn[checkPlace].type && conn[checkPlace].type !== this.type)
+          .forEach(conn => conn.delete());
+      }
+    }
+
+    hide() {
+      this.hidden = true;
+      return this;
+    }
+
+    unhide() {
+      this.hidden = false;
+      return this;
+    }
+
+    delete() {
+      while (this.connectors.length) {
+        this.connectors[0].delete();
+      }
+
+      if (this.node && this instanceof XIBLE.NodeInput) {
+        delete this.node.inputs[this.name];
+      }
+
+      if (this.node && this instanceof XIBLE.NodeOutput) {
+        delete this.node.outputs[this.name];
+      }
+    }
+
+  }
+
+  return Io;
 };
 
-},{"./Input.js":4,"./Output.js":7,"events":11}],6:[function(require,module,exports){
-module.exports = function(XIBLE) {
-
-	const EventEmitter = require('events').EventEmitter;
-
-	class Node extends EventEmitter {
-
-		constructor(obj = {}, ignoreData = false) {
-
-			super();
-
-			Object.assign(this, obj);
-			this.removeAllListeners();
-
-			if (!this._id) {
-				this._id = XIBLE.generateObjectId();
-			}
-
-			//copy data
-			this.data = null;
-			if (obj.data && !ignoreData) {
-				this.data = Object.assign({}, obj.data);
-			} else {
-				this.data = {};
-			}
-
-			//add inputs
-			this.initInputs(obj.inputs);
-
-			//add outputs
-			this.initOutputs(obj.outputs);
-
-			this.setPosition(obj.left, obj.top);
-
-		}
-
-		initInputs(inputs) {
-
-			this.inputs = {};
-			if (inputs) {
-				for (let name in inputs) {
-					this.addInput(new XIBLE.NodeInput(name, inputs[name]));
-				}
-			}
-
-		}
-
-		initOutputs(outputs) {
-
-			this.outputs = {};
-			if (outputs) {
-				for (let name in outputs) {
-					this.addOutput(new XIBLE.NodeOutput(name, outputs[name]));
-				}
-			}
-
-		}
-
-		static getAll() {
-
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/nodes`);
-			return req.toJson().then((nodes) => {
-
-				Object.keys(nodes).forEach((nodeName) => {
-					nodes[nodeName] = new Node(nodes[nodeName]);
-				});
-
-				return nodes;
-
-			});
-
-		}
-
-		static getAllInputObjectNodes(node) {
-
-			let resultNodes = [node];
-			let resultConnectors = [];
-
-			let objectInputs = node.getInputs().filter((input) => input.type !== 'trigger');
-
-			let inputObjectNodes = [];
-			objectInputs.forEach((objectInput) => {
-
-				resultConnectors.push(...objectInput.connectors);
-				objectInput.connectors.forEach((connector) => {
-
-					let objs = Node.getAllInputObjectNodes(connector.origin.node);
-					resultNodes.push(...objs.nodes);
-					resultConnectors.push(...objs.connectors);
-
-				});
-
-			});
-
-			return {
-				'nodes': resultNodes,
-				'connectors': resultConnectors
-			};
-
-		}
-
-		setData(attr, value) {
-
-			if (typeof value === 'undefined') {
-				Object.assign(this.data, attr);
-			} else {
-				this.data[attr] = value;
-			}
-
-			this.emit('setdata', attr, value);
-			return this;
-
-		}
-
-		getData(attr) {
-			return this.data[attr];
-		}
-
-		getEditorContent() {
-
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/nodes/${encodeURIComponent(this.name)}/editor/index.htm`);
-			return req.toString();
-
-		}
-
-		setPosition(left = 0, top = 0) {
-
-			this.left = left;
-			this.top = top;
-
-			this.emit('position', this);
-
-		}
-
-		addInput(input) {
-
-			this.addIo(input);
-			this.inputs[input.name] = input;
-
-			return input;
-
-		}
-
-		addOutput(output) {
-
-			this.addIo(output);
-			this.outputs[output.name] = output;
-
-			return output;
-
-		}
-
-		addIo(child) {
-
-			child.node = this;
-
-			if (!child._id) {
-				child._id = XIBLE.generateObjectId();
-			}
-
-			child.node = this;
-			return child;
-
-		}
-
-		deleteInput(input) {
-
-			delete this.inputs[input.name];
-			input.node = null;
-
-			return input;
-
-		}
-
-		deleteOutput(output) {
-
-			delete this.outputs[output.name];
-			output.node = null;
-
-			return output;
-
-		}
-
-		delete() {
-
-			for (let name in this.inputs) {
-				this.inputs[name].delete();
-			}
-
-			for (let name in this.outputs) {
-				this.outputs[name].delete();
-			}
-
-			if (this.flow) {
-
-				let nodeIndex = this.flow.nodes.indexOf(this);
-				if (nodeIndex > -1) {
-					this.flow.nodes.splice(nodeIndex, 1);
-				}
-
-			}
-
-		}
-
-		getInputByName(name) {
-			return this.inputs[name];
-		}
-
-		getOutputByName(name) {
-			return this.outputs[name];
-		}
-
-		getInputs() {
-
-			return Object.keys(this.inputs)
-				.map((key) => this.inputs[key]);
-
-		}
-
-		getOutputs() {
-
-			return Object.keys(this.outputs)
-				.map((key) => this.outputs[key]);
-
-		}
-
-		getGlobalOutputs() {
-			return this.getOutputs().filter((output) => output.global);
-		}
-
-		getInputsByType(type = null) {
-
-			let inputs = [];
-			for (let name in this.inputs) {
-				if (this.inputs[name].type === type) {
-					inputs.push(this.inputs[name]);
-				}
-			}
-			return inputs;
-
-		}
-
-		getOutputsByType(type = null) {
-
-			let outputs = [];
-			for (let name in this.outputs) {
-				if (this.outputs[name].type === type) {
-					outputs.push(this.outputs[name]);
-				}
-			}
-			return outputs;
-
-		}
-
-		removeAllStatuses() {
-		}
-
-	}
-
-	return Node;
-
+},{"events":11}],6:[function(require,module,exports){
+'use strict';
+
+module.exports = (XIBLE) => {
+  const EventEmitter = require('events').EventEmitter;
+
+  class Node extends EventEmitter {
+
+    constructor(obj = {}, ignoreData = false) {
+      super();
+
+      Object.assign(this, obj);
+      this.removeAllListeners();
+
+      if (!this._id) {
+        this._id = XIBLE.generateObjectId();
+      }
+
+      // copy data
+      this.data = null;
+      if (obj.data && !ignoreData) {
+        this.data = Object.assign({}, obj.data);
+      } else {
+        this.data = {};
+      }
+
+      // add inputs
+      this.initInputs(obj.inputs);
+
+      // add outputs
+      this.initOutputs(obj.outputs);
+
+      this.setPosition(obj.left, obj.top);
+    }
+
+    initInputs(inputs) {
+      this.inputs = {};
+      if (inputs) {
+        for (const name in inputs) {
+          this.addInput(new XIBLE.NodeInput(name, inputs[name]));
+        }
+      }
+    }
+
+    initOutputs(outputs) {
+      this.outputs = {};
+      if (outputs) {
+        for (const name in outputs) {
+          this.addOutput(new XIBLE.NodeOutput(name, outputs[name]));
+        }
+      }
+    }
+
+    static getAll() {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/nodes`);
+      return req.toJson().then((nodes) => {
+        Object.keys(nodes).forEach((nodeName) => {
+          nodes[nodeName] = new Node(nodes[nodeName]);
+        });
+
+        return nodes;
+      });
+    }
+
+    static getAllInputObjectNodes(node) {
+      const resultNodes = [node];
+      const resultConnectors = [];
+      const objectInputs = node.getInputs().filter(input => input.type !== 'trigger');
+      objectInputs.forEach((objectInput) => {
+        resultConnectors.push(...objectInput.connectors);
+        objectInput.connectors.forEach((connector) => {
+          const objs = Node.getAllInputObjectNodes(connector.origin.node);
+          resultNodes.push(...objs.nodes);
+          resultConnectors.push(...objs.connectors);
+        });
+      });
+
+      return {
+        nodes: resultNodes,
+        connectors: resultConnectors
+      };
+    }
+
+    setData(attr, value) {
+      if (typeof value === 'undefined') {
+        Object.assign(this.data, attr);
+      } else {
+        this.data[attr] = value;
+      }
+
+      this.emit('setdata', attr, value);
+      return this;
+    }
+
+    getData(attr) {
+      return this.data[attr];
+    }
+
+    getEditorContent() {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/nodes/${encodeURIComponent(this.name)}/editor/index.htm`);
+      return req.toString();
+    }
+
+    setPosition(left = 0, top = 0) {
+      this.left = left;
+      this.top = top;
+
+      this.emit('position', this);
+    }
+
+    addInput(input) {
+      this.addIo(input);
+      this.inputs[input.name] = input;
+
+      return input;
+    }
+
+    addOutput(output) {
+      this.addIo(output);
+      this.outputs[output.name] = output;
+
+      return output;
+    }
+
+    addIo(child) {
+      child.node = this;
+
+      if (!child._id) {
+        child._id = XIBLE.generateObjectId();
+      }
+
+      child.node = this;
+      return child;
+    }
+
+    deleteInput(input) {
+      delete this.inputs[input.name];
+      input.node = null;
+
+      return input;
+    }
+
+    deleteOutput(output) {
+      delete this.outputs[output.name];
+      output.node = null;
+
+      return output;
+    }
+
+    delete() {
+      for (const name in this.inputs) {
+        this.inputs[name].delete();
+      }
+
+      for (const name in this.outputs) {
+        this.outputs[name].delete();
+      }
+
+      if (this.flow) {
+        const nodeIndex = this.flow.nodes.indexOf(this);
+        if (nodeIndex > -1) {
+          this.flow.nodes.splice(nodeIndex, 1);
+        }
+      }
+    }
+
+    getInputByName(name) {
+      return this.inputs[name];
+    }
+
+    getOutputByName(name) {
+      return this.outputs[name];
+    }
+
+    getInputs() {
+      return Object.keys(this.inputs)
+        .map(key => this.inputs[key]);
+    }
+
+    getOutputs() {
+      return Object.keys(this.outputs)
+        .map(key => this.outputs[key]);
+    }
+
+    getGlobalOutputs() {
+      return this.getOutputs().filter(output => output.global);
+    }
+
+    getInputsByType(type = null) {
+      const inputs = [];
+      for (const name in this.inputs) {
+        if (this.inputs[name].type === type) {
+          inputs.push(this.inputs[name]);
+        }
+      }
+      return inputs;
+    }
+
+    getOutputsByType(type = null) {
+      const outputs = [];
+      for (const name in this.outputs) {
+        if (this.outputs[name].type === type) {
+          outputs.push(this.outputs[name]);
+        }
+      }
+      return outputs;
+    }
+
+    removeAllStatuses() {
+    }
+
+  }
+
+  return Node;
 };
 
 },{"events":11}],7:[function(require,module,exports){
-module.exports = function(XIBLE) {
+'use strict';
 
-	const Io = require('./Io.js');
+module.exports = (XIBLE) => {
+  class Output extends XIBLE.NodeIo {
 
-	class Output extends Io {
+    delete() {
+      super.delete();
 
-		constructor() {
-			super(...arguments);
-		}
+      if (this.node) {
+        this.node.deleteOutput(this);
+      }
+    }
 
-		delete() {
+  }
 
-			super.delete();
-
-			if (this.node) {
-				this.node.deleteOutput(this);
-			}
-
-		}
-
-	}
-
-	return Output;
-
+  return Output;
 };
 
-},{"./Io.js":5}],8:[function(require,module,exports){
-module.exports = function(XIBLE) {
+},{}],8:[function(require,module,exports){
+'use strict';
 
-	class Registry {
+module.exports = (XIBLE) => {
+  class Registry {
 
-		static searchNodePacks(searchString) {
+    static searchNodePacks(searchString) {
+      const req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/registry/nodepacks?search=${encodeURIComponent(searchString)}`);
+      return req.toJson();
+    }
 
-			let req = XIBLE.httpBase.request('GET', `http${XIBLE.baseUrl}/api/registry/nodepacks?search=${encodeURIComponent(searchString)}`);
-			return req.toJson();
+    static installNodePackByName(nodePackName) {
+      const req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/registry/nodepacks/${encodeURIComponent(nodePackName)}/install`);
+      req.timeout = 120000; // give this a high timeout because installing may take a while
+      return req.send();
+    }
 
-		}
+  }
 
-		static installNodePackByName(nodePackName) {
-
-			let req = XIBLE.httpBase.request('PATCH', `http${XIBLE.baseUrl}/api/registry/nodepacks/${encodeURIComponent(nodePackName)}/install`);
-			req.timeout = 120000; //give this a high timeout because installing may take a while
-			return req.send();
-
-		}
-
-	}
-
-	return Registry;
-
+  return Registry;
 };
 
 },{}],9:[function(require,module,exports){
-'use strict'; /* jshint ignore: line */
+'use strict';
 
-//require a WebSocket module for nodejs
+// require a WebSocket module for nodejs
 const WebSocket = require('ws');
 
 const OoHttpBase = require('oohttp').Base;
-let EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('events').EventEmitter;
 
 class XibleWrapper extends EventEmitter {
 
-	constructor(obj) {
+  constructor(obj) {
+    super();
 
-		super();
+    // get obj properties we need
+    this.secure = typeof obj.secure === 'boolean' ? obj.secure : true;
+    this.hostname = obj.hostname;
+    this.port = obj.port || 9600;
+    this.baseUrl = `${this.secure ? 's' : ''}://${this.hostname}:${this.port}`;
 
-		//get obj properties we need
-		this.secure = typeof obj.secure === 'boolean' ? obj.secure : true;
-		this.hostname = obj.hostname;
-		this.port = obj.port || 9600;
-		this.baseUrl = `${this.secure ? 's' : ''}://${this.hostname}:${this.port}`;
+    this.httpBase = new OoHttpBase();
 
-		this.httpBase = new OoHttpBase();
+    // token if specified
+    if (obj.token) {
+      this.setToken(obj.token);
+    }
 
-		//token if specified
-		if (obj.token) {
-			this.setToken(obj.token);
-		}
+    // default props
+    this.readyState = XibleWrapper.STATE_CLOSED;
+    this.webSocket = null;
+    this.socketServer = null;
 
-		//default props
-		this.readyState = XibleWrapper.STATE_CLOSED;
-		this.webSocket = null;
-		this.socketServer = null;
+    this.Flow = require('./Flow.js')(this);
+    this.Node = require('./Node.js')(this);
+    this.NodeIo = require('./Io.js')(this);
+    this.NodeInput = require('./Input.js')(this);
+    this.NodeOutput = require('./Output.js')(this);
+    this.Connector = require('./Connector.js')(this);
+    this.Config = require('./Config.js')(this);
+    this.Registry = require('./Registry.js')(this);
+  }
 
-		this.Flow = require('./Flow.js')(this);
-		this.Node = require('./Node.js')(this);
-		this.NodeIo = require('./Io.js')(this);
-		this.NodeInput = require('./Input.js')(this);
-		this.NodeOutput = require('./Output.js')(this);
-		this.Connector = require('./Connector.js')(this);
-		this.Config = require('./Config.js')(this);
-		this.Registry = require('./Registry.js')(this);
+  static get STATE_CONNECTING() {
+    return 0;
+  }
 
-	}
+  static get STATE_OPEN() {
+    return 1;
+  }
 
-	static get STATE_CONNECTING() {
-		return 0;
-	}
+  static get STATE_CLOSING() {
+    return 2;
+  }
 
-	static get STATE_OPEN() {
-		return 1;
-	}
+  static get STATE_CLOSED() {
+    return 3;
+  }
 
-	static get STATE_CLOSING() {
-		return 2;
-	}
+  generateObjectId() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return `${s4() + s4()}-${s4()}-${s4()}-${
+      s4()}-${s4()}${s4()}${s4()}`;
+  }
 
-	static get STATE_CLOSED() {
-		return 3;
-	}
+  setToken(token) {
+    this.token = token;
+    this.httpBase.headers['x-access-token'] = this.token;
+  }
 
-	generateObjectId() {
+  getServerDate() {
+    const req = this.httpBase.request('GET', `http${this.baseUrl}/api/serverDate`);
+    return req.toJson();
+  }
 
-		function s4() {
-			return Math.floor((1 + Math.random()) * 0x10000)
-				.toString(16)
-				.substring(1);
-		}
-		return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-			s4() + '-' + s4() + s4() + s4();
+  getServerClientDateDifference() {
+    return this.getServerDate().then(epoch => epoch - Date.now());
+  }
 
-	}
+  getPersistentWebSocketMessages() {
+    const req = this.httpBase.request('GET', `http${this.baseUrl}/api/persistentWebSocketMessages`);
+    return req.toJson();
+  }
 
-	setToken(token) {
+  connectSocket() {
+    // setup a websocket towards
+    const ws = this.webSocket = new WebSocket(`ws${this.baseUrl}/?token=${this.token}`);
+    ws.addEventListener('open', (event) => {
+      this.readyState = XibleWrapper.STATE_OPEN;
+      this.emit('open', event);
+    });
 
-		this.token = token;
-		this.httpBase.headers['x-access-token'] = this.token;
+    ws.addEventListener('close', (event) => {
+      this.readyState = XibleWrapper.STATE_CLOSED;
+      this.webSocket = null;
+      this.emit('close', event);
+    });
 
-	}
+    ws.addEventListener('error', (event) => {
+      this.emit('error', event);
+    });
 
-	getServerDate() {
+    const messageHandler = (json) => {
+      if (json.method !== 'xible.messages') {
+        this.emit('message', json);
+        return;
+      }
 
-		let req = this.httpBase.request('GET', `http${this.baseUrl}/api/serverDate`);
-		return req.toJson();
+      for (let i = 0; i < json.messages.length; i += 1) {
+        messageHandler(json.messages[i]);
+      }
+    };
 
-	}
+    ws.addEventListener('message', (event) => {
+      let json;
+      try {
+        /**
+        * Parses event.data from the message to JSON and emits the resulting object
+        * @event XibleWrapper#json
+        * @type {Object}
+        */
+        json = JSON.parse(event.data);
+      } catch (err) {}
 
-	getServerClientDateDifference() {
-		return this.getServerDate().then((epoch) => epoch - Date.now());
-	}
+      if (!json) {
+        return;
+      }
 
-	getPersistentWebSocketMessages() {
+      messageHandler(json);
+    });
+  }
 
-		let req = this.httpBase.request('GET', `http${this.baseUrl}/api/persistentWebSocketMessages`);
-		return req.toJson();
+  connect() {
+    if (this.readyState !== XibleWrapper.STATE_CLOSED) {
+      throw new Error('Cannot connect; not in a closed state');
+    }
 
-	}
+    this.readyState = XibleWrapper.STATE_CONNECTING;
+    this.connectSocket();
+  }
 
-	connectSocket() {
+  close() {
+    if (this.readyState !== XibleWrapper.STATE_OPEN) {
+      throw new Error('Cannot connect; not in a open state');
+    }
 
-		//setup a websocket towards
-		let ws = this.webSocket = new WebSocket(`ws${this.baseUrl}/?token=${this.token}`);
-		ws.addEventListener('open', (event) => {
+    this.readyState = XibleWrapper.STATE_CLOSING;
 
-			this.readyState = XibleWrapper.STATE_OPEN;
-			this.emit('open', event);
+    this.stopAutoReconnect();
 
-		});
+    if (this.webSocket) {
+      return new Promise((resolve) => {
+        this.webSocket.once('close', () => {
+          resolve(this);
+        });
 
-		ws.addEventListener('close', (event) => {
+        this.webSocket.close();
+      });
+    }
+    return Promise.resolve(this);
+  }
 
-			this.readyState = XibleWrapper.STATE_CLOSED;
-			this.webSocket = null;
-			this.emit('close', event);
+  /**
+  * This method will force an automatic reconnect of the socket every <timeout> after a close event
+  * @param {Number} timeout the amount of milliseconds after 'close' before retrying
+  */
+  autoReconnect(timeout = 5000) {
+    this.on('close', this._autoReconnectListener = () => {
+      setTimeout(() => {
+        if (this.readyState === XibleWrapper.STATE_CLOSED) {
+          this.connect();
+        }
+      }, timeout);
+    });
+  }
 
-		});
-
-		ws.addEventListener('error', (event) => {
-			this.emit('error', event);
-		});
-
-		let messageHandler = (json) => {
-			if (json.method !== 'xible.messages') {
-				this.emit('message', json);
-				return;
-			}
-
-			for(let i = 0; i < json.messages.length; i += 1) {
-				messageHandler(json.messages[i]);
-			}
-		}
-
-		ws.addEventListener('message', (event) => {
-
-			let json;
-			try {
-
-				/**
-				 *  Parses event.data from the message to JSON and emits the resulting object
-				 *  @event XibleWrapper#json
-				 *  @type {Object}
-				 */
-				json = JSON.parse(event.data);
-			} catch (err) {}
-
-			if (!json) {
-				return;
-			}
-
-			messageHandler(json);
-
-		});
-
-	}
-
-	connect() {
-
-		if (this.readyState !== XibleWrapper.STATE_CLOSED) {
-			throw `Cannot connect; not in a closed state`;
-		}
-
-		this.readyState = XibleWrapper.STATE_CONNECTING;
-		this.connectSocket();
-
-	}
-
-	close() {
-
-		if (this.readyState !== XibleWrapper.STATE_OPEN) {
-			throw `Cannot connect; not in a open state`;
-		}
-
-		this.readyState = XibleWrapper.STATE_CLOSING;
-
-		this.stopAutoReconnect();
-
-		if (this.webSocket) {
-			return new Promise((resolve, reject) => {
-
-				this.webSocket.once('close', () => {
-					resolve(this);
-				});
-
-				this.webSocket.close();
-
-			});
-
-		} else {
-			return Promise.resolve(this);
-		}
-
-	}
-
-	/**
-	 *  This method will force an automatic reconnect of the socket every <timeout> after a close event
-	 *  @param {Number} timeout the amount of milliseconds after 'close' before retrying
-	 */
-	autoReconnect(timeout = 5000) {
-
-		this.on('close', this._autoReconnectListener = () => {
-			setTimeout(() => {
-				if (this.readyState === XibleWrapper.STATE_CLOSED) {
-					this.connect();
-				}
-			}, timeout);
-		});
-
-	}
-
-	//if this close is enforced and autoreconnect is on,
-	//disable autoreconnect
-	stopAutoReconnect(timeout) {
-
-		if (this.autoReconnectListener) {
-
-			this.removeListener('close', this.autoReconnectListener);
-			this.autoReconnectListener = null;
-
-		}
-
-	}
+  // if this close is enforced and autoreconnect is on,
+  // disable autoreconnect
+  stopAutoReconnect() {
+    if (this.autoReconnectListener) {
+      this.removeListener('close', this.autoReconnectListener);
+      this.autoReconnectListener = null;
+    }
+  }
 
 }
 
