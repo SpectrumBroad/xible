@@ -611,6 +611,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.name = null;
       this.type = null;
       this.singleType = false;
+      this.assignsOutputType = null;
       this.maxConnectors = null;
       this.node = null;
       this.description = null;
@@ -626,6 +627,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         if (typeof obj.singleType === 'boolean') {
           this.singleType = obj.singleType;
+        }
+
+        if (typeof obj.assignsOutputType === 'string') {
+          this.assignsOutputType = obj.assignsOutputType;
         }
 
         if (typeof obj.maxConnectors === 'number') {

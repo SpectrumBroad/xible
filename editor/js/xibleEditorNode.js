@@ -688,16 +688,10 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 			element: el
 		}));
 
-		if (obj && obj.listeners) {
-
-			(obj.listeners.attach || []).forEach((listener) => {
-				this.on('attach', eval(`(${listener})`));
-			});
-
-			(obj.listeners.detach || []).forEach((listener) => {
-				this.on('detach', eval(`(${listener})`));
-			});
-
+		if(obj && typeof obj.assignsOutputType === 'string') {
+		  this.on('settype', () => {
+		    this.node.getOutputByName(obj.assignsOutputType).setType(this.type);
+		  });
 		}
 
 		//double click for global
@@ -761,7 +755,6 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 	}
 
 	setType(type) {
-
 		//remove old type
 		if (this.type) {
 			this.element.classList.remove(this.type);
@@ -775,7 +768,6 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
 		}
 
 		return this;
-
 	}
 
 	setName(name) {

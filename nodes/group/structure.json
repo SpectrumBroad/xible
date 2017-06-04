@@ -5,7 +5,8 @@
   "inputs": {
     "any": {
       "type": null,
-  		"singleType": true
+  		"singleType": true,
+      "assignsOutputType": "grouped"
   	}
   },
   "outputs": {
