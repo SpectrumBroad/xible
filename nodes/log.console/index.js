@@ -1,10 +1,12 @@
 'use strict';
 
+const util = require('util');
+
 function log(str, NODE) {
   console.log(str);
 
   NODE.addStatus({
-    message: `${str}`,
+    message: util.inspect(str),
     timeout: 3000
   });
 }
