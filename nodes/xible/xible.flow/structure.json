@@ -1,0 +1,10 @@
+{
+  "name": "xible.flow",
+  "type": "object",
+  "description": "Defines the current flow.",
+  "outputs": {
+    "flow": {
+      "type": "xible.flow"
+    }
+  }
+}
