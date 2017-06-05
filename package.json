@@ -40,6 +40,7 @@
     "node": ">=7.0.0"
   },
   "dependencies": {
+    "xible-wrapper": "*",
     "xible-registry-wrapper": "*",
     "nopt": "*",
     "ws": "*",

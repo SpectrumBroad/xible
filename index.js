@@ -220,6 +220,11 @@ class Xible extends EventEmitter {
       index: false
     }));
 
+    // expose xibleWrapper to editor
+    expressApp.get('/js/xibleWrapper.js', (req, res) => {
+      res.sendFile(`${__dirname}/node_modules/xible-wrapper/dist/index.js`);
+    });
+
     // init the webserver
     const webPortNumber = this.Config.getValue('webserver.portnumber') || 9600;
     this.webPortNumber = webPortNumber;
