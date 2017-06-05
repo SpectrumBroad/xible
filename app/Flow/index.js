@@ -738,6 +738,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           fork = require('child_process').fork;
         }
 
+        let flow;
         this.worker = fork(`${__dirname}/../../child.js`);
         this.worker.on('message', (message) => {
           switch (message.method) {
@@ -796,7 +797,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             case 'startFlowById':
 
-              const flow = XIBLE.getFlowById(message.flowId);
+              flow = XIBLE.getFlowById(message.flowId);
               if (flow) {
                 flow.forceStart().then(() => {
                   if (this.worker && this.worker.connected) {
@@ -813,6 +814,23 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 });
               }
 
+              break;
+
+            case 'getFlowById':
+              flow = XIBLE.getFlowById(message.flowId);
+              this.worker.send({
+                method: 'returnFlow',
+                flowId: message.flowId,
+                flow: {
+                  _id: flow._id,
+                  name: flow.name,
+                  runnable: flow.runnable,
+                  directed: flow.directed,
+                  state: flow.state,
+                  initLevel: flow.initLevel,
+                  timing: flow.timing
+                }
+              });
               break;
 
             case 'stop':
