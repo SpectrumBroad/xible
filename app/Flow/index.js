@@ -796,7 +796,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               break;
 
             case 'startFlowById':
-
               flow = XIBLE.getFlowById(message.flowId);
               if (flow) {
                 flow.forceStart().then(() => {
@@ -818,10 +817,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             case 'getFlowById':
               flow = XIBLE.getFlowById(message.flowId);
-              this.worker.send({
-                method: 'returnFlow',
-                flowId: message.flowId,
-                flow: {
+              let returnFlow = null;
+              if (flow) {
+                returnFlow = {
                   _id: flow._id,
                   name: flow.name,
                   runnable: flow.runnable,
@@ -829,7 +827,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                   state: flow.state,
                   initLevel: flow.initLevel,
                   timing: flow.timing
-                }
+                };
+              }
+              this.worker.send({
+                method: 'returnFlow',
+                flowId: message.flowId,
+                flow: returnFlow
               });
               break;
 
