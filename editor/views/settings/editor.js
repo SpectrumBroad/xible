@@ -3,10 +3,25 @@ View.routes['/settings/editor'] = function(EL) {
 	EL.innerHTML = `
 		<section>
 			<h1>Editor</h1>
+			<section id="nodes">
+				<h2>Nodes</h2>
+				<dl>
+					<dt>
+						<label for="settingsEditorNodesStatusesMax">
+							Maximum status lines per node
+							<div>
+								The maximum amount of status lines visible on each nodes. Based on the first-in-first-out principle.<br/>
+								This excempts progress bars. An empty value indicates no limit.
+							</div>
+						</label>
+					</dt>
+					<dd><input id="settingsEditorNodesStatusesMax" type="number" data-configpath="editor.nodes.statuses.max" /></dd>
+				</dl>
+			</section>
+
 			<section id="viewstate">
 				<h2>Viewstate</h2>
 				<dl>
-
 					<dt>
 						<label for="settingsEditorViewStateZoomStateOnOpen">
 							Zoom state on open
@@ -23,7 +38,6 @@ View.routes['/settings/editor'] = function(EL) {
 							<option value="fit">Fit - Zooms to fit</option>
 						</select>
 					</dd>
-
 				</dl>
 			</section>
 

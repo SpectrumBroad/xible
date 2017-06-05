@@ -366,36 +366,48 @@ class XibleEditorNode extends xibleWrapper.Node {
 	}
 
 	addStatus(status) {
-
 		if (!status || !status._id) {
 			return;
 		}
 
-		let ul = this.statusEl;
-		if (!ul) {
+		xibleWrapper.Config
+			.getValue('editor.nodes.statuses.max')
+			.then((configMaxStatuses) => {
+				let statusCount = 0;
+				let ul = this.statusEl;
+				if (!ul) {
+					ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
+					ul.classList.add('statuses');
+				} else {
+					statusCount = ul.querySelectorAll('li:not(.bar)').length;
+				}
 
-			ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
-			ul.classList.add('statuses');
+				if(typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
+					const removeChild = ul.firstChild;
+					this.removeStatusById(removeChild.getAttribute('data-statusid'));
+				}
 
-		}
+				if(configMaxStatuses === 0) {
+					return;
+				}
 
-		let li = ul.appendChild(document.createElement('li'));
-		li.setAttribute('data-statusid', status._id);
+				let li = ul.appendChild(document.createElement('li'));
+				li.setAttribute('data-statusid', status._id);
 
-		if (status.color) {
-			li.classList.add(status.color);
-		}
+				if (status.color) {
+					li.classList.add(status.color);
+				}
 
-		if (status.message) {
-			li.appendChild(document.createTextNode(status.message));
-		}
+				if (status.message) {
+					li.appendChild(document.createTextNode(status.message));
+				}
 
-		if (status.timeout) {
-			this.statusTimeouts[status._id] = window.setTimeout(() => {
-				this.removeStatusById(status._id);
-			}, status.timeout);
-		}
-
+				if (status.timeout) {
+					this.statusTimeouts[status._id] = window.setTimeout(() => {
+						this.removeStatusById(status._id);
+					}, status.timeout);
+				}
+			});
 	}
 
 	updateStatusById(statusId, status) {
