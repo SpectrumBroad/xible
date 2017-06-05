@@ -505,6 +505,8 @@ class XibleEditor extends EventEmitter {
 		this.backgroundTop = flow.viewState.backgroundTop;
 		this.transform();
 
+		this.emit('viewflow');
+
 	}
 
 	/**
