@@ -36,6 +36,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.directed = false;
       this.state = Flow.STATE_STOPPED;
       this.initLevel = initLevel;
+
+      this.timing = {};
     }
 
     static get INITLEVEL_NONE() {
@@ -707,7 +709,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     init() {
-      const initStartTime = process.hrtime();
+      this.timing.initStart = process.hrtime();
 
       if (!this.runnable) {
         return Promise.reject('not runnable');
@@ -743,7 +745,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             case 'initializing':
 
               if (this.worker && this.worker.connected) {
-                const initializingDiff = process.hrtime(initStartTime);
+                const initializingDiff = process.hrtime(this.timing.initStart);
                 flowDebug(`flow/worker initializing in ${initializingDiff[0] * 1000 + (initializingDiff[1] / 1e6)}ms`);
 
                 this.worker.send({
@@ -762,7 +764,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             case 'initialized':
 
-              const initializedDiff = process.hrtime(initStartTime);
+              const initializedDiff = process.hrtime(this.timing.initStart);
               flowDebug(`flow/worker initialized in ${initializedDiff[0] * 1000 + (initializedDiff[1] / 1e6)}ms`);
 
               this.state = Flow.STATE_INITIALIZED;

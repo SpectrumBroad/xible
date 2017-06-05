@@ -20,7 +20,7 @@ module.exports = (NODE) => {
       values = vals;
 
       // save the state
-      state.set(this, {
+      state.set(NODE, {
         values: vals
       });
 
@@ -30,7 +30,7 @@ module.exports = (NODE) => {
 
   valueOut.on('trigger', (conn, state, callback) => {
     // state handling (if refresh complete was used)
-    const thisState = state.get(this);
+    const thisState = state.get(NODE);
     if (thisState) {
       callback(thisState.values);
       return;
