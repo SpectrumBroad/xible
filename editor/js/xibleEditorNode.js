@@ -382,12 +382,16 @@ class XibleEditorNode extends xibleWrapper.Node {
 					statusCount = ul.querySelectorAll('li:not(.bar)').length;
 				}
 
-				if(typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
-					const removeChild = ul.firstChild;
-					this.removeStatusById(removeChild.getAttribute('data-statusid'));
+				// remove all statuses above the max config setting
+				if (typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
+					while (statusCount >= configMaxStatuses && ul.firstChild) {
+						const removeChild = ul.firstChild;
+						this.removeStatusById(removeChild.getAttribute('data-statusid'));
+						statusCount -= 1;
+					}
 				}
 
-				if(configMaxStatuses === 0) {
+				if (configMaxStatuses === 0) {
 					return;
 				}
 
