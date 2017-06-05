@@ -5,8 +5,12 @@ const util = require('util');
 function log(str, NODE) {
   console.log(str);
 
+  if (typeof str !== 'string') {
+    str = util.inspect(str);
+  }
+
   NODE.addStatus({
-    message: util.inspect(str),
+    message: str,
     timeout: 3000
   });
 }
