@@ -746,6 +746,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
               if (this.worker && this.worker.connected) {
                 const initializingDiff = process.hrtime(this.timing.initStart);
+
                 flowDebug(`flow/worker initializing in ${initializingDiff[0] * 1000 + (initializingDiff[1] / 1e6)}ms`);
 
                 this.worker.send({
@@ -764,6 +765,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             case 'initialized':
 
+              this.timing.initEnd = process.hrtime();
               const initializedDiff = process.hrtime(this.timing.initStart);
               flowDebug(`flow/worker initialized in ${initializedDiff[0] * 1000 + (initializedDiff[1] / 1e6)}ms`);
 
@@ -881,7 +883,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
         this.state = Flow.STATE_STARTING;
 
-        const startTime = process.hrtime();
+        this.timing.startStart = process.hrtime();
 
         return new Promise((resolve) => {
           // let client now we're starting up the flow
@@ -907,7 +909,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
                 case 'started':
 
-                  const startedDiff = process.hrtime(startTime);
+                  this.timing.startEnd = process.hrtime();
+                  const startedDiff = process.hrtime(this.timing.startStart);
                   flowDebug(`flow/worker started in ${startedDiff[0] * 1000 + (startedDiff[1] / 1e6)}ms`);
 
                   resolve(this);
