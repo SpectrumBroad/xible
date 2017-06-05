@@ -66,9 +66,11 @@ View.routes['/settings'] = function(EL) {
 
 						case 'number':
 
-							value = +value;
-							if (isNaN(value)) {
-								return;
+							if(typeof value === 'string' && value.length > 0) {
+								value = +value;
+								if (isNaN(value)) {
+									return;
+								}
 							}
 
 							break;
