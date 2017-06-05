@@ -1,5 +1,6 @@
 'use strict';
 
+const EventEmitter = require('events').EventEmitter;
 const debug = require('debug');
 const fs = require('fs');
 
@@ -118,6 +119,13 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
       delete sel[pathSplit.pop()];
 
+      // emit
+      this.emit('deleteValue', path);
+      XIBLE.broadcastWebSocket({
+        method: 'xible.config.deleteValue',
+        path
+      });
+
       if (configPath) {
         saveConfig(configPath, config);
       }
@@ -151,6 +159,14 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
       sel[pathSplit.pop()] = value;
 
+      // emit
+      this.emit('setValue', path, value);
+      XIBLE.broadcastWebSocket({
+        method: 'xible.config.setValue',
+        path,
+        value
+      });
+
       if (configPath) {
         saveConfig(configPath, config);
       }
@@ -177,6 +193,10 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
     }
 
   }
+
+  // statically hook eventemitter
+  Object.assign(Config, EventEmitter.prototype);
+  EventEmitter.call(Config);
 
   if (EXPRESS_APP) {
     require('./routes.js')(Config, XIBLE, EXPRESS_APP);
