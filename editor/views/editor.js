@@ -368,7 +368,7 @@ View.routes['/editor'] = function(EL) {
 	let flowEditorHolder = document.getElementById('flowEditorHolder');
 
 	//zoom and reset
-	document.getElementById('zoomOutButton').onclick = function() {
+	function zoomOut() {
 
 		if (xibleEditor.zoom < 0.2) {
 			return;
@@ -378,13 +378,15 @@ View.routes['/editor'] = function(EL) {
 		xibleEditor.transform();
 
 	};
-	document.getElementById('zoomResetButton').onclick = function() {
+	document.getElementById('zoomOutButton').onclick = zoomOut;
+	function zoomReset() {
 
 		xibleEditor.zoom = 1;
 		xibleEditor.transform();
 
 	};
-	document.getElementById('zoomInButton').onclick = function() {
+	document.getElementById('zoomResetButton').onclick = zoomReset;
+	function zoomIn() {
 
 		if (xibleEditor.zoom >= 5) {
 			return;
@@ -394,7 +396,8 @@ View.routes['/editor'] = function(EL) {
 		xibleEditor.transform();
 
 	};
-	document.getElementById('zoomFitButton').onclick = function() {
+	document.getElementById('zoomInButton').onclick = zoomIn;
+	function zoomFit() {
 
 		if (!xibleEditor.loadedFlow || !xibleEditor.loadedFlow.nodes.length) {
 			return;
@@ -467,6 +470,7 @@ View.routes['/editor'] = function(EL) {
 		xibleEditor.transform();
 
 	};
+	document.getElementById('zoomFitButton').onclick = zoomFit;
 
 	//add the flow names to the flow tab list
 	let flowListUl = document.getElementById('flowList');
@@ -569,6 +573,19 @@ View.routes['/editor'] = function(EL) {
 					}
 				}
 			});
+
+			//set desired zoomstate
+			xibleWrapper.Config.getValue('editor.viewstate.zoomstateonopen')
+				.then((value) => {
+					switch(value) {
+						case 'reset':
+							zoomReset();
+						break;
+						case 'fit':
+							zoomFit();
+						break;
+					}
+				});
 
 		};
 

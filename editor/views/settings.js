@@ -13,13 +13,13 @@ View.routes['/settings'] = function(EL) {
 					<li><a href="/settings/general#vault" onclick="settingsViewHolder.navigate('/settings/general#vault'); return false;">Vault</a></li>
 				</ul>
 			</section>
-			<!--
 			<section>
 				<h1>Editor</h1>
 				<ul>
-					<li><a href="/settings/editor#general" onclick="settingsViewHolder.navigate('/settings/editor#general'); return false;">General</a></li>
+					<li><a href="/settings/editor#viewstate" onclick="settingsViewHolder.navigate('/settings/editor#viewstate'); return false;">Viewstate</a></li>
 				</ul>
 			</section>
+<!--
 			<section>
 				<h1>Security</h1>
 				<ul>

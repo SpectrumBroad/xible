@@ -3,82 +3,30 @@ View.routes['/settings/editor'] = function(EL) {
 	EL.innerHTML = `
 		<section>
 			<h1>Editor</h1>
-			<section id="general">
-				<h2>General</h2>
+			<section id="viewstate">
+				<h2>Viewstate</h2>
 				<dl>
+
 					<dt>
-						<label for="settingsRegistryGeneralUrl">
-							URL
-							<div>Connection URL towards the XIBLE registry. This registry is used for downloading nodepacks and flows.</div>
+						<label for="settingsEditorViewStateZoomStateOnOpen">
+							Zoom state on open
+							<div>
+								Change the zoom state of a flow when opening.<br/>
+								Note that any alteration in the viewstate will be saved when hitting 'Save' or 'Deploy' on the flow.
+							</div>
 						</label>
 					</dt>
-					<dd><input id="settingsRegistryGeneralUrl" type="url" value="https://registry.xible.io" /></dd>
-				</dl>
-			</section>
-			<section id="nodepacks">
-				<h2>Nodepacks</h2>
-				<dl>
-
-					<dd class="checkbox">
-						<label for="settingsRegistryNodepacksAllowPublish">
-							<input type="checkbox" value="true" id="settingsRegistryNodepacksAllowPublish" />
-							<span></span>
-						</label>
+					<dd>
+						<select id="settingsEditorViewStateZoomStateOnOpen" data-configpath="editor.viewstate.zoomstateonopen">
+							<option value="untouched">Untouched - Leaves the state as-is</option>
+							<option value="reset">Reset - Sets the zoom level to the default value</option>
+							<option value="fit">Fit - Zooms to fit</option>
+						</select>
 					</dd>
-					<dt class="checkbox">
-						<label for="settingsRegistryNodepacksAllowPublish">
-							Allow publish
-							<div>Enable or disable the ability to publish nodepacks.</div>
-						</label>
-					</dt>
-
-					<dd class="checkbox">
-						<label for="settingsRegistryNodepacksAllowInstall">
-							<input type="checkbox" value="true" id="settingsRegistryNodepacksAllowInstall" />
-							<span></span>
-						</label>
-					</dd>
-					<dt class="checkbox">
-						<label for="settingsRegistryNodepacksAllowInstall">
-							Allow install
-							<div>Enable or disable the ability to install nodepacks.</div>
-						</label>
-					</dt>
 
 				</dl>
 			</section>
-			<section id="flows">
-				<h2>Flows</h2>
-				<dl>
 
-					<dd class="checkbox">
-						<label for="settingsRegistryFlowsAllowPublish">
-							<input type="checkbox" value="true" id="settingsRegistryFlowsAllowPublish" />
-							<span></span>
-						</label>
-					</dd>
-					<dt class="checkbox">
-						<label for="settingsRegistryFlowsAllowPublish">
-							Allow publish
-							<div>Enable or disable the ability to publish flows.</div>
-						</label>
-					</dt>
-
-					<dd class="checkbox">
-						<label for="settingsRegistryFlowsAllowInstall">
-							<input type="checkbox" value="true" id="settingsRegistryFlowsAllowInstall" />
-							<span></span>
-						</label>
-					</dd>
-					<dt class="checkbox">
-						<label for="settingsRegistryFlowsAllowInstall">
-							Allow install
-							<div>Enable or disable the ability to install flows.</div>
-						</label>
-					</dt>
-
-				</dl>
-			</section>
 		</section>
 	`;
 
