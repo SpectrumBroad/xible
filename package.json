@@ -25,10 +25,8 @@
   ],
   "scripts": {
     "start": "node cli.js server start",
-    "debug": "export DEBUG=\"xible*\"; ./node_modules/.bin/nodemon cli.js server start",
-    "debug-win": "set DEBUG=xible* & ./node_modules/.bin/nodemon cli.js server start",
-    "inspect": "export DEBUG=\"xible*\"; ./node_modules/.bin/nodemon --inspect cli.js server start",
-    "inspect-win": "set DEBUG=xible* & ./node_modules/.bin/nodemon --inspect cli.js server start",
+    "debug": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon cli.js server start",
+    "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect cli.js server start",
     "prepublish": "npm shrinkwrap --only=prod"
   },
   "bin": {
