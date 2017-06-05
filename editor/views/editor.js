@@ -301,6 +301,9 @@ View.routes['/editor'] = function(EL) {
 
 	//update the usage charts
 	xibleEditor.on('flow.usage', (flows) => {
+		if(!xibleEditor.loadedFlow || !flows || !flows.length) {
+			return;
+		}
 
 		//only run this on the loaded flow
 		let flow = flows.find((flow) => flow._id === xibleEditor.loadedFlow._id);
