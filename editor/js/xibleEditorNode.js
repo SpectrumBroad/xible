@@ -402,8 +402,15 @@ class XibleEditorNode extends xibleWrapper.Node {
 					li.classList.add(status.color);
 				}
 
-				if (status.message) {
-					li.appendChild(document.createTextNode(status.message));
+				if (typeof status.message === 'string') {
+					let messageLineSplit = status.message.split('\n');
+					for (let i = 0; i < messageLineSplit.length; i += 1) {
+						if (i) {
+							li.appendChild(document.createElement('br'));
+						}
+						li.appendChild(document.createTextNode(messageLineSplit[i]));
+					}
+					messageLineSplit = null;
 				}
 
 				if (status.timeout) {
