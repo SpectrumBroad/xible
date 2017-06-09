@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.6.0][] - 2017-06-09
 ### Added
 -   Node inputs now have a string value `assignsOutputType` that allows the given output to be assigned the same type as the input. See the [node structure documentation](https://www.xible.io/docs/guides/nodes/structure.htm#structure.json) for more information.
 
@@ -12,8 +15,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The maximum amount of statuses visible on any node in the editor can be changed through the settings. The value is stored in the configuration file as `editor.nodes.statuses.max`. ([#13](https://github.com/SpectrumBroad/xible/issues/13))
 
+-   A flow saves some performance metrics in the timing object. This object is only available on flows in the main thread.
+
 ### Changed
 -   xible-wrapper is now fetched from [npm](http://npmjs.com/package/xible-wrapper). It used to be distributed within the xible package itself.
+
+-   All xiblepm commands deliver the user-auth-token header to the registry, if the user is logged in. Previously, the user token was only sent for publish commands.
 
 ## [0.5.0][] - 2017-06-03
 ### Added
@@ -50,7 +57,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/SpectrumBroad/xible/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/SpectrumBroad/xible/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/SpectrumBroad/xible/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/SpectrumBroad/xible/compare/v0.3.1...v0.4.0
