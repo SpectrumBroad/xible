@@ -9,9 +9,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     throw new Error('"registry.url" not found in config');
   }
 
-  const xibleRegistry = new XibleRegistryWrapper({
-    url: registryUrl
-  });
+  const xibleRegistry = new XibleRegistryWrapper(registryUrl);
 
   // the tmp path for downloading this node
   const TMP_REGISTRY_DIR = '/tmp/xibleRegistryTmp';
