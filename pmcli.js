@@ -123,6 +123,12 @@ function getUserInput(question, pwd) {
   });
 }
 
+// set the user token if there is one
+const userToken = getUserToken();
+if (userToken) {
+  xible.Registry.setToken(userToken);
+}
+
 // cli commands
 const cli = {
 
@@ -185,7 +191,7 @@ const cli = {
 
               // publish
               return xible.Registry.Flow
-                .publish(flowJson, token)
+                .publish(flowJson)
                 .catch(publishErr => Promise.reject(`Failed to publish flow "${flow._id}": ${publishErr}`))
                 .then((publishedFlow) => {
                   console.log(`Published flow "${publishedFlow._id}".`);
@@ -326,7 +332,7 @@ const cli = {
                       registry: {
                         url: `https://registry.npmjs.com/${nodePackName}`
                       }
-                    }, token)
+                    })
                     .catch(publishErr => reject(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`))
                     .then((publishedNodePack) => {
                       console.log(`Published nodepack "${publishedNodePack.name}".`);
