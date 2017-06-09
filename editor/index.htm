@@ -47,13 +47,11 @@
 	</main>
 
 	<script>
-		xibleWrapper = new XibleWrapper({
-
-			hostname: window.location.hostname,
-			port: window.location.port,
-			secure: window.location.protocol === 'https:'
-
-		});
+		let locationPort = window.location.port || '';
+		if(locationPort) {
+			locationPort = `:${locationPort}`;
+		}
+		xibleWrapper = new XibleWrapper(`${window.location.protocol}//${window.location.hostname}${locationPort}`);
 		xibleWrapper.on('error', (err) => {
 			console.log(err);
 		});

@@ -91,7 +91,7 @@ class XibleEditorNodeSelector {
 			searchOnlineButton.classList.add('loading');
 
 			//query the registry
-			xibleWrapper.Registry
+			this.xibleEditor.xibleWrapper.Registry
 				.searchNodePacks(filterInput.value)
 				.then((nodePacks) => {
 
@@ -268,7 +268,7 @@ class XibleEditorNodeSelector {
 		this.detailConfirmButton.disabled = true;
 
 		//check if config allows installing new nodepacks
-		xibleWrapper.Config
+		this.xibleEditor.xibleWrapper.Config
 			.getValue('registry.nodepacks.allowinstall')
 			.then((allowInstall) => {
 
@@ -287,7 +287,7 @@ class XibleEditorNodeSelector {
 			this.detailConfirmButton.classList.add('loading');
 			li.classList.add('loading');
 
-			xibleWrapper.Registry
+			this.xibleEditor.xibleWrapper.Registry
 				.installNodePackByName(nodePack.name)
 				.then(() => {
 
@@ -448,33 +448,31 @@ class XibleEditorNodeSelector {
 		this.nodesUl.innerHTML = '';
 
 		//get the installed nodes
-		let req = xibleWrapper.httpBase.request('GET', `http${xibleWrapper.baseUrl}/api/nodes`);
-		return req.toJson().then((nodes) => {
+		return this.xibleEditor.xibleWrapper.http.request('GET', '/api/nodes')
+			.toJson().then((nodes) => {
+				Object.keys(nodes).forEach((nodeName) => {
 
-			Object.keys(nodes).forEach((nodeName) => {
+					let li = this.buildNode(nodeName, nodes[nodeName]);
+					this.hookNode(li, nodes[nodeName]);
 
-				let li = this.buildNode(nodeName, nodes[nodeName]);
-				this.hookNode(li, nodes[nodeName]);
+					if (visibleNodeNames) {
+						li.classList.add('hidden');
+					}
 
+					this.nodesUl.appendChild(li);
+
+				});
+
+				//make items visible that were so before
 				if (visibleNodeNames) {
-					li.classList.add('hidden');
-				}
-
-				this.nodesUl.appendChild(li);
-
-			});
-
-			//make items visible that were so before
-			if (visibleNodeNames) {
-				for (let i = 0; i < visibleNodeNames.length; ++i) {
-					let h1 = this.nodesUl.querySelector(`li h1[title="${visibleNodeNames[i]}"]`);
-					if (h1) {
-						h1.parentNode.classList.remove('hidden');
+					for (let i = 0; i < visibleNodeNames.length; ++i) {
+						let h1 = this.nodesUl.querySelector(`li h1[title="${visibleNodeNames[i]}"]`);
+						if (h1) {
+							h1.parentNode.classList.remove('hidden');
+						}
 					}
 				}
-			}
-
-		});
+			});
 
 	}
 
