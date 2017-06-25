@@ -247,7 +247,8 @@ class Xible extends EventEmitter {
       wsDebug(`listening on port: ${webPortNumber}`);
 
       const webSocketServer = new ws.Server({
-        server: webServer
+        server: webServer,
+        ssl: this.secure
       });
       this.webSocketServer = webSocketServer;
 
