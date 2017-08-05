@@ -15,36 +15,32 @@ View.routes['/editor'] = function(EL) {
 			<p id="flowNotRunnable" class="status alert hidden">
 				This flow cannot be started because it contains nodes that don't exist in the given configuration.
 			</p>
-			<section class="buttons">
+			<section class="buttons editor">
 				<button type="button" id="xibleFlowDeployButton">Deploy</button>
 				<button type="button" id="xibleFlowStartButton">Start</button>
 				<button type="button" id="xibleFlowStopButton">Stop</button>
 				<button type="button" id="xibleFlowSaveButton">Save</button>
 				<button type="button" id="xibleFlowDeleteButton">Delete</button>
 			</section>
-			<section id="console">
-				<ul class="stats">
-					<li>
-						<div>
-							<canvas id="cpuChart"></canvas>
-						</div>
-						<label id="cpu">cpu</label>
-					</li>
-					<li>
-						<div>
-							<canvas id="memChart"></canvas>
-						</div>
-						<label id="rss">rss</label>
-						<label id="heapTotal">heap total</label>
-						<label id="heapUsed">heap used</label>
-					</li>
-					<li>
-						<div>
-							<canvas id="delayChart"></canvas>
-						</div>
-						<label id="delay">event loop delay</label>
-					</li>
-				</ul>
+			<section class="stats">
+				<div>
+					<canvas id="cpuChart"></canvas>
+				</div>
+				<label id="cpu">cpu</label>
+			</section>
+			<section class="stats">
+				<div>
+					<canvas id="memChart"></canvas>
+				</div>
+				<label id="rss">rss</label>
+				<label id="heapTotal">heap total</label>
+				<label id="heapUsed">heap used</label>
+			</section>
+			<section class="stats">
+				<div>
+					<canvas id="delayChart"></canvas>
+				</div>
+				<label id="delay">event loop delay</label>
 			</section>
 		</div>
 		<div id="flowEditorHolder">

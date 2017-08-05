@@ -85,3 +85,57 @@
 #sub header {
 	margin: 0;
 }
+
+#sub section.buttons {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.buttons button {
+	box-sizing: border-box;
+	-webkit-appearance: none;
+	appearance: none;
+	color: #fff;
+	font-weight: bold;
+	font-family: inherit;
+	border: 1px solid transparent;
+	background-color: #282828;
+	padding: 10px;
+	cursor: pointer;
+	display: block;
+	border-radius: 4px;
+	margin: 10px;
+	min-width: 30%;
+	flex: 1 1 0;
+}
+
+.buttons button:hover {
+	background-color: #383838;
+}
+
+.buttons button:active, .buttons button:focus {
+	-webkit-appearance: none;
+	appearance: none;
+	outline: 0;
+	border: 2px solid #45679E;
+	padding: 8px;
+}
+
+.buttons button:disabled {
+	cursor: default;
+	border: 1px solid #282828;
+	background-color: #181818;
+	color: #585858;
+}
+
+
+@media (max-height: 820px) and (min-height: 1px) {
+	#sub section {
+		padding: 10px 0;
+	}
+
+	.buttons button {
+		padding: 8px;
+		margin: 6px 10px;
+	}
+}
