@@ -1,4 +1,3 @@
-
 #sub {
 	font-family: arial;
 	box-shadow: inset 6px 0 6px -6px rgba(0, 0, 0, 1);
@@ -100,7 +99,7 @@
 	font-family: inherit;
 	border: 1px solid transparent;
 	background-color: #282828;
-	padding: 10px;
+	padding: 10px 0;
 	cursor: pointer;
 	display: block;
 	border-radius: 4px;
@@ -128,14 +127,19 @@
 	color: #585858;
 }
 
-
 @media (max-height: 820px) and (min-height: 1px) {
 	#sub section {
 		padding: 10px 0;
 	}
 
 	.buttons button {
-		padding: 8px;
+		padding: 8px 0;
 		margin: 6px 10px;
+	}
+}
+
+@media (max-width: 1023px) and (min-width: 1px) {
+	#sub {
+		width: 180px;
 	}
 }

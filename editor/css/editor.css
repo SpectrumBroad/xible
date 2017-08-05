@@ -154,6 +154,12 @@
 	}
 }
 
+@media (max-width: 1023px) and (min-width: 1px) and (max-height: 820px) {
+	.editor.buttons button::before {
+		display: none;
+	}
+}
+
 .nodeList {
 	-webkit-user-select: none;
 	-moz-user-select: none;
