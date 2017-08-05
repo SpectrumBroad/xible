@@ -23,20 +23,28 @@ View.routes['/editor'] = function(EL) {
 				<button type="button" id="xibleFlowDeleteButton">Delete</button>
 			</section>
 			<section id="console">
-				<div class="stats">
-
-					<canvas id="cpuChart"></canvas>
-					<label id="cpu">cpu</label>
-
-					<canvas id="memChart"></canvas>
-					<label id="rss">rss</label>
-					<label id="heapTotal">heap total</label>
-					<label id="heapUsed">heap used</label>
-
-					<canvas id="delayChart"></canvas>
-					<label id="delay">event loop delay</label>
-
-				</div>
+				<ul class="stats">
+					<li>
+						<div>
+							<canvas id="cpuChart"></canvas>
+						</div>
+						<label id="cpu">cpu</label>
+					</li>
+					<li>
+						<div>
+							<canvas id="memChart"></canvas>
+						</div>
+						<label id="rss">rss</label>
+						<label id="heapTotal">heap total</label>
+						<label id="heapUsed">heap used</label>
+					</li>
+					<li>
+						<div>
+							<canvas id="delayChart"></canvas>
+						</div>
+						<label id="delay">event loop delay</label>
+					</li>
+				</ul>
 			</section>
 		</div>
 		<div id="flowEditorHolder">
@@ -154,6 +162,8 @@ View.routes['/editor'] = function(EL) {
 		},
 
 		options: {
+			responsive: true,
+			maintainAspectRatio: false,
 			legend: {
 				display: false
 			},
@@ -219,6 +229,8 @@ View.routes['/editor'] = function(EL) {
 		},
 
 		options: {
+			responsive: true,
+			maintainAspectRatio: false,
 			legend: {
 				display: false
 			},
@@ -268,6 +280,8 @@ View.routes['/editor'] = function(EL) {
 		},
 
 		options: {
+			responsive: true,
+			maintainAspectRatio: false,
 			legend: {
 				display: false
 			},

@@ -59,16 +59,31 @@
 
 #console>.stats {
 	width: 100%;
-	height: 200px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
 }
 
-#console>.stats>canvas {
+#console>.stats>li {
+	display: block;
+	margin: 0;
+	padding: 0;
+	overflow: auto;
+}
+
+#console>.stats>li>div {
+	position: relative;
+	height: 120px;
+}
+
+#console>.stats>li>div>canvas {
 	display: block;
 	width: 100%;
 	height: 50%;
 }
 
-#console>.stats>label {
+#console>.stats>li>label {
 	display: block;
 	float: left;
 	position: relative;
@@ -76,7 +91,7 @@
 	margin: 4px;
 }
 
-#console>.stats>label::before {
+#console>.stats>li>label::before {
 	margin: 3px 4px 4px;
 	display: block;
 	float: left;
