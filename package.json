@@ -47,7 +47,8 @@
     "body-parser": "*",
     "spdy": "*",
     "sanitize-filename": "*",
-    "fs-extra": "*"
+    "fs-extra": "*",
+    "strip-ansi": "*"
   },
   "devDependencies": {
     "eslint": "*",
