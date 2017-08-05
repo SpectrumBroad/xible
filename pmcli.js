@@ -24,6 +24,7 @@ const fs = require('fs');
 const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
+const stripAnsi = require('strip-ansi');
 const Xible = require('./index.js');
 
 // option parsing
@@ -49,8 +50,12 @@ const xible = new Xible({
 });
 
 function logError(msg, exitCode) {
-  console.error(msg);
+  console.error(stripAnsi(msg));
   process.exitCode = exitCode || 1;
+}
+
+function log(msg) {
+  console.log(stripAnsi(msg));
 }
 
 // determine the stripped registry url
@@ -194,7 +199,7 @@ const cli = {
                 .publish(flowJson)
                 .catch(publishErr => Promise.reject(`Failed to publish flow "${flow._id}": ${publishErr}`))
                 .then((publishedFlow) => {
-                  console.log(`Published flow "${publishedFlow._id}".`);
+                  log(`Published flow "${publishedFlow._id}".`);
                 });
             });
         });
@@ -229,7 +234,7 @@ const cli = {
             return Promise.reject(`Flow "${ARG}" does not exist`);
           }
           return registryFlow.install(altFlowId)
-            .then(() => console.log(`Installed flow "${altFlowId || registryFlow.name}"`));
+            .then(() => log(`Installed flow "${altFlowId || registryFlow.name}"`));
         });
     },
     remove() {
@@ -249,7 +254,7 @@ const cli = {
         return Promise.reject(`Flow "${ARG}" does not exist`);
       }
       return flow.delete()
-        .then(() => console.log(`Flow "${ARG}" removed`));
+        .then(() => log(`Flow "${ARG}" removed`));
     },
     search() {
       if (!ARG) {
@@ -260,7 +265,7 @@ const cli = {
         .search(ARG)
         .then((flows) => {
           Object.keys(flows).forEach((flowName) => {
-            console.log(`${flowName}`);
+            log(`${flowName}`);
           });
         });
     }
@@ -335,7 +340,7 @@ const cli = {
                     })
                     .catch(publishErr => reject(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`))
                     .then((publishedNodePack) => {
-                      console.log(`Published nodepack "${publishedNodePack.name}".`);
+                      log(`Published nodepack "${publishedNodePack.name}".`);
                       resolve();
                     });
                 });
@@ -376,7 +381,7 @@ const cli = {
             nodes[nodeName]
               .getRegistryData()
               .then((data) => {
-                console.log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
+                log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
               });
           });
         });
@@ -405,11 +410,11 @@ const cli = {
         return Promise.resolve();
       }
 
-      console.log(xible.Config.getValue(ARG));
+      log(xible.Config.getValue(ARG));
       return Promise.resolve();
     },
     list() {
-      console.log(JSON.stringify(xible.Config.getAll(), null, '\t'));
+      log(JSON.stringify(xible.Config.getAll(), null, '\t'));
       return Promise.resolve();
     }
   },
@@ -422,7 +427,7 @@ const cli = {
       const token = getUserToken();
 
       if (!token) {
-        console.log('Not logged in.');
+        log('Not logged in.');
         return Promise.resolve();
       }
 
@@ -430,10 +435,10 @@ const cli = {
         .getByToken(token)
         .then((user) => {
           if (!user) {
-            console.log('Not logged in.');
+            log('Not logged in.');
             return;
           }
-          console.log(user.name);
+          log(user.name);
         });
     },
     logout() {
@@ -522,10 +527,10 @@ function printUsage(path) {
     logError(`Unrecognized context: "${context}"\n`);
   }
 
-  console.log(`Usage: xiblepm ${cli[context] ? context : '<context>'} <command>\n\nWhere ${cli[context] ? '<command>' : '<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
+  log(`Usage: xiblepm ${cli[context] ? context : '<context>'} <command>\n\nWhere ${cli[context] ? '<command>' : '<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
 
   if (cli[context]) {
-    console.log('Type: xiblepm <context> help for more help about the specified context.');
+    log('Type: xiblepm <context> help for more help about the specified context.');
   }
 }
 

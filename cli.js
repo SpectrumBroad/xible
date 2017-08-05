@@ -23,6 +23,7 @@ process.env.DEBUG = 'xible*';
 
 const fs = require('fs');
 const nopt = require('nopt');
+const stripAnsi = require('strip-ansi');
 const Xible = require('./index.js');
 
 // option parsing
@@ -46,8 +47,12 @@ const ARG = remain.shift();
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
 
 function logError(msg, exitCode) {
-  console.error(msg);
+  console.error(stripAnsi(msg));
   process.exitCode = exitCode || 1;
+}
+
+function log(msg) {
+  console.log(stripAnsi(msg));
 }
 
 // cli commands
@@ -87,7 +92,7 @@ const cli = {
               reject(`Failed to install service: ${writeServiceErr}`);
               return;
             }
-            console.log(`Service installed with User="${user}" and Group="${group}".`);
+            log(`Service installed with User="${user}" and Group="${group}".`);
             resolve();
           });
         });
@@ -100,7 +105,7 @@ const cli = {
             reject(`Failed to remove service: ${err}`);
             return;
           }
-          console.log('Service removed.');
+          log('Service removed.');
           resolve();
         });
       });
@@ -113,7 +118,7 @@ const cli = {
             reject(`Failed to start service: ${err}`);
             return;
           }
-          console.log('Service started.');
+          log('Service started.');
           resolve();
         });
       });
@@ -126,7 +131,7 @@ const cli = {
             reject(`Failed to stop service: ${err}`);
             return;
           }
-          console.log('Service stopped.');
+          log('Service stopped.');
           resolve();
         });
       });
@@ -136,16 +141,16 @@ const cli = {
         const exec = require('child_process').exec;
         exec('systemctl show xible.service -p ActiveState', (err, stdout) => {
           if (err) {
-            console.log(`Failed to get service status: ${err}`);
+            log(`Failed to get service status: ${err}`);
             return;
           }
           stdout = `${stdout}`;
           if (/=inactive/.test(stdout)) {
-            console.log('inactive');
+            log('inactive');
           } else if (/=active/.test(stdout)) {
-            console.log('active');
+            log('active');
           } else {
-            console.log('unknown');
+            log('unknown');
           }
           resolve();
         });
@@ -161,7 +166,7 @@ const cli = {
               reject(`Failed to enable service: ${err}`);
               return;
             }
-            console.log('Service enabled. Xible will now automatically start at boot.');
+            log('Service enabled. Xible will now automatically start at boot.');
             resolve();
           });
         }));
@@ -174,7 +179,7 @@ const cli = {
             reject(`Failed to disable service: ${err}`);
             return;
           }
-          console.log('Service disabled.');
+          log('Service disabled.');
           resolve();
         });
       });
@@ -202,10 +207,10 @@ function printUsage(path) {
     logError(`Unrecognized context: "${context}"\n`);
   }
 
-  console.log(`Usage: xible ${cli[context] ? context : '<context>'} <command>\n\nWhere ${cli[context] ? '<command>' : '<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
+  log(`Usage: xible ${cli[context] ? context : '<context>'} <command>\n\nWhere ${cli[context] ? '<command>' : '<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
 
   if (cli[context]) {
-    console.log('Type: xible <context> help for more help about the specified context.');
+    log('Type: xible <context> help for more help about the specified context.');
   }
 }
 
