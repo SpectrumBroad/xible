@@ -112,7 +112,7 @@ nav>ul::before {
 
 nav>ul>li {
 	height: 100px;
-	width: 100px;
+	width: 100%;
 	font-weight: bold;
 	position: relative;
 	z-index: 2;
@@ -153,6 +153,25 @@ nav>ul>li>a>span {
 
 nav>ul>li.editor>a>span {
 	transform: rotate(90deg) translatey(2px);
+}
+
+@media (max-width: 1279px) and (min-height: 1px) {
+	nav>ul {
+		width: 28px;
+	}
+
+	nav>ul>li {
+		height: 60px;
+	}
+
+	nav>ul>li>a {
+		letter-spacing: 0;
+		writing-mode: vertical-lr;
+	}
+
+	nav>ul>li>a>span {
+		display: none;
+	}
 }
 
 .view {
