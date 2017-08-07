@@ -28,6 +28,8 @@
 }
 
 #flowEditorHolder .zoomButtons button {
+	-webkit-appearance: none;
+	appearance: none;
 	margin: 0;
 	padding: 2px 4px;
 	width: auto;
@@ -51,6 +53,15 @@
 #flowEditorHolder .zoomButtons button:last-child {
 	border-right: none;
 	border-radius: 0 6px 6px 0;
+}
+
+#flowEditorHolder .zoomButtons button:hover {
+	background-color: #282828;
+}
+
+#flowEditorHolder .zoomButtons button:active,
+#flowEditorHolder .zoomButtons button:focus {
+	outline: 0;
 }
 
 .stats div {
