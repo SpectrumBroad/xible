@@ -30,12 +30,14 @@ const Xible = require('./index.js');
 const knownOpts = {
   config: String,
   user: String,
-  group: String
+  group: String,
+  force: Boolean
 };
 const shortHands = {
   c: '--config',
   u: '--user',
-  g: '--group'
+  g: '--group',
+  f: '--force'
 };
 const opts = nopt(knownOpts, shortHands);
 const remain = opts.argv.remain;
@@ -61,10 +63,38 @@ const cli = {
   flow: {
 
     start() {
-      return Promise.reject('Not implemented yet');
+      if (!ARG) {
+        return Promise.reject('The flow name must be provided');
+      }
+
+      return Xible.addQueueFile(CONFIG_PATH, {
+        method: 'flow.start',
+        flowName: ARG
+      });
     },
     stop() {
-      return Promise.reject('Not implemented yet');
+      if (!ARG) {
+        return Promise.reject('The flow name must be provided');
+      }
+
+      return Xible.addQueueFile(CONFIG_PATH, {
+        method: 'flow.stop',
+        flowName: ARG
+      });
+    },
+    delete() {
+      if (!ARG) {
+        return Promise.reject('The flow name must be provided');
+      }
+
+      if (!opts.force) {
+        return Promise.reject('Are you sure you want to delete this flow? Provide --force to confirm.');
+      }
+
+      return Xible.addQueueFile(CONFIG_PATH, {
+        method: 'flow.delete',
+        flowName: ARG
+      });
     }
 
   },

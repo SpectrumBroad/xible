@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const os = require('os');
+const fs = require('fs');
 const debug = require('debug');
 
 // setup debug
@@ -57,6 +58,12 @@ class Xible extends EventEmitter {
     if (this.child) {
       appNames = ['Config', 'Flow', 'Node'];
     } else {
+      // write PID file
+      this.writePidFile();
+      this.initQueueFile();
+      process.on('exit', () => {
+        this.removePidFile();
+      });
       this.initWeb();
       this.persistentWebSocketMessages = {};
       appNames = ['Config', 'Flow', 'Node', 'Registry'];
@@ -65,6 +72,133 @@ class Xible extends EventEmitter {
     for (let i = 0; i < appNames.length; i += 1) {
       Object.assign(this, require(`./app/${appNames[i]}`)(this, this.expressApp, (appNames[i] === 'Config' && configObj ? configObj : undefined)));
     }
+  }
+
+  /**
+  * Creates a PID file in path `${this.configPath}.pid`
+  */
+  writePidFile() {
+    if (!this.configPath) {
+      throw new Error('Cannot write PID file, configPath not set.');
+    }
+    fs.writeFile(`${this.configPath}.pid`, process.pid, {
+      mode: 0o600
+    }, (err) => {
+      if (err) {
+        throw err;
+      }
+      xibleDebug('PID file created');
+    });
+  }
+
+  /**
+  * Removes the PID file from path `${this.configPath}.pid`
+  */
+  removePidFile() {
+    if (!this.configPath) {
+      throw new Error('Cannot remove PID file, configPath not set.');
+    }
+    fs.unlink(`${this.configPath}.pid`, (err) => {
+      if (err) {
+        throw err;
+      }
+      xibleDebug('PID file removed');
+    });
+  }
+
+  static addQueueFile(configPath, str) {
+    if (typeof str !== 'string') {
+      str = JSON.stringify(str);
+    }
+    return new Promise((resolve, reject) => {
+      fs.appendFile(`${this.resolvePath(configPath)}.queue`, `${str}\n`, {
+        mode: 0o600
+      }, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
+
+  /**
+  * Inits and manages the queue file for remote CLI commands.
+  */
+  initQueueFile() {
+    // tracks where in the file we're at
+    let queueLine = 0;
+
+    // create/overwrite the queue file
+    fs.writeFile(`${this.configPath}.queue`, '', {
+      mode: 0o600
+    }, (err) => {
+      if (err) {
+        throw err;
+      }
+      xibleDebug('Queue file created');
+      fs.watch(`${this.configPath}.queue`, (type) => {
+        if (type !== 'change') {
+          throw new Error('Queue file got renamed.');
+        }
+
+        // get the latest contents of the queue file
+        fs.readFile(`${this.configPath}.queue`, {
+          encoding: 'utf8'
+        }, (readQueueErr, data) => {
+          // handle errors reading the queue file
+          if (readQueueErr) {
+            xibleDebug(readQueueErr);
+            return;
+          }
+
+          // ignore empty file changes
+          if (!data) {
+            return;
+          }
+
+          // process each line of the queue
+          const dataLines = data.split('\n');
+          for (let i = queueLine; i < dataLines.length; i += 1) {
+            if (dataLines[i]) {
+              queueLine += 1;
+              try {
+                const obj = JSON.parse(dataLines[i]);
+
+                // get the flow if applicable
+                let flow;
+                if (obj.flowName) {
+                  flow = this.getFlowByName(obj.flowName);
+                  if (!flow) {
+                    continue;
+                  }
+                }
+
+                // handle the actual method
+                switch (obj.method) {
+                  case 'flow.start':
+                    flow.forceStart();
+                    break;
+                  case 'flow.stop':
+                    flow.forceStop();
+                    break;
+                  case 'flow.delete':
+                    flow.forceStop()
+                    .then(() => flow.delete());
+                    break;
+                  default:
+                    xibleDebug(`Unhandled method "${obj.method}"`);
+                    break;
+                }
+              } catch (jsonParseErr) {
+                xibleDebug(jsonParseErr);
+              }
+            }
+          }
+        });
+      });
+    });
   }
 
   // load nodes and flows
@@ -211,8 +345,6 @@ class Xible extends EventEmitter {
 
     // setup client requests over https
     const spdy = require('spdy');
-    const fs = require('fs');
-
     const expressApp = this.expressApp;
 
     // editor
