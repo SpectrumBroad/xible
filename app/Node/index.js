@@ -797,7 +797,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       // create the vault if it doesn't exist
       if (!fs.existsSync(vaultPath)) {
         vaultDebug('creating new');
-        fs.writeFileSync(vaultPath, '{}');
+        fs.writeFileSync(vaultPath, '{}', {
+          mode: 0o600
+        });
       }
 
       try {
@@ -809,7 +811,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     static save() {
       try {
-        fs.writeFileSync(vaultPath, JSON.stringify(vault));
+        fs.writeFileSync(vaultPath, JSON.stringify(vault), {
+          mode: 0o600
+        });
       } catch (e) {
         vaultDebug(`could not save "${vaultPath}"`);
       }
