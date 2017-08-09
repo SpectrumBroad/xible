@@ -21,6 +21,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
     try {
       fsExtra.copySync(DEFAULT_PATH, path);
+      fs.chmodSync(path, 0o600);
       return true;
     } catch (err) {
       configDebug(`could not create "${path}": ${err}`);
@@ -33,7 +34,9 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
     configContents = JSON.stringify(configContents, null, '\t');
 
     try {
-      fs.writeFileSync(path, configContents);
+      fs.writeFileSync(path, configContents, {
+        mode: 0o600
+      });
     } catch (err) {
       configDebug(`failed to write config to "${path}": ${err}`);
       throw new Error(`failed to write config to "${path}": ${err}`);
