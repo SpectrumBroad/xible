@@ -238,6 +238,7 @@ const cli = {
         });
     },
     remove() {
+      console.warn('"xiblepm flow remove <name>" is deprecated in favor of "xible flow delete <name>"');
       if (!ARG) {
         return Promise.reject('The flow name must be provided');
       }
