@@ -524,7 +524,11 @@ const cli = {
 
 function printUsage(path) {
   if (context !== 'help') {
-    logError(`Unrecognized context: "${context}"\n`);
+    if (cli[context]) {
+      logError(`Unrecognized command: "${command}"\n`);
+    } else {
+      logError(`Unrecognized context: "${context}"\n`);
+    }
   }
 
   log(`Usage: xiblepm ${cli[context] ? context : '<context>'} <command>\n\nWhere ${cli[context] ? '<command>' : '<context>'} is one of:\n\t${Object.keys(path).join(', ')}\n`);
