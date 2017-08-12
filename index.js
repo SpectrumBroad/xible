@@ -58,12 +58,6 @@ class Xible extends EventEmitter {
     if (this.child) {
       appNames = ['Config', 'Flow', 'Node'];
     } else {
-      // write PID file
-      this.writePidFile();
-      this.initQueueFile();
-      process.on('exit', () => {
-        this.removePidFile();
-      });
       this.initWeb();
       this.persistentWebSocketMessages = {};
       appNames = ['Config', 'Flow', 'Node', 'Registry'];
@@ -216,6 +210,13 @@ class Xible extends EventEmitter {
     if (this.child) {
       return Promise.resolve();
     }
+
+    // write PID file
+    this.writePidFile();
+    this.initQueueFile();
+    process.on('exit', () => {
+      this.removePidFile();
+    });
 
     this.startWeb();
 
