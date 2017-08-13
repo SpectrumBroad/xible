@@ -87,17 +87,26 @@ class Xible extends EventEmitter {
 
   /**
   * Removes the PID file from path `${this.configPath}.pid`
+  * This is a sync action as it can be called on process.exit
   */
   removePidFile() {
     if (!this.configPath) {
       throw new Error('Cannot remove PID file, configPath not set.');
     }
-    fs.unlink(`${this.configPath}.pid`, (err) => {
-      if (err) {
-        throw err;
-      }
-      xibleDebug('PID file removed');
-    });
+    fs.unlinkSync(`${this.configPath}.pid`);
+    xibleDebug('PID file removed');
+  }
+
+  /**
+  * Removes the queue file from path `${this.configPath}.queue`
+  * This is a sync action as it can be called on process.exit
+  */
+  removeQueueFile() {
+    if (!this.configPath) {
+      throw new Error('Cannot remove queue file, configPath not set.');
+    }
+    fs.unlinkSync(`${this.configPath}.queue`);
+    xibleDebug('Queue file removed');
   }
 
   static addQueueFile(configPath, str) {
@@ -121,6 +130,10 @@ class Xible extends EventEmitter {
   * Inits and manages the queue file for remote CLI commands.
   */
   initQueueFile() {
+    if (!this.configPath) {
+      throw new Error('Cannot remove PID file, configPath not set.');
+    }
+
     // tracks where in the file we're at
     let queueLine = 0;
 
@@ -214,8 +227,16 @@ class Xible extends EventEmitter {
     // write PID file
     this.writePidFile();
     this.initQueueFile();
+    process.on('SIGINT', () => {
+      process.exit(1);
+    });
+    process.on('SIGTERM', () => {
+      process.exit(1);
+    });
     process.on('exit', () => {
+      this.removeQueueFile();
       this.removePidFile();
+      xibleDebug('exit');
     });
 
     this.startWeb();
