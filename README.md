@@ -2,8 +2,11 @@
 A visual programming language. Visit <https://xible.io> for more information.
 
 ## Installation
-Once you have Node.js installed, simply run;
-1. `sudo npm install -g xible`
+See the [installation documentation](https://xible.io/docs/installation) for details.
+
+Once you have Node.js installed;
+-   On Linux run: `sudo npm install xible -g`
+-   On Windows run: `npm install xible -g`
 
 ## Start XIBLE
 After installation is completed;
