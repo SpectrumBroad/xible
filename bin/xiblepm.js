@@ -24,7 +24,6 @@ const fs = require('fs');
 const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
-const stripAnsi = require('strip-ansi');
 const Xible = require('../index.js');
 
 // option parsing
@@ -49,14 +48,10 @@ const xible = new Xible({
   configPath: CONFIG_PATH
 });
 
-function logError(msg, exitCode) {
-  console.error(stripAnsi(msg));
-  process.exitCode = exitCode || 1;
-}
-
-function log(msg) {
-  console.log(stripAnsi(msg));
-}
+const {
+  log,
+  logError
+} = require('./log');
 
 // determine the stripped registry url
 function getStrippedRegistryUrl() {
@@ -389,37 +384,6 @@ const cli = {
     }
   },
 
-  config: {
-    set() {
-      let value = remain.shift();
-      if (value === 'true') {
-        value = true;
-      } else if (value === 'false') {
-        value = false;
-      }
-
-      xible.Config.setValue(ARG, value);
-      return Promise.resolve();
-    },
-    delete() {
-      xible.Config.deleteValue(ARG);
-      return Promise.resolve();
-    },
-    get() {
-      if (!ARG) {
-        this.list();
-        return Promise.resolve();
-      }
-
-      log(xible.Config.getValue(ARG));
-      return Promise.resolve();
-    },
-    list() {
-      log(JSON.stringify(xible.Config.getAll(), null, '\t'));
-      return Promise.resolve();
-    }
-  },
-
   user: {
     me() {
       return this.whoami();
@@ -522,6 +486,8 @@ const cli = {
   }
 
 };
+
+cli.config = require('./config')(xible);
 
 function printUsage(path) {
   if (context !== 'help') {

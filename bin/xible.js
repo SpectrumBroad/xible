@@ -20,7 +20,6 @@ process.title = 'xible';
 
 const fs = require('fs');
 const nopt = require('nopt');
-const stripAnsi = require('strip-ansi');
 const Xible = require('../index.js');
 
 // option parsing
@@ -48,14 +47,10 @@ const xible = new Xible({
   configPath: CONFIG_PATH
 });
 
-function logError(msg, exitCode) {
-  console.error(stripAnsi(msg));
-  process.exitCode = exitCode || 1;
-}
-
-function log(msg) {
-  console.log(stripAnsi(msg));
-}
+const {
+  log,
+  logError
+} = require('./log');
 
 // cli commands
 const cli = {
@@ -241,6 +236,8 @@ const cli = {
   }
 
 };
+
+cli.config = require('./config')(xible);
 
 function printUsage(path) {
   if (context !== 'help') {
