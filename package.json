@@ -18,20 +18,28 @@
   "keywords": [
     "xible",
     "visual",
+    "flow",
+    "workflow",
     "connector",
+    "string",
     "wire",
     "programming",
-    "node"
+    "automation",
+    "automate",
+    "flexible",
+    "node",
+    "nodejs",
+    "javascript"
   ],
   "scripts": {
     "start": "node cli.js server start",
-    "debug": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon cli.js server start",
-    "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect cli.js server start",
+    "debug": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon ./bin/xible.js server start",
+    "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect ./bin/xible.js server start",
     "prepublish": "npm shrinkwrap --only=prod"
   },
   "bin": {
-    "xible": "./cli.js",
-    "xiblepm": "./pmcli.js"
+    "xible": "./bin/xible.js",
+    "xiblepm": "./bin/xiblepm.js"
   },
   "main": "index.js",
   "engines": {

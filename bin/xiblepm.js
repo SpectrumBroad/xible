@@ -25,7 +25,7 @@ const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
 const stripAnsi = require('strip-ansi');
-const Xible = require('./index.js');
+const Xible = require('../index.js');
 
 // option parsing
 const knownOpts = {

@@ -18,13 +18,10 @@ if (typeof WScript !== 'undefined') {
 
 process.title = 'xible';
 
-// start with debug logging enabled until we have a 'normal' way of logging
-process.env.DEBUG = 'xible*';
-
 const fs = require('fs');
 const nopt = require('nopt');
 const stripAnsi = require('strip-ansi');
-const Xible = require('./index.js');
+const Xible = require('../index.js');
 
 // option parsing
 const knownOpts = {
@@ -45,8 +42,11 @@ const context = remain.shift() || 'help';
 const command = remain.shift();
 const ARG = remain.shift();
 
-// get the config path for XIBLE
+// get a xible instance
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
+const xible = new Xible({
+  configPath: CONFIG_PATH
+});
 
 function logError(msg, exitCode) {
   console.error(stripAnsi(msg));
@@ -61,7 +61,6 @@ function log(msg) {
 const cli = {
 
   flow: {
-
     start() {
       if (!ARG) {
         return Promise.reject('The flow name must be provided');
@@ -75,6 +74,18 @@ const cli = {
     stop() {
       if (!ARG) {
         return Promise.reject('The flow name must be provided');
+      }
+
+      let flowPath = xible.Config.getValue('flows.path');
+      if (!flowPath) {
+        return Promise.reject('no "flows.path" configured');
+      }
+      flowPath = xible.resolvePath(flowPath);
+      xible.Flow.initFromPath(flowPath);
+      const flow = xible.getFlowById(ARG);
+
+      if (!flow) {
+        return Promise.reject(`Flow "${ARG}" does not exist`);
       }
 
       return Xible.addQueueFile(CONFIG_PATH, {
@@ -96,7 +107,6 @@ const cli = {
         flowName: ARG
       });
     }
-
   },
 
   service: {
@@ -215,17 +225,17 @@ const cli = {
       });
     }
   },
+
   server: {
     start() {
-      // setup a XIBLE instance
-      const xible = new Xible({
-        configPath: CONFIG_PATH
-      });
+      // start with debug logging enabled until we have a 'normal' way of logging
+      process.env.DEBUG = 'xible*';
 
-      // init
+      // init xible
       return xible.init();
     }
   },
+
   start() {
     return this.server.start();
   }
