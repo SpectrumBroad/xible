@@ -693,6 +693,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Fetches all input values for this input.
     * @param {FlowState} state The flowstate at the time of calling.
+    * @fires NodeOutput#trigger
     * @returns {Promise.<Array>} An array of all values
     * as returned by the outputs on the other ends of connected connectors or globals.
     * If any of the outputs returns an array,
@@ -706,7 +707,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         // add global outputs as a dummy connector to the connector list
         if (!conns.length && this.global) {
-          conns = this.node.flow.getGlobalOutputsByType(this.type).map(output => ({
+          conns = this.node.flow
+          .getGlobalOutputsByType(this.type)
+          .map(output => ({
             origin: output
           }));
         }
@@ -721,9 +724,21 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         let callbacksReceived = 0;
         for (let i = 0; i < connLength; i += 1) {
           const conn = conns[i];
+          let calledBack = false;
 
-          // trigger the input
+          /**
+          * Trigger event on the origin NodeOutput.
+          * @event NodeOutput#trigger
+          * @param {Connector}
+          * @param {FlowState}
+          * @param {Function} callback
+          */
           conn.origin.emit('trigger', conn, state, (value) => { // eslint-disable-line
+            // verify that this callback wasn't already made.
+            if (calledBack) {
+              throw new Error('Already called back');
+            }
+            calledBack = true;
             // let everyone know that the trigger is done
             conn.origin.emit('triggerdone');
 
