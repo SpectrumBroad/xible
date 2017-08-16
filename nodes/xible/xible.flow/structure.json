@@ -1,7 +1,7 @@
 {
   "name": "xible.flow",
   "type": "object",
-  "description": "Defines the current flow.",
+  "description": "Defines a flow.",
   "outputs": {
     "flow": {
       "type": "xible.flow"
