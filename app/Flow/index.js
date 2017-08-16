@@ -136,9 +136,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           delete statuses[flowId];
         } else if (statuses[flowId]) {
           flows[flowId].forceStart()
-            .catch((err) => {
-              flowDebug(`failed to start "${flowId}": ${err}`);
-            });
+          .catch((err) => {
+            flowDebug(`failed to start "${flowId}": ${err}`);
+          });
         } else if (flows[flowId].initLevel === Flow.INITLEVEL_FLOW) {
           flows[flowId].init();
         }
@@ -623,13 +623,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           }
         }
 
-          // trigger the action nodes
+        // trigger the action nodes
         for (let i = 0; i < actionNodes.length; i += 1) {
           actionNodes[i].getInputs()
-            .filter(input => input.type === 'trigger')
-            .forEach((input) => {
-              input.emit('trigger', null, flowState);
-            });
+          .filter(input => input.type === 'trigger')
+          .forEach((input) => {
+            input.emit('trigger', null, flowState);
+          });
         }
       });
 
@@ -666,7 +666,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         case Flow.STATE_STOPPED:
           return this.init()
-            .then(startFlow);
+          .then(startFlow);
 
         case Flow.STATE_STOPPING:
           return new Promise((resolve) => {
@@ -683,7 +683,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         case Flow.STATE_STARTED:
           return this.stop()
-            .then(() => this.forceStart(directNodes));
+          .then(() => this.forceStart(directNodes));
 
         case Flow.STATE_STARTING:
           return new Promise((resolve) => {
