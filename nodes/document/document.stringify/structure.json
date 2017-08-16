@@ -4,12 +4,12 @@
   "description": "Converts a document into a JSON string.",
   "inputs": {
     "document": {
-  		"type": "document"
-  	}
+      "type": "document"
+    }
   },
   "outputs": {
     "json": {
-  		"type": "string"
-  	}
+      "type": "string"
+    }
   }
 }

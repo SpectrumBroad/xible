@@ -4,15 +4,15 @@
   "description": "Assigns new key/value pairs to an existing document. Returns a new document, does not update the existing document.",
   "inputs": {
     "document": {
-  		"type": "document"
-  	},
+      "type": "document"
+    },
     "variable": {
-  		"type": "variable"
-  	}
+      "type": "variable"
+    }
   },
   "outputs": {
     "document": {
-  		"type": "document"
-  	}
+      "type": "document"
+    }
   }
 }

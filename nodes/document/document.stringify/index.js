@@ -1,15 +1,13 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let docIn = NODE.getInputByName('document');
+module.exports = (NODE) => {
+  const docIn = NODE.getInputByName('document');
 
-	let stringOut = NODE.getOutputByName('json');
-
-	stringOut.on('trigger', (conn, state, callback) => {
-
-		docIn.getValues(state).then((docs) => {
-			callback(JSON.stringify(docs));
-		});
-
-	});
-
+  const stringOut = NODE.getOutputByName('json');
+  stringOut.on('trigger', (conn, state, callback) => {
+    docIn.getValues(state)
+    .then((docs) => {
+      callback(JSON.stringify(docs));
+    });
+  });
 };

@@ -4,12 +4,12 @@
   "description": "A document containing (nested) key-value pairs.",
   "inputs": {
     "variable": {
-  		"type": "variable"
-  	}
+      "type": "variable"
+    }
   },
   "outputs": {
     "document": {
-  		"type": "document"
-  	}
+      "type": "document"
+    }
   }
 }
