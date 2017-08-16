@@ -1,29 +1,22 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let variableIn = NODE.getInputByName('variable');
+module.exports = (NODE) => {
+  const variableIn = NODE.getInputByName('variable');
 
-	let docOut = NODE.getOutputByName('document');
+  const docOut = NODE.getOutputByName('document');
+  docOut.on('trigger', (conn, state, callback) => {
+    variableIn.getValues(state).then((variables) => {
+      const doc = {};
+      variables.forEach((variable) => {
+        let val = variable.values;
+        if (val.length === 1) {
+          val = val[0];
+        }
 
-	docOut.on('trigger', (conn, state, callback) => {
+        doc[variable.name] = val;
+      });
 
-		variableIn.getValues(state).then((variables) => {
-
-			let doc = {};
-			variables.forEach((variable) => {
-
-				let val = variable.values;
-				if (val.length === 1) {
-					val = val[0];
-				}
-
-				doc[variable.name] = val;
-
-			});
-
-			callback(doc);
-
-		});
-
-	});
-
+      callback(doc);
+    });
+  });
 };
