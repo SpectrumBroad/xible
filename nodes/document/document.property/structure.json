@@ -1,0 +1,15 @@
+{
+  "name": "document.property",
+  "type": "object",
+  "description": "Returns a specific value from a document key as a new document.",
+  "inputs": {
+    "document": {
+      "type": "document"
+    }
+  },
+  "outputs": {
+    "document": {
+      "type": "document"
+    }
+  }
+}
