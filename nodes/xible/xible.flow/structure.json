@@ -5,6 +5,10 @@
   "outputs": {
     "flow": {
       "type": "xible.flow"
+    },
+    "timing": {
+      "type": "document",
+      "description": "Returns the timing object on the flow."
     }
   }
 }
