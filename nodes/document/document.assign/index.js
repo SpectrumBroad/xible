@@ -7,10 +7,10 @@ module.exports = (NODE) => {
   const docOut = NODE.getOutputByName('document');
   docOut.on('trigger', (conn, state, callback) => {
     Promise.all([docIn.getValues(state), variableIn.getValues(state)]).then(([docs, variables]) => {
-      docs.forEach((doc) => {
+      const assignedDocs = docs.map((doc) => {
         // copy the document
         // FIXME: should merge deep
-        doc = Object.assign({}, doc);
+        const copyDoc = Object.assign({}, doc);
 
         // add/overwrite the new vars
         variables.forEach((variable) => {
@@ -19,11 +19,11 @@ module.exports = (NODE) => {
             val = val[0];
           }
 
-          doc[variable.name] = val;
+          copyDoc[variable.name] = val;
         });
-
-        callback(doc);
+        return copyDoc;
       });
+      callback(assignedDocs);
     });
   });
 };
