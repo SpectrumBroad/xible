@@ -38,7 +38,6 @@ const opts = nopt(knownOpts, shortHands);
 const remain = opts.argv.remain;
 const context = remain.shift() || 'help';
 const command = remain.shift();
-const ARG = remain.shift();
 
 // get a xible instance
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
@@ -51,54 +50,70 @@ const {
   logError
 } = require('./log');
 
-// cli commands
+/**
+* Returns a flow by the given id/name.
+* Rejects if no flows.path is configured in the xible instance.
+* @returns {Promise.<XIBLE.Flow>}
+*/
+function getFlowById(flowId) {
+  if (!flowId) {
+    return Promise.reject('The flow name must be provided');
+  }
+
+  let flowPath = xible.Config.getValue('flows.path');
+  if (!flowPath) {
+    return Promise.reject('no "flows.path" configured');
+  }
+  flowPath = xible.resolvePath(flowPath);
+  xible.Flow.initFromPath(flowPath);
+  return Promise.resolve(xible.getFlowById(flowId));
+}
+
+// cli contexts and commands
 const cli = {
 
   flow: {
-    start() {
-      if (!ARG) {
-        return Promise.reject('The flow name must be provided');
-      }
+    start(flowName) {
+      return getFlowById(flowName)
+      .then((flow) => {
+        if (!flow) {
+          return Promise.reject(`Flow "${flowName}" does not exist`);
+        }
 
-      return Xible.addQueueFile(CONFIG_PATH, {
-        method: 'flow.start',
-        flowName: ARG
+        return xible.CliQueue.add({
+          method: 'flow.start',
+          flowName
+        });
       });
     },
-    stop() {
-      if (!ARG) {
-        return Promise.reject('The flow name must be provided');
-      }
+    stop(flowName) {
+      return getFlowById(flowName)
+      .then((flow) => {
+        if (!flow) {
+          return Promise.reject(`Flow "${flowName}" does not exist`);
+        }
 
-      let flowPath = xible.Config.getValue('flows.path');
-      if (!flowPath) {
-        return Promise.reject('no "flows.path" configured');
-      }
-      flowPath = xible.resolvePath(flowPath);
-      xible.Flow.initFromPath(flowPath);
-      const flow = xible.getFlowById(ARG);
-
-      if (!flow) {
-        return Promise.reject(`Flow "${ARG}" does not exist`);
-      }
-
-      return Xible.addQueueFile(CONFIG_PATH, {
-        method: 'flow.stop',
-        flowName: ARG
+        return xible.CliQueue.add({
+          method: 'flow.stop',
+          flowName
+        });
       });
     },
-    delete() {
-      if (!ARG) {
-        return Promise.reject('The flow name must be provided');
-      }
-
+    delete(flowName) {
       if (!opts.force) {
         return Promise.reject('Are you sure you want to delete this flow? Provide --force to confirm.');
       }
 
-      return Xible.addQueueFile(CONFIG_PATH, {
-        method: 'flow.delete',
-        flowName: ARG
+      return getFlowById(flowName)
+      .then((flow) => {
+        if (!flow) {
+          return Promise.reject(`Flow "${flowName}" does not exist`);
+        }
+
+        return xible.CliQueue.add({
+          method: 'flow.delete',
+          flowName
+        });
       });
     }
   },
@@ -192,18 +207,18 @@ const cli = {
     },
     enable() {
       return this.install()
-        .catch(err => Promise.reject(`Failed to enable service: ${err}`))
-        .then(() => new Promise((resolve, reject) => {
-          const exec = require('child_process').exec;
-          exec('systemctl enable xible.service', (err) => {
-            if (err) {
-              reject(`Failed to enable service: ${err}`);
-              return;
-            }
-            log('Service enabled. Xible will now automatically start at boot.');
-            resolve();
-          });
-        }));
+      .catch(err => Promise.reject(`Failed to enable service: ${err}`))
+      .then(() => new Promise((resolve, reject) => {
+        const exec = require('child_process').exec;
+        exec('systemctl enable xible.service', (err) => {
+          if (err) {
+            reject(`Failed to enable service: ${err}`);
+            return;
+          }
+          log('Service enabled. Xible will now automatically start at boot.');
+          resolve();
+        });
+      }));
     },
     disable() {
       return new Promise((resolve, reject) => {
@@ -256,11 +271,11 @@ function printUsage(path) {
 
 if (cli[context]) {
   if (!command && typeof cli[context] === 'function') {
-    cli[context]()
-      .catch(err => logError(err));
+    cli[context](...remain)
+    .catch(err => logError(err));
   } else if (command && typeof cli[context][command] === 'function') {
-    cli[context][command]()
-      .catch(err => logError(err));
+    cli[context][command](...remain)
+    .catch(err => logError(err));
   } else {
     printUsage(cli[context]);
   }

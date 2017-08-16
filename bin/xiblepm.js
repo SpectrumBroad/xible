@@ -39,7 +39,6 @@ const opts = nopt(knownOpts, shortHands);
 const remain = opts.argv.remain;
 const context = remain.shift() || 'help';
 const command = remain.shift();
-const ARG = remain.shift();
 
 // get a xible instance
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
@@ -128,12 +127,12 @@ if (userToken) {
   xible.Registry.setToken(userToken);
 }
 
-// cli commands
+// cli context and commands
 const cli = {
 
   flow: {
-    publish() {
-      if (!ARG) {
+    publish(flowName) {
+      if (!flowName) {
         return Promise.reject('The flow name must be provided');
       }
 
@@ -147,9 +146,9 @@ const cli = {
       }
       flowPath = xible.resolvePath(flowPath);
       xible.Flow.initFromPath(flowPath);
-      const flow = xible.getFlowById(ARG);
+      const flow = xible.getFlowById(flowName);
       if (!flow) {
-        return Promise.reject(`No such flow "${ARG}"`);
+        return Promise.reject(`No such flow "${flowName}"`);
       }
 
       let flowJson = flow.json;
@@ -171,35 +170,35 @@ const cli = {
 
       // verify that we're logged in
       return xible.Registry.User
-        .getByToken(token)
-        .catch(getUserErr => Promise.reject(`Failed to get user from token: ${getUserErr}`))
-        .then((user) => {
-          if (!user) {
-            return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
+      .getByToken(token)
+      .catch(getUserErr => Promise.reject(`Failed to get user from token: ${getUserErr}`))
+      .then((user) => {
+        if (!user) {
+          return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
+        }
+
+        // verify if this node had been published before
+        return xible.Registry.Flow
+        .getByName(flow._id)
+        .catch(getFlowErr => Promise.reject(`Failed to get flow from registry: ${getFlowErr}`))
+        .then((registryFlow) => {
+          // verify that whoami equals the remote user
+          if (registryFlow && registryFlow.publishUserName !== user.name) {
+            return Promise.reject(`Flow "${registryFlow._id}" was previously published by "${registryFlow.publishUserName}". You are currently logged in as "${user.name}".`);
           }
 
-          // verify if this node had been published before
+          // publish
           return xible.Registry.Flow
-            .getByName(flow._id)
-            .catch(getFlowErr => Promise.reject(`Failed to get flow from registry: ${getFlowErr}`))
-            .then((registryFlow) => {
-              // verify that whoami equals the remote user
-              if (registryFlow && registryFlow.publishUserName !== user.name) {
-                return Promise.reject(`Flow "${registryFlow._id}" was previously published by "${registryFlow.publishUserName}". You are currently logged in as "${user.name}".`);
-              }
-
-              // publish
-              return xible.Registry.Flow
-                .publish(flowJson)
-                .catch(publishErr => Promise.reject(`Failed to publish flow "${flow._id}": ${publishErr}`))
-                .then((publishedFlow) => {
-                  log(`Published flow "${publishedFlow._id}".`);
-                });
-            });
+          .publish(flowJson)
+          .catch(publishErr => Promise.reject(`Failed to publish flow "${flow._id}": ${publishErr}`))
+          .then((publishedFlow) => {
+            log(`Published flow "${publishedFlow._id}".`);
+          });
         });
+      });
     },
-    install() {
-      if (!ARG) {
+    install(flowName) {
+      if (!flowName) {
         return Promise.reject('The flow name must be provided');
       }
 
@@ -214,7 +213,7 @@ const cli = {
       }
       flowPath = xible.resolvePath(flowPath);
       xible.Flow.initFromPath(flowPath);
-      const flow = xible.getFlowById(altFlowId || ARG);
+      const flow = xible.getFlowById(altFlowId || flowName);
 
       // check if the flow already exists
       if (flow && !opts.force) {
@@ -222,18 +221,18 @@ const cli = {
       }
 
       return xible.Registry.Flow
-        .getByName(ARG)
-        .then((registryFlow) => {
-          if (!registryFlow) {
-            return Promise.reject(`Flow "${ARG}" does not exist`);
-          }
-          return registryFlow.install(altFlowId)
-            .then(() => log(`Installed flow "${altFlowId || registryFlow.name}"`));
-        });
+      .getByName(flowName)
+      .then((registryFlow) => {
+        if (!registryFlow) {
+          return Promise.reject(`Flow "${flowName}" does not exist`);
+        }
+        return registryFlow.install(altFlowId)
+        .then(() => log(`Installed flow "${altFlowId || registryFlow.name}"`));
+      });
     },
-    remove() {
+    remove(flowName) {
       console.warn('"xiblepm flow remove <name>" has been deprecated in favor of "xible flow delete <name>"');
-      if (!ARG) {
+      if (!flowName) {
         return Promise.reject('The flow name must be provided');
       }
 
@@ -243,26 +242,26 @@ const cli = {
       }
       flowPath = xible.resolvePath(flowPath);
       xible.Flow.initFromPath(flowPath);
-      const flow = xible.getFlowById(ARG);
+      const flow = xible.getFlowById(flowName);
 
       if (!flow) {
-        return Promise.reject(`Flow "${ARG}" does not exist`);
+        return Promise.reject(`Flow "${flowName}" does not exist`);
       }
       return flow.delete()
-        .then(() => log(`Flow "${ARG}" removed`));
+      .then(() => log(`Flow "${flowName}" removed`));
     },
-    search() {
-      if (!ARG) {
+    search(str) {
+      if (!str) {
         return Promise.reject('The search string must be provided');
       }
 
       return xible.Registry.Flow
-        .search(ARG)
-        .then((flows) => {
-          Object.keys(flows).forEach((flowName) => {
-            log(`${flowName}`);
-          });
+      .search(str)
+      .then((flows) => {
+        Object.keys(flows).forEach((flowName) => {
+          log(`${flowName}`);
         });
+      });
     }
   },
 
@@ -343,43 +342,43 @@ const cli = {
         });
       });
     },
-    install() {
+    install(nodePackName) {
       if (!xible.Config.getValue('registry.nodepacks.allowinstall')) {
         return Promise.reject('Your config does not allow to install nodepacks from the registry');
       }
 
-      if (!ARG) {
+      if (!nodePackName) {
         return Promise.reject('The nodepack name must be provided');
       }
 
       return xible.Registry.NodePack
-        .getByName(ARG)
-        .then((nodePack) => {
-          if (!nodePack) {
-            return Promise.reject(`Nodepack "${ARG}" does not exist`);
-          }
-          return nodePack.install();
-        });
+      .getByName(nodePackName)
+      .then((nodePack) => {
+        if (!nodePack) {
+          return Promise.reject(`Nodepack "${nodePackName}" does not exist`);
+        }
+        return nodePack.install();
+      });
     },
     remove() {
       return Promise.reject('Not implemented yet');
     },
-    search() {
-      if (!ARG) {
+    search(str) {
+      if (!str) {
         return Promise.reject('The search string must be provided');
       }
 
       return xible.Registry.NodePack
-        .search(ARG)
-        .then((nodes) => {
-          Object.keys(nodes).forEach((nodeName) => {
-            nodes[nodeName]
-              .getRegistryData()
-              .then((data) => {
-                log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
-              });
-          });
+      .search(str)
+      .then((nodes) => {
+        Object.keys(nodes).forEach((nodeName) => {
+          nodes[nodeName]
+            .getRegistryData()
+            .then((data) => {
+              log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
+            });
         });
+      });
     }
   },
 
@@ -506,11 +505,11 @@ function printUsage(path) {
 
 if (cli[context]) {
   if (!command && typeof cli[context] === 'function') {
-    cli[context]()
-      .catch(err => logError(err));
+    cli[context](...remain)
+    .catch(err => logError(err));
   } else if (command && typeof cli[context][command] === 'function') {
-    cli[context][command]()
-      .catch(err => logError(err));
+    cli[context][command](...remain)
+    .catch(err => logError(err));
   } else {
     printUsage(cli[context]);
   }

@@ -60,7 +60,7 @@ class Xible extends EventEmitter {
     } else {
       this.initWeb();
       this.persistentWebSocketMessages = {};
-      appNames = ['Config', 'Flow', 'Node', 'Registry'];
+      appNames = ['Config', 'CliQueue', 'Flow', 'Node', 'Registry'];
     }
 
     for (let i = 0; i < appNames.length; i += 1) {
@@ -97,117 +97,6 @@ class Xible extends EventEmitter {
     xibleDebug('PID file removed');
   }
 
-  /**
-  * Removes the queue file from path `${this.configPath}.queue`
-  * This is a sync action as it can be called on process.exit
-  */
-  removeQueueFile() {
-    if (!this.configPath) {
-      throw new Error('Cannot remove queue file, configPath not set.');
-    }
-    fs.unlinkSync(`${this.configPath}.queue`);
-    xibleDebug('Queue file removed');
-  }
-
-  static addQueueFile(configPath, str) {
-    if (typeof str !== 'string') {
-      str = JSON.stringify(str);
-    }
-    return new Promise((resolve, reject) => {
-      fs.appendFile(`${this.resolvePath(configPath)}.queue`, `${str}\n`, {
-        mode: 0o600
-      }, (err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve();
-      });
-    });
-  }
-
-  /**
-  * Inits and manages the queue file for remote CLI commands.
-  */
-  initQueueFile() {
-    if (!this.configPath) {
-      throw new Error('Cannot remove PID file, configPath not set.');
-    }
-
-    // tracks where in the file we're at
-    let queueLine = 0;
-
-    // create/overwrite the queue file
-    fs.writeFile(`${this.configPath}.queue`, '', {
-      mode: 0o600
-    }, (err) => {
-      if (err) {
-        throw err;
-      }
-      xibleDebug('Queue file created');
-      fs.watch(`${this.configPath}.queue`, (type) => {
-        if (type !== 'change') {
-          throw new Error('Queue file got renamed.');
-        }
-
-        // get the latest contents of the queue file
-        fs.readFile(`${this.configPath}.queue`, {
-          encoding: 'utf8'
-        }, (readQueueErr, data) => {
-          // handle errors reading the queue file
-          if (readQueueErr) {
-            xibleDebug(readQueueErr);
-            return;
-          }
-
-          // ignore empty file changes
-          if (!data) {
-            return;
-          }
-
-          // process each line of the queue
-          const dataLines = data.split('\n');
-          for (let i = queueLine; i < dataLines.length; i += 1) {
-            if (dataLines[i]) {
-              queueLine += 1;
-              try {
-                const obj = JSON.parse(dataLines[i]);
-
-                // get the flow if applicable
-                let flow;
-                if (obj.flowName) {
-                  flow = this.getFlowByName(obj.flowName);
-                  if (!flow) {
-                    continue;
-                  }
-                }
-
-                // handle the actual method
-                switch (obj.method) {
-                  case 'flow.start':
-                    flow.forceStart();
-                    break;
-                  case 'flow.stop':
-                    flow.forceStop();
-                    break;
-                  case 'flow.delete':
-                    flow.forceStop()
-                    .then(() => flow.delete());
-                    break;
-                  default:
-                    xibleDebug(`Unhandled method "${obj.method}"`);
-                    break;
-                }
-              } catch (jsonParseErr) {
-                xibleDebug(jsonParseErr);
-              }
-            }
-          }
-        });
-      });
-    });
-  }
-
   // load nodes and flows
   init(obj) {
     xibleDebug('init');
@@ -226,7 +115,7 @@ class Xible extends EventEmitter {
 
     // write PID file
     this.writePidFile();
-    this.initQueueFile();
+    this.CliQueue.init();
     process.on('SIGINT', () => {
       process.exit(1);
     });
@@ -234,7 +123,7 @@ class Xible extends EventEmitter {
       process.exit(1);
     });
     process.on('exit', () => {
-      this.removeQueueFile();
+      this.CliQueue.removeFile();
       this.removePidFile();
       xibleDebug('exit');
     });
