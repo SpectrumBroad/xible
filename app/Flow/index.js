@@ -18,6 +18,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   // default init level for flows
   const initLevel = XIBLE.Config.getValue('flows.initlevel');
 
+  // check inspect arguments so we can fork properly
+  let inspectPortNumberIncrement = 0;
+  let inspectLevel = 0;
+  if (process.execArgv.some(arg => arg.includes('--inspect='))) {
+    inspectLevel = 1;
+  } else if (process.execArgv.some(arg => arg.includes('--inspect-brk='))) {
+    inspectLevel = 2;
+  }
+
   /**
   * Flow class
   */
@@ -739,7 +748,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
 
         let flow;
-        this.worker = fork(`${__dirname}/../../child.js`);
+        const execArgv = [];
+        if (inspectLevel === 1) {
+          execArgv.push(`--inspect=0.0.0.0:${9229 + (inspectPortNumberIncrement += 1)}`);
+        } else if (inspectLevel === 2) {
+          execArgv.push(`--inspect-brk=0.0.0.0:${9229 + (inspectPortNumberIncrement += 1)}`);
+        }
+        this.worker = fork(`${__dirname}/../../child.js`, {
+          execArgv
+        });
         this.worker.on('message', (message) => {
           switch (message.method) {
 
