@@ -1,7 +1,7 @@
 {
   "name": "document.assign",
   "type": "object",
-  "description": "Assigns new key/value pairs to an existing document.",
+  "description": "Assigns new key/value pairs to an existing document. Returns a new document, does not update the existing document.",
   "inputs": {
     "document": {
   		"type": "document"
