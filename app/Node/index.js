@@ -729,8 +729,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           /**
           * Trigger event on the origin NodeOutput.
           * @event NodeOutput#trigger
-          * @param {Connector}
-          * @param {FlowState}
+          * @param {Connector} conn
+          * @param {FlowState} state
           * @param {Function} callback
           */
           conn.origin.emit('trigger', conn, state, (value) => { // eslint-disable-line
