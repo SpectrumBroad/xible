@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Resizing the editor to only narrowly fit the cpu/mem/delay charts no longer toggles the scrollbar in- and out of view. ([#11](https://github.com/SpectrumBroad/xible/issues/11))
 
+-   Publishing flows to the registry no longer includes the vault data ([#25](https://github.com/SpectrumBroad/xible/issues/25))
+
 ## [0.6.0][] - 2017-06-09
 ### Added
 -   Node inputs now have a string value `assignsOutputType` that allows the given output to be assigned the same type as the input. See the [node structure documentation](https://www.xible.io/docs/guides/nodes/structure.htm#structure.json) for more information.
