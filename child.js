@@ -52,7 +52,6 @@ process.on('message', (message) => {
   switch (message.method) {
 
     case 'init':
-
       xible = new Xible({
         child: true
       }, message.config);
@@ -79,36 +78,35 @@ process.on('message', (message) => {
       structuredNodes = null;
 
       xible.init()
-        .then(() => {
-          flow = new xible.Flow();
-          flow.initJson(message.flow);
+      .then(() => {
+        flow = new xible.Flow();
+        flow.initJson(message.flow);
 
-          // inform the master that we initialized
-          if (process.connected) {
-            process.send({
-              method: 'initialized'
-            });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
+        // inform the master that we initialized
+        if (process.connected) {
+          process.send({
+            method: 'initialized'
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
 
-          if (process.connected) {
-            process.send({
-              method: 'stop',
-              error: err
-            });
-          }
+        if (process.connected) {
+          process.send({
+            method: 'stop',
+            error: err
+          });
+        }
 
-          if (flow) {
-            flow.stop();
-          }
-        });
+        if (flow) {
+          flow.stop();
+        }
+      });
 
       break;
 
     case 'start':
-
       let startPromise;
       if (message.directNodes) {
         startPromise = flow.direct(message.directNodes);
@@ -117,33 +115,32 @@ process.on('message', (message) => {
       }
 
       startPromise
-        .then(() => {
-          // inform the master that we actually started
-          if (process.connected) {
-            process.send({
-              method: 'started'
-            });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
+      .then(() => {
+        // inform the master that we actually started
+        if (process.connected) {
+          process.send({
+            method: 'started'
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
 
-          if (process.connected) {
-            process.send({
-              method: 'stop',
-              error: err
-            });
-          }
+        if (process.connected) {
+          process.send({
+            method: 'stop',
+            error: err
+          });
+        }
 
-          if (flow) {
-            flow.stop();
-          }
-        });
+        if (flow) {
+          flow.stop();
+        }
+      });
 
       break;
 
     case 'stop':
-
       if (flow) {
         flow.stop();
       }
@@ -151,7 +148,6 @@ process.on('message', (message) => {
       break;
 
     case 'directNodes':
-
       if (flow) {
         flow.direct(message.directNodes);
       }
