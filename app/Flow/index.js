@@ -65,9 +65,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Init flows from a given path.
     * This will parse all json files except for _status.json into flows.
     * Note that a path cannot be initiated twice because it is used for saveStatuses()
-    * @static
-    * @param {String} path  The path to the directory containing the flows.
-    * @return {Object.<String, Flow>} list of flows by their _id
+    * @param {String} path The path to the directory containing the flows.
+    * @return {Object.<String, Flow>} List of flows by their _id.
     */
     static initFromPath(flowPath) {
       flowDebug(`init flows from "${flowPath}"`);
@@ -120,7 +119,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Initializes all flows from a given path, by running them through initFromPath().
     * Processes the related flow statuses and starts/inits where necessary.
     * @param {String} flowPath The path to the directory containing the flows.
-    * @return {Object.<String, Flow>} list of flows by their _id
+    * @return {Object.<String, Flow>} List of flows by their _id.
     * @since 0.5.0
     */
     static init(flowPath) {
