@@ -820,7 +820,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       try {
         vault = JSON.parse(fs.readFileSync(vaultPath));
       } catch (err) {
-        vaultDebug(`could not open "${vaultPath}"`);
+        vaultDebug(`could not open "${vaultPath}"\n`, err);
       }
     }
 
@@ -829,8 +829,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         fs.writeFileSync(vaultPath, JSON.stringify(vault), {
           mode: 0o600
         });
-      } catch (e) {
-        vaultDebug(`could not save "${vaultPath}"`);
+      } catch (err) {
+        vaultDebug(`could not save "${vaultPath}"\n`, err);
       }
     }
 
