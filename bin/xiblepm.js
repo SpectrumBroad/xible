@@ -145,7 +145,7 @@ const cli = {
         return Promise.reject('no "flows.path" configured');
       }
       flowPath = xible.resolvePath(flowPath);
-      xible.Flow.initFromPath(flowPath);
+      xible.Flow.initFromPath(flowPath, true);
       const flow = xible.getFlowById(flowName);
       if (!flow) {
         return Promise.reject(`No such flow "${flowName}"`);

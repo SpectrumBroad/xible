@@ -54,9 +54,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       // vault
       if (this._id) {
         this.vault = new NodeVault(this);
-
-        // add vault data to the data field
-        Object.assign(this.data, this.vault.get());
       }
 
       // construct

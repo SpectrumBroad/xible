@@ -66,9 +66,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * This will parse all json files except for _status.json into flows.
     * Note that a path cannot be initiated twice because it is used for saveStatuses()
     * @param {String} path The path to the directory containing the flows.
+    * @param {Boolean} cleanVault Indicates whether the json data from each flow needs vault sanitizing.
     * @return {Object.<String, Flow>} List of flows by their _id.
     */
-    static initFromPath(flowPath) {
+    static initFromPath(flowPath, cleanVault) {
       flowDebug(`init flows from "${flowPath}"`);
       if (this.flowPath) {
         throw new Error(`cannot init multiple flow paths. "${this.flowPath}" already init`);
@@ -103,7 +104,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             const json = JSON.parse(fs.readFileSync(filepath));
             if (json._id) {
               const flow = new Flow(XIBLE);
-              flow.initJson(json);
+              flow.initJson(json, cleanVault);
               flows[flow._id] = flow;
             }
           } catch (err) {
@@ -285,6 +286,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
           // check for data keys that should be vaulted
           // remove those from the json (the json is used for saving)
+          // save the vault data thereafter
           if (cleanVault) {
             const nodeVaultKeys = nodeConstr.vault;
             const nodeVaultData = {};
@@ -300,6 +302,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             if (Object.keys(nodeVaultData).length) {
               xibleNode.vault.set(Object.assign(xibleNode.vault.get() || {}, nodeVaultData));
             }
+          } else if (xibleNode.vault) {
+            Object.assign(xibleNode.data, xibleNode.vault.get());
           }
 
           if (!xibleNode) {
