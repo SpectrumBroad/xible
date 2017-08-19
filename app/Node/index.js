@@ -698,7 +698,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   }
 
   /**
-  * Trigger event on the destination nodeInput.
   * This event is emitted after a node calls trigger() on one of its outputs.
   * The event is fired for each of the input triggers connected to the output where trigger() was called upon.
   * @event NodeInput#trigger
@@ -778,7 +777,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   }
 
   /**
-  * Trigger event on the origin nodeOutput.
   * This event is emitted after a node calls getValues() on one of its inputs.
   * The event is fired for each of the outputs connected to the input where getValues() was called upon.
   * @event NodeOutput#trigger
