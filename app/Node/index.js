@@ -13,6 +13,22 @@ let express;
 const nodeDebug = debug('xible:node');
 
 module.exports = (XIBLE, EXPRESS_APP) => {
+
+  /**
+  * Trigger event which is applied to event nodes when the flow starts,
+  * after all nodes have received the init event.
+  * It is also applied to a node when it gets triggered through
+  * an input trigger after a call from nodeOutput.trigger().
+  * @event Node#trigger
+  * @param {FlowState} state A blank state, equal to the state provided on the init event.
+  */
+
+  /**
+  * Init event which is applied to all nodes, when the flow starts.
+  * @event Node#init
+  * @param {FlowState} state The initial (blank) state of the flow.
+  */
+
   /**
   * Node class
   * @extends EventEmitter
@@ -682,6 +698,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   }
 
   /**
+  * Trigger event on the destination nodeInput.
+  * This event is emitted after a node calls trigger() on one of its outputs.
+  * The event is fired for each of the input triggers connected to the output where trigger() was called upon.
+  * @event NodeInput#trigger
+  * @param {Connector} conn The connector responsible for the trigger.
+  * @param {FlowState} state The state provided from the calling node.
+  */
+
+  /**
   * Class for inputs of a Node.
   * @extends NodeIo
   */
@@ -723,16 +748,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           const conn = conns[i];
           let calledBack = false;
 
-          /**
-          * Trigger event on the origin nodeOutput.
-          * This event is emitted after a node calls getValues() on one of its inputs.
-          * The event is fired for each of the outputs connected to the input where getValues() was called upon.
-          * @event NodeOutput#trigger
-          * @param {Connector} conn The connector responsible for the trigger.
-          * @param {FlowState} state The state provided from the calling node.
-          * @param {Function} callback Use the callback function to return your value.
-          * You can only callback once, otherwise an Error is thrown.
-          */
           conn.origin.emit('trigger', conn, state, (value) => { // eslint-disable-line
             // verify that this callback wasn't already made.
             if (calledBack) {
@@ -763,6 +778,17 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   }
 
   /**
+  * Trigger event on the origin nodeOutput.
+  * This event is emitted after a node calls getValues() on one of its inputs.
+  * The event is fired for each of the outputs connected to the input where getValues() was called upon.
+  * @event NodeOutput#trigger
+  * @param {Connector} conn The connector responsible for the trigger.
+  * @param {FlowState} state The state provided from the calling node.
+  * @param {Function} callback Use the callback function to return your value.
+  * You can only callback once, otherwise an Error is thrown.
+  */
+
+  /**
   * Class for outputs of a Node.
   * @extends NodeIo
   */
@@ -786,15 +812,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       for (let i = 0; i < conns.length; i += 1) {
         const conn = conns[i];
         conn.destination.node.emit('trigger');
-
-        /**
-        * Trigger event on the destination nodeInput.
-        * This event is emitted after a node calls trigger() on one of its outputs.
-        * The event is fired for each of the input triggers connected to the output where trigger() was called upon.
-        * @event NodeInput#trigger
-        * @param {Connector} conn The connector responsible for the trigger.
-        * @param {FlowState} state The state provided from the calling node.
-        */
         conn.destination.emit('trigger', conn, state.split());
       }
     }
