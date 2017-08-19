@@ -765,7 +765,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           switch (message.method) {
 
             case 'initializing':
-
               if (this.worker && this.worker.connected) {
                 const initializingDiff = process.hrtime(this.timing.initStart);
 
@@ -786,7 +785,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               break;
 
             case 'initialized':
-
               this.timing.initEnd = process.hrtime();
               const initializedDiff = process.hrtime(this.timing.initStart);
               flowDebug(`flow/worker initialized in ${initializedDiff[0] * 1000 + (initializedDiff[1] / 1e6)}ms`);
@@ -804,7 +802,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               break;
 
             case 'started':
-
               this.state = Flow.STATE_STARTED;
               this.emit('started');
 
@@ -858,17 +855,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               break;
 
             case 'stop':
-
               this.forceStop();
               break;
 
             case 'broadcastWebSocket':
-
               XIBLE.broadcastWebSocket(message.message);
               break;
 
             case 'usage':
-
               this.usage = message.usage;
               break;
 
@@ -890,7 +884,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
           if (this.initLevel === Flow.INITLEVEL_FLOW) {
             this.init()
-              .catch((err) => { console.error(err); });
+            .catch(err => console.error(err));
           }
         });
 
@@ -911,6 +905,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Starts a flow. Rejects if flow is not stopped
     * Note that the behaviour is different when called from a worker process
     * @param  {Node[]} directNodes  nodes to direct
+    * @fires Node#trigger
+    * @fires Node#init
     * @return {Promise}
     */
     start(directNodes) {
@@ -950,7 +946,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               switch (message.method) {
 
                 case 'started':
-
                   this.timing.startEnd = process.hrtime();
                   const startedDiff = process.hrtime(this.timing.startStart);
                   flowDebug(`flow/worker started in ${startedDiff[0] * 1000 + (startedDiff[1] / 1e6)}ms`);
@@ -976,25 +971,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       process.nextTick(() => {
         // init all nodes
         for (let i = 0; i < this.nodes.length; i += 1) {
-          /**
-          * Init event which is applied to all nodes, when the flow starts.
-          * @event Node#init
-          * @param {FlowState} state The initial (blank) state of the flow.
-          */
           this.nodes[i].emit('init', flowState);
         }
 
         // trigger all event objects that are listening
         for (let i = 0; i < this.nodes.length; i += 1) {
           if (this.nodes[i].type === 'event') {
-            /**
-            * Trigger event which is applied to event nodes when the flow starts,
-            * after all nodes have received the init event.
-            * It is also applied to a node when it gets triggered through
-            * an input trigger after a call from nodeOutput.trigger().
-            * @event Node#trigger
-            * @param {FlowState} state A blank state, equal to the state provided on the init event.
-            */
             this.nodes[i].emit('trigger', flowState);
           }
         }
