@@ -23,7 +23,8 @@
     "no-continue": "off",
     "guard-for-in": "off",
     "no-restricted-syntax": ["off"],
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "no-use-before-define": ["error", {"functions": false, "classes": false}]
   },
   "plugins": [
     "import"
