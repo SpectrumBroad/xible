@@ -46,6 +46,16 @@ main {
 	color: #ddd;
 }
 
+main a {
+	color: #eee;
+	text-decoration: underline;
+}
+
+main a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+
 p.hidden {
 	display: none;
 }

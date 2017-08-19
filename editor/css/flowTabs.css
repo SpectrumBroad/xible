@@ -29,6 +29,7 @@
 	white-space: nowrap;
 	height: 100%;
 	background-color: inherit;
+	text-decoration: none;
 }
 
 .flowList li.add {
