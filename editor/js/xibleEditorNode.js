@@ -327,31 +327,28 @@ class XibleEditorNode extends xibleWrapper.Node {
 	}
 
 	updateProgressBarById(statusId, status) {
-
 		if (!this.statusEl || !statusId || !status || typeof status.percentage !== 'number') {
 			return;
 		}
 
-		let li = this.statusEl.querySelector('li.bar[data-statusid="' + statusId + '"]');
+		const li = this.statusEl.querySelector('li.bar[data-statusid="' + statusId + '"]');
 		if (li) {
-
-			let bar = li.querySelector('.holder>div');
+			const bar = li.querySelector('.holder>div');
 			bar.style.transition = 'none';
 			bar.style.width = `${status.percentage}%`;
 
 			if (status.updateOverTime) {
-
-				//check when this progressbar should start (future)
-				//or when it started (past)
+				// check when this progressbar should start (future)
+				// or when it started (past)
 				let startDiff = Date.now() - status.startDate + this.editor.serverClientDateDifference;
 
-				//max it out
+				// max it out
 				if (startDiff > status.updateOverTime) {
 					startDiff = status.updateOverTime;
 				}
 
-				//if this progressbar should have started in the past
-				//calculate where the width should be right now
+				// if this progressbar should have started in the past
+				// calculate where the width should be right now
 				if (startDiff > 0) {
 					bar.style.width = `${startDiff/status.updateOverTime*100}%`;
 				}
@@ -359,10 +356,8 @@ class XibleEditorNode extends xibleWrapper.Node {
 				bar.offsetWidth; /* jshint ignore: line */
 				bar.style.transition = `width ${status.updateOverTime-(startDiff>0?startDiff:0)}ms ${startDiff<0?Math.abs(startDiff):0}ms linear`;
 				bar.style.width = '100%';
-
 			}
 		}
-
 	}
 
 	addStatus(status) {
@@ -371,97 +366,86 @@ class XibleEditorNode extends xibleWrapper.Node {
 		}
 
 		xibleWrapper.Config
-			.getValue('editor.nodes.statuses.max')
-			.then((configMaxStatuses) => {
-				let statusCount = 0;
-				let ul = this.statusEl;
-				if (!ul) {
-					ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
-					ul.classList.add('statuses');
-				} else {
-					statusCount = ul.querySelectorAll('li:not(.bar)').length;
-				}
+		.getValue('editor.nodes.statuses.max')
+		.then((configMaxStatuses) => {
+			let statusCount = 0;
+			let ul = this.statusEl;
+			if (!ul) {
+				ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
+				ul.classList.add('statuses');
+			} else {
+				statusCount = ul.querySelectorAll('li:not(.bar)').length;
+			}
 
-				// remove all statuses above the max config setting
-				if (typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
-					while (statusCount >= configMaxStatuses && ul.firstChild) {
-						const removeChild = ul.firstChild;
-						this.removeStatusById(removeChild.getAttribute('data-statusid'));
-						statusCount -= 1;
+			// remove all statuses above the max config setting
+			if (typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
+				while (statusCount >= configMaxStatuses && ul.firstChild) {
+					const removeChild = ul.firstChild;
+					this.removeStatusById(removeChild.getAttribute('data-statusid'));
+					statusCount -= 1;
+				}
+			}
+
+			if (configMaxStatuses === 0) {
+				return;
+			}
+
+			const li = ul.appendChild(document.createElement('li'));
+			li.setAttribute('data-statusid', status._id);
+
+			if (status.color) {
+				li.classList.add(status.color);
+			}
+
+			if (typeof status.message === 'string') {
+				let messageLineSplit = status.message.split('\n');
+				for (let i = 0; i < messageLineSplit.length; i += 1) {
+					if (i) {
+						li.appendChild(document.createElement('br'));
 					}
+					li.appendChild(document.createTextNode(messageLineSplit[i]));
 				}
+				messageLineSplit = null;
+			}
 
-				if (configMaxStatuses === 0) {
-					return;
-				}
-
-				let li = ul.appendChild(document.createElement('li'));
-				li.setAttribute('data-statusid', status._id);
-
-				if (status.color) {
-					li.classList.add(status.color);
-				}
-
-				if (typeof status.message === 'string') {
-					let messageLineSplit = status.message.split('\n');
-					for (let i = 0; i < messageLineSplit.length; i += 1) {
-						if (i) {
-							li.appendChild(document.createElement('br'));
-						}
-						li.appendChild(document.createTextNode(messageLineSplit[i]));
-					}
-					messageLineSplit = null;
-				}
-
-				if (status.timeout) {
-					this.statusTimeouts[status._id] = window.setTimeout(() => {
-						this.removeStatusById(status._id);
-					}, status.timeout);
-				}
-			});
+			if (status.timeout) {
+				this.statusTimeouts[status._id] = window.setTimeout(() => {
+					this.removeStatusById(status._id);
+				}, status.timeout);
+			}
+		});
 	}
 
 	updateStatusById(statusId, status) {
-
 		if (!this.statusEl) {
 			return;
 		}
 
-		let li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
+		const li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
 		if (li) {
-
 			if (status.message) {
-
 				if (li.lastChild) {
 					li.removeChild(li.lastChild);
 				}
 
 				li.appendChild(document.createTextNode(status.message));
-
 			}
-
 		}
-
 	}
 
 	removeStatusById(statusId, timeout) {
-
 		//clear timeout
 		if (this.statusTimeouts[statusId]) {
-
 			window.clearTimeout(this.statusTimeouts[statusId]);
 			this.statusTimeouts[statusId] = null;
 			delete this.statusTimeouts[statusId];
-
 		}
 
 		//get and delete li
 		if (this.statusEl) {
-
-			let li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
+			const li = this.statusEl.querySelector(`li[data-statusid="${statusId}"]`);
 			if (li) {
-
-				let fn = () => {
+				const fn = () => {
 					if (this.statusEl) {
 						this.statusEl.removeChild(li);
 					}
@@ -472,15 +456,11 @@ class XibleEditorNode extends xibleWrapper.Node {
 				} else {
 					fn();
 				}
-
 			}
-
 		}
-
 	}
 
 	removeAllStatuses() {
-
 		//clear all timeouts
 		let statusId;
 		for (statusId in this.statusTimeouts) {
@@ -496,7 +476,6 @@ class XibleEditorNode extends xibleWrapper.Node {
 			}
 			this.statusEl = null;
 		}
-
 	}
 
 	setTracker(status) {
