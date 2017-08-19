@@ -241,8 +241,8 @@ class Xible extends EventEmitter {
   static generateObjectId() {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
+      .toString(16)
+      .substring(1);
     }
     return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
   }
@@ -400,7 +400,6 @@ class Xible extends EventEmitter {
         case 'xible.node.addStatus':
         case 'xible.node.setTracker':
         case 'xible.node.addProgressBar':
-
           this.setPersistentWebSocketMessage(message);
 
           if (message.status.timeout) {
@@ -412,7 +411,6 @@ class Xible extends EventEmitter {
           break;
 
         case 'xible.node.updateProgressBarById':
-
           copyMessage = Object.assign({}, message);
           copyMessage.method = 'xible.node.addProgressBar';
           this.setPersistentWebSocketMessage(copyMessage);
@@ -420,7 +418,6 @@ class Xible extends EventEmitter {
           break;
 
         case 'xible.node.updateStatusById':
-
           copyMessage = Object.assign({}, message);
           copyMessage.method = 'xible.node.addStatus';
           this.setPersistentWebSocketMessage(copyMessage);
@@ -508,26 +505,6 @@ class Xible extends EventEmitter {
 
   getFlowByName(name) {
     return this.getFlowById(name);
-  }
-
-  deleteFlow(flow, callback) {
-    if (flow._id) {
-      delete this.flows[flow._id];
-    }
-
-    if (typeof callback === 'function') {
-      callback();
-    }
-  }
-
-  deleteFlowById(id, callback) {
-    if (id) {
-      delete this.flows[id];
-    }
-
-    if (typeof callback === 'function') {
-      callback();
-    }
   }
 
 }
