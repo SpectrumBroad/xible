@@ -66,7 +66,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * This will parse all json files except for _status.json into flows.
     * Note that a path cannot be initiated twice because it is used for saveStatuses()
     * @param {String} path The path to the directory containing the flows.
-    * @param {Boolean} cleanVault Indicates whether the json data from each flow needs vault sanitizing.
+    * @param {Boolean} cleanVault Indicates whether the json data from each flow
+    * needs vault sanitizing.
     * @return {Object.<String, Flow>} List of flows by their _id.
     */
     static initFromPath(flowPath, cleanVault) {
@@ -486,7 +487,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           msg = `triggered '${output.name}' in ${diff}ms`;
 
         } else {
-          msg = `triggered '${output.name}' @ ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
+          msg = `triggered '${output.name}' @
+          ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
         }
 
         node.setTracker({
@@ -695,6 +697,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           });
 
       }
+
+      return Promise.reject(new Error('Flow in unknown state'));
     }
 
     static get STATE_STOPPED() {
@@ -1023,6 +1027,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           });
 
       }
+
+      return Promise.reject(new Error('Flow in unknown state'));
     }
 
     /**
@@ -1031,76 +1037,75 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @return {Promise}
     */
     stop() {
-      if (!XIBLE.child) {
-        if (this.state !== Flow.STATE_STARTED && this.state !== Flow.STATE_INITIALIZED) {
-          return Promise.reject('cannot stop; flow is not started or initialized');
-        }
-        this.state = Flow.STATE_STOPPING;
+      if (XIBLE.child) {
+        flowDebug('stopping flow from worker');
 
-        return new Promise((resolve) => {
-          this.saveStatus(false);
+        // close any node that wants to
+        this.nodes.forEach(node => node.emit('close'));
 
-          if (this.worker) {
+        flowDebug('stopped flow from worker');
+        process.exit(0);
+      }
+
+      if (this.state !== Flow.STATE_STARTED && this.state !== Flow.STATE_INITIALIZED) {
+        return Promise.reject('cannot stop; flow is not started or initialized');
+      }
+      this.state = Flow.STATE_STOPPING;
+
+      return new Promise((resolve) => {
+        this.saveStatus(false);
+
+        if (this.worker) {
+          XIBLE.broadcastWebSocket({
+            method: 'xible.flow.stopping',
+            flowId: this._id
+          });
+
+          flowDebug('stopping flow from master');
+          let killTimeout;
+
+          this.worker.once('exit', () => {
+            if (killTimeout) {
+              clearTimeout(killTimeout);
+              killTimeout = null;
+            }
+
+            resolve(this);
+          });
+
+          this.worker.on('disconnect', () => {
+            if (this.worker) {
+              flowDebug('killing worker the normal way');
+              this.worker.kill();
+            } else if (killTimeout) {
+              clearTimeout(killTimeout);
+              killTimeout = null;
+            }
+          });
+
+          this.worker.send({
+            method: 'stop'
+          });
+
+          this.worker.disconnect();
+
+          // forcibly kill after 5 seconds
+          killTimeout = setTimeout(() => {
+            flowDebug('killing worker from master using SIGKILL');
+            this.worker.kill('SIGKILL');
+
+            // cleanup all open statuses
             XIBLE.broadcastWebSocket({
-              method: 'xible.flow.stopping',
+              method: 'xible.flow.removeAllStatuses',
               flowId: this._id
             });
 
-            flowDebug('stopping flow from master');
-            let killTimeout;
-
-            this.worker.once('exit', () => {
-              if (killTimeout) {
-                clearTimeout(killTimeout);
-                killTimeout = null;
-              }
-
-              resolve(this);
-            });
-
-            this.worker.on('disconnect', () => {
-              if (this.worker) {
-                flowDebug('killing worker the normal way');
-                this.worker.kill();
-              } else if (killTimeout) {
-                clearTimeout(killTimeout);
-                killTimeout = null;
-              }
-            });
-
-            this.worker.send({
-              method: 'stop'
-            });
-
-            this.worker.disconnect();
-
-            // forcibly kill after 5 seconds
-            killTimeout = setTimeout(() => {
-              flowDebug('killing worker from master using SIGKILL');
-              this.worker.kill('SIGKILL');
-
-              // cleanup all open statuses
-              XIBLE.broadcastWebSocket({
-                method: 'xible.flow.removeAllStatuses',
-                flowId: this._id
-              });
-
-              killTimeout = null;
-            }, 5000);
-          } else {
-            resolve(this);
-          }
-        });
-      }
-
-      flowDebug('stopping flow from worker');
-
-        // close any node that wants to
-      this.nodes.forEach(node => node.emit('close'));
-
-      flowDebug('stopped flow from worker');
-
-      process.exit(0);
+            killTimeout = null;
+          }, 5000);
+        } else {
+          resolve(this);
+        }
+      });
     }
 
   }
@@ -1118,7 +1123,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @param  {Node}  node
     * @param  {Object}  obj
     */
-    this.set = function (node, obj) {
+    this.set = function FlowStateSet(node, obj) {
       if (!(node instanceof XIBLE.Node)) {
         throw new Error('node must be instanceof Node');
       } else if (!(obj instanceof Object)) {
@@ -1134,7 +1139,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @param  {Node}  node
     * @return  {Object}
     */
-    this.get = function (node) {
+    this.get = function FlowStateGet(node) {
       if (!(node instanceof XIBLE.Node)) {
         throw new Error('node must be instanceof Node');
       }
@@ -1146,7 +1151,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Splits the flowState into a new flowState
     * @return  {FlowState}  the new flowState
     */
-    this.split = function () {
+    this.split = function FlowStateSplit() {
       return new FlowState(Object.assign({}, states));
     };
 
