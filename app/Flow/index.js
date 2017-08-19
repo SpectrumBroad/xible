@@ -469,7 +469,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       // track output triggers
       /*
-      //uncommenting this needs to take care of commented _trackerTriggerTime elsewhere
+      // uncommenting this needs to take care of commented _trackerTriggerTime elsewhere
+      // and this.node.emit('triggerout', this); in /app/Node/index.js
       node.prependListener('triggerout', (output) => {
 
         if (!output.connectors.length) {
@@ -973,14 +974,27 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const flowState = new FlowState();
 
       process.nextTick(() => {
-          // init all nodes
+        // init all nodes
         for (let i = 0; i < this.nodes.length; i += 1) {
+          /**
+          * Init event which is applied to all nodes, when the flow starts.
+          * @event Node#init
+          * @param {FlowState} state The initial (blank) state of the flow.
+          */
           this.nodes[i].emit('init', flowState);
         }
 
-          // trigger all event objects that are listening
+        // trigger all event objects that are listening
         for (let i = 0; i < this.nodes.length; i += 1) {
           if (this.nodes[i].type === 'event') {
+            /**
+            * Trigger event which is applied to event nodes when the flow starts,
+            * after all nodes have received the init event.
+            * It is also applied to a node when it gets triggered through
+            * an input trigger after a call from nodeOutput.trigger().
+            * @event Node#trigger
+            * @param {FlowState} state A blank state, equal to the state provided on the init event.
+            */
             this.nodes[i].emit('trigger', flowState);
           }
         }

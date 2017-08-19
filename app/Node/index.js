@@ -724,11 +724,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           let calledBack = false;
 
           /**
-          * Trigger event on the origin NodeOutput.
+          * Trigger event on the origin nodeOutput.
+          * This event is emitted after a node calls getValues() on one of its inputs.
+          * The event is fired for each of the outputs connected to the input where getValues() was called upon.
           * @event NodeOutput#trigger
-          * @param {Connector} conn
-          * @param {FlowState} state
-          * @param {Function} callback
+          * @param {Connector} conn The connector responsible for the trigger.
+          * @param {FlowState} state The state provided from the calling node.
+          * @param {Function} callback Use the callback function to return your value.
+          * You can only callback once, otherwise an Error is thrown.
           */
           conn.origin.emit('trigger', conn, state, (value) => { // eslint-disable-line
             // verify that this callback wasn't already made.
@@ -736,8 +739,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               throw new Error('Already called back');
             }
             calledBack = true;
-            // let everyone know that the trigger is done
-            conn.origin.emit('triggerdone');
 
             // we only send arrays between nodes
             // we don't add non existant values
@@ -770,6 +771,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Triggers an output with type === 'trigger'
     * @param {FlowState} state The flowstate at the time of calling.
+    * @fires NodeInput#trigger
     * @throws {Error} Throws whenever this.type !== 'trigger'.
     */
     trigger(state) {
@@ -778,12 +780,21 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
       Node.flowStateCheck(state);
 
-      this.node.emit('triggerout', this);
+      // this.node.emit('triggerout', this);
 
       const conns = this.connectors;
       for (let i = 0; i < conns.length; i += 1) {
         const conn = conns[i];
         conn.destination.node.emit('trigger');
+
+        /**
+        * Trigger event on the destination nodeInput.
+        * This event is emitted after a node calls trigger() on one of its outputs.
+        * The event is fired for each of the input triggers connected to the output where trigger() was called upon.
+        * @event NodeInput#trigger
+        * @param {Connector} conn The connector responsible for the trigger.
+        * @param {FlowState} state The state provided from the calling node.
+        */
         conn.destination.emit('trigger', conn, state.split());
       }
     }
