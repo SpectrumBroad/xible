@@ -29,7 +29,9 @@ module.exports = (Config, XIBLE, EXPRESS_APP) => {
   });
 
   EXPRESS_APP.get('/api/config/validatePermissions', (req, res) => {
-    Config.validatePermissions().then((result) => {
+    Config
+    .validatePermissions()
+    .then((result) => {
       res.json(result);
     });
   });

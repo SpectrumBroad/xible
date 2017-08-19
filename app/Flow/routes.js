@@ -58,27 +58,29 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
   // stop an existing flow
   EXPRESS_APP.patch('/api/flows/:flowId/stop', (req, res) => {
-    req.locals.flow.forceStop()
-      .then(() => {
-        res.end();
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).end();
-      });
+    req.locals.flow
+    .forceStop()
+    .then(() => {
+      res.end();
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).end();
+    });
   });
 
 
   // start an existing flow
   EXPRESS_APP.patch('/api/flows/:flowId/start', (req, res) => {
-    req.locals.flow.forceStart()
-      .then(() => {
-        res.end();
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).end();
-      });
+    req.locals.flow
+    .forceStart()
+    .then(() => {
+      res.end();
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).end();
+    });
   });
 
 
@@ -126,12 +128,16 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     }
 
     const flow = req.locals.flow;
-    flow.forceStop().then(() => {
+    flow
+    .forceStop()
+    .then(() => {
       // init the newly provided json over the existing flow
       flow.initJson(req.body, true);
 
       // save it to file
-      flow.save().then(() => {
+      flow
+      .save()
+      .then(() => {
         // output the flow id
         res.json({
           _id: flow._id
@@ -144,10 +150,11 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
   // delete an existing flow
   EXPRESS_APP.delete('/api/flows/:flowId', (req, res) => {
     const flow = req.locals.flow;
-    flow.forceStop().then(() => {
-      flow.delete().then(() => {
-        res.end();
-      });
+    flow
+    .forceStop()
+    .then(() => flow.delete())
+    .then(() => {
+      res.end();
     });
   });
 };

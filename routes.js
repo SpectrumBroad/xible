@@ -2,7 +2,9 @@
 
 module.exports = (XIBLE, EXPRESS_APP) => {
   EXPRESS_APP.get('/api/validateFlowPermissions', (req, res) => {
-    XIBLE.Flow.validatePermissions().then((result) => {
+    XIBLE.Flow
+    .validatePermissions()
+    .then((result) => {
       res.json(result);
     });
   });
