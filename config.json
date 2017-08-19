@@ -20,6 +20,20 @@
     "path": "~/.xible/vault.json"
   },
 
+  "editor": {
+    "nodes": {
+      "statuses": {
+        "max": null
+      }
+    },
+    "flows": {
+      "allowdirect": false
+    },
+    "viewstate": {
+      "zoomstateonopen": "untouched"
+    }
+  },
+
   "registry": {
     "url": "https://registry.xible.io",
 
