@@ -1,0 +1,15 @@
+{
+  "name": "console.clear",
+  "type": "action",
+  "description": "When standard out is a TTY, this node will attempt to clear the TTY. When standard out is not a TTY, this node does nothing.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

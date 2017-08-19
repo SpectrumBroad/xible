@@ -1,0 +1,18 @@
+{
+  "name": "console.error",
+  "type": "action",
+  "description": "Prints to standard error with newline.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "value": {
+      "type": null
+    }
+  },
+  "outputs": {
+    "done": {
+      "type": "trigger"
+    }
+  }
+}

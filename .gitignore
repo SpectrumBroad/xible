@@ -7,6 +7,7 @@ nodes/*
 !nodes/compare
 !nodes/cast
 !nodes/if
+!nodes/console
 !nodes/log.console
 !nodes/waitfor
 !nodes/filter
