@@ -13,7 +13,6 @@ let express;
 const nodeDebug = debug('xible:node');
 
 module.exports = (XIBLE, EXPRESS_APP) => {
-
   /**
   * Trigger event which is applied to event nodes when the flow starts,
   * after all nodes have received the init event.
@@ -699,7 +698,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   /**
   * This event is emitted after a node calls trigger() on one of its outputs.
-  * The event is fired for each of the input triggers connected to the output where trigger() was called upon.
+  * The event is fired for each of the input triggers connected to the output
+  * where trigger() was called upon.
   * @event NodeInput#trigger
   * @param {Connector} conn The connector responsible for the trigger.
   * @param {FlowState} state The state provided from the calling node.
@@ -778,7 +778,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   /**
   * This event is emitted after a node calls getValues() on one of its inputs.
-  * The event is fired for each of the outputs connected to the input where getValues() was called upon.
+  * The event is fired for each of the outputs connected to the input
+  * where getValues() was called upon.
   * @event NodeOutput#trigger
   * @param {Connector} conn The connector responsible for the trigger.
   * @param {FlowState} state The state provided from the calling node.
