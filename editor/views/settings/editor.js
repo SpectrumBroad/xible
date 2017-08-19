@@ -19,6 +19,27 @@ View.routes['/settings/editor'] = function(EL) {
 				</dl>
 			</section>
 
+			<section id="flows">
+				<h2>Flows</h2>
+				<p class="warning">
+					Running a flow in direct mode can have undesired side-effects. Take special note of the <a href="https://xible.io/docs/editor#direct" target="_blank" rel="noopener">online documentation</a>.
+				</p>
+				<dl>
+					<dd class="checkbox">
+						<label for="settingsEditorFlowsAllowDirect">
+							<input type="checkbox" value="true" id="settingsEditorFlowsAllowDirect" data-configpath="editor.flows.allowdirect" />
+							<span></span>
+						</label>
+					</dd>
+					<dt class="checkbox">
+						<label for="settingsEditorFlowsAllowDirect">
+							Allow direct mode
+							<div>Enable or disable the ability to run part of a flow directly.</div>
+						</label>
+					</dt>
+				</dl>
+			</section>
+
 			<section id="viewstate">
 				<h2>Viewstate</h2>
 				<dl>

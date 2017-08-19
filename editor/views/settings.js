@@ -17,6 +17,7 @@ View.routes['/settings'] = function(EL) {
 				<h1>Editor</h1>
 				<ul>
 					<li><a href="/settings/editor#nodes" onclick="settingsViewHolder.navigate('/settings/editor#nodes'); return false;">Nodes</a></li>
+					<li><a href="/settings/editor#flows" onclick="settingsViewHolder.navigate('/settings/editor#flows'); return false;">Flows</a></li>
 					<li><a href="/settings/editor#viewstate" onclick="settingsViewHolder.navigate('/settings/editor#viewstate'); return false;">Viewstate</a></li>
 				</ul>
 			</section>

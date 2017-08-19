@@ -5,7 +5,7 @@ View.routes['/nodes'] = function(EL) {
       <section>
         <h1>Installed</h1>
         <ul>
-          <li><a href="/test">blaat</a></li>
+          <li><a href="/test"></a></li>
         </ul>
       </section>
     </div>

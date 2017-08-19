@@ -54,32 +54,41 @@ class XibleEditorNode extends xibleWrapper.Node {
 				return;
 			}
 
-			this.flow.undirect();
+			// check if direct mode is alowed before continuing
+			xibleWrapper.Config
+			.getValue('editor.flows.allowdirect')
+			.then((allowDirect) => {
+				if(!allowDirect) {
+					return;
+				}
 
-			// fetch all related connectors and nodes for the double clicked node
-			let related = XibleEditorNode.getAllInputObjectNodes(this);
+				this.flow.undirect();
 
-			// don't forget about globals
-			related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
+				// fetch all related connectors and nodes for the double clicked node
+				let related = XibleEditorNode.getAllInputObjectNodes(this);
 
-			related.nodes.forEach((node) => {
-				node._directSetDataListener = () => this.editor.loadedFlow.direct(related);
-				node.on('setdata', node._directSetDataListener);
+				// don't forget about globals
+				related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
+
+				related.nodes.forEach((node) => {
+					node._directSetDataListener = () => this.editor.loadedFlow.direct(related);
+					node.on('setdata', node._directSetDataListener);
+				});
+
+				this.editor.loadedFlow.nodes
+				.filter((node) => related.nodes.indexOf(node) === -1)
+				.forEach((node) => {
+					node.element.classList.add('nodirect');
+				});
+
+				this.editor.loadedFlow.connectors
+				.filter((connector) => related.connectors.indexOf(connector) === -1)
+				.forEach((connector) => {
+					connector.element.classList.add('nodirect');
+				});
+
+				this.editor.loadedFlow.direct(related);
 			});
-
-			this.editor.loadedFlow.nodes
-			.filter((node) => related.nodes.indexOf(node) === -1)
-			.forEach((node) => {
-				node.element.classList.add('nodirect');
-			});
-
-			this.editor.loadedFlow.connectors
-			.filter((connector) => related.connectors.indexOf(connector) === -1)
-			.forEach((connector) => {
-				connector.element.classList.add('nodirect');
-			});
-
-			this.editor.loadedFlow.direct(related);
 		});
 
 		if (!obj.nodeExists) {
