@@ -1,21 +1,20 @@
 class XibleEditorNode extends xibleWrapper.Node {
 
 	constructor(obj, ignoreData) {
-
 		let el = document.createElement('div');
 		el.classList.add('node');
 
 		let headerEl = el.appendChild(document.createElement('h1'));
 
-		//add ios
+		// add ios
 		let ios = el.appendChild(document.createElement('div'));
 		ios.classList.add('io');
 
-		//add input list
+		// add input list
 		let inputList = ios.appendChild(document.createElement('ul'));
 		inputList.classList.add('input');
 
-		//add output list
+		// add output list
 		let outputList = ios.appendChild(document.createElement('ul'));
 		outputList.classList.add('output');
 
@@ -27,8 +26,8 @@ class XibleEditorNode extends xibleWrapper.Node {
 
 		headerEl.appendChild(document.createTextNode(this.name));
 
-		//add additional content
-		if (this.hostsEditorContent) { //load editor static hosted content for this node
+		// add additional content
+		if (this.hostsEditorContent) { // load editor static hosted content for this node
 			this.getAndProcessEditorContent();
 		} else if (!this.nodeExists && obj.editorContent) {
 			this.processEditorContent(obj.editorContent);
@@ -37,7 +36,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 		this.statusTimeouts = {};
 		this.statusEl = null;
 
-		//selection handlers
+		// selection handlers
 		this.element.addEventListener('mousedown', (event) => {
 			if (this.editor) {
 				this.editor.toggleSelectionOnMouseEvent(event, this);
@@ -49,55 +48,48 @@ class XibleEditorNode extends xibleWrapper.Node {
 			}
 		});
 
-		//direct handler
+		// direct handler
 		headerEl.addEventListener('dblclick', (event) => {
-
 			if (!this.editor || this.type !== 'action' || !this.editor.browserSupport) {
 				return;
 			}
 
 			this.flow.undirect();
 
-			//fetch all related connectors and nodes for the double clicked node
+			// fetch all related connectors and nodes for the double clicked node
 			let related = XibleEditorNode.getAllInputObjectNodes(this);
 
-			//don't forget about globals
+			// don't forget about globals
 			related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
 
 			related.nodes.forEach((node) => {
-
 				node._directSetDataListener = () => this.editor.loadedFlow.direct(related);
 				node.on('setdata', node._directSetDataListener);
-
 			});
 
 			this.editor.loadedFlow.nodes
-				.filter((node) => related.nodes.indexOf(node) === -1)
-				.forEach((node) => {
-					node.element.classList.add('nodirect');
-				});
+			.filter((node) => related.nodes.indexOf(node) === -1)
+			.forEach((node) => {
+				node.element.classList.add('nodirect');
+			});
 
 			this.editor.loadedFlow.connectors
-				.filter((connector) => related.connectors.indexOf(connector) === -1)
-				.forEach((connector) => {
-					connector.element.classList.add('nodirect');
-				});
+			.filter((connector) => related.connectors.indexOf(connector) === -1)
+			.forEach((connector) => {
+				connector.element.classList.add('nodirect');
+			});
 
 			this.editor.loadedFlow.direct(related);
-
 		});
 
 		if (!obj.nodeExists) {
-
 			this.element.classList.add('fail');
 			this.addStatus({
 				_id: 1,
 				color: 'red',
 				message: `This node does not exist in this configuration`
 			});
-
 		}
-
 	}
 
 	initInputs(inputs) {
