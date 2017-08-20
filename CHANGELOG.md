@@ -1,14 +1,19 @@
 # Change Log
-All notable changes to the XIBLE project will be documented in this file.
+All notable changes to the [XIBLE project](https://xible.io) will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.7.0][]
 ### Added
 -   Flows can be [started](https://xible.io/docs/commandlinetools/xible#flow.start)/[stopped](https://xible.io/docs/commandlinetools/xible#flow.stop) and [deleted](https://xible.io/docs/commandlinetools/xible#flow.delete) using the cli. See the [xible cli documentation](https://xible.io/docs/commandlinetools/xible) for more information. ([#18](https://github.com/SpectrumBroad/xible/issues/18))
 
 -   The `xible` command line interface supports the 'config' context just like `xiblepm`. ([#22](https://github.com/SpectrumBroad/xible/issues/22))
+
+-   `console.log`, `console.error` and `console.clear` nodes are now included in XIBLE. `log.console` is deprecated and will be removed in a future release. ([#27](https://github.com/SpectrumBroad/xible/issues/27))
 
 ### Changed
 -   `xiblepm flow remove` is deprecated in favor of `xible flow delete`.
@@ -18,6 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   The `document.assign` node only callbacks once when multiple documents are hooked up to the 'document' input.
 
 -   Callbacks from nodes in response to `output.on('trigger')` resulting from a `input.getValues()` call can now only be called back once. An error is thrown if called multiple times.
+
+-   [Direct mode](https://xible.io/docs/editor#direct) can now be enabled/disabled through the settings. It is disabled by default. ([#26](https://github.com/SpectrumBroad/xible/issues/26))
 
 ### Fixed
 -   Resizing the editor to only narrowly fit the cpu/mem/delay charts no longer toggles the scrollbar in- and out of view. ([#11](https://github.com/SpectrumBroad/xible/issues/11))
@@ -74,7 +81,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/SpectrumBroad/xible/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/SpectrumBroad/xible/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/SpectrumBroad/xible/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/SpectrumBroad/xible/compare/v0.4.0...v0.4.1
