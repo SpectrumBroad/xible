@@ -17,6 +17,9 @@ if (typeof WScript !== 'undefined') {
 
 process.title = 'xible';
 
+// start with debug logging enabled until we have a 'normal' way of logging
+process.env.DEBUG = 'xible*';
+
 const fs = require('fs');
 const nopt = require('nopt');
 const Xible = require('../index.js');
@@ -237,9 +240,6 @@ const cli = {
 
   server: {
     start() {
-      // start with debug logging enabled until we have a 'normal' way of logging
-      process.env.DEBUG = 'xible*';
-
       // init xible
       return xible.init();
     }
