@@ -1,5 +1,3 @@
-const CHART_MAX_TICKS = 60;
-
 class XibleEditor extends EventEmitter {
 
 	constructor(xibleWrapper) {

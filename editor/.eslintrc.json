@@ -5,9 +5,21 @@
   },
   "extends": "airbnb",
   "env": {
-    "browser": false,
-    "node": true,
+    "browser": true,
+    "node": false,
     "es6": true
+  },
+  "globals": {
+    "xibleWrapper": false,
+    "View": false,
+    "ViewHolder": false,
+    "XibleEditor": false,
+    "Chart": false,
+    "mainViewHolder": false,
+    "XibleEditorFlow": false,
+    "XibleEditorNode": false,
+    "XibleEditorConnector": false,
+    "XibleWrapper": false
   },
   "rules": {
     "global-require": "off",

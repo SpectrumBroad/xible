@@ -1,8 +1,9 @@
-View.routes['/welcome'] = function(EL) {
+'use strict';
 
+View.routes['/welcome'] = (EL) => {
   EL.innerHTML = `
-		<div id="sub">
-			<header>XIBLE</header>
+    <div id="sub">
+      <header>XIBLE</header>
     </div>
     <div class="inner">
       <section>
@@ -11,5 +12,4 @@ View.routes['/welcome'] = function(EL) {
       </section>
     </div>
   `;
-
 };

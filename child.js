@@ -50,8 +50,7 @@ process.on('unhandledRejection', (reason) => {
 // init message handler
 process.on('message', (message) => {
   switch (message.method) {
-
-    case 'init':
+    case 'init': {
       xible = new Xible({
         child: true
       }, message.config);
@@ -105,8 +104,9 @@ process.on('message', (message) => {
       });
 
       break;
+    }
 
-    case 'start':
+    case 'start': {
       let startPromise;
       if (message.directNodes) {
         startPromise = flow.direct(message.directNodes);
@@ -139,21 +139,23 @@ process.on('message', (message) => {
       });
 
       break;
+    }
 
-    case 'stop':
+    case 'stop': {
       if (flow) {
         flow.stop();
       }
 
       break;
+    }
 
-    case 'directNodes':
+    case 'directNodes': {
       if (flow) {
         flow.direct(message.directNodes);
       }
 
       break;
-
+    }
   }
 });
 

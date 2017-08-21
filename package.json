@@ -63,7 +63,7 @@
     "eslint": "*",
     "eslint-plugin-import": "*",
     "eslint-config-airbnb": "*",
-    "eslint-plugin-jsx-a11y": "*",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "*",
     "nodemon": "*"
   }

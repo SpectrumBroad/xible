@@ -1,5 +1,7 @@
-View.routes['/nodes'] = function(EL) {
-	EL.innerHTML = `
+'use strict';
+
+View.routes['/nodes'] = (EL) => {
+  EL.innerHTML = `
     <div id="sub">
       <header>XIBLE</header>
       <section>

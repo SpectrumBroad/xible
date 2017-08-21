@@ -31,7 +31,6 @@ function handleBroadcastWebSocketError(err) {
 let broadcastWebSocketMessagesThrottle = [];
 
 class Xible extends EventEmitter {
-
   constructor(obj, configObj) {
     super();
 
@@ -396,7 +395,6 @@ class Xible extends EventEmitter {
     if (typeof message !== 'string') {
       // save some messages to replay on new connections
       switch (message.method) {
-
         case 'xible.node.addStatus':
         case 'xible.node.setTracker':
         case 'xible.node.addProgressBar':
@@ -442,7 +440,6 @@ class Xible extends EventEmitter {
             delete this.persistentWebSocketMessages[message.flowId];
           }
           break;
-
       }
 
       if (WEB_SOCKET_THROTTLE > 0) {
@@ -472,7 +469,8 @@ class Xible extends EventEmitter {
       obj.name = name;
     }
 
-    return (this.nodes[name] = obj);
+    this.nodes[name] = obj;
+    return obj;
   }
 
   getNodes() {
@@ -506,7 +504,6 @@ class Xible extends EventEmitter {
   getFlowByName(name) {
     return this.getFlowById(name);
   }
-
 }
 
 module.exports = Xible;
