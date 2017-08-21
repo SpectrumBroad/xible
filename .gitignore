@@ -18,3 +18,4 @@ nodes/*
 !nodes/boolean
 ssl/
 docs/
+package-lock.json
