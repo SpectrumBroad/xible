@@ -429,8 +429,10 @@ class XibleEditor extends EventEmitter {
   }
 
   /**
-  * Opens the given flow in the editor
-  * @param {XibleEditorFlow} flow The flow to open/view/edit
+  * Opens the given flow in the editor.
+  * Does nothing if that flow is already loaded.
+  * @param {XibleEditorFlow} flow The flow to open/view/edit.
+  * @returns {Boolean} False if this flow is already loaded, true otherwise.
   */
   viewFlow(flow) {
     if (!(flow instanceof XibleEditorFlow)) {
@@ -439,7 +441,7 @@ class XibleEditor extends EventEmitter {
 
     // don't reload an already loaded flow
     if (this.loadedFlow && this.loadedFlow._id === flow._id) {
-      return;
+      return false;
     }
 
     // unload already loaded flow
@@ -474,6 +476,7 @@ class XibleEditor extends EventEmitter {
     this.transform();
 
     this.emit('viewflow');
+    return true;
   }
 
   /**

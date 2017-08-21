@@ -555,7 +555,9 @@ const editorView = (EL) => {
       });
       li.classList.add('open');
 
-      xibleEditor.viewFlow(flow);
+      if (!xibleEditor.viewFlow(flow)) {
+        return;
+      }
 
       setLoadedFlowState(flow);
 
