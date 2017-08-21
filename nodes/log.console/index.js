@@ -35,4 +35,11 @@ module.exports = (NODE) => {
       doneOut.trigger(state);
     });
   });
+
+  NODE.on('init', () => {
+    NODE.addStatus({
+      message: '"log.console" is deprecated. Use "console.log" instead.',
+      color: 'red'
+    });
+  });
 };
