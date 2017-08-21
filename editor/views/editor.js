@@ -1,6 +1,6 @@
 'use strict';
 
-View.routes['/editor'] = (EL) => {
+const editorView = (EL) => {
   const CHART_MAX_TICKS = 60;
 
   EL.innerHTML = `
@@ -560,7 +560,8 @@ View.routes['/editor'] = (EL) => {
       setLoadedFlowState(flow);
 
       // get all persistent websocket messages
-      xibleWrapper.getPersistentWebSocketMessages().then((messages) => {
+      xibleWrapper.getPersistentWebSocketMessages()
+      .then((messages) => {
         let flowId;
         let nodeId;
         let statusId;
@@ -574,7 +575,8 @@ View.routes['/editor'] = (EL) => {
       });
 
       // set desired zoomstate
-      xibleWrapper.Config.getValue('editor.viewstate.zoomstateonopen').then((value) => {
+      xibleWrapper.Config.getValue('editor.viewstate.zoomstateonopen')
+      .then((value) => {
         switch (value) {
           case 'reset':
             zoomReset();
@@ -744,3 +746,6 @@ View.routes['/editor'] = (EL) => {
     });
   });
 };
+
+View.routes['/editor'] = editorView;
+View.routes['/editor/:flowName'] = editorView;

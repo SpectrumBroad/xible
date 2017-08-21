@@ -19,7 +19,8 @@
     "XibleEditorFlow": false,
     "XibleEditorNode": false,
     "XibleEditorConnector": false,
-    "XibleWrapper": false
+    "XibleWrapper": false,
+    "XibleEditorNodeSelector": false
   },
   "rules": {
     "global-require": "off",
