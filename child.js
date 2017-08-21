@@ -6,12 +6,12 @@ let flow;
 let xible;
 
 /**
- * Requires the path to a Node.
- * The try/catch prevents proper compilation by the v8 engine,
- * therefore it is in a seperate function.
- * @param {String} nodePath Path to the node directory where index.js resides.
- * @returns {Function|null}
- */
+* Requires the path to a Node.
+* The try/catch prevents proper compilation by the v8 engine,
+* therefore it is in a seperate function.
+* @param {String} nodePath Path to the node directory where index.js resides.
+* @returns {Function|null}
+*/
 function requireNode(nodePath) {
   try {
     return require(nodePath);
