@@ -1,26 +1,20 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let stringIn = NODE.getInputByName('string');
+module.exports = (NODE) => {
+  const stringIn = NODE.getInputByName('string');
 
-	let resultOut = NODE.getOutputByName('result');
-	resultOut.on('trigger', (conn, state, callback) => {
+  const resultOut = NODE.getOutputByName('result');
+  resultOut.on('trigger', (conn, state, callback) => {
+    stringIn.getValues(state).then((strs) => {
+      let result = '';
+      for (let i = 0; i < strs.length; i += 1) {
+        const str = strs[i];
+        if (typeof str === 'string') {
+          result += str.trim();
+        }
+      }
 
-		stringIn.getValues(state).then((strs) => {
-
-			let result = '';
-			for (let i = 0; i < strs.length; ++i) {
-
-				let str = strs[i];
-				if (typeof str === 'string') {
-					result += str.trim();
-				}
-
-			}
-
-			callback(result);
-
-		});
-
-	});
-
+      callback(result);
+    });
+  });
 };

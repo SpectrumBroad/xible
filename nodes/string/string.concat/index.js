@@ -1,39 +1,27 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let aIn = NODE.getInputByName('a');
-	let bIn = NODE.getInputByName('b');
+module.exports = (NODE) => {
+  const aIn = NODE.getInputByName('a');
+  const bIn = NODE.getInputByName('b');
 
-	let stringOut = NODE.getOutputByName('string');
+  const stringOut = NODE.getOutputByName('string');
+  stringOut.on('trigger', (conn, state, callback) => {
+    Promise.all([aIn.getValues(state), bIn.getValues(state)])
+    .then(([strsa, strsb]) => {
+      let result = '';
+      if (strsa.length) {
+        strsa.forEach((str) => {
+          result += str;
+        });
+      }
 
-	stringOut.on('trigger', (conn, state, callback) => {
+      if (strsb.length) {
+        strsb.forEach((str) => {
+          result += str;
+        });
+      }
 
-		aIn.getValues(state).then((strsa) => {
-
-			bIn.getValues(state).then((strsb) => {
-
-				let result = '';
-				if (strsa.length) {
-
-					strsa.forEach(str => {
-						result += str;
-					});
-
-				}
-
-				if (strsb.length) {
-
-					strsb.forEach(str => {
-						result += str;
-					});
-
-				}
-
-				callback(result);
-
-			});
-
-		});
-
-	});
-
+      callback(result);
+    });
+  });
 };
