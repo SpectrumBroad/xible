@@ -305,40 +305,40 @@ const cli = {
 
           // verify that we're logged in
           xible.Registry.User
-            .getByToken(token)
-            .catch(getUserErr => reject(`Failed to get user from token: ${getUserErr}`))
-            .then((user) => {
-              if (!user) {
-                reject('User could not be verified. Please login using "xiblepm user login".');
+          .getByToken(token)
+          .catch(getUserErr => reject(`Failed to get user from token: ${getUserErr}`))
+          .then((user) => {
+            if (!user) {
+              reject('User could not be verified. Please login using "xiblepm user login".');
+              return;
+            }
+
+            // verify if this node had been published before
+            xible.Registry.NodePack
+            .getByName(nodePackName)
+            .catch(getNodePackErr => reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
+            .then((nodePack) => {
+              // verify that whoami equals the remote user
+              if (nodePack && nodePack.publishUserName !== user.name) {
+                reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
                 return;
               }
 
-              // verify if this node had been published before
+              // publish
               xible.Registry.NodePack
-                .getByName(nodePackName)
-                .catch(getNodePackErr => reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
-                .then((nodePack) => {
-                  // verify that whoami equals the remote user
-                  if (nodePack && nodePack.publishUserName !== user.name) {
-                    reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
-                    return;
-                  }
-
-                  // publish
-                  xible.Registry.NodePack
-                    .publish({
-                      name: nodePackName,
-                      registry: {
-                        url: `https://registry.npmjs.com/${nodePackName}`
-                      }
-                    })
-                    .catch(publishErr => reject(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`))
-                    .then((publishedNodePack) => {
-                      log(`Published nodepack "${publishedNodePack.name}".`);
-                      resolve();
-                    });
-                });
+              .publish({
+                name: nodePackName,
+                registry: {
+                  url: `https://registry.npmjs.com/${nodePackName}`
+                }
+              })
+              .catch(publishErr => reject(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`))
+              .then((publishedNodePack) => {
+                log(`Published nodepack "${publishedNodePack.name}".`);
+                resolve();
+              });
             });
+          });
         });
       });
     },
@@ -373,10 +373,10 @@ const cli = {
       .then((nodes) => {
         Object.keys(nodes).forEach((nodeName) => {
           nodes[nodeName]
-            .getRegistryData()
-            .then((data) => {
-              log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
-            });
+          .getRegistryData()
+          .then((data) => {
+            log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
+          });
         });
       });
     }
@@ -395,14 +395,14 @@ const cli = {
       }
 
       return xible.Registry.User
-        .getByToken(token)
-        .then((user) => {
-          if (!user) {
-            log('Not logged in.');
-            return;
-          }
-          log(user.name);
-        });
+      .getByToken(token)
+      .then((user) => {
+        if (!user) {
+          log('Not logged in.');
+          return;
+        }
+        log(user.name);
+      });
     },
     logout() {
       setUserToken(null);
@@ -412,19 +412,66 @@ const cli = {
       const user = new xible.Registry.User();
 
       return getUserInput('Enter your username: ')
-        .then((userName) => {
-          user.name = userName;
-          return getUserInput('Enter your password: ', true);
-        })
-        .then((password) => {
-          if (!password) {
-            return Promise.reject('You need to enter a password.');
-          }
+      .then((userName) => {
+        user.name = userName;
+        return getUserInput('Enter your password: ', true);
+      })
+      .then((password) => {
+        if (!password) {
+          return Promise.reject('You need to enter a password.');
+        }
 
-          user.password = password;
+        user.password = password;
 
-          return user.getToken();
-        })
+        return user.getToken();
+      })
+      .then((token) => {
+        if (!token) {
+          return Promise.reject('No token returned.');
+        }
+
+        return setUserToken(token);
+      });
+    },
+    add() {
+      const newUser = new xible.Registry.User();
+
+      return getUserInput('Enter your username: ')
+      .then((userName) => {
+        if (!userName) {
+          return Promise.reject('You need a username.');
+        } else if (!/^[a-zA-Z0-9_-]{3,}$/.test(userName)) {
+          return Promise.reject('Your username may only contain upper and lower case letters, numbers, an underscore and a dash.\nIt must also be at least 3 characters long.');
+        }
+
+        newUser.name = userName;
+        return getUserInput('Enter your email address: ');
+      })
+      .then((emailAddress) => {
+        if (!emailAddress) {
+          return Promise.reject('You need an email address.');
+        } else if (!/^.+@.+\..+$/.test(emailAddress)) {
+          return Promise.reject('You need a valid email address.');
+        }
+
+        newUser.emailAddress = emailAddress;
+        return getUserInput('Enter your password: ', true);
+      })
+      .then((password) => {
+        if (!password) {
+          return Promise.reject('You need a password.');
+        }
+
+        newUser.password = password;
+        return getUserInput('Verify your password: ', true);
+      })
+      .then((password) => {
+        if (newUser.password !== password) {
+          return Promise.reject('Passwords do not match.');
+        }
+
+        return xible.Registry.User
+        .add(newUser)
         .then((token) => {
           if (!token) {
             return Promise.reject('No token returned.');
@@ -432,54 +479,7 @@ const cli = {
 
           return setUserToken(token);
         });
-    },
-    add() {
-      const newUser = new xible.Registry.User();
-
-      return getUserInput('Enter your username: ')
-        .then((userName) => {
-          if (!userName) {
-            return Promise.reject('You need a username.');
-          } else if (!/^[a-zA-Z0-9_-]{3,}$/.test(userName)) {
-            return Promise.reject('Your username may only contain upper and lower case letters, numbers, an underscore and a dash.\nIt must also be at least 3 characters long.');
-          }
-
-          newUser.name = userName;
-          return getUserInput('Enter your email address: ');
-        })
-        .then((emailAddress) => {
-          if (!emailAddress) {
-            return Promise.reject('You need an email address.');
-          } else if (!/^.+@.+\..+$/.test(emailAddress)) {
-            return Promise.reject('You need a valid email address.');
-          }
-
-          newUser.emailAddress = emailAddress;
-          return getUserInput('Enter your password: ', true);
-        })
-        .then((password) => {
-          if (!password) {
-            return Promise.reject('You need a password.');
-          }
-
-          newUser.password = password;
-          return getUserInput('Verify your password: ', true);
-        })
-        .then((password) => {
-          if (newUser.password !== password) {
-            return Promise.reject('Passwords do not match.');
-          }
-
-          return xible.Registry.User
-            .add(newUser)
-            .then((token) => {
-              if (!token) {
-                return Promise.reject('No token returned.');
-              }
-
-              return setUserToken(token);
-            });
-        });
+      });
     }
   }
 
