@@ -304,41 +304,49 @@ const cli = {
           }
 
           // verify that we're logged in
-          xible.Registry.User
-          .getByToken(token)
-          .catch(getUserErr => reject(`Failed to get user from token: ${getUserErr}`))
-          .then((user) => {
-            if (!user) {
-              reject('User could not be verified. Please login using "xiblepm user login".');
-              return;
-            }
-
-            // verify if this node had been published before
-            xible.Registry.NodePack
-            .getByName(nodePackName)
-            .catch(getNodePackErr => reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
-            .then((nodePack) => {
-              // verify that whoami equals the remote user
-              if (nodePack && nodePack.publishUserName !== user.name) {
-                reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
-                return;
+          resolve(
+            xible.Registry.User
+            .getByToken(token)
+            .catch(getUserErr => Promise.reject(`Failed to get user from token: ${getUserErr}`))
+            .then((user) => {
+              if (!user) {
+                return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
               }
 
-              // publish
-              xible.Registry.NodePack
-              .publish({
-                name: nodePackName,
-                registry: {
-                  url: `https://registry.npmjs.com/${nodePackName}`
+              // verify if this node had been published before
+              return xible.Registry.NodePack
+              .getByName(nodePackName)
+              .catch(getNodePackErr => Promise.reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
+              .then((nodePack) => {
+                // verify that whoami equals the remote user
+                if (nodePack && nodePack.publishUserName !== user.name) {
+                  return Promise.reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
                 }
-              })
-              .catch(publishErr => reject(`Failed to publish nodepack "${nodePack.name}": ${publishErr}`))
-              .then((publishedNodePack) => {
-                log(`Published nodepack "${publishedNodePack.name}".`);
-                resolve();
+
+                // publish
+                return xible.Registry.NodePack
+                .publish({
+                  name: nodePackName,
+                  registry: {
+                    url: `https://registry.npmjs.com/${nodePackName}`
+                  }
+                })
+                .then((publishedNodePack) => {
+                  log(`Published nodepack "${publishedNodePack.name}".`);
+                })
+                .catch((publishErr) => {
+                  if (publishErr.statusCode === 400 && publishErr.data) {
+                    console.log(publishErr.data);
+                    try {
+                      publishErr = JSON.parse(publishErr.data).message;
+                    } catch (jsonParseErr) {
+                    }
+                  }
+                  return Promise.reject(`Failed to publish nodepack "${nodePackName}": ${publishErr}`);
+                });
               });
-            });
-          });
+            })
+          );
         });
       });
     },
