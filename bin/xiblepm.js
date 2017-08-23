@@ -336,7 +336,6 @@ const cli = {
                 })
                 .catch((publishErr) => {
                   if (publishErr.statusCode === 400 && publishErr.data) {
-                    console.log(publishErr.data);
                     try {
                       publishErr = JSON.parse(publishErr.data).message;
                     } catch (jsonParseErr) {
