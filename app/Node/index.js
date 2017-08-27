@@ -33,7 +33,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * @extends EventEmitter
   */
   class Node extends EventEmitter {
-
     constructor(obj) {
       super();
 
@@ -137,23 +136,23 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             }
 
             this.getStructure(normalizedPath)
-              .then((structure) => {
-                structures[structure.name] = structure;
-                checkAndResolve();
-              }).catch((getStructureErr) => {
-                // process subdirs instead
-                this.getStructures(normalizedPath)
-                .then((nestedStructures) => {
-                  if (!Object.keys(nestedStructures).length) {
-                    nodeDebug(getStructureErr);
-                    checkAndResolve();
-                    return;
-                  }
-
-                  Object.assign(structures, nestedStructures);
+            .then((structure) => {
+              structures[structure.name] = structure;
+              checkAndResolve();
+            }).catch((getStructureErr) => {
+              // process subdirs instead
+              this.getStructures(normalizedPath)
+              .then((nestedStructures) => {
+                if (!Object.keys(nestedStructures).length) {
+                  nodeDebug(getStructureErr);
                   checkAndResolve();
-                });
+                  return;
+                }
+
+                Object.assign(structures, nestedStructures);
+                checkAndResolve();
               });
+            });
           });
         }
       });
@@ -608,7 +607,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       return true;
     }
-
   }
 
   /**
@@ -616,7 +614,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * @extends EventEmitter
   */
   class NodeIo extends EventEmitter {
-
     constructor(obj) {
       super();
 
@@ -693,7 +690,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       return false;
     }
-
   }
 
   /**
@@ -710,7 +706,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * @extends NodeIo
   */
   class NodeInput extends NodeIo {
-
     /**
     * Fetches all input values for this input.
     * @param {FlowState} state The flowstate at the time of calling.
@@ -773,7 +768,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
       });
     }
-
   }
 
   /**
@@ -792,7 +786,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * @extends NodeIo
   */
   class NodeOutput extends NodeIo {
-
     /**
     * Triggers an output with type === 'trigger'
     * @param {FlowState} state The flowstate at the time of calling.
@@ -814,7 +807,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         conn.destination.emit('trigger', conn, state.split());
       }
     }
-
   }
 
   if (EXPRESS_APP) {
@@ -831,7 +823,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   vaultPath = XIBLE.resolvePath(vaultPath);
 
   class MainVault {
-
     static init() {
       // create the vault if it doesn't exist
       if (!fs.existsSync(vaultPath)) {
@@ -881,11 +872,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       vault[node._id] = obj;
       this.save();
     }
-
   }
 
   class NodeVault {
-
     constructor(node) {
       this.node = node;
     }
@@ -899,7 +888,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     get() {
       return MainVault.get(this.node);
     }
-
   }
 
   return {
