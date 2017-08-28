@@ -10,4 +10,11 @@ module.exports = (NODE) => {
       callback(JSON.stringify(docs));
     });
   });
+
+  NODE.on('init', () => {
+    NODE.addStatus({
+      message: '"document" and "document.*" nodes are deprecated. Use "object.*" instead.',
+      color: 'red'
+    });
+  });
 };
