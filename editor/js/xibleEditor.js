@@ -298,13 +298,12 @@ class XibleEditor extends EventEmitter {
         break;
 
       case 'xible.flow.usage':
-
         this.emit('flow.usage', json.flows);
 
         // emit for every flow
-        json.flows.forEach((flow) => {
-          this.flows[flow._id].emit('usage', flow);
-        });
+        for (let i = 0; i < json.flows.length; i += 1) {
+          this.flows[json.flows[i]._id].emit('usage', json.flows[i]);
+        }
 
         break;
     }
