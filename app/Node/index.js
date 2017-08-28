@@ -663,6 +663,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.type = null;
       this.singleType = false;
       this.assignsOutputType = null;
+      this.assignsInputType = null;
       this.maxConnectors = null;
       this.node = null;
       this.description = null;
@@ -682,6 +683,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         if (typeof obj.assignsOutputType === 'string') {
           this.assignsOutputType = obj.assignsOutputType;
+        }
+
+        if (typeof obj.assignsInputType === 'string') {
+          this.assignsInputType = obj.assignsInputType;
         }
 
         if (typeof obj.maxConnectors === 'number') {

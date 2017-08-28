@@ -11,7 +11,9 @@
   },
   "outputs": {
     "grouped": {
-      "type": null
+      "type": null,
+      "singleType": true,
+      "assignsInputType": "any"
     },
     "count": {
       "type": "math.number"
