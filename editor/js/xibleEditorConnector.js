@@ -1,173 +1,175 @@
+'use strict';
+
 class XibleEditorConnector extends xibleWrapper.Connector {
+  constructor(obj) {
+    // create the connector HTML/SVG elements
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    el.classList.add('connector');
+    const path = el.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
 
-	constructor(obj) {
+    super(Object.assign({}, obj, { element: el }));
 
-		//create the connector HTML/SVG elements
-		let el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		el.classList.add('connector');
-		let path = el.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
+    // selection handlers
+    path.addEventListener('mousedown', event => this.editor.toggleSelectionOnMouseEvent(event, this));
+    path.addEventListener('mouseup', event => this.editor.toggleSelectionOnMouseEvent(event, this));
+  }
 
-		super(Object.assign({}, obj, {
-			element: el
-		}));
+  setType(type) {
+    if (this.type) {
+      this.element.firstChild.classList.remove(this.type);
+    }
 
-		//selection handlers
-		path.addEventListener('mousedown', (event) => this.editor.toggleSelectionOnMouseEvent(event, this));
-		path.addEventListener('mouseup', (event) => this.editor.toggleSelectionOnMouseEvent(event, this));
+    super.setType(type);
+    this.element.firstChild.classList.add(this.type);
+  }
 
-	}
+  filterDuplicateConnectors(type, end) {
+    if (
+      !this.editor || !this.editor.dummyXibleConnectors ||
+      this.editor.dummyXibleConnectors.indexOf(this) === -1
+    ) {
+      super.filterDuplicateConnectors(type, end);
+    }
+  }
 
-	setType(type) {
+  setOrigin(origin) {
+    if (this.origin && this.origin.connectors.indexOf(this) > -1) {
+      this.origin.node.removeListener('position', this.originDrawFn);
+    }
 
-		if (this.type) {
-			this.element.firstChild.classList.remove(this.type);
-		}
+    super.setOrigin(origin);
 
-		super.setType(type);
-		this.element.firstChild.classList.add(this.type);
+    if (!origin) {
+      return null;
+    }
 
-	}
+    this.draw();
 
-	filterDuplicateConnectors(type, end) {
+    // redraw on move of origin
+    this.origin.node.on('position', this.originDrawFn = this.draw.bind(this));
 
-		if (!this.editor || !this.editor.dummyXibleConnectors || this.editor.dummyXibleConnectors.indexOf(this) === -1) {
-			super.filterDuplicateConnectors(type, end);
-		}
+    return origin;
+  }
 
-	}
+  setDestination(destination) {
+    if (this.destination && this.destination.connectors.indexOf(this) > -1) {
+      this.destination.node.removeListener('position', this.destinationDrawFn);
 
-	setOrigin(origin) {
+      // find global conns with same type
+      if (this.destination.global !== false && this.destination.connectors.length === 1 && this.destination.type && document.querySelector(`.output>.${this.destination.type.replace(/\./g, '\\.')}.global`)) {
+        this.destination.setGlobal(true);
+      }
+    }
 
-		if (this.origin && this.origin.connectors.indexOf(this) > -1) {
-			this.origin.node.removeListener('position', this.originDrawFn);
-		}
+    super.setDestination(destination);
 
-		super.setOrigin(origin);
+    if (!destination) {
+      return null;
+    }
 
-		if (!origin) {
-			return null;
-		}
+    this.draw();
 
-		this.draw();
+    // redraw on move of origin
+    this.destination.node.on('position', this.destinationDrawFn = this.draw.bind(this));
 
-		//redraw on move of origin
-		this.origin.node.on('position', this.originDrawFn = this.draw.bind(this));
+    return destination;
+  }
 
-	}
+  /**
+  * Recalculates and writes/draws all values of a connector,
+  * relative to the start- and end-point.
+  * @returns {Boolean} Returns false if no action was taken, true otherwise.
+  */
+  draw() {
+    const { element: el, origin, destination } = this;
 
-	setDestination(destination) {
+    // only continue if both sides are known
+    if (destination && origin) {
+      el.style.visibility = '';
+    } else {
+      el.style.visibility = 'none';
+      return false;
+    }
 
-		if (this.destination && this.destination.connectors.indexOf(this) > -1) {
+    if (!el.parentNode) {
+      return false;
+    }
 
-			this.destination.node.removeListener('position', this.destinationDrawFn);
+    // get the position of the output
+    const originNodeStyle = getComputedStyle(origin.node.element);
+    const originLeft = origin.node.left + origin.element.offsetLeft + origin.element.offsetWidth +
+      parseInt(originNodeStyle.borderLeftWidth, 10) +
+      parseInt(originNodeStyle.paddingLeft, 10);
+    const originTop = origin.node.top + origin.element.offsetTop;
 
-			//find global conns with same type
-			if (
-				this.destination.global !== false &&
-				this.destination.connectors.length === 1 &&	this.destination.type &&
-				document.querySelector(`.output>.${this.destination.type.replace(/\./g,'\\.')}.global`)
-			) {
-				this.destination.setGlobal(true);
-			}
+    // get the position of the input
+    const destinationNodeStyle = getComputedStyle(destination.node.element);
+    const destinationLeft = destination.node.left + destination.element.offsetLeft +
+      parseInt(destinationNodeStyle.borderLeftWidth, 10) +
+      parseInt(destinationNodeStyle.paddingLeft, 10);
+    const destinationTop = destination.node.top + destination.element.offsetTop;
 
-		}
+    // get the distances between input and output
+    const height = Math.abs(originTop - destinationTop);
+    const width = Math.abs(originLeft - destinationLeft);
 
-		super.setDestination(destination);
+    // calculate the tension
+    const maxTension = 100;
+    const minTension = 0;
+    let tension = Math.floor((width / 3) + (height / 3));
 
-		if (!destination) {
-			return null;
-		}
+    if (originLeft - destinationLeft < 0) {
+      tension = tension > maxTension
+        ? maxTension
+        : tension;
+    }
 
-		this.draw();
+    tension = tension < minTension
+      ? minTension
+      : tension;
 
-		//redraw on move of origin
-		this.destination.node.on('position', this.destinationDrawFn = this.draw.bind(this));
+    // update the path for the bezier curve
+    const startX = destinationLeft > originLeft
+      ? (tension / 2)
+      : width + (tension / 2);
+    const endX = destinationLeft > originLeft
+      ? destinationLeft - originLeft + (tension / 2)
+      : 0 + (tension / 2);
+    const startY = destinationTop > originTop
+      ? 10
+      : height + 10;
+    const endY = destinationTop > originTop
+      ? destinationTop - originTop + 10
+      : 10;
+    el.firstChild.setAttribute('d', `M${startX},${startY} C${startX + tension},${startY} ${endX - tension},${endY} ${endX},${endY}`);
 
-	}
+    // calc the x/y position of the svg element
+    let left = originLeft < destinationLeft
+      ? originLeft
+      : destinationLeft;
+    const top = (originTop < destinationTop
+      ? originTop
+      : destinationTop) + 1;
 
-	draw() {
+    // apply tension to left position of svg
+    left -= (tension / 2);
 
-		let {
-			element: el,
-			origin,
-			destination
-		} = this;
+    // update the location and size of the svg
+    el.style.transform = `translate(${left}px, ${top}px)`;
+    el.style.width = `${width + tension}px`;
+    el.style.height = `${height + 20}px`;
 
-		//only continue if both sides are known
-		if (destination && origin) {
-			el.style.visibility = '';
-		} else {
+    this.top = top;
+    this.left = left;
 
-			el.style.visibility = 'none';
-			return false;
+    return true;
+  }
 
-		}
+  delete() {
+    super.delete();
 
-		if (!el.parentNode) {
-			return;
-		}
-
-		//get the position of the output
-		let originNodeStyle = getComputedStyle(origin.node.element);
-		let originLeft = origin.node.left + origin.element.offsetLeft + origin.element.offsetWidth + parseInt(originNodeStyle.borderLeftWidth) + parseInt(originNodeStyle.paddingLeft);
-		let originTop = origin.node.top + origin.element.offsetTop;
-
-		//get the position of the input
-		let destinationNodeStyle = getComputedStyle(destination.node.element);
-		let destinationLeft = destination.node.left + destination.element.offsetLeft + parseInt(destinationNodeStyle.borderLeftWidth) + parseInt(destinationNodeStyle.paddingLeft);
-		let destinationTop = destination.node.top + destination.element.offsetTop;
-
-		//get the distances between input and output
-		let height = Math.abs(originTop - destinationTop);
-		let width = Math.abs(originLeft - destinationLeft);
-
-		//calculate the tension
-		const maxTension = 100;
-		const minTension = 0;
-		let tension = Math.floor((width / 3) + (height / 3));
-
-		if (originLeft - destinationLeft < 0) {
-			tension = tension > maxTension ? maxTension : tension;
-		}
-
-		tension = tension < minTension ? minTension : tension;
-
-		//update the path for the bezier curve
-		let startX = destinationLeft > originLeft ? (tension / 2) : width + (tension / 2);
-		let endX = destinationLeft > originLeft ? destinationLeft - originLeft + (tension / 2) : 0 + (tension / 2);
-		let startY = destinationTop > originTop ? 10 : height + 10;
-		let endY = destinationTop > originTop ? destinationTop - originTop + 10 : 10;
-		el.firstChild.setAttribute('d', 'M' + startX + ',' + startY + ' C' + (startX + tension) + ',' + startY + ' ' + (endX - tension) + ',' + endY + ' ' + endX + ',' + endY);
-
-		//get the bounding box for the bezier curve so we can size the parent svg element
-		let pathBounding = el.firstChild.getBoundingClientRect();
-		let pathWidth = (pathBounding.width / this.editor.zoom);
-
-		//calc the x/y position of the svg element
-		let left = originLeft < destinationLeft ? originLeft : destinationLeft;
-		let top = (originTop < destinationTop ? originTop : destinationTop) + 1;
-
-		//apply tension to left position of svg
-		left -= (tension / 2);
-
-		//update the location and size of the svg
-		el.style.transform = `translate(${left}px, ${top}px)`;
-		el.style.width = (width + tension) + 'px';
-		el.style.height = (height + 20) + 'px';
-
-		this.top = top;
-		this.left = left;
-
-	}
-
-	delete() {
-
-		super.delete();
-
-		if (this.editor) {
-			this.editor.deleteConnector(this);
-		}
-
-	}
-
+    if (this.editor) {
+      this.editor.deleteConnector(this);
+    }
+  }
 }
