@@ -1,5 +1,3 @@
-/* eslint-disable no-use-before-define */
-
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
@@ -103,7 +101,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     static getStructures(structuresPath) {
       return new Promise((resolve) => {
         const files = this.getFiles(structuresPath);
-        const structures = {};
+        const structures = {
+          nodes: {},
+          typedefs: {}
+        };
         let loadedCounter = 0;
 
         if (!files.length) {
@@ -137,7 +138,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             this.getStructure(normalizedPath)
             .then((structure) => {
-              structures[structure.name] = structure;
+              if (structure.node) {
+                structures.nodes[structure.node.name] = structure.node;
+              }
+              if (structure.typedefs) {
+                Object.assign(structures.typedefs, structure.typedefs);
+              }
               checkAndResolve();
             }).catch((getStructureErr) => {
               // process subdirs instead
@@ -149,7 +155,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                   return;
                 }
 
-                Object.assign(structures, nestedStructures);
+                Object.assign(structures.nodes, nestedStructures.nodes);
+                Object.assign(structures.typedefs, nestedStructures.typedefs);
                 checkAndResolve();
               });
             });
@@ -159,7 +166,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Tries to fetch the structure.json from a directory. Also checks for editor contents.
+    * Tries to fetch the structure.json from a directory.
+    * Also checks for editor contents and typedef.json.
     * @param {String} dirPath Path to the directory containting the structure.json.
     * @returns {Promise.<Object>} Promise which resolves after the structure is complete,
     * or cannot be found.
@@ -167,47 +175,66 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     */
     static getStructure(dirPath) {
       return new Promise((resolve, reject) => {
-        let structure;
+        let structure = null;
+        const typedefs = {};
+        const structurePath = `${dirPath}/structure.json`;
+        const typedefPath = `${dirPath}/typedef.json`;
 
         // check for structure.json
-        fs.access(`${dirPath}/structure.json`, fs.constants.R_OK, (err) => {
+        fs.access(structurePath, fs.constants.R_OK, (err) => {
           if (err) {
-            reject(`Could not access "${dirPath}/structure.json": ${err}`);
+            reject(`Could not access "${structurePath}": ${err}`);
             return;
           }
 
           try {
-            structure = require(`${dirPath}/structure.json`);
+            structure = require(structurePath);
             structure.path = dirPath;
           } catch (requireStructureJsonErr) {
-            reject(`Could not require "${dirPath}/structure.json": ${requireStructureJsonErr}`);
+            reject(`Could not require "${structurePath}": ${requireStructureJsonErr}`);
             return;
           }
 
-          // check for editor contents
-          fs.stat(`${dirPath}/editor`, (statEditorErr, stat) => {
-            if (statEditorErr) {
-              resolve(structure);
-              return;
+          // check for typedef.json
+          fs.access(typedefPath, fs.constants.R_OK, (typeDefAccessErr) => {
+            if (!typeDefAccessErr) {
+              try {
+                Object.assign(typedefs, require(typedefPath));
+              } catch (requireTypedefJsonError) {
+                reject(`Could not require "${typedefPath}": ${requireTypedefJsonError}`);
+              }
             }
 
-            if (stat.isDirectory()) {
-              structure.editorContentPath = `${dirPath}/editor`;
-            }
+            // check for editor contents
+            fs.stat(`${dirPath}/editor`, (statEditorErr, stat) => {
+              if (statEditorErr) {
+                resolve({
+                  node: structure,
+                  typedefs
+                });
+                return;
+              }
 
-            resolve(structure);
+              if (stat.isDirectory()) {
+                structure.editorContentPath = `${dirPath}/editor`;
+              }
+
+              resolve({
+                node: structure,
+                typedefs
+              });
+            });
           });
         });
       });
     }
 
     /**
-    * Initializes all nodes found in a certain path, recursively,
+    * Initializes all nodes and typedefs found in a certain path, recursively,
     * by running getStructures() on that path, and hosting editor contents if applicable.
     * @param {String} nodePath Path to the directory containting the nodes.
     * If the directory does not exist, it will be created.
-    * @returns {Promise} A Promise which resolves after calling getStructures(),
-    * hosting editor contents and adding the result using XIBLE.addNode().
+    * @returns {Promise.<Object>}
     * @private
     */
     static initFromPath(nodePath) {
@@ -216,17 +243,25 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       // check that nodePath exists
       if (!fs.existsSync(nodePath)) {
         nodeDebug(`creating "${nodePath}"`);
-        fs.mkdirSync(nodePath);
+
+        try {
+          fs.mkdirSync(nodePath);
+        } catch (err) {
+          nodeDebug(`creation of "${nodePath}" failed: `, err);
+        }
+        return Promise.resolve({});
       }
 
       if (!XIBLE.child && !express) {
         express = require('express');
       }
 
-      return this.getStructures(nodePath).then((structures) => {
-        for (const nodeName in structures) {
-          const structure = structures[nodeName];
-          XIBLE.addNode(nodeName, structure);
+      return this.getStructures(nodePath)
+      .then((structures) => {
+        // store the nodes
+        for (const nodeName in structures.nodes) {
+          const structure = structures.nodes[nodeName];
+          XIBLE.addNode(structure);
 
           // host editor contents if applicable
           if (structure.editorContentPath && !XIBLE.child) {
@@ -238,6 +273,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             }));
           }
         }
+
+        // store the typedefs
+        for (const typeDefName in structures.typedefs) {
+          structures.typedefs[typeDefName].name = typeDefName;
+          XIBLE.TypeDef.add(structures.typedefs[typeDefName]);
+        }
+        return structures;
       });
     }
 

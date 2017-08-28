@@ -59,7 +59,7 @@ class Xible extends EventEmitter {
     } else {
       this.initWeb();
       this.persistentWebSocketMessages = {};
-      appNames = ['Config', 'CliQueue', 'Flow', 'Node', 'Registry'];
+      appNames = ['Config', 'CliQueue', 'Flow', 'Node', 'TypeDef', 'Registry'];
     }
 
     for (let i = 0; i < appNames.length; i += 1) {
@@ -455,18 +455,15 @@ class Xible extends EventEmitter {
     });
   }
 
-  addNode(name, obj) {
-    if (!name || !obj) {
-      throw new Error('first argument needs to be string, second object');
+  addNode(obj) {
+    if (!obj || !obj.name) {
+      throw new Error('Argument needs to be an object with a name parameter');
     }
+    const name = obj.name;
 
     // check if a similar node with the same name doesn't already exist
     if (this.nodes[name]) {
       return this.nodes[name];
-    }
-
-    if (!obj.name) {
-      obj.name = name;
     }
 
     this.nodes[name] = obj;
