@@ -202,28 +202,26 @@ class XibleEditor extends EventEmitter {
   getFlows() {
     /*
 
-		TODO: should use XibleWrapper.flows.getAll() instead
-				return this.xibleWrapper.Flow.getAll().then((flows) => {
-
-					Object.keys(flows).forEach((flowId) => {
-						let flow = new XibleEditorFlow(flows[flowId]);
-						this.flows[flowId] = flow;
-					});
-
-					return this.flows;
-
-				});
-		*/
-    return new Promise((resolve, reject) => {
-      const req = this.xibleWrapper.http.request('GET', '/api/flows');
-      req.toObject(Object).then((flows) => {
-        for (const flowId in flows) {
-          const flow = new XibleEditorFlow(flows[flowId]);
-          this.flows[flowId] = flow;
-        }
-
-        resolve(this.flows);
+    TODO: should use XibleWrapper.flows.getAll() instead
+    return this.xibleWrapper.Flow.getAll()
+    .then((flows) => {
+      Object.keys(flows).forEach((flowId) => {
+        let flow = new XibleEditorFlow(flows[flowId]);
+        this.flows[flowId] = flow;
       });
+
+      return this.flows;
+    });
+    */
+    const req = this.xibleWrapper.http.request('GET', '/api/flows');
+    return req.toObject(Object)
+    .then((flows) => {
+      for (const flowId in flows) {
+        const flow = new XibleEditorFlow(flows[flowId]);
+        this.flows[flowId] = flow;
+      }
+
+      return this.flows;
     });
   }
 
@@ -339,7 +337,10 @@ class XibleEditor extends EventEmitter {
 
     node.getInputs().forEach((input) => {
       let globalValue = input.global;
-      if (globalTypes.indexOf(input.type) > -1 && !input.connectors.length && input.global !== false) {
+      if (
+        globalTypes.indexOf(input.type) > -1 &&
+        !input.connectors.length && input.global !== false
+      ) {
         globalValue = true;
       }
       input.setGlobal(globalValue);
@@ -508,7 +509,8 @@ class XibleEditor extends EventEmitter {
 
   /**
   * Deselect everything if no arguments provided, or remove just the first argument.
-  * @param {(XibleEditorNode|XibleEditorConnector)} [obj] The Node or Connector to remove from the selection.
+  * @param {(XibleEditorNode|XibleEditorConnector)} [obj]
+  * The Node or Connector to remove from the selection.
   */
   deselect(obj) {
     if (obj) {
@@ -555,19 +557,6 @@ class XibleEditor extends EventEmitter {
     } else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
       this.deselect(obj);
     }
-
-    /*
-
-		if(event.ctrlKey && eevent.type === 'mouseup' && selectionIndex > -1 && this.nodeDragHasFired)
-			duplicate (onmousemove already)
-			selection to duplicates
-
-		if(event.ctrlKey && event.type === 'mouseup' && selectionIndex === -1 && this.nodeDragHasFired)
-			select (onmousemove already)
-			duplicate (onmousemove already)
-			selection to duplicates
-
-		*/
   }
 
   /**

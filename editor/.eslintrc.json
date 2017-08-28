@@ -20,7 +20,8 @@
     "XibleEditorNode": false,
     "XibleEditorConnector": false,
     "XibleWrapper": false,
-    "XibleEditorNodeSelector": false
+    "XibleEditorNodeSelector": false,
+    "EventEmitter": false
   },
   "rules": {
     "global-require": "off",
