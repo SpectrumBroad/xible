@@ -302,7 +302,10 @@ class XibleEditor extends EventEmitter {
 
         // emit for every flow
         for (let i = 0; i < json.flows.length; i += 1) {
-          this.flows[json.flows[i]._id].emit('usage', json.flows[i]);
+          const flow = this.flows[json.flows[i]._id];
+          if (flow) {
+            flow.emit('usage', json.flows[i]);
+          }
         }
 
         break;
