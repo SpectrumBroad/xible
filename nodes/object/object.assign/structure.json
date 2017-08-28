@@ -1,0 +1,18 @@
+{
+  "name": "object.assign",
+  "type": "object",
+  "description": "Assigns new key/value pairs to an existing object. Returns a new object, does not update the original object.",
+  "inputs": {
+    "object": {
+      "type": "object"
+    },
+    "variable": {
+      "type": "variable"
+    }
+  },
+  "outputs": {
+    "object": {
+      "type": "object"
+    }
+  }
+}

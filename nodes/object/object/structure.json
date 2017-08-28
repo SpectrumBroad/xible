@@ -1,0 +1,15 @@
+{
+  "name": "object",
+  "type": "object",
+  "description": "An object containing (nested) key-value pairs.",
+  "inputs": {
+    "variable": {
+      "type": "variable"
+    }
+  },
+  "outputs": {
+    "object": {
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "object.stringify",
+  "type": "object",
+  "description": "Converts an object into a JSON string.",
+  "inputs": {
+    "object": {
+      "type": "object"
+    }
+  },
+  "outputs": {
+    "json": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "object.value",
+  "type": "object",
+  "description": "Returns a specific value from an object key as a new object.",
+  "inputs": {
+    "object": {
+      "type": "object"
+    }
+  },
+  "outputs": {
+    "object": {
+      "type": "object"
+    }
+  }
+}
