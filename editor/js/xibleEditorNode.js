@@ -767,7 +767,7 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
           });
 
           // hide the dummy
-          // this.node.editor.dummyXibleNode.element.style.visibility = 'hidden';
+          this.node.editor.dummyXibleNode.element.style.visibility = 'hidden';
           this.node.editor.dummyXibleNode.element.style.zIndex = -1;
 
           let outGoing = this instanceof XibleEditorNodeOutput;
