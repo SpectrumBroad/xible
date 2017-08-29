@@ -3,6 +3,7 @@
 module.exports = (XIBLE, EXPRESS_APP) => {
   const XibleRegistryWrapper = require('xible-registry-wrapper');
   const fsExtra = require('fs-extra');
+  const os = require('os');
 
   const registryUrl = XIBLE.Config.getValue('registry.url');
   if (!registryUrl) {
@@ -12,7 +13,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   const xibleRegistry = new XibleRegistryWrapper(registryUrl);
 
   // the tmp path for downloading this node
-  const TMP_REGISTRY_DIR = '/tmp/xibleRegistryTmp';
+  const TMP_REGISTRY_DIR = `${os.tmpdir() || '/tmp'}/xibleRegistryTmp`;
 
   function cleanUp() {
     return new Promise((resolve, reject) => {
