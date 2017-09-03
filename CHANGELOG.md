@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
 Nothing notable at the moment.
+### Added
+-   Introduction of type definitions for inputs and outputs. This allows types to extend other types and provide custom colors for those types. ([#17](https://github.com/SpectrumBroad/xible/issues/17))
+
+-   Added `object.*` nodes to replace the `document.*` nodes.
+
+### Changed
+-   `document.*` nodes are now deprecated in favor `object.*`.
+
+-   `log.console` now contains a deprecation notice. It was already deprecated in 0.7.0. ([#27](https://github.com/SpectrumBroad/xible/issues/27))
+
+-   Registry actions such as `xiblepm nodepack install` use the proper OS dependent "tmp" directory. ([#33](https://github.com/SpectrumBroad/xible/issues/33))
 
 ## [0.7.0][]
 ### Added
