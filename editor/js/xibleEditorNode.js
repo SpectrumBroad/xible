@@ -630,8 +630,7 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 }
 
-
-class XibleEditorNodeIo extends xibleWrapper.NodeIo {
+const XibleEditorNodeIo = toExtend => class extends toExtend {
   constructor(name, obj) {
     const el = document.createElement('li');
     el.appendChild(document.createElement('div'));
@@ -645,7 +644,8 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
       const globalValue = !this.global;
       if (
         this instanceof XibleEditorNodeInput &&
-        !this.node.flow.getGlobalOutputs().find(gOutput => gOutput.type === this.type)
+        !this.node.flow.getGlobalOutputs()
+        .find(gOutput => gOutput.type === this.type)
       ) {
         return;
       }
@@ -856,25 +856,20 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
       }
 
       const outGoing = this instanceof XibleEditorNodeOutput;
-
-      // 'this' is the destination
+      const end = connectors[0][(outGoing ? 'origin' : 'destination')];
       if (
-        (
-          outGoing && this.node !== connectors[0].destination.node &&
-          (
-            (!this.type && connectors[0].destination.type !== 'trigger') ||
-            (!connectors[0].destination.type && this.type !== 'trigger') ||
-            this.type === connectors[0].destination.type
-          )
-        ) ||
-        (!outGoing && this.node !== connectors[0].origin.node &&
-          (
-            (!this.type && connectors[0].origin.type !== 'trigger') ||
-            (!connectors[0].origin.type && this.type !== 'trigger') ||
-            this.type === connectors[0].origin.type
-          )
-        )
+        end !== this.node.editor.dummyIo &&
+        end !== this
       ) {
+        return;
+      }
+
+      this.matchesConnectors(connectors)
+      .then((matchesConnectors) => {
+        if (!matchesConnectors) {
+          return;
+        }
+
         // create the new connectors
         connectors.forEach((conn) => {
           const newConn = new XibleEditorConnector({
@@ -898,10 +893,10 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
         this.node.editor.dummyIo = null;
         this.node.editor.dummyXibleNode.delete();
         this.node.editor.dummyXibleNode = null;
-      }
+      });
     });
 
-    // handle snap-to whenever a new connector is hovered over this action
+    // handle snap-to whenever a new connector is hovered over this io
     el.addEventListener('mouseover', () => {
       const connectors = this.node.editor.dummyXibleConnectors;
       if (!connectors) {
@@ -921,29 +916,27 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
         }
       }
 
+      const outGoing = this instanceof XibleEditorNodeOutput;
+      const end = connectors[0][(outGoing ? 'origin' : 'destination')];
       if (
-        this instanceof XibleEditorNodeInput &&
-        this.node !== connectors[0].origin.node &&
-        connectors[0].destination === this.node.editor.dummyIo &&
-        (
-          (!this.type && connectors[0].origin.type !== 'trigger') ||
-          (!connectors[0].origin.type && this.type !== 'trigger') ||
-          this.type === connectors[0].origin.type
-        )
+        end !== this.node.editor.dummyIo &&
+        end !== this
       ) {
-        connectors.forEach(conn => conn.setDestination(this));
-      } else if (
-        this instanceof XibleEditorNodeOutput &&
-        this.node !== connectors[0].destination.node &&
-        connectors[0].origin === this.node.editor.dummyIo &&
-        (
-          (!this.type && connectors[0].destination.type !== 'trigger') ||
-          (!connectors[0].destination.type && this.type !== 'trigger') ||
-          this.type === connectors[0].destination.type
-        )
-      ) {
-        connectors.forEach(conn => conn.setOrigin(this));
+        return;
       }
+
+      this.matchesConnectors(connectors)
+      .then((matchesConnectors) => {
+        if (!matchesConnectors) {
+          return;
+        }
+
+        if (this instanceof XibleEditorNodeInput) {
+          connectors.forEach(conn => conn.setDestination(this));
+        } else {
+          connectors.forEach(conn => conn.setOrigin(this));
+        }
+      });
     });
 
     // handle snap-out
@@ -964,13 +957,12 @@ class XibleEditorNodeIo extends xibleWrapper.NodeIo {
       }
     });
   }
+};
+
+class XibleEditorNodeInput extends XibleEditorNodeIo(xibleWrapper.NodeInput) {
 }
 
-
-class XibleEditorNodeInput extends XibleEditorNodeIo {
-}
-
-class XibleEditorNodeOutput extends XibleEditorNodeIo {
+class XibleEditorNodeOutput extends XibleEditorNodeIo(xibleWrapper.NodeOutput) {
   setGlobal(global) {
     super.setGlobal(global);
 
