@@ -7,7 +7,7 @@
       "type": "xible.flow"
     },
     "timing": {
-      "type": "document",
+      "type": "object",
       "description": "Returns the timing object on the flow."
     }
   }
