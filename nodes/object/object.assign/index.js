@@ -4,7 +4,7 @@ module.exports = (NODE) => {
   const objIn = NODE.getInputByName('object');
   const variableIn = NODE.getInputByName('variable');
 
-  const docOut = NODE.getOutputByName('document');
+  const docOut = NODE.getOutputByName('object');
   docOut.on('trigger', (conn, state, callback) => {
     Promise.all([objIn.getValues(state), variableIn.getValues(state)])
     .then(([objs, variables]) => {
