@@ -13,12 +13,17 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   const xibleRegistry = new XibleRegistryWrapper(registryUrl);
 
   // the tmp path for downloading this node
-  const TMP_REGISTRY_DIR = `${os.tmpdir() || '/tmp'}/xibleRegistryTmp`;
+  const TMP_REGISTRY_DIR = `${os.tmpdir() || '/tmp'}/xibleRegistry-`;
+  console.log(os.tmpdir());
 
-  function cleanUp() {
+  function cleanUp(tmpRegDir) {
+    if (!tmpRegDir) {
+      return Promise.resolve();
+    }
+
     return new Promise((resolve, reject) => {
       // remove the tmp dir
-      fsExtra.remove(TMP_REGISTRY_DIR, (err) => {
+      fsExtra.remove(tmpRegDir, (err) => {
         if (err) {
           reject(err);
           return;
@@ -79,6 +84,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return Promise.reject('Your config does not allow to install nodepacks from the registry');
     }
 
+    let tmpRegDir;
     let nodePath = XIBLE.Config.getValue('nodes.path');
     if (!nodePath) {
       return Promise.reject('no "nodes.path" configured');
@@ -86,20 +92,23 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     nodePath = XIBLE.resolvePath(nodePath);
 
     // get the registrydata
-    return this.getRegistryData().then((registryData) => {
+    return this.getRegistryData()
+    .then((registryData) => {
       if (!registryData.name) {
         return Promise.reject(`No "name" field found in the registry data for node "${this.name}"`);
       }
 
-      return this.getTarballUrl().then(tarballUrl => new Promise((resolve, reject) => {
+      return this.getTarballUrl()
+      .then(tarballUrl => new Promise((resolve, reject) => {
         // check if the tarbalUrl is safe
         if (encodeURI(tarballUrl) !== tarballUrl) {
           reject(new Error('Package URL contains potentially unsafe characters'));
           return;
         }
 
-        // clean the tmp dir where we will download the npm package
-        fsExtra.emptyDir(TMP_REGISTRY_DIR, (err) => {
+        // create the tmp dir
+        fsExtra.mkdtemp(TMP_REGISTRY_DIR, (err, mTmpRegDir) => {
+          tmpRegDir = mTmpRegDir;
           if (err) {
             reject(err);
             return;
@@ -112,7 +121,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           delete packageJson.devDependencies;
 
           // write off package.json
-          fsExtra.writeFile(`${TMP_REGISTRY_DIR}/package.json`, JSON.stringify(packageJson), (createPackageJsonErr) => {
+          fsExtra.writeFile(`${tmpRegDir}/package.json`, JSON.stringify(packageJson), (createPackageJsonErr) => {
             if (createPackageJsonErr) {
               reject(createPackageJsonErr);
               return;
@@ -120,8 +129,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             // fork npm to install the registry url
             const fork = require('child_process').spawn;
-            const npm = fork('npm', ['install', tarballUrl], {
-              cwd: TMP_REGISTRY_DIR,
+            const npm = fork('npm', ['install', '--no-save', tarballUrl], {
+              cwd: tmpRegDir,
               shell: true
             });
 
@@ -139,7 +148,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               // when success, resolve
               const onSuccess = () => XIBLE.Node
               .initFromPath(nodeDestDir)
-              .then(cleanUp)
+              .then(() => cleanUp(tmpRegDir))
               .then(() => {
                 // see if we can/need to reinit flows that are not runnable
                 const flows = XIBLE.getFlows();
@@ -162,7 +171,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 }
 
                 // first move the node itself
-                fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules/${registryData.name}`, nodeDestDir, {
+                fsExtra.move(`${tmpRegDir}/node_modules/${registryData.name}`, nodeDestDir, {
                   overwrite: true
                 }, (moveNodeErr) => {
                   if (moveNodeErr) {
@@ -171,7 +180,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                   }
 
                   // check if there's anything left in node_modules
-                  fsExtra.readdir(`${TMP_REGISTRY_DIR}/node_modules`, (remainingNodeModulesErr, files) => {
+                  fsExtra.readdir(`${tmpRegDir}/node_modules`, (remainingNodeModulesErr, files) => {
                     if (remainingNodeModulesErr) {
                       reject(remainingNodeModulesErr);
                       return;
@@ -183,7 +192,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                     }
 
                     // move the rest of the node_modules
-                    fsExtra.move(`${TMP_REGISTRY_DIR}/node_modules`, `${nodeDestDir}/node_modules`, {
+                    fsExtra.move(`${tmpRegDir}/node_modules`, `${nodeDestDir}/node_modules`, {
                       overwrite: true
                     }, (moveNodeModulesErr) => {
                       if (moveNodeModulesErr) {
@@ -208,7 +217,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           });
         });
       }));
-    }).catch(err => cleanUp().then(() => Promise.reject(err)).catch(() => Promise.reject(err)));
+    })
+    .catch(err =>
+      cleanUp(tmpRegDir)
+      .then(() => Promise.reject(err))
+      .catch(() => Promise.reject(err))
+    );
   };
 
   if (EXPRESS_APP) {
