@@ -13,7 +13,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   const xibleRegistry = new XibleRegistryWrapper(registryUrl);
 
   // the tmp path for downloading this node
-  const TMP_REGISTRY_DIR = `${os.tmpdir() || '/tmp'}/xibleRegistry-`;
+  const TMP_REGISTRY_DIR = `${os.tmpdir() || '/tmp'}/xible-registry-`;
   console.log(os.tmpdir());
 
   function cleanUp(tmpRegDir) {
