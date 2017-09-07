@@ -3,7 +3,7 @@
   "type": "object",
   "description": "Returns a list of all keys in the given object(s).",
   "inputs": {
-    "object": {
+    "objects": {
       "type": "object"
     }
   },

@@ -3,7 +3,7 @@
   "type": "object",
   "description": "An object containing (nested) key-value pairs.",
   "inputs": {
-    "variable": {
+    "variables": {
       "type": "variable"
     }
   },

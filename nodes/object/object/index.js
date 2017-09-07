@@ -1,11 +1,11 @@
 'use strict';
 
 module.exports = (NODE) => {
-  const variableIn = NODE.getInputByName('variable');
+  const variablesIn = NODE.getInputByName('variables');
 
   const objOut = NODE.getOutputByName('object');
   objOut.on('trigger', (conn, state, callback) => {
-    variableIn
+    variablesIn
     .getValues(state)
     .then((variables) => {
       const obj = {};

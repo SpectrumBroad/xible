@@ -1,9 +1,9 @@
 {
   "name": "object.stringify",
   "type": "object",
-  "description": "Converts an object into a JSON string.",
+  "description": "Converts one or more objects into a JSON string. If multiple objects are provided, the array containing them will be part of the JSON output.",
   "inputs": {
-    "object": {
+    "objects": {
       "type": "object"
     }
   },

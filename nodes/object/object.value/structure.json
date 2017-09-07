@@ -3,12 +3,12 @@
   "type": "object",
   "description": "Returns a specific value from an object key as a new object.",
   "inputs": {
-    "object": {
+    "objects": {
       "type": "object"
     }
   },
   "outputs": {
-    "object": {
+    "objects": {
       "type": "object"
     }
   }

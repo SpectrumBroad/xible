@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = (NODE) => {
-  const objIn = NODE.getInputByName('object');
+  const objsIn = NODE.getInputByName('objects');
 
-  const objOut = NODE.getOutputByName('object');
-  objOut.on('trigger', (conn, state, callback) => {
+  const objsOut = NODE.getOutputByName('objects');
+  objsOut.on('trigger', (conn, state, callback) => {
     const key = NODE.data.key;
     if (!key) {
       return;
     }
-    objIn.getValues(state)
+    objsIn.getValues(state)
     .then((objs) => {
       const values = objs
       .filter(obj => Object.prototype.hasOwnProperty.call(obj, key))
