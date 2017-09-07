@@ -44,7 +44,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.directed = false;
       this.state = Flow.STATE_STOPPED;
       this.initLevel = initLevel;
-
       this.timing = {};
     }
 
@@ -723,7 +722,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     init() {
-      this.timing.initStart = process.hrtime();
+      this.timing = {
+        initStart: process.hrtime()
+      };
 
       if (!this.runnable) {
         return Promise.reject('not runnable');
