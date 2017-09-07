@@ -1,0 +1,10 @@
+{
+  "name": "xible.versions",
+  "type": "object",
+  "description": "Returns the versions associated with XIBLE.",
+  "outputs": {
+    "versions": {
+      "type": "object"
+    }
+  }
+}
