@@ -643,8 +643,19 @@ class XibleEditor extends EventEmitter {
           }
 
           if (
-            (selNode.getInputsByType(connector.origin.type).length || (connector.origin.type !== 'trigger' && selNode.getInputsByType(null).length)) &&
-            (selNode.getOutputsByType(connector.origin.type).length || (connector.destination.type !== 'trigger' && selNode.getOutputsByType(null).length) || (selNode.outputs.length && !connector.destination.type && selNode.outputs.length > selNode.getOutputsByType('trigger').length))
+            (
+              selNode.getInputsByType(connector.origin.type).length ||
+              (connector.origin.type !== 'trigger' && selNode.getInputsByType(null).length)
+            ) &&
+            (
+              selNode.getOutputsByType(connector.origin.type).length ||
+              (connector.destination.type !== 'trigger' && selNode.getOutputsByType(null).length) ||
+              (
+                selNode.outputs.length &&
+                !connector.destination.type &&
+                selNode.outputs.length > selNode.getOutputsByType('trigger').length
+              )
+            )
           ) {
             const connBounding = connector.element.getBoundingClientRect();
             if (
