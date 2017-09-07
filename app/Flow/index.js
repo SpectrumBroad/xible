@@ -31,7 +31,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * Flow class
   */
   class Flow extends EventEmitter {
-
     constructor() {
       super();
 
@@ -652,7 +651,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const startFlow = () => this.start(directNodes);
 
       switch (this.state) {
-
         case Flow.STATE_INITIALIZING:
           return new Promise((resolve) => {
             this.once('initialized', () => {
@@ -695,7 +693,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           return new Promise((resolve) => {
             this.once('started', () => resolve(this));
           });
-
       }
 
       return Promise.reject(new Error('Flow in unknown state'));
@@ -767,12 +764,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         });
         this.worker.on('message', (message) => {
           switch (message.method) {
-
             case 'initializing':
               if (this.worker && this.worker.connected) {
                 const initializingDiff = process.hrtime(this.timing.initStart);
 
-                flowDebug(`flow/worker initializing in ${initializingDiff[0] * 1000 + (initializingDiff[1] / 1e6)}ms`);
+                flowDebug(`flow/worker initializing in ${(initializingDiff[0] * 1000) + (initializingDiff[1] / 1e6)}ms`);
 
                 this.worker.send({
                   method: 'init',
@@ -788,10 +784,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
               break;
 
-            case 'initialized':
+            case 'initialized': {
               this.timing.initEnd = process.hrtime();
               const initializedDiff = process.hrtime(this.timing.initStart);
-              flowDebug(`flow/worker initialized in ${initializedDiff[0] * 1000 + (initializedDiff[1] / 1e6)}ms`);
+              flowDebug(`flow/worker initialized in ${(initializedDiff[0] * 1000) + (initializedDiff[1] / 1e6)}ms`);
 
               this.state = Flow.STATE_INITIALIZED;
               resolve(this);
@@ -804,6 +800,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               });
 
               break;
+            }
 
             case 'started':
               this.state = Flow.STATE_STARTED;
@@ -837,7 +834,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
               break;
 
-            case 'getFlowById':
+            case 'getFlowById': {
               flow = XIBLE.getFlowById(message.flowId);
               let returnFlow = null;
               if (flow) {
@@ -857,6 +854,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 flow: returnFlow
               });
               break;
+            }
 
             case 'stop':
               this.forceStop();
@@ -869,7 +867,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             case 'usage':
               this.usage = message.usage;
               break;
-
           }
         });
 
@@ -948,15 +945,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           if (this.worker && this.worker.connected) {
             this.worker.on('message', (message) => {
               switch (message.method) {
-
-                case 'started':
+                case 'started': {
                   this.timing.startEnd = process.hrtime();
                   const startedDiff = process.hrtime(this.timing.startStart);
-                  flowDebug(`flow/worker started in ${startedDiff[0] * 1000 + (startedDiff[1] / 1e6)}ms`);
+                  flowDebug(`flow/worker started in ${(startedDiff[0] * 1000) + (startedDiff[1] / 1e6)}ms`);
 
                   resolve(this);
                   break;
-
+                }
               }
             });
 
@@ -998,7 +994,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const stopFlow = () => this.stop();
 
       switch (this.state) {
-
         case Flow.STATE_INITIALIZING:
           return new Promise((resolve) => {
             this.once('initialized', () => {
@@ -1025,7 +1020,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               resolve(this);
             });
           });
-
       }
 
       return Promise.reject(new Error('Flow in unknown state'));
@@ -1107,7 +1101,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
       });
     }
-
   }
 
   /**
