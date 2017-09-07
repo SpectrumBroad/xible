@@ -1,13 +1,14 @@
 {
   "name": "object.assign",
   "type": "object",
-  "description": "Assigns new key/value pairs to an existing object. Returns a new object, does not update the original object.",
+  "description": "Assigns the values of the source objects to the target object. Returns a new object, does not update the target object.",
   "inputs": {
-    "object": {
-      "type": "object"
+    "target": {
+      "type": "object",
+      "maxConnectors": 1
     },
-    "variable": {
-      "type": "variable"
+    "sources": {
+      "type": "object"
     }
   },
   "outputs": {
