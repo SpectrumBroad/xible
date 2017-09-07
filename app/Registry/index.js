@@ -14,7 +14,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   // the tmp path for downloading this node
   const TMP_REGISTRY_DIR = `${os.tmpdir() || '/tmp'}/xible-registry-`;
-  console.log(os.tmpdir());
 
   function cleanUp(tmpRegDir) {
     if (!tmpRegDir) {
