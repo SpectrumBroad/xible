@@ -251,11 +251,11 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   delete() {
-    super.delete();
-
     if (this.editor) {
       this.editor.deleteNode(this);
     }
+
+    super.delete();
   }
 
   addProgressBar(status) {
