@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
 Nothing notable at the moment.
+
+## [0.8.0][]
 ### Added
 -   Introduction of [type definitions](https://xible.io/docs/guides/nodes/typedefs) for inputs and outputs. This allows types to extend other types and provide custom colors for those types. ([#17](https://github.com/SpectrumBroad/xible/issues/17))
 
@@ -92,7 +94,8 @@ Nothing notable at the moment.
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/SpectrumBroad/xible/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/SpectrumBroad/xible/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/SpectrumBroad/xible/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/SpectrumBroad/xible/compare/v0.4.1...v0.5.0
