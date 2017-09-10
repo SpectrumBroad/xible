@@ -1,42 +1,36 @@
-module.exports = function(NODE) {
+'use strict';
 
-	var valuesIn = NODE.getInputByName('values');
-	var anyOut = NODE.getOutputByName('result');
-	anyOut.on('trigger', (conn, state, callback) => {
+module.exports = (NODE) => {
+  const valuesIn = NODE.getInputByName('values');
+  const anyOut = NODE.getOutputByName('result');
+  anyOut.on('trigger', (conn, state, callback) => {
+    // get the input values
+    valuesIn.getValues(state)
+    .then((vals) => {
+      callback(vals.map((val) => {
+        switch (NODE.data.castType) {
+          case 'string':
+            return `${val}`;
 
-		//get the input values
-		valuesIn.getValues(state).then((vals) => {
+          case 'math.number':
+            return +val;
 
-			callback(vals.map((val) => {
+          case 'boolean':
+            return !!val;
 
-				switch (NODE.data.castType) {
+          case 'date':
+            return new Date(val);
 
-					case 'string':
-						return '' + val;
+          case 'time': {
+            const d = new Date(val);
+            d.setFullYear(0, 0, 1);
+            return d;
+          }
 
-					case 'math.number':
-						return +val;
-
-					case 'boolean':
-						return !!val;
-
-					case 'date':
-						return new Date(val);
-
-					case 'time':
-						let d = new Date(val);
-						d.setFullYear(0, 0, 1);
-						return d;
-
-					default: //just in case
-						return val;
-
-				}
-
-			}));
-
-		});
-
-	});
-
+          default: // just in case
+            return val;
+        }
+      }));
+    });
+  });
 };

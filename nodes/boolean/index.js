@@ -1,8 +1,8 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let stringOut = NODE.getOutputByName('result');
-	stringOut.on('trigger', (conn, state, callback) => {
-		callback(NODE.data.value === 'true');
-	});
-
+module.exports = (NODE) => {
+  const stringOut = NODE.getOutputByName('result');
+  stringOut.on('trigger', (conn, state, callback) => {
+    callback(NODE.data.value === 'true');
+  });
 };
