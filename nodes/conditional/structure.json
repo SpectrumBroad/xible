@@ -7,10 +7,12 @@
       "type": "boolean"
     },
     "if true": {
-      "type": null
+      "type": null,
+      "desciption": "If the condition is truthy, this input is passed to the 'value' output."
     },
     "if false": {
-      "type": null
+      "type": null,
+      "desciption": "If the condition is falsy, this input is passed to the 'value' output."
     }
   },
   "outputs": {

@@ -6,17 +6,20 @@
     "any": {
       "type": null,
   		"singleType": true,
-      "assignsOutputType": "grouped"
+      "assignsOutputType": "grouped",
+      "description": "The values to be grouped."
   	}
   },
   "outputs": {
     "grouped": {
       "type": null,
       "singleType": true,
-      "assignsInputType": "any"
+      "assignsInputType": "any",
+      "description": "List of all values connected to the 'any' input."
     },
     "count": {
-      "type": "math.number"
+      "type": "math.number",
+      "description": "The amount of connectors to the 'any' input."
     }
   }
 }

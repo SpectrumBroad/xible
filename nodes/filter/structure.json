@@ -4,7 +4,8 @@
   "description": "Filters data based on an input condition.",
   "inputs": {
     "any": {
-      "type": null
+      "type": null,
+      "description": "The values to filter based on the condition result."
     },
     "condition": {
       "type": "boolean"
@@ -12,10 +13,12 @@
   },
   "outputs": {
     "filtered": {
-      "type": null
+      "type": null,
+      "description": "Values from the 'any' input with a corresponding truthy condition."
     },
     "dropped": {
-      "type": null
+      "type": null,
+      "description": "Values from the 'any' input with a corresponding falsy condition."
     }
   }
 }
