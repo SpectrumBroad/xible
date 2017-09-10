@@ -1,40 +1,36 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let anyIn = NODE.getInputByName('any');
-	let boolIn = NODE.getInputByName('condition');
+module.exports = (NODE) => {
+  const anyIn = NODE.getInputByName('any');
+  const conditionIn = NODE.getInputByName('condition');
 
-	let filteredOut = NODE.getOutputByName('filtered');
-	filteredOut.on('trigger', (conn, state, callback) => {
+  const filteredOut = NODE.getOutputByName('filtered');
+  filteredOut.on('trigger', (conn, state, callback) => {
+    if (!conditionIn.isConnected()) {
+      return;
+    }
 
-		anyIn.getValues(state).then((values) => {
+    anyIn.getValues(state)
+    .then((values) => {
+      conditionIn.getValues(state)
+      .then((conditions) => {
+        if (!conditions.includes(false)) {
+          callback(values);
+        }
+      });
+    });
+  });
 
-			boolIn.getValues(state).then((conditions) => {
-
-				if (conditions.indexOf(false) === -1) {
-					callback(values);
-				}
-
-			});
-
-		});
-
-	});
-
-	let droppedOut = NODE.getOutputByName('dropped');
-	droppedOut.on('trigger', (conn, state, callback) => {
-
-		anyIn.getValues(state).then((values) => {
-
-			boolIn.getValues(state).then((conditions) => {
-
-				if (conditions.indexOf(true) === -1) {
-					callback(values);
-				}
-
-			});
-
-		});
-
-	});
-
+  const droppedOut = NODE.getOutputByName('dropped');
+  droppedOut.on('trigger', (conn, state, callback) => {
+    anyIn.getValues(state)
+    .then((values) => {
+      conditionIn.getValues(state)
+      .then((conditions) => {
+        if (!conditions.includes(true)) {
+          callback(values);
+        }
+      });
+    });
+  });
 };
