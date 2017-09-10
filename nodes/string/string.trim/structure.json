@@ -3,7 +3,7 @@
   "type": "object",
   "description": "Trims whitespace from both ends of a string. Whitespace in this context is all the whitespace characters (space, tab, no-break space, etc.) and all the line terminator characters (LF, CR, etc.).",
   "inputs": {
-    "string": {
+    "strings": {
       "type": "string",
       "description": "If multiple inputs are given, they are concatenated after the trim action on each string."
     }
