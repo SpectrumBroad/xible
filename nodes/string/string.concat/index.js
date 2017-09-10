@@ -10,15 +10,15 @@ module.exports = (NODE) => {
     .then(([strsa, strsb]) => {
       let result = '';
       if (strsa.length) {
-        strsa.forEach((str) => {
-          result += str;
-        });
+        for (let i = 0; i < strsa.length; i += 1) {
+          result += strsa[i];
+        }
       }
 
       if (strsb.length) {
-        strsb.forEach((str) => {
-          result += str;
-        });
+        for (let i = 0; i < strsb.length; i += 1) {
+          result += strsb[i];
+        }
       }
 
       callback(result);
