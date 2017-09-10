@@ -9,16 +9,17 @@ Nothing notable at the moment.
 
 ## [0.8.0][]
 ### Added
--   Introduction of [type definitions](https://xible.io/docs/guides/nodes/typedefs) for inputs and outputs. This allows types to extend other types and provide custom colors for those types. ([#17](https://github.com/SpectrumBroad/xible/issues/17))
+-   [Introduction](https://discuss.xible.io/t/on-the-introduction-of-typedefs/52) of [type definitions](https://xible.io/docs/guides/nodes/typedefs) for inputs and outputs. This allows types to extend other types and provide custom colors for those types. ([#17](https://github.com/SpectrumBroad/xible/issues/17))
 
 -   Added `object.*` nodes to replace the `document.*` nodes.
 
 ### Changed
 -   `document.*` nodes are now deprecated in favor `object.*`.
 
--   `log.console` now contains a deprecation notice. It was already deprecated in 0.7.0. ([#27](https://github.com/SpectrumBroad/xible/issues/27))
-
 -   Registry actions such as `xiblepm nodepack install` use the proper OS dependent "tmp" directory. ([#33](https://github.com/SpectrumBroad/xible/issues/33))
+
+### Removed
+-   `log.console` node is now removed, after it was deprecated in favor of `console.log`. ([#27](https://github.com/SpectrumBroad/xible/issues/27))
 
 ## [0.7.0][]
 ### Added
