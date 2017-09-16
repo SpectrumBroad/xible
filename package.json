@@ -44,7 +44,7 @@
   },
   "main": "index.js",
   "engines": {
-    "node": ">=7.0.0"
+    "node": ">=7.6.0"
   },
   "dependencies": {
     "xible-wrapper": "*",
