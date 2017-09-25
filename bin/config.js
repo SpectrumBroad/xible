@@ -7,6 +7,18 @@ const {
 module.exports = XIBLE => (
   {
     set(arg, value) {
+      // assignment using equals sign
+      if (value === undefined) {
+        if (arg.includes('=')) {
+          const argSplit = arg.split('=');
+          arg = argSplit.shift();
+          value = argSplit.join('=');
+        } else {
+          value = '';
+        }
+      }
+
+      // boolean handling
       if (value === 'true') {
         value = true;
       } else if (value === 'false') {
