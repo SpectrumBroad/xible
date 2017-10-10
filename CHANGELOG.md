@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Fixed
+-   Long uninterrupted strings in node descriptions would overflow the node selector.
 
 ## [0.8.0][]
 ### Added

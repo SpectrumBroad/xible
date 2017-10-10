@@ -213,6 +213,7 @@
 #nodeSelector>ul>li>p, #detailNodeSelector p {
 	margin: 8px 0 0 0;
 	padding: 0;
+	overflow: hidden;
 }
 
 #detailNodeSelector p.status {
