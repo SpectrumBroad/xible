@@ -11,6 +11,13 @@
 	border: 1px solid #000;
 	box-sizing: border-box;
 	z-index: 1;
+	contain: content;
+}
+
+#nodeSelector.loading::after {
+	background-color: #777;
+	bottom: auto;
+	top: 0;
 }
 
 #detailNodeSelector code {
@@ -96,6 +103,7 @@
 	width: 100%;
 	max-height: 38vh;
 	overflow-y: auto;
+	contain: content;
 }
 
 #nodeSelector.hidden, #detailNodeSelector.hidden {
@@ -110,6 +118,7 @@
 	cursor: pointer;
 	position: relative;
 	order: 3;
+	contain: content;
 }
 
 #nodeSelector>ul>li:first-child {
@@ -126,6 +135,12 @@
 
 #nodeSelector>ul>li.hidden {
 	display: none;
+}
+
+#nodeSelector>ul>li.max {
+	background-color: #ccc;
+	cursor: default;
+
 }
 
 #nodeSelector>ul>li.online::before {
@@ -147,6 +162,11 @@
 #nodeSelector>ul>li:hover {
 	background-color: #45679E;
 	color: #fff;
+}
+
+#nodeSelector>ul>li.max:hover {
+	background-color: #ccc;
+	color: #000;
 }
 
 #nodeSelector>ul>li>h1, #detailNodeSelector h1 {

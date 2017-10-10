@@ -36,7 +36,6 @@ class XibleEditorNodeSelector {
     // the div containing the node list
     let div = this.div = document.body.appendChild(document.createElement('div'));
     div.setAttribute('id', 'nodeSelector');
-    div.classList.add('hidden');
 
     // this list will be populated with the local installed nodes
     const nodesUl = this.nodesUl = document.createElement('ul');
@@ -44,27 +43,13 @@ class XibleEditorNodeSelector {
     const filterInput = this.filterInput = div.appendChild(document.createElement('input'));
     filterInput.setAttribute('type', 'text');
     filterInput.setAttribute('placeholder', 'filter nodes');
-    filterInput.addEventListener('input', (event) => {
+    filterInput.addEventListener('input', () => {
       // always hide the detail div when typing
       // this prevents the div to be left hanging at an incosistent position
       // relative to the main div
       this.detailDiv.classList.add('hidden');
 
-      const filterInputValue = filterInput.value.toLowerCase();
-      const searchWords = this.getSearchWords();
-
-      let noResults = true;
-      nodesUl.querySelectorAll('li').forEach((li) => {
-        if (this.setListVisibility(li, filterInputValue, searchWords)) {
-          noResults = false;
-        }
-      });
-
-      if (noResults) {
-        div.classList.add('noresults');
-      } else {
-        div.classList.remove('noresults');
-      }
+      this.setListsVisibility();
 
       this.position();
     });
@@ -89,22 +74,9 @@ class XibleEditorNodeSelector {
 
       // query the registry
       this.xibleEditor.xibleWrapper.Registry
-      .searchNodePacks(filterInput.value)
+      .searchNodePacks(filterInputValue)
       .then((nodePacks) => {
-        // clear all non-online results
-        const foundResults = !!Object.keys(nodePacks).length;
-        if (foundResults) {
-          nodesUl.querySelectorAll('li:not(.online)').forEach((li) => {
-            li.classList.add('hidden');
-          });
-
-          div.classList.remove('noresults');
-        } else {
-          div.classList.add('noresults');
-        }
-
         // print the li's belonging to the found nodePacks
-        let noResults = true;
         for (const nodePackName in nodePacks) {
           const nodePack = nodePacks[nodePackName];
           for (let i = 0; i < nodePack.nodes.length; i += 1) {
@@ -114,6 +86,7 @@ class XibleEditorNodeSelector {
               continue;
             }
 
+            // construct the new node and append to the list
             const li = this.buildNode(nodeName, nodePack.nodes[i]);
             li.classList.add('online');
             li.onclick = () => {
@@ -121,19 +94,10 @@ class XibleEditorNodeSelector {
               this.detailedNodeView(li, nodePack, nodeName);
             };
             nodesUl.appendChild(li);
-
-            // ensure only those li's are visible that match the search criteria
-            if (this.setListVisibility(li, filterInputValue, searchWords)) {
-              noResults = false;
-            }
           }
         }
 
-        if (noResults) {
-          div.classList.add('noresults');
-        } else {
-          div.classList.remove('noresults');
-        }
+        this.setListsVisibility('online');
 
         this.position();
 
@@ -160,8 +124,9 @@ class XibleEditorNodeSelector {
         !event.ctrlKey && XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport &&
         (event.target === XIBLE_EDITOR.element || event.target === XIBLE_EDITOR.element.firstChild)
       ) {
-        this.open(event);
         event.preventDefault();
+        event.stopPropagation();
+        this.open(event);
       }
     };
     this.xibleEditor.element.addEventListener('contextmenu', openOnMouseEvent);
@@ -191,11 +156,99 @@ class XibleEditorNodeSelector {
       document.body.removeEventListener('mousedown', mouseDownEventHandler);
     });
 
+    // check what the default hide of the node selector is
+    const clientRect = this.div.getBoundingClientRect();
+    this.baseHeight = clientRect.height;
+    this.baseWidth = clientRect.width;
+
+    // hide the div
+    div.classList.add('hidden');
+
     this.fill();
   }
 
+  /**
+  * Returns a list of search words from the filterInput
+  * @returns {String[]}
+  */
   getSearchWords() {
-    return this.filterInput.value.toLowerCase().replace(/[\W_]+/g, ' ').split(' ');
+    return this.filterInput.value.toLowerCase()
+    .replace(/[\W_]+/g, ' ')
+    .split(' ');
+  }
+
+  /**
+  * Removes the max message,
+  * indicating that MAX_VISIBLE_ITEMS has been reached.
+  * @returns {Boolean} Whether or not there was a max messages to remove.
+  */
+  removeMaxMessage() {
+    const maxLi = this.nodesUl.querySelector('.max');
+    if (maxLi) {
+      this.nodesUl.removeChild(maxLi);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+  * Adds the max message,
+  * indicating that MAX_VISIBLE_ITEMS has been reached.
+  * @returns {Boolean} Whether or not the max message was added.
+  * Returns false if already exists.
+  */
+  addMaxMessage() {
+    if (this.nodesUl.querySelector('.max')) {
+      return false;
+    }
+    const newMaxLi = this.nodesUl.appendChild(document.createElement('li'));
+    newMaxLi.classList.add('max');
+    newMaxLi.appendChild(document.createTextNode(`The specified filter returns more than the allowed maximum of ${XibleEditorNodeSelector.MAX_VISIBLE_ITEMS} results.`));
+
+    return true;
+  }
+
+  /**
+  * Runs setVisibility() on each item in the list.
+  * @param {String} className List of css class names that should be on the list element before making visible.
+  * @returns {Boolean} Whether there are any visible results or not.
+  */
+  setListsVisibility(className) {
+    const filterInputValue = this.filterInput.value.toLowerCase();
+    const searchWords = this.getSearchWords();
+
+    this.removeMaxMessage();
+
+    // filter the results
+    const max = XibleEditorNodeSelector.MAX_VISIBLE_ITEMS;
+    let visible = 0;
+    let i;
+
+    const lis = Array.from(this.nodesUl.querySelectorAll('li'));
+    for (i = 0; i < lis.length; i += 1) {
+      if (visible >= max) {
+        if (visible === max) {
+          this.addMaxMessage();
+        }
+        lis[i].classList.add('hidden');
+        visible += 1;
+      } else if (!filterInputValue) {
+        lis[i].classList.remove('hidden');
+        visible += 1;
+      } else if (className && !lis[i].classList.contains(className)) {
+        lis[i].classList.add('hidden');
+      } else if (this.setListVisibility(lis[i], filterInputValue, searchWords)) {
+        visible += 1;
+      }
+    }
+
+    if (!filterInputValue || visible) {
+      this.div.classList.remove('noresults');
+    } else {
+      this.div.classList.add('noresults');
+    }
+
+    return visible > 0;
   }
 
   /**
@@ -262,7 +315,7 @@ class XibleEditorNodeSelector {
         this.detailDiv.classList.add('hidden');
 
         // refill
-        this.fill();
+        return this.fill();
       })
       .catch((err) => {
         this.detailConfirmButton.disabled = true;
@@ -381,9 +434,13 @@ class XibleEditorNodeSelector {
   /**
   * Fetches the nodes from xible and places them in the nodeSelector ul.
   * Keeps visible state correct if this functions is called multiple times.
-  * @returns {Promise.<undefined>} Resolves when complete.
+  * @returns {Promise} Resolves when complete.
   */
   fill() {
+    // indicate that we're loading stuff
+    this.div.classList.add('loading');
+    this.reset();
+
     // track all nodeNames currently visible
     let visibleNodeNames;
     if (Array.from(this.nodesUl.querySelectorAll('li.hidden')).length) {
@@ -391,13 +448,28 @@ class XibleEditorNodeSelector {
       .querySelectorAll('li:not(.hidden) h1'))
       .map(header => header.getAttribute('title'));
     }
+    const hasMax = !!this.nodesUl.querySelector('.max');
 
     this.nodesUl.innerHTML = '';
 
     // get the installed nodes
     return this.xibleEditor.xibleWrapper.http.request('GET', '/api/nodes')
-    .toJson().then((nodes) => {
-      Object.keys(nodes).forEach((nodeName) => {
+    .toJson()
+    .then((nodes) => {
+      // hide loader
+      if (this.div.classList.contains('hidden')) {
+        this.div.classList.remove('loading');
+      } else {
+        this.div.addEventListener('animationiteration', () => {
+          this.div.classList.remove('loading');
+        }, {
+          once: true
+        });
+      }
+
+
+      Object.keys(nodes)
+      .forEach((nodeName) => {
         const li = this.buildNode(nodeName, nodes[nodeName]);
         this.hookNode(li, nodes[nodeName]);
 
@@ -408,6 +480,8 @@ class XibleEditorNodeSelector {
         this.nodesUl.appendChild(li);
       });
 
+      // this.setListsVisibility();
+
       // make items visible that were so before
       if (visibleNodeNames) {
         for (let i = 0; i < visibleNodeNames.length; i += 1) {
@@ -416,6 +490,10 @@ class XibleEditorNodeSelector {
             h1.parentNode.classList.remove('hidden');
           }
         }
+      }
+
+      if (hasMax) {
+        this.addMaxMessage();
       }
     });
   }
@@ -443,32 +521,35 @@ class XibleEditorNodeSelector {
   * @param {MouseEvent} event Event which triggered the open. Used to set the correct position.
   */
   open(event) {
-    // unhide all nodes,
-    // so the correct height is checked against the window height and mouse pos
-    // they will be hidden again later on
-    Array.from(this.nodesUl.querySelectorAll('li.hidden')).forEach((li) => {
-      li.classList.remove('hidden');
-    });
+    // 0.38 is the vh defined on the nodeSelector CSS
+    const divHeight = Math.floor((0.38 * window.innerHeight) + this.baseHeight);
+    const divWidth = this.baseWidth;
 
     // track the positions where the selector was originally opened
     this.openXPosition = event.pageX;
     this.openYPosition = event.pageY;
 
-    // unhide and position the nodeselector for the first overflow check
-    this.div.classList.remove('hidden');
+    // position the nodeselector
     this.div.style.left = `${this.openXPosition}px`;
     this.div.style.top = `${this.openYPosition}px`;
 
     // ensure we are not overflowing the chrome
-    // this needs to be checked with a non-filtered list
-    // otherwise changing the filter might still overflow y
-    const clientRect = this.div.getBoundingClientRect();
-    this.openTop = this.openLeft = false;
-    if (clientRect.top + clientRect.height > window.innerHeight) {
+    this.openTop = false;
+    this.openLeft = false;
+    if (this.openYPosition + divHeight + 2 > window.innerHeight) {
       this.openTop = true;
     }
-    if (clientRect.left + clientRect.width > window.innerWidth) {
+    if (this.openXPosition + divWidth + 2 > window.innerWidth) {
       this.openLeft = true;
+    }
+
+    this.setListsVisibility();
+
+    this.div.classList.remove('hidden');
+
+    // reposition
+    if (this.openTop || this.openLeft) {
+      this.position();
     }
 
     // focus!
@@ -476,20 +557,6 @@ class XibleEditorNodeSelector {
       this.filterInput.select();
     }
     this.filterInput.focus();
-
-    // filter the results
-    if (this.filterInput.value) {
-      Array.from(this.nodesUl.querySelectorAll('li')).forEach((li) => {
-        if (this.filterInput.value && li.textContent.indexOf(this.filterInput.value) === -1) {
-          li.classList.add('hidden');
-        }
-      });
-    }
-
-    // reposition
-    if (this.openTop || this.openLeft) {
-      this.position();
-    }
   }
 
   /**
@@ -498,9 +565,20 @@ class XibleEditorNodeSelector {
   */
   close() {
     this.div.classList.add('hidden');
+    this.reset();
+  }
+
+  /**
+  * Resets the state of the nodeselector.
+  */
+  reset() {
     this.detailDiv.classList.add('hidden');
 
     this.detailConfirmButton.classList.remove('loading');
     this.searchOnlineButton.classList.remove('loading');
+  }
+
+  static get MAX_VISIBLE_ITEMS() {
+    return 25;
   }
 }
