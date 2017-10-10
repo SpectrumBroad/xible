@@ -130,7 +130,9 @@ class XibleEditor extends EventEmitter {
     describeEl.appendChild(node.element);
 
     // add the description for each io
-    node.getInputs().concat(node.getOutputs()).forEach((io) => {
+    node.getInputs()
+    .concat(node.getOutputs())
+    .forEach((io) => {
       // get rid of event listeners
       const clonedNode = io.element.cloneNode(true);
       io.element.parentNode.replaceChild(clonedNode, io.element);
@@ -157,13 +159,15 @@ class XibleEditor extends EventEmitter {
       }
 
       node.element.onmouseenter = () => {
-        node.getRootLabelElements().forEach((label) => {
+        node.getRootLabelElements()
+        .forEach((label) => {
           label.classList.add('nodeHover');
         });
       };
 
       node.element.onmouseleave = () => {
-        node.getRootLabelElements().forEach((label) => {
+        node.getRootLabelElements()
+        .forEach((label) => {
           label.classList.remove('nodeHover');
         });
       };
@@ -337,7 +341,8 @@ class XibleEditor extends EventEmitter {
     let globalTypes = [].concat(...this.loadedFlow.nodes.map(node => node.getGlobalOutputs()
     .map(output => output.type)));
 
-    node.getInputs().forEach((input) => {
+    node.getInputs()
+    .forEach((input) => {
       let globalValue = input.global;
       if (
         globalTypes.indexOf(input.type) > -1 &&
@@ -349,7 +354,8 @@ class XibleEditor extends EventEmitter {
     });
 
     // global outputs
-    node.getGlobalOutputs().forEach((output) => {
+    node.getGlobalOutputs()
+    .forEach((output) => {
       this.loadedFlow.setGlobalFromOutput(output);
     });
 
@@ -901,8 +907,10 @@ class XibleEditor extends EventEmitter {
           // select all
         case 'a':
           if (event.ctrlKey) {
-            this.loadedFlow.nodes.forEach(node => this.select(node));
-            this.loadedFlow.connectors.forEach(connector => this.select(connector));
+            this.loadedFlow.nodes
+            .forEach(node => this.select(node));
+            this.loadedFlow.connectors
+            .forEach(connector => this.select(connector));
 
             event.preventDefault();
           }
@@ -1019,8 +1027,8 @@ class XibleEditor extends EventEmitter {
       }
 
       if (
-        this.loadedFlow.nodes.indexOf(dup.origin.node) === -1 ||
-    this.loadedFlow.nodes.indexOf(dup.destination.node) === -1
+        !this.loadedFlow.nodes.includes(dup.origin.node) ||
+        !this.loadedFlow.nodes.includes(dup.destination.node)
       ) {
         return;
       }
@@ -1060,7 +1068,8 @@ class XibleEditor extends EventEmitter {
         return;
       }
 
-      sel.getOutputs().forEach((output) => {
+      sel.getOutputs()
+      .forEach((output) => {
         if (processedOutputs.indexOf(output._id) > -1) {
           return;
         }
