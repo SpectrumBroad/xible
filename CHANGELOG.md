@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Within the editor, optional input fields are now hidden unless the containing node is either hovered or selected. ([#36](https://github.com/SpectrumBroad/xible/issues/36))
 
+-   The `xible` command line interface now supports the 'node' context for getting and setting data values on nodes. ([#34](https://github.com/SpectrumBroad/xible/issues/34))
+
+-   Add a 'state' output to the `xible.flow` node. This returns the running state of a flow, a number between 0 and 5, inclusive.
+
 ### Removed
 -   `document.*` nodes are removed, after they were deprecated in favor of `object.*`.
 
@@ -25,7 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   `document.*` nodes are now deprecated in favor `object.*`.
 
--   Registry actions such as `xiblepm nodepack install` use the proper OS dependent "tmp" directory. ([#33](https://github.com/SpectrumBroad/xible/issues/33))
+-   Registry actions such as `xiblepm nodepack install` use the proper OS dependent 'tmp' directory. ([#33](https://github.com/SpectrumBroad/xible/issues/33))
 
 ### Removed
 -   `log.console` node is now removed, after it was deprecated in favor of `console.log`. ([#27](https://github.com/SpectrumBroad/xible/issues/27))
