@@ -206,8 +206,13 @@ const cli = {
       }
       await loadNodes();
 
-      // store the value in either the flow or vault
+      // get the node constructor to verify if the given arg/prop is vaulted
       const nodeConstr = xible.getNodeByName(node.name);
+      if (!nodeConstr) {
+        throw `No such node installed: "${node.name}"`;
+      }
+
+      // store the value in either the flow or vault
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
         node.vault.set(Object.assign(node.vault.get() || {}, {
@@ -237,8 +242,13 @@ const cli = {
       }
       await loadNodes();
 
-      // store the value in either the flow or vault
+      // get the node constructor to verify if the given arg/prop is vaulted
       const nodeConstr = xible.getNodeByName(node.name);
+      if (!nodeConstr) {
+        throw `No such node installed: "${node.name}"`;
+      }
+
+      // delete the value from either the flow or vault
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
         const vaultObj = node.vault.get() || {};
@@ -268,9 +278,14 @@ const cli = {
       }
       await loadNodes();
 
+      // get the node constructor to verify if the given arg/prop is vaulted
+      const nodeConstr = xible.getNodeByName(node.name);
+      if (!nodeConstr) {
+        throw `No such node installed: "${node.name}"`;
+      }
+
       // get the value from either the flow or vault
       let dataValue = '';
-      const nodeConstr = xible.getNodeByName(node.name);
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
         dataValue = node.vault.get() || {};
