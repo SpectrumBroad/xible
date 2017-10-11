@@ -1,8 +1,12 @@
 {
-
-  "ignore": ["flows/*", "vault.json", "config.json"],
+  "ignore": [
+    "flows/*",
+    "nodes/xible-nodepack-*",
+    "nodes/xible-np-*",
+    "vault.json",
+    "config.json"
+  ],
   "execMap": {
     "js": "node"
   }
-
 }
