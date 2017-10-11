@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-throw-literal */
+
 'use strict';
 
 // windows: running "xible x" in this folder will invoke WSH, not node.
@@ -29,7 +31,8 @@ const knownOpts = {
   config: String,
   user: String,
   group: String,
-  force: Boolean
+  force: Boolean,
+  'node-id': String
 };
 const shortHands = {
   c: '--config',
@@ -53,71 +56,232 @@ const {
   logError
 } = require('./log');
 
+let loadedNodes = false;
 /**
-* Returns a flow by the given id/name.
-* Rejects if no flows.path is configured in the xible instance.
-* @returns {Promise.<XIBLE.Flow>}
+* Loads all nodes.
 */
-function getFlowById(flowId) {
-  if (!flowId) {
-    return Promise.reject('The flow name must be provided');
+async function loadNodes() {
+  if (loadedNodes) {
+    return;
+  }
+  const nodesPath = xible.Config.getValue('nodes.path');
+  if (!nodesPath) {
+    throw new Error('need a "nodes.path" in the configuration to load the installed nodes from');
   }
 
+  await Promise.all([
+    xible.Node.initFromPath(`${__dirname}/../nodes`),
+    xible.Node.initFromPath(xible.resolvePath(nodesPath))
+  ]);
+  loadedNodes = true;
+}
+
+/**
+* Returns the found node by the given nodeId,
+* or null if not found.
+* @param {String} nodeId 
+*/
+function getNodeById(nodeId) {
+  const flows = getFlows();
+  for (const flowId in flows) {
+    const flow = flows[flowId];
+    const node = flow.getNodeById(nodeId);
+    if (node) {
+      return node;
+    }
+  }
+  return null;
+}
+
+let loadedFlows = false;
+/**
+* Loads all flows.
+*/
+function loadFlows() {
+  if (loadedFlows) {
+    return;
+  }
   let flowPath = xible.Config.getValue('flows.path');
   if (!flowPath) {
-    return Promise.reject('no "flows.path" configured');
+    throw 'no "flows.path" configured';
   }
   flowPath = xible.resolvePath(flowPath);
   xible.Flow.initFromPath(flowPath);
-  return Promise.resolve(xible.getFlowById(flowId));
+  loadedFlows = true;
+}
+
+/**
+* Returns a flow by the given id/name.
+* Rejects if no flows.path is configured in the xible instance.
+* @returns {XIBLE.Flow[]}
+*/
+function getFlows() {
+  loadFlows();
+  return xible.getFlows();
+}
+
+/**
+* Returns a flow by the given id/name.
+* Rejects if no flows.path is configured in the xible instance.
+* @returns {XIBLE.Flow}
+*/
+function getFlowById(flowId) {
+  if (!flowId) {
+    throw 'The flow name must be provided';
+  }
+
+  loadFlows();
+  return xible.getFlowById(flowId);
 }
 
 // cli contexts and commands
 const cli = {
 
   flow: {
-    start(flowName) {
-      return getFlowById(flowName)
-      .then((flow) => {
-        if (!flow) {
-          return Promise.reject(`Flow "${flowName}" does not exist`);
-        }
-
-        return xible.CliQueue.add({
-          method: 'flow.start',
-          flowName
-        });
-      });
-    },
-    stop(flowName) {
-      return getFlowById(flowName)
-      .then((flow) => {
-        if (!flow) {
-          return Promise.reject(`Flow "${flowName}" does not exist`);
-        }
-
-        return xible.CliQueue.add({
-          method: 'flow.stop',
-          flowName
-        });
-      });
-    },
-    delete(flowName) {
-      if (!opts.force) {
-        return Promise.reject('Are you sure you want to delete this flow? Provide --force to confirm.');
+    async start(flowName) {
+      const flow = getFlowById(flowName);
+      if (!flow) {
+        throw `Flow "${flowName}" does not exist`;
       }
 
-      return getFlowById(flowName)
-      .then((flow) => {
-        if (!flow) {
-          return Promise.reject(`Flow "${flowName}" does not exist`);
-        }
-
-        return xible.CliQueue.add({
-          method: 'flow.delete',
-          flowName
-        });
+      return xible.CliQueue.add({
+        method: 'flow.start',
+        flowName
       });
+    },
+    async stop(flowName) {
+      const flow = getFlowById(flowName);
+      if (!flow) {
+        throw `Flow "${flowName}" does not exist`;
+      }
+
+      return xible.CliQueue.add({
+        method: 'flow.stop',
+        flowName
+      });
+    },
+    async delete(flowName) {
+      if (!opts.force) {
+        throw 'Are you sure you want to delete this flow? Provide --force to confirm.';
+      }
+
+      const flow = getFlowById(flowName);
+      if (!flow) {
+        throw `Flow "${flowName}" does not exist`;
+      }
+
+      return xible.CliQueue.add({
+        method: 'flow.delete',
+        flowName
+      });
+    }
+  },
+
+  node: {
+    async set(arg, value) {
+      const nodeId = opts['node-id'];
+      if (!nodeId) {
+        throw 'A --node-id argument needs to be specified';
+      }
+
+      if (!arg) {
+        throw 'Please specify what property to set';
+      }
+
+      // assignment using equals sign
+      if (value === undefined) {
+        if (arg.includes('=')) {
+          const argSplit = arg.split('=');
+          arg = argSplit.shift();
+          value = argSplit.join('=');
+        } else {
+          value = '';
+        }
+      }
+
+      // find out where nodeId resides
+      const node = getNodeById(nodeId);
+      if (!node) {
+        throw `No node found with node-id "${nodeId}"`;
+      }
+      await loadNodes();
+
+      // store the value in either the flow or vault
+      const nodeConstr = xible.getNodeByName(node.name);
+      const nodeVaultKeys = nodeConstr.vault;
+      if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
+        node.vault.set(Object.assign(node.vault.get() || {}, {
+          [arg]: value
+        }));
+      } else {
+        node.data[arg] = value;
+
+        // save the flow
+        node.flow.save();
+      }
+    },
+    async delete(arg) {
+      const nodeId = opts['node-id'];
+      if (!nodeId) {
+        throw 'A --node-id argument needs to be specified';
+      }
+
+      if (!arg) {
+        throw 'Please specify what to delete.';
+      }
+
+      // find out where nodeId resides
+      const node = getNodeById(nodeId);
+      if (!node) {
+        throw `No node found with node-id "${nodeId}"`;
+      }
+      await loadNodes();
+
+      // store the value in either the flow or vault
+      const nodeConstr = xible.getNodeByName(node.name);
+      const nodeVaultKeys = nodeConstr.vault;
+      if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
+        const vaultObj = node.vault.get() || {};
+        delete vaultObj[arg];
+        node.vault.set(vaultObj);
+      } else {
+        delete node.data[arg];
+
+        // save the flow
+        node.flow.save();
+      }
+    },
+    async get(arg) {
+      const nodeId = opts['node-id'];
+      if (!nodeId) {
+        throw 'A --node-id argument needs to be specified';
+      }
+
+      if (!arg) {
+        throw 'Please specify what to delete.';
+      }
+
+      // find out where nodeId resides
+      const node = getNodeById(nodeId);
+      if (!node) {
+        throw `No node found with node-id "${nodeId}"`;
+      }
+      await loadNodes();
+
+      // get the value from either the flow or vault
+      let dataValue = '';
+      const nodeConstr = xible.getNodeByName(node.name);
+      const nodeVaultKeys = nodeConstr.vault;
+      if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
+        dataValue = node.vault.get() || {};
+      } else {
+        dataValue = node.data[arg];
+      }
+
+      if (dataValue === undefined || dataValue === null) {
+        dataValue = '';
+      }
+      log(dataValue);
     }
   },
 
