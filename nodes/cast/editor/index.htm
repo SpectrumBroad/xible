@@ -1,5 +1,5 @@
 <selectcontainer>
-  <select data-outputvalue="castType">
+  <select required="required" data-outputvalue="castType">
     <option selected>string</option>
     <option>boolean</option>
     <option>math.number</option>
@@ -8,8 +8,9 @@
   </select>
 </selectcontainer>
 <script>
-  let castTypeSelect = document.querySelector('select');
+  const castTypeSelect = document.querySelector('select');
   castTypeSelect.onchange = () => {
-    this.getOutputByName('result').setType(castTypeSelect.value);
+    this.getOutputByName('result')
+    .setType(castTypeSelect.value);
   };
 </script>

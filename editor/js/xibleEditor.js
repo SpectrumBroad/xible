@@ -158,20 +158,6 @@ class XibleEditor extends EventEmitter {
         return;
       }
 
-      node.element.onmouseenter = () => {
-        node.getRootLabelElements()
-        .forEach((label) => {
-          label.classList.add('nodeHover');
-        });
-      };
-
-      node.element.onmouseleave = () => {
-        node.getRootLabelElements()
-        .forEach((label) => {
-          label.classList.remove('nodeHover');
-        });
-      };
-
       // add the description for each input element
       node.getRootLabelElements()
       .forEach((label) => {

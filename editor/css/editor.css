@@ -311,9 +311,13 @@
 	opacity: 0.6;
 }
 
+.xible .node:hover {
+	z-index: 3;
+}
+
 .xible .node.selected {
 	border-color: gold;
-	z-index: 3;
+	z-index: 4;
 }
 
 .xible .node.nodirect {

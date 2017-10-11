@@ -491,10 +491,22 @@ class XibleEditorNode extends xibleWrapper.Node {
   * Creates a label for every input/selectcontainer element that doesn't have one.
   */
   convenienceLabel() {
-    this.getRootInputElements().forEach((el) => {
+    this.getRootInputElements()
+    .forEach((el) => {
       const label = document.createElement('label');
       this.editorContentEl.replaceChild(label, el);
       label.appendChild(el);
+
+      // set the required attribute
+      // because the :has() pseudo selector is not available (yet)
+      if (
+        el.required ||
+        (el.nodeName === 'SELECTCONTAINER' && el.querySelector('select') && el.querySelector('select').required)
+      ) {
+        label.classList.add('required');
+      } else {
+        label.classList.add('optional');
+      }
 
       // copy the description to the label
       const description = el.getAttribute('data-description');

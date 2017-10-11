@@ -56,16 +56,6 @@ label p.none {
 	font-style: italic;
 }
 
-label.nodeHover p {
-	color: #555;
-}
-
-label:hover p {
-	overflow: visible;
-	color: #fff;
-	z-index: 2;
-}
-
 label p::before, label:hover p.overflow::after {
 	display: block;
 	position: absolute;
@@ -93,20 +83,52 @@ label p.overflow::after {
 	color: #eee;
 }
 
-label.nodeHover p.overflow::after {
+:host-context(.node:hover) label p {
+	color: #555;
+}
+
+:host-context(.node:hover) label:hover p {
+	overflow: visible;
+	color: #fff;
+	z-index: 2;
+}
+
+:host-context(.node:hover) label p.overflow::after {
 	color: #333;
 }
 
-label:hover p.overflow {
+:host-context(.node:hover) label:hover p.overflow {
 	height: auto;
 }
 
-label:hover p.overflow::after {
+:host-context(.node:hover) label:hover p.overflow::after {
 	top: auto;
 	bottom: 0;
 }
 
-input~span, selectcontainer~span {
+/*
+if only...
+:host>label:has(input:optional) {
+	display: none;
+}
+*/
+
+:host>label.optional {
+	display: none;
+}
+
+:host-context(.node:hover)>label,
+:host-context(.node.selected)>label {
+	display: block;
+}
+
+/* always show all labels and inputs when in describe/help mode */
+:host-context(.describe)>label {
+	display: block;
+}
+
+input~span,
+selectcontainer~span {
 	display: none;
 	box-sizing: border-box;
 	position: absolute;
@@ -127,22 +149,29 @@ input~span, selectcontainer~span {
 
 /* vertical align for contents of the above */
 
-input~span::before, selectcontainer~span::before {
+input~span::before,
+selectcontainer~span::before {
 	content: "";
 	display: inline-block;
 	height: 100%;
 	vertical-align: middle;
 }
 
-input~span.unknown, selectcontainer~span.unknown {
+input~span.unknown,
+selectcontainer~span.unknown {
 	color: #888;
 }
 
-input:hover, input:focus, selectcontainer:hover select, selectcontainer select:focus {
+input:hover,
+input:focus,
+selectcontainer:hover select,
+selectcontainer select:focus {
 	border-radius: 0 6px 6px 0;
 }
 
-input:hover~span, input:focus~span, selectcontainer:hover~span {
+input:hover~span,
+input:focus~span,
+selectcontainer:hover~span {
 	display: block;
 }
 
