@@ -5,8 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Added
+-   Within the editor, optional input fields are now hidden unless the containing node is either hovered or selected. ([#36](https://github.com/SpectrumBroad/xible/issues/36))
+
+### Removed
+-   `document.*` nodes are removed, after they were deprecated in favor of `object.*`.
+
 ### Fixed
 -   Long uninterrupted strings in node descriptions would overflow the node selector.
+
+-   Performance of node selector has been greatly improved when there are a lot of nodes installed.
 
 ## [0.8.0][]
 ### Added
