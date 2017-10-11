@@ -26,6 +26,17 @@ module.exports = (NODE) => {
     getFlow(flowId, callback);
   });
 
+  const stateOut = NODE.getOutputByName('state');
+  stateOut.on('trigger', (conn, satte, callback) => {
+    const flowId = NODE.data.flowName || NODE.flow.name;
+    getFlow(flowId, (flow) => {
+      if (!flow) {
+        return;
+      }
+      callback(flow.state);
+    });
+  });
+
   const timingOut = NODE.getOutputByName('timing');
   timingOut.on('trigger', (conn, state, callback) => {
     const flowId = NODE.data.flowName || NODE.flow.name;

@@ -6,6 +6,10 @@
     "flow": {
       "type": "xible.flow"
     },
+    "state": {
+      "type": "math.number",
+      "description": "Returns the running state of the flow. 0=stopped, 1=stopping, 2=initializing, 3=initialized, 4=starting, 5=started."
+    },
     "timing": {
       "type": "object",
       "description": "Returns the timing object on the flow."
