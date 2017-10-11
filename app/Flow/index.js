@@ -291,7 +291,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             const nodeVaultData = {};
             if (nodeVaultKeys && Array.isArray(nodeVaultKeys)) {
               for (const dataKey in node.data) {
-                if (nodeVaultKeys.indexOf(dataKey) > -1) {
+                if (nodeVaultKeys.includes(dataKey)) {
                   nodeVaultData[dataKey] = node.data[dataKey];
                   delete node.data[dataKey];
                 }
