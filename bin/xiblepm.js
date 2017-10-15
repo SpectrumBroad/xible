@@ -230,26 +230,6 @@ const cli = {
         .then(() => log(`Installed flow "${altFlowId || registryFlow.name}"`));
       });
     },
-    remove(flowName) {
-      console.warn('"xiblepm flow remove <name>" has been deprecated in favor of "xible flow delete <name>"');
-      if (!flowName) {
-        return Promise.reject('The flow name must be provided');
-      }
-
-      let flowPath = xible.Config.getValue('flows.path');
-      if (!flowPath) {
-        return Promise.reject('no "flows.path" configured');
-      }
-      flowPath = xible.resolvePath(flowPath);
-      xible.Flow.initFromPath(flowPath);
-      const flow = xible.getFlowById(flowName);
-
-      if (!flow) {
-        return Promise.reject(`Flow "${flowName}" does not exist`);
-      }
-      return flow.delete()
-      .then(() => log(`Flow "${flowName}" removed`));
-    },
     search(str) {
       if (!str) {
         return Promise.reject('The search string must be provided');
