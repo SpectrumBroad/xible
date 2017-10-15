@@ -444,58 +444,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       node.flow = this;
 
       // track direct triggers of nodes
-      node.prependListener('trigger', () => {
+      node.prependListener('triggerStartTime', (type) => {
         const d = new Date();
         // node._trackerTriggerTime = d.getTime();
 
         node.setTracker({
-          message: `start @ ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`,
+          message: `${type === 'output' ? 'hit' : 'start'} @ ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`,
           timeout: 3000
         });
       });
-
-      // track incoming output triggers
-      for (const name in node.outputs) {
-        node.outputs[name].prependListener('trigger', () => {
-          const d = new Date();
-          // node._trackerTriggerTime = d.getTime();
-          node.setTracker({
-            message: `start @ ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`,
-            timeout: 3000
-          });
-        });
-      }
-
-      // track output triggers
-      /*
-      // uncommenting this needs to take care of commented _trackerTriggerTime elsewhere
-      // and this.node.emit('triggerout', this); in /app/Node/index.js
-      node.prependListener('triggerout', (output) => {
-
-        if (!output.connectors.length) {
-          return;
-        }
-
-        let d = new Date();
-        let msg;
-
-        if (node._trackerTriggerTime) {
-
-          let diff = d.getTime() - node._trackerTriggerTime;
-          msg = `triggered '${output.name}' in ${diff}ms`;
-
-        } else {
-          msg = `triggered '${output.name}' @
-          ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
-        }
-
-        node.setTracker({
-          message: msg,
-          timeout: 3500
-        });
-
-      });
-      */
 
       // add and return
       this.nodes.push(node);
@@ -977,8 +934,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         // trigger all event objects that are listening
         for (let i = 0; i < this.nodes.length; i += 1) {
-          if (this.nodes[i].type === 'event') {
-            this.nodes[i].emit('trigger', flowState);
+          const node = this.nodes[i];
+          if (node.type === 'event') {
+            node.emit('triggerStartTime', 'input');
+            node.emit('trigger', flowState);
           }
         }
       });

@@ -14,8 +14,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   /**
   * Trigger event which is applied to event nodes when the flow starts,
   * after all nodes have received the init event.
-  * It is also applied to a node when it gets triggered through
-  * an input trigger after a call from nodeOutput.trigger().
   * @event Node#trigger
   * @param {FlowState} state A blank state, equal to the state provided on the init event.
   */
@@ -789,6 +787,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           const conn = conns[i];
           let calledBack = false;
 
+          conn.origin.node.emit('triggerStartTime', 'output');
           conn.origin.emit('trigger', conn, state, (value) => { // eslint-disable-line
             // verify that this callback wasn't already made.
             if (calledBack) {
@@ -850,7 +849,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const conns = this.connectors;
       for (let i = 0; i < conns.length; i += 1) {
         const conn = conns[i];
-        conn.destination.node.emit('trigger');
+        conn.destination.node.emit('triggerStartTime', 'input');
         conn.destination.emit('trigger', conn, state.split());
       }
     }
