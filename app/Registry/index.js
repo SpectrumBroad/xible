@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = (XIBLE, EXPRESS_APP) => {
-  const XibleRegistryWrapper = require('xible-registry-wrapper');
-  const fsExtra = require('fs-extra');
-  const os = require('os');
+const XibleRegistryWrapper = require('xible-registry-wrapper');
+const fsExtra = require('fs-extra');
+const os = require('os');
 
+module.exports = (XIBLE, EXPRESS_APP) => {
   const registryUrl = XIBLE.Config.getValue('registry.url');
   if (!registryUrl) {
     throw new Error('"registry.url" not found in config');
