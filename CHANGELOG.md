@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Implemented `xiblepm nodepack upgrade` for upgrading nodepacks. ([#41](https://github.com/SpectrumBroad/xible/issues/41))
 
+### Changed
+-   Instances of Node only receive a trigger event when they are an event node at the start of a flow. Previously, this event would also be emitted whenever an input trigger was hit.
+
 ### Removed
 -   `document.*` nodes are removed, after they were deprecated in favor of `object.*`.
 
