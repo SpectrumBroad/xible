@@ -12,13 +12,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Add a 'state' output to the `xible.flow` node. This returns the running state of a flow, a number between 0 and 5, inclusive.
 
+-   Implemented `xiblepm nodepack remove` for removing nodepacks. ([#24](https://github.com/SpectrumBroad/xible/issues/24))
+
+-   Implemented `xiblepm nodepack upgrade` for upgrading nodepacks. ([#41](https://github.com/SpectrumBroad/xible/issues/41))
+
 ### Removed
 -   `document.*` nodes are removed, after they were deprecated in favor of `object.*`.
+
+-   `xiblepm flow remove` is removed after it was deprecated in version 0.7.0. It was replaced by `xible flow delete`.
 
 ### Fixed
 -   Long uninterrupted strings in node descriptions would overflow the node selector.
 
--   Performance of node selector has been greatly improved when there are a lot of nodes installed.
+-   Performance of node selector has been greatly improved, especially when there are many nodes installed.
 
 ## [0.8.0][]
 ### Added
