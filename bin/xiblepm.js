@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-throw-literal */
+
 'use strict';
 
 // windows: running "xible x" in this folder will invoke WSH, not node.
@@ -379,12 +381,13 @@ const cli = {
 
       return xible.Registry.NodePack
       .search(str)
-      .then((nodes) => {
-        Object.keys(nodes).forEach((nodeName) => {
-          nodes[nodeName]
+      .then((nodePacks) => {
+        Object.keys(nodePacks)
+        .forEach((nodePackName) => {
+          nodePacks[nodePackName]
           .getRegistryData()
           .then((data) => {
-            log(`${nodeName}: ${data.description}: ${data['dist-tags'].latest}`);
+            log(`${nodePackName}: ${data.description}: ${data['dist-tags'].latest}`);
           });
         });
       });
