@@ -360,6 +360,18 @@ const cli = {
       nodePack.remove();
       log(`Nodepack "${nodePackName}" removed`);
     },
+    async upgrade(nodePackName) {
+      if (!nodePackName) {
+        throw 'The nodepack name must be provided';
+      }
+
+      const nodePack = await xible.NodePack.getByName(nodePackName);
+      if (nodePack) {
+        nodePack.remove();
+      }
+
+      await this.install(nodePackName);
+    },
     search(str) {
       if (!str) {
         return Promise.reject('The search string must be provided');
