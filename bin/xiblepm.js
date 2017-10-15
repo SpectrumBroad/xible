@@ -342,7 +342,7 @@ const cli = {
       .getByName(nodePackName)
       .then((nodePack) => {
         if (!nodePack) {
-          return Promise.reject(`Nodepack "${nodePackName}" does not exist`);
+          return Promise.reject(`Nodepack "${nodePackName}" does not exist in the registry`);
         }
         return nodePack.install();
       });
