@@ -59,7 +59,7 @@ class Xible extends EventEmitter {
     } else {
       this.initWeb();
       this.persistentWebSocketMessages = {};
-      appNames = ['Config', 'CliQueue', 'Flow', 'Node', 'TypeDef', 'Registry'];
+      appNames = ['Config', 'CliQueue', 'Flow', 'NodePack', 'Node', 'TypeDef', 'Registry'];
     }
 
     for (let i = 0; i < appNames.length; i += 1) {
