@@ -347,8 +347,18 @@ const cli = {
         return nodePack.install();
       });
     },
-    remove() {
-      return Promise.reject('Not implemented yet');
+    async remove(nodePackName) {
+      if (!nodePackName) {
+        throw 'The nodepack name must be provided';
+      }
+
+      const nodePack = await xible.NodePack.getByName(nodePackName);
+      if (!nodePack) {
+        throw `Nodepack "${nodePackName}" is not installed`;
+      }
+
+      nodePack.remove();
+      log(`Nodepack "${nodePackName}" removed`);
     },
     search(str) {
       if (!str) {
