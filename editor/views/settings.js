@@ -45,7 +45,7 @@ View.routes['/settings'] = (EL) => {
     <div class="inner" id="settingsContent"></div>
   `;
 
-  const settingsViewHolder = new ViewHolder(document.getElementById('settingsContent'), '/settings');
+  const settingsViewHolder = window.settingsViewHolder = new ViewHolder(document.getElementById('settingsContent'), '/settings');
   settingsViewHolder.on('load', (view) => {
     // unselect all buttons from #sub
     Array.from(document.querySelectorAll('#sub ul a'))
