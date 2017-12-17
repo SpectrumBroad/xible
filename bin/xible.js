@@ -79,7 +79,7 @@ async function loadNodes() {
 /**
 * Returns the found node by the given nodeId,
 * or null if not found.
-* @param {String} nodeId 
+* @param {String} nodeId
 */
 function getNodeById(nodeId) {
   const flows = getFlows();
@@ -304,7 +304,7 @@ const cli = {
     // TODO: support windows
     install() {
       return new Promise((resolve, reject) => {
-        fs.readFile(`${__dirname}/xible.service`, 'utf8', (err, xibleServiceContents) => {
+        fs.readFile(`${__dirname}/../xible.service`, 'utf8', (err, xibleServiceContents) => {
           if (err) {
             reject(`Failed to install service: ${err}`);
             return;
@@ -397,7 +397,7 @@ const cli = {
             reject(`Failed to enable service: ${err}`);
             return;
           }
-          log('Service enabled. Xible will now automatically start at boot.');
+          log('Service enabled. XIBLE will now automatically start at boot.');
           resolve();
         });
       }));
