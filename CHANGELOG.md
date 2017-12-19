@@ -5,7 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Fixed
+-   `xible service install` is working again. ([#43](https://github.com/SpectrumBroad/xible/issues/43))
+
+-   `npm start` from the XIBLE directory is working again.
+
+-   Navigating the settings page properly uses async requests again instead of reloading the entire page.
 
 ## [0.9.0][]
 ### Added
