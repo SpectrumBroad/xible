@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.9.1][]
 ### Fixed
 -   `xible service install` is working again. ([#43](https://github.com/SpectrumBroad/xible/issues/43))
 
@@ -125,7 +128,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/SpectrumBroad/xible/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/SpectrumBroad/xible/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/SpectrumBroad/xible/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/SpectrumBroad/xible/compare/v0.6.0...v0.7.0
