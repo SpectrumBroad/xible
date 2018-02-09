@@ -134,8 +134,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         // if a flow doesn't exist anymore, remove it from the statuses
         if (!flows[flowId]) {
           delete statuses[flowId];
-        } else if (statuses[flowId]) {
-          flows[flowId].forceStart()
+        } else if (statuses[flowId].running) {
+          flows[flowId].forceStart(statuses[flowId].params)
           .catch((err) => {
             flowDebug(`failed to start "${flowId}": ${err}`);
           });
@@ -419,10 +419,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           resolve(this);
         });
 
-        // update status file
-        const statuses = Flow.getStatuses();
-        delete statuses[this._id];
-        Flow.saveStatuses(statuses);
+        // update status
+        this.saveStatus(false);
 
         // remove from Xible instance
         if (XIBLE) {
@@ -536,10 +534,25 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Saves the status (running or not) for this flow by calling Flow.saveStatuses().
     * @param {Boolean} running Status of the flow.
+    * @param {Object} params Set of provided parameters for the flow.
     */
-    saveStatus(running) {
+    saveStatus(running, params) {
       const statuses = Flow.getStatuses();
-      statuses[this._id] = !!running;
+
+      if (!running) {
+        delete statuses[this._id];
+      } else {
+        const status = {
+          running: true
+        };
+
+        if (params) {
+          status.params = params;
+        }
+
+        statuses[this._id] = status;
+      }
+
       Flow.saveStatuses(statuses);
     }
 
@@ -897,7 +910,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
           // save the status
           if (!directNodes) {
-            this.saveStatus(true);
+            this.saveStatus(true, params);
             this.directed = false;
           } else {
             this.directed = true;
