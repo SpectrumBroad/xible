@@ -110,7 +110,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
 
         function checkAndResolve() {
-          if (++loadedCounter === files.length) {
+          if (++loadedCounter === files.length) { // eslint-disable-line
             resolve(structures);
           }
         }
@@ -807,7 +807,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             }
 
             // all done
-            if (++callbacksReceived === connLength) {
+            if (++callbacksReceived === connLength) {  // eslint-disable-line
               resolve(values);
             }
           });

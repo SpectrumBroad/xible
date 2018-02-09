@@ -82,7 +82,6 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
   * Config class
   */
   class Config {
-
     /**
     * Validates if writing to the config file is possible/allowed
     * @returns {Promise} true or false
@@ -113,7 +112,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
       for (let i = 0; i < pathSplit.length - 1; i += 1) {
         const part = pathSplit[i];
-        if (sel.hasOwnProperty(part)) {
+        if (sel.hasOwnProperty(part)) { // eslint-disable-line
           sel = sel[part];
         } else {
           return false;
@@ -153,7 +152,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
       for (let i = 0; i < pathSplit.length - 1; i += 1) {
         const part = pathSplit[i];
-        if (sel.hasOwnProperty(part)) {
+        if (sel.hasOwnProperty(part)) { // eslint-disable-line
           sel = sel[part];
         } else {
           sel = sel[part] = {};
@@ -181,7 +180,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
       for (let i = 0; i < pathSplit.length; i += 1) {
         const part = pathSplit[i];
-        if (sel.hasOwnProperty(part)) {
+        if (sel.hasOwnProperty(part)) { // eslint-disable-line
           sel = sel[part];
         } else {
           return null;
@@ -194,7 +193,6 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
     static getAll() {
       return config;
     }
-
   }
 
   // statically hook eventemitter

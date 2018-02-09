@@ -35,7 +35,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
      * Fetches a nodePack by the given name,
-     * @param {String} name 
+     * @param {String} name
      * @returns {Promise.<NodePack|null>}
      */
     static async getByName(name) {

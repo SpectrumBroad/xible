@@ -115,7 +115,6 @@ module.exports = (XIBLE) => {
         });
       });
     }
-
   }
 
   return {
