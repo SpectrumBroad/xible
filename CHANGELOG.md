@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Added the `xible.flow.param` node including applicable command line and REST API options. These allow parameters to be send when starting a flow. ([#45](https://github.com/SpectrumBroad/xible/issues/45))
 
+### Fixed
+-   Configuring SSL now redirects plain HTTP requests to the configured SSL port, instead of `plain HTTP port + 1`.
+
 ## [0.9.1][]
 ### Fixed
 -   `xible service install` is working again. ([#43](https://github.com/SpectrumBroad/xible/issues/43))
