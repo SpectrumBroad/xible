@@ -45,6 +45,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.state = Flow.STATE_STOPPED;
       this.initLevel = initLevel;
       this.timing = {};
+      this.params = {};
     }
 
     static get INITLEVEL_NONE() {
@@ -549,7 +550,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     direct(nodes) {
       if (!XIBLE.child) {
         if (this.state !== Flow.STATE_STARTED || !this.directed) {
-          return this.forceStart(nodes);
+          return this.forceStart(null, nodes);
         }
 
         this.worker.send({
@@ -600,11 +601,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Starts a flow. Stops the flow first if it is already started.
     * If the flow is already starting, the returned promise resolves when it has finished starting.
+    * @param {Object} params
     * @param {Node[]} directNodes nodes to direct
     * @return {Promise}
     */
-    forceStart(directNodes) {
-      const startFlow = () => this.start(directNodes);
+    forceStart(params, directNodes) {
+      const startFlow = () => this.start(params, directNodes);
 
       switch (this.state) {
         case Flow.STATE_INITIALIZING:
@@ -637,13 +639,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               ) {
                 resolve(this);
               }
-              resolve(this.forceStart(directNodes));
+              resolve(this.forceStart(params, directNodes));
             });
           });
 
         case Flow.STATE_STARTED:
           return this.stop()
-          .then(() => this.forceStart(directNodes));
+          .then(() => this.forceStart(params, directNodes));
 
         case Flow.STATE_STARTING:
           return new Promise((resolve) => {
@@ -863,12 +865,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Starts a flow. Rejects if flow is not stopped
     * Note that the behaviour is different when called from a worker process
-    * @param  {Node[]} directNodes  nodes to direct
+    * @param {Object} params
+    * @param {Node[]} directNodes nodes to direct
     * @fires Node#trigger
     * @fires Node#init
     * @return {Promise}
     */
-    start(directNodes) {
+    start(params, directNodes) {
       if (!this.runnable) {
         return Promise.reject('not runnable');
       }
@@ -916,7 +919,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             this.worker.send({
               method: 'start',
-              directNodes
+              directNodes,
+              params
             });
           }
         });
@@ -924,6 +928,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       flowDebug('starting flow from worker');
 
+      this.params = params || {};
       const flowState = new FlowState();
 
       process.nextTick(() => {

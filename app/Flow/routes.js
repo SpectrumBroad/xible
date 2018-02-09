@@ -71,16 +71,14 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
 
   // start an existing flow
-  EXPRESS_APP.patch('/api/flows/:flowId/start', (req, res) => {
-    req.locals.flow
-    .forceStart()
-    .then(() => {
+  EXPRESS_APP.patch('/api/flows/:flowId/start', async (req, res) => {
+    try {
+      await req.locals.flow.forceStart(req.body.params);
       res.end();
-    })
-    .catch((err) => {
+    } catch (err) {
       console.error(err);
       res.status(500).end();
-    });
+    }
   });
 
 

@@ -5,7 +5,6 @@ const debug = require('debug')('xible:cliqueue');
 
 module.exports = (XIBLE) => {
   class CliQueue {
-
     /**
     * Inits and manages the queue file for remote CLI commands.
     */
@@ -65,7 +64,7 @@ module.exports = (XIBLE) => {
                   // handle the actual method
                   switch (obj.method) {
                     case 'flow.start':
-                      flow.forceStart();
+                      flow.forceStart(obj.params);
                       break;
                     case 'flow.stop':
                       flow.forceStop();

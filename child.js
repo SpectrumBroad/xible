@@ -110,7 +110,7 @@ process.on('message', (message) => {
       if (message.directNodes) {
         startPromise = flow.direct(message.directNodes);
       } else {
-        startPromise = flow.start();
+        startPromise = flow.start(message.params);
       }
 
       startPromise

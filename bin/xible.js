@@ -32,7 +32,8 @@ const knownOpts = {
   user: String,
   group: String,
   force: Boolean,
-  'node-id': String
+  'node-id': String,
+  params: Array
 };
 const shortHands = {
   c: '--config',
@@ -134,9 +135,30 @@ function getFlowById(flowId) {
   return xible.getFlowById(flowId);
 }
 
+/**
+* Parses the contents of nopt.params into an array with all parameters
+* Returns null no params argument is provided on the commandline.
+* @returns {String[]|null}
+*/
+function parseParams() {
+  if (!opts.params) {
+    return null;
+  }
+
+  const params = {};
+  opts.params.join(',').split(',').forEach((param) => {
+    const paramEqualsIndex = param.indexOf('=');
+    if (paramEqualsIndex > -1) {
+      const paramName = param.substring(0, paramEqualsIndex);
+      const paramValue = param.substring(paramEqualsIndex + 1);
+      params[paramName] = paramValue;
+    }
+  });
+  return params;
+}
+
 // cli contexts and commands
 const cli = {
-
   flow: {
     async start(flowName) {
       const flow = getFlowById(flowName);
@@ -146,7 +168,8 @@ const cli = {
 
       return xible.CliQueue.add({
         method: 'flow.start',
-        flowName
+        flowName,
+        params: parseParams()
       });
     },
     async stop(flowName) {
@@ -268,7 +291,7 @@ const cli = {
       }
 
       if (!arg) {
-        throw 'Please specify what to delete.';
+        throw 'Please specify what to get.';
       }
 
       // find out where nodeId resides
