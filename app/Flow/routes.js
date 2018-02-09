@@ -24,9 +24,8 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     res.json(returnFlows);
   });
 
-
   // create a new flow
-  EXPRESS_APP.post('/api/flows', (req, res) => {
+  EXPRESS_APP.post('/api/flows', async (req, res) => {
     if (!req.body || !req.body._id) {
       res.status(400).end();
       return;
@@ -34,13 +33,12 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
     const flow = new FLOW();
     flow.initJson(req.body, true);
-    flow.save();
+    await flow.save();
 
     res.json({
       _id: flow._id
     });
   });
-
 
   // get a flow by a given id
   EXPRESS_APP.param('flowId', (req, res, next, id) => {
@@ -55,20 +53,16 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     next();
   });
 
-
   // stop an existing flow
-  EXPRESS_APP.patch('/api/flows/:flowId/stop', (req, res) => {
-    req.locals.flow
-    .forceStop()
-    .then(() => {
+  EXPRESS_APP.patch('/api/flows/:flowId/stop', async (req, res) => {
+    try {
+      await req.locals.flow.forceStop();
       res.end();
-    })
-    .catch((err) => {
+    } catch (err) {
       console.error(err);
       res.status(500).end();
-    });
+    }
   });
-
 
   // start an existing flow
   EXPRESS_APP.patch('/api/flows/:flowId/start', async (req, res) => {
@@ -81,13 +75,11 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     }
   });
 
-
   // run part of a flow directly
   EXPRESS_APP.patch('/api/flows/:flowId/direct', (req, res) => {
     req.locals.flow.direct(req.body);
     res.end();
   });
-
 
   // run part of a flow directly
   EXPRESS_APP.patch('/api/flows/:flowId/undirect', (req, res) => {
@@ -97,7 +89,6 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     // output the flow id
     res.end();
   });
-
 
   // get an existing flow
   EXPRESS_APP.get('/api/flows/:flowId', (req, res) => {
@@ -117,42 +108,33 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     res.json(returnFlow);
   });
 
-
   // update an existing flow
-  EXPRESS_APP.put('/api/flows/:flowId', (req, res) => {
+  EXPRESS_APP.put('/api/flows/:flowId', async (req, res) => {
     if (!req.body) {
       res.status(400).end();
       return;
     }
 
     const flow = req.locals.flow;
-    flow
-    .forceStop()
-    .then(() => {
-      // init the newly provided json over the existing flow
-      flow.initJson(req.body, true);
+    await flow.forceStop();
 
-      // save it to file
-      flow
-      .save()
-      .then(() => {
-        // output the flow id
-        res.json({
-          _id: flow._id
-        });
-      });
+    // init the newly provided json over the existing flow
+    flow.initJson(req.body, true);
+
+    // save it to file
+    await flow.save();
+
+    // output the flow id
+    res.json({
+      _id: flow._id
     });
   });
 
-
   // delete an existing flow
-  EXPRESS_APP.delete('/api/flows/:flowId', (req, res) => {
+  EXPRESS_APP.delete('/api/flows/:flowId', async (req, res) => {
     const flow = req.locals.flow;
-    flow
-    .forceStop()
-    .then(() => flow.delete())
-    .then(() => {
-      res.end();
-    });
+    await flow.forceStop();
+    await flow.delete();
+    res.end();
   });
 };
