@@ -14,6 +14,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       if (obj) {
         Object.assign(this, obj);
       }
+
+      if (!this.extends) {
+        this.extends = 'object';
+    }
     }
 
     static getAll() {
