@@ -58,7 +58,6 @@ const editorView = (EL) => {
   `;
 
   const xibleEditor = new XibleEditor(xibleWrapper);
-  const connectionLost = document.getElementById('connectionLost');
   const permissionsValidate = document.getElementById('validateWritePermissions');
 
   // validate if the flows can be altered
@@ -744,25 +743,9 @@ const editorView = (EL) => {
   if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
     loadFlows();
     loadTypeDefStyles();
-  } else {
-    connectionLost.classList.remove('hidden');
   }
 
   xibleWrapper.on('open', () => {
-    connectionLost.innerHTML = 'Connection re-established';
-    connectionLost.classList.remove('alert');
-    connectionLost.classList.add('success');
-
-    connectionLost.addEventListener('animationiteration', () => {
-      // ensure the connection is indeed still open
-      // by the time we want to remove the connectionLost message
-      if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
-        connectionLost.classList.add('hidden');
-      }
-    }, {
-      once: true
-    });
-
     // reload the flows
     loadFlows();
 
@@ -775,10 +758,6 @@ const editorView = (EL) => {
 
   // clear all flow statuses when connection closes
   xibleWrapper.on('close', () => {
-    connectionLost.innerHTML = 'Connection lost';
-    connectionLost.classList.add('alert');
-    connectionLost.classList.remove('hidden', 'success');
-
     Array.from(flowListUl.querySelectorAll('li'))
     .forEach((li) => {
       li.classList.remove('started', 'starting', 'stopping', 'direct');

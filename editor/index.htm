@@ -60,6 +60,43 @@
 		});
 		xibleWrapper.autoReconnect();
 		xibleWrapper.connect();
+
+    xibleWrapper.on('open', () => {
+      const connectionLost = document.getElementById('connectionLost');
+      if (!connectionLost) {
+        return;
+      }
+
+      connectionLost.innerHTML = 'Connection re-established';
+      connectionLost.classList.remove('alert');
+      connectionLost.classList.add('success');
+
+      connectionLost.addEventListener('animationiteration', () => {
+        // ensure the connection is indeed still open
+        // by the time we want to remove the connectionLost message
+        if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+          connectionLost.classList.add('hidden');
+        }
+      }, {
+        once: true
+      });
+    });
+
+    xibleWrapper.on('close', () => {
+      const connectionLost = document.getElementById('connectionLost');
+      if (!connectionLost) {
+        return;
+      }
+
+      connectionLost.innerHTML = 'Connection lost';
+      connectionLost.classList.add('alert');
+      connectionLost.classList.remove('hidden', 'success');
+    });
+
+    const connectionLost = document.getElementById('connectionLost');
+    if (connectionLost && xibleWrapper.readyState !== XibleWrapper.STATE_OPEN) {
+      connectionLost.classList.remove('hidden');
+    }
 	</script>
 
 	<!-- editor related js files -->

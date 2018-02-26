@@ -4,6 +4,9 @@ View.routes['/settings'] = (EL) => {
   EL.innerHTML = `
     <div id="sub">
       <header>XIBLE</header>
+      <p id="connectionLost" class="status loading alert hidden">
+        Connection lost
+      </p>
       <p id="validateWritePermissions" class="status loading">Validating write permissions</p>
       <section>
         <h1>General</h1>
