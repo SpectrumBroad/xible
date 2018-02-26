@@ -390,6 +390,19 @@ const cli = {
         });
       });
     },
+    restart() {
+      return new Promise((resolve, reject) => {
+        const exec = require('child_process').exec;
+        exec('systemctl restart xible.service', (err) => {
+          if (err) {
+            reject(`Failed to restart service: ${err}`);
+            return;
+          }
+          log('Service restarted.');
+          resolve();
+        });
+      });
+    },
     status() {
       return new Promise((resolve) => {
         const exec = require('child_process').exec;
