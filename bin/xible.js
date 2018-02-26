@@ -135,28 +135,6 @@ function getFlowById(flowId) {
   return xible.getFlowById(flowId);
 }
 
-/**
-* Parses the contents of nopt.params into an array with all parameters
-* Returns null no params argument is provided on the commandline.
-* @returns {String[]|null}
-*/
-function parseParams() {
-  if (!opts.params) {
-    return null;
-  }
-
-  const params = {};
-  opts.params.join(',').split(',').forEach((param) => {
-    const paramEqualsIndex = param.indexOf('=');
-    if (paramEqualsIndex > -1) {
-      const paramName = param.substring(0, paramEqualsIndex);
-      const paramValue = param.substring(paramEqualsIndex + 1);
-      params[paramName] = paramValue;
-    }
-  });
-  return params;
-}
-
 // cli contexts and commands
 const cli = {
   flow: {
@@ -166,10 +144,20 @@ const cli = {
         throw `Flow "${flowName}" does not exist`;
       }
 
+      let params;
+      if (opts.params) {
+        try {
+          params = JSON.parse(opts.params);
+        } catch (err) {
+          return Promise.reject('The provided parameters are not valid JSON');
+        }
+      }
+
+
       return xible.CliQueue.add({
         method: 'flow.start',
         flowName,
-        params: parseParams()
+        params
       });
     },
     async stop(flowName) {
