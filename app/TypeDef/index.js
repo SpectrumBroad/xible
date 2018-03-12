@@ -33,6 +33,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         typeDef = new TypeDef(typeDef);
       }
       typeDefs[typeDef.name] = typeDef;
+      return typeDef;
     }
 
     static toJSON() {
