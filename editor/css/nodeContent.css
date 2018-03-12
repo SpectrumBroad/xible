@@ -1,4 +1,6 @@
-input, button, select {
+input,
+button,
+select {
 	box-sizing: border-box;
 	border: 2px solid #3E3E3E;
 	display: block;
@@ -184,9 +186,8 @@ input[type="checkbox"] {
 
 input[type="checkbox"]~span {
 	cursor: pointer;
-	vertical-align: bottom;
 	box-sizing: border-box;
-	display: inline-block;
+	display: block;
 	background-color: #3E3E3E;
 	border: 2px solid #3E3E3E;
 	width: 40px;
@@ -194,8 +195,6 @@ input[type="checkbox"]~span {
 	position: relative;
 	border-radius: 6px;
 	float: right;
-	top: 0;
-	right: 0;
 	opacity: 1;
 	background-image: none;
 	box-shadow: none;
@@ -240,7 +239,8 @@ button, input[type="button"] {
 	text-align: left;
 }
 
-button:hover, input[type="button"]:hover, button:focus, input[type="button"]:focus {
+button:hover, input[type="button"]:hover,
+button:focus, input[type="button"]:focus {
 	outline: none;
 	background-color: #5b7cb3;
 }
@@ -284,7 +284,9 @@ input[type=range]::-webkit-slider-thumb {
 	margin-top: -9px;
 }
 
-.xible .node.fail>.content input, .xible .node.fail>button, .node.fail>.content select {
+.xible .node.fail>.content input,
+.xible .node.fail>button,
+.node.fail>.content select {
 	border: 2px solid #f00;
 	background-color: rgba(255, 0, 0, 0.3);
 }
@@ -311,7 +313,8 @@ selectcontainer::after {
 	pointer-events: none;
 }
 
-input:focus, .node>.content select:focus {
+input:focus,
+.node>.content select:focus {
 	outline: none;
 	border: 2px solid #45679E;
 	-webkit-user-select: text;
