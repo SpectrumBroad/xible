@@ -17,7 +17,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       if (!this.extends && this.name !== 'object') {
         this.extends = 'object';
-    }
+      }
     }
 
     static getAll() {
@@ -42,7 +42,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   }
 
   if (EXPRESS_APP) {
-    require('./routes.js')(typeDefs, XIBLE, EXPRESS_APP);
+    require('./routes.js')(TypeDef, XIBLE, EXPRESS_APP);
   }
 
   return {
