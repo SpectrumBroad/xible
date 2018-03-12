@@ -230,15 +230,20 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Initializes all nodes and typedefs found in a certain path, recursively,
     * by running getStructures() on that path, and hosting editor contents if applicable.
+     * Throws when run from a worker.
     * @param {String} nodePath Path to the directory containting the nodes.
     * If the directory does not exist, it will be created.
     * @returns {Promise.<Object>}
     * @private
     */
-    static initFromPath(nodePath) {
+    static async initFromPath(nodePath) {
+      if (XIBLE.child) {
+        throw new Error('Cannot call Node.initFromPath() from worker');
+      }
+
       nodeDebug(`init nodes from "${nodePath}"`);
 
-      // check that nodePath exists
+      // Check that nodePath exists. Try to create the path if it does not exist.
       if (!fs.existsSync(nodePath)) {
         nodeDebug(`creating "${nodePath}"`);
 
@@ -247,38 +252,69 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         } catch (err) {
           nodeDebug(`creation of "${nodePath}" failed: `, err);
         }
-        return Promise.resolve({});
+        return {};
       }
 
       if (!XIBLE.child && !express) {
         express = require('express');
       }
 
-      return this.getStructures(nodePath)
-      .then((structures) => {
-        // store the nodes
+      const structures = await this.getStructures(nodePath);
+
+      // Store the typedefs.
+      for (const typeDefName in structures.typedefs) {
+        structures.typedefs[typeDefName].name = typeDefName;
+        XIBLE.TypeDef.add(structures.typedefs[typeDefName]);
+      }
+
+      /* Store the nodes.
+       * The nodes are not constructed, only the plain object is stored here.
+       * FlowInstances will construct the necessary nodes when that flowInstance is started.
+       * Editor details are hosted here.
+       */
         for (const nodeName in structures.nodes) {
           const structure = structures.nodes[nodeName];
+
+        // Create default typeDefs for unknown input types.
+        if (structure.inputs) {
+          for (const inputName in structure.inputs) {
+            const input = structure.inputs[inputName];
+            if (typeof input.type === 'string' && input.type !== 'trigger' && !structures.typedefs[input.type]) {
+              // nodeDebug(`creating default typedef for "${input.type}"`);
+              structures.typedefs[input.type] = { name: input.type };
+              XIBLE.TypeDef.add(structures.typedefs[input.type]);
+              break;
+            }
+          }
+        }
+
+        // Create default typeDefs for unknown output types.
+        if (structure.outputs) {
+          for (const outputName in structure.outputs) {
+            const output = structure.outputs[outputName];
+            if (typeof output.type === 'string' && output.type !== 'trigger' && !structures.typedefs[output.type]) {
+              // nodeDebug(`creating default typedef for "${output.type}"`);
+              structures.typedefs[output.type] = { name: output.type };
+              XIBLE.TypeDef.add(structures.typedefs[output.type]);
+              break;
+            }
+          }
+        }
+
           XIBLE.addNode(structure);
 
-          // host editor contents if applicable
-          if (structure.editorContentPath && !XIBLE.child) {
+        // Host editor contents if applicable
+        if (structure.editorContentPath) {
             structure.hostsEditorContent = true;
 
-            nodeDebug(`hosting "/api/nodes/${nodeName}/editor"`);
+          // nodeDebug(`hosting "/api/nodes/${nodeName}/editor"`);
             EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, express.static(structure.editorContentPath, {
               index: false
             }));
           }
         }
 
-        // store the typedefs
-        for (const typeDefName in structures.typedefs) {
-          structures.typedefs[typeDefName].name = typeDefName;
-          XIBLE.TypeDef.add(structures.typedefs[typeDefName]);
-        }
         return structures;
-      });
     }
 
     /**
