@@ -660,8 +660,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.name = null;
       this.type = null;
       this.singleType = false;
-      this.assignsOutputType = null;
-      this.assignsInputType = null;
+      this.assignsOutputTypes = null;
+      this.assignsInputTypes = null;
       this.maxConnectors = null;
       this.node = null;
       this.description = null;
@@ -680,11 +680,25 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
 
         if (typeof obj.assignsOutputType === 'string') {
-          this.assignsOutputType = obj.assignsOutputType;
+          this.assignsOutputTypes = [obj.assignsOutputType];
+        }
+
+        if (
+          Array.isArray(obj.assignsOutputTypes) &&
+          obj.assignsOutputTypes.every(assignsOutputType => typeof assignsOutputType === 'string')
+        ) {
+          this.assignsOutputTypes = obj.assignsOutputTypes;
         }
 
         if (typeof obj.assignsInputType === 'string') {
-          this.assignsInputType = obj.assignsInputType;
+          this.assignsInputTypes = [obj.assignsInputType];
+        }
+
+        if (
+          Array.isArray(obj.assignsInputTypes) &&
+          obj.assignsInputTypes.every(assignsInputType => typeof assignsInputType === 'string')
+        ) {
+          this.assignsInputTypes = obj.assignsInputTypes;
         }
 
         if (typeof obj.maxConnectors === 'number') {
@@ -751,6 +765,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * @extends NodeIo
   */
   class NodeInput extends NodeIo {
+    constructor(...args) {
+      super(...args);
+
+      if (!this.type) {
+        this.type = 'object';
+      }
+    }
+
     /**
     * Fetches all input values for this input.
     * @param {FlowState} state The flowstate at the time of calling.
@@ -785,6 +807,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         let callbacksReceived = 0;
         for (let i = 0; i < connLength; i += 1) {
           const conn = conns[i];
+
+          /* Ignore any outputs that have no type,
+           * since we cannot guarantee that the type matches this input.
+           */
+          if (!conn.origin.type) {
+            continue;
+          }
+
           let calledBack = false;
 
           conn.origin.node.emit('triggerStartTime', 'output');

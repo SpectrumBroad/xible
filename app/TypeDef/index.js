@@ -15,7 +15,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         Object.assign(this, obj);
       }
 
-      if (!this.extends) {
+      if (!this.extends && this.name !== 'object') {
         this.extends = 'object';
     }
     }
