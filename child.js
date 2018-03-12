@@ -3,6 +3,7 @@
 const Xible = require('./index.js');
 
 let flow;
+let flowInstance;
 let xible;
 
 /**
@@ -22,10 +23,8 @@ function requireNode(nodePath) {
         method: 'stop',
         error: err
       });
-    }
-
-    if (flow) {
-      flow.stop();
+    } else if (flowInstance) {
+      flowInstance.stop();
     }
 
     return null;
@@ -40,10 +39,8 @@ process.on('unhandledRejection', (reason) => {
       method: 'stop',
       error: reason
     });
-  }
-
-  if (flow) {
-    flow.stop();
+  } else if (flowInstance) {
+    flowInstance.stop();
   }
 });
 
@@ -106,11 +103,17 @@ process.on('message', (message) => {
     }
 
     case 'start': {
+      flowInstance = flow.createInstance({
+        params: message.params,
+        directNodes: message.directNodes
+      });
+      flowInstance._id = message.flowInstanceId;
+
       let startPromise;
       if (message.directNodes) {
-        startPromise = flow.direct(message.directNodes);
+        startPromise = flowInstance.direct(message.directNodes);
       } else {
-        startPromise = flow.start(message.params);
+        startPromise = flowInstance.start();
       }
 
       startPromise
@@ -132,8 +135,8 @@ process.on('message', (message) => {
           });
         }
 
-        if (flow) {
-          flow.stop();
+        if (flowInstance) {
+          flowInstance.stop();
         }
       });
 
@@ -141,16 +144,16 @@ process.on('message', (message) => {
     }
 
     case 'stop': {
-      if (flow) {
-        flow.stop();
+      if (flowInstance) {
+        flowInstance.stop();
       }
 
       break;
     }
 
     case 'directNodes': {
-      if (flow) {
-        flow.direct(message.directNodes);
+      if (flowInstance) {
+        flowInstance.direct(message.directNodes);
       }
 
       break;

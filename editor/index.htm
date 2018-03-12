@@ -2,63 +2,57 @@
 <html lang="EN">
 
 <head>
+  <title>XIBLE</title>
 
-	<title>XIBLE</title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
 
-	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
+  <base href="/">
 
-	<base href="/">
+  <link rel="stylesheet" href="css/index.css" type="text/css" />
+  <link rel="stylesheet" href="css/main.css" type="text/css" />
+  <link rel="stylesheet" href="css/form.css" type="text/css" />
+  <link rel="stylesheet" href="css/sub.css" type="text/css" />
+  <link rel="stylesheet" href="css/flows.css" type="text/css" />
 
-	<link rel="stylesheet" href="css/index.css" type="text/css" />
-	<link rel="stylesheet" href="css/main.css" type="text/css" />
-	<link rel="stylesheet" href="css/form.css" type="text/css" />
-	<link rel="stylesheet" href="css/sub.css" type="text/css" />
+  <!-- editor related css files -->
+  <link rel="stylesheet" href="css/editor.css" type="text/css" />
+  <link rel="stylesheet" href="css/describe.css" type="text/css" />
+  <link rel="stylesheet" href="css/flowTabs.css" type="text/css" />
+  <link rel="stylesheet" href="css/nodeSelector.css" type="text/css" />
 
-	<!-- editor related css files -->
-	<link rel="stylesheet" href="css/editor.css" type="text/css" />
-	<link rel="stylesheet" href="css/describe.css" type="text/css" />
-	<link rel="stylesheet" href="css/flowTabs.css" type="text/css" />
-	<link rel="stylesheet" href="css/nodeSelector.css" type="text/css" />
+  <!-- settings related css files -->
+  <link rel="stylesheet" href="css/settings.css" type="text/css" />
 
-	<!-- settings related css files -->
-	<link rel="stylesheet" href="css/settings.css" type="text/css" />
-
-	<script src="js/EventEmitter.min.js"></script>
-	<script src="js/xibleWrapper.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/view.js"></script>
-
+  <script src="js/EventEmitter.min.js"></script>
+  <script src="js/xibleWrapper.js"></script>
+  <script src="js/Chart.min.js"></script>
+  <script src="js/view.js"></script>
 </head>
 
 <body>
-
-	<nav>
-
-		<ul>
-
-			<!--			<li><a href="/flows" onclick="mainViewHolder.navigate('/flows'); return false;"><span>&#xe059;</span>Flows</a></li> -->
-			<!--			<li><a href="/nodes" onclick="mainViewHolder.navigate('/nodes'); return false;"><span>&#xe044;</span>Nodes</a></li> -->
+  <nav>
+    <ul>
+      <!--			<li><a href="/nodes" onclick="mainViewHolder.navigate('/nodes'); return false;"><span>&#xe044;</span>Nodes</a></li> -->
       <li id="navSettings"><a href="/settings" onclick="mainViewHolder.navigate('/settings'); return false;"><span>S</span>Settings</a></li>
-			<li class="editor"><a href="/editor" onclick="mainViewHolder.navigate('/editor'); return false;"><span>&#xe029;</span>Editor</a></li>
-			<li><a href="https://xible.io/docs" target="_blank" rel="noopener"><span>(</span>Docs</a></li>
+      <li><a href="/flows" onclick="mainViewHolder.navigate('/flows'); return false;"><span>&#xe059;</span>Flows</a></li>
+      <li class="editor"><a href="/editor" onclick="mainViewHolder.navigate('/editor'); return false;"><span>&#xe029;</span>Editor</a></li>
+      <li><a href="https://xible.io/docs" target="_blank" rel="noopener"><span>(</span>Docs</a></li>
+    </ul>
+  </nav>
 
-		</ul>
+  <main id="main">
+  </main>
 
-	</nav>
-
-	<main id="main">
-	</main>
-
-	<script>
-		let locationPort = window.location.port || '';
-		if(locationPort) {
-			locationPort = `:${locationPort}`;
-		}
-		xibleWrapper = new XibleWrapper(`${window.location.protocol}//${window.location.hostname}${locationPort}`);
-		xibleWrapper.on('error', (err) => {
-			console.log(err);
-		});
-
+  <script>
+    let locationPort = window.location.port || '';
+    if(locationPort) {
+      locationPort = `:${locationPort}`;
+    }
+    xibleWrapper = new XibleWrapper(`${window.location.protocol}//${window.location.hostname}${locationPort}`);
+    xibleWrapper.on('error', (err) => {
+      console.log(err);
+    });
+  
     xibleWrapper.on('open', () => {
       xibleWrapper.Config.getValue('editor.settings.visible')
       .then((settingsVisible) => {
@@ -100,40 +94,41 @@
       connectionLost.classList.remove('hidden', 'success');
     });
 
+    xibleWrapper.autoReconnect();
+    xibleWrapper.connect();
+
     const connectionLost = document.getElementById('connectionLost');
     if (connectionLost && xibleWrapper.readyState !== XibleWrapper.STATE_OPEN) {
       connectionLost.classList.remove('hidden');
     }
-	</script>
+  </script>
 
-	<!-- editor related js files -->
-	<script src="js/xibleEditorNode.js"></script>
-	<script src="js/xibleEditorFlow.js"></script>
-	<script src="js/xibleEditorConnector.js"></script>
-	<script src="js/xibleEditor.js"></script>
-	<script src="js/xibleEditorNodeSelector.js"></script>
+  <!-- editor related js files -->
+  <script src="js/xibleEditorNode.js"></script>
+  <script src="js/xibleEditorFlow.js"></script>
+  <script src="js/xibleEditorConnector.js"></script>
+  <script src="js/xibleEditor.js"></script>
+  <script src="js/xibleEditorNodeSelector.js"></script>
 
-	<script>
-		mainViewHolder = new ViewHolder(document.getElementById('main'));
-		mainViewHolder.on('render', (view) => {
+  <script>
+    mainViewHolder = new ViewHolder(document.getElementById('main'));
+    mainViewHolder.on('render', (view) => {
+      //unselect all buttons from lhs
+      Array.from(document.querySelectorAll(`body>nav a`))
+      .forEach((a) => a.classList.remove('view'));
 
-			//unselect all buttons from lhs
-			Array.from(document.querySelectorAll(`body>nav a`))
-				.forEach((a) => a.classList.remove('view'));
-
-			//select the button from lhs
-			let a = document.querySelector(`body>nav a[href="${view.name}"]`);
-			if (!a) {
-				return;
-			}
-			a.classList.add('view');
-
-		});
-		mainViewHolder.hookNavHandler();
-		mainViewHolder.loadNav().catch(() => {
-			mainViewHolder.navigate('/welcome');
-		});
-	</script>
+      //select the button from lhs
+      let a = document.querySelector(`body>nav a[href="${view.name}"]`);
+      if (!a) {
+        return;
+      }
+      a.classList.add('view');
+    });
+    mainViewHolder.hookNavHandler();
+    mainViewHolder.loadNav().catch(() => {
+      mainViewHolder.navigate('/welcome');
+    });
+  </script>
 
 </body>
 

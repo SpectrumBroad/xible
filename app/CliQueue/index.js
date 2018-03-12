@@ -64,14 +64,13 @@ module.exports = (XIBLE) => {
                   // handle the actual method
                   switch (obj.method) {
                     case 'flow.start':
-                      flow.forceStart(obj.params);
+                      flow.createInstance({ params: obj.params }).forceStart();
                       break;
                     case 'flow.stop':
-                      flow.forceStop();
+                      flow.stopAllInstances();
                       break;
                     case 'flow.delete':
-                      flow.forceStop()
-                      .then(() => flow.delete());
+                      flow.delete();
                       break;
                     default:
                       debug(`Unhandled method "${obj.method}"`);

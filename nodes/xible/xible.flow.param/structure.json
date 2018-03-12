@@ -4,7 +4,6 @@
   "description": "Returns the value for a provided parameter to this flow.",
   "inputs": {
     "default": {
-      "type": null,
       "description": "Specifies the default value to return when the parameter itself is not provided.",
       "maxConnectors": 1
     }

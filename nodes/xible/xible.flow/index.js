@@ -1,50 +1,12 @@
 'use strict';
 
-function getFlow(flowId, callback) {
-  let messageHandler = (message) => {
-    if (message.flowId !== flowId || message.method !== 'returnFlow') {
-      return;
-    }
-    process.removeListener('message', messageHandler);
-    messageHandler = null;
-
-    callback(message.flow);
-  };
-
-  process.on('message', messageHandler);
-
-  process.send({
-    method: 'getFlowById',
-    flowId
-  });
-}
+const getFlow = require('../utils.js').getFlow;
 
 module.exports = (NODE) => {
   const flowOut = NODE.getOutputByName('flow');
-  flowOut.on('trigger', (conn, state, callback) => {
+  flowOut.on('trigger', async (conn, state, callback) => {
     const flowId = NODE.data.flowName || NODE.flow.name;
-    getFlow(flowId, callback);
-  });
-
-  const stateOut = NODE.getOutputByName('state');
-  stateOut.on('trigger', (conn, satte, callback) => {
-    const flowId = NODE.data.flowName || NODE.flow.name;
-    getFlow(flowId, (flow) => {
-      if (!flow) {
-        return;
-      }
-      callback(flow.state);
-    });
-  });
-
-  const timingOut = NODE.getOutputByName('timing');
-  timingOut.on('trigger', (conn, state, callback) => {
-    const flowId = NODE.data.flowName || NODE.flow.name;
-    getFlow(flowId, (flow) => {
-      if (!flow) {
-        return;
-      }
-      callback(flow.timing);
-    });
+    const flow = await getFlow(flowId);
+    callback(flow);
   });
 };

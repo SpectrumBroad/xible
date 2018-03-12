@@ -90,6 +90,24 @@
 	flex-wrap: wrap;
 }
 
+#sub form {
+	padding: 6px 10px;
+}
+
+#sub input {
+	font-size: 1.2em;
+}
+
+#sub dl {
+ margin: 0;
+ padding: 0;
+}
+
+#sub dt, #sub dd {
+	padding: 6px 10px;
+	margin-left: 0;
+}
+
 .buttons button {
 	box-sizing: border-box;
 	-webkit-appearance: none;

@@ -1,62 +1,77 @@
 'use strict';
 
+const getFlowInstance = require('../utils.js').getFlowInstance;
+
 module.exports = (NODE) => {
   const triggerIn = NODE.getInputByName('trigger');
-  const flowIn = NODE.getInputByName('flow');
+  const flowsIn = NODE.getInputByName('flows');
   const doneOut = NODE.getOutputByName('done');
+  const instanceOut = NODE.getOutputByName('instance');
 
-  triggerIn.on('trigger', (conn, state) => {
-    flowIn.getValues(state).then((flows) => {
-      let flowIds = flows.filter(flow => !!flow).map(flow => flow._id);
-      if (!flowIds.length) {
-        flowIds = [NODE.data.flowName || NODE.flow._id];
-      }
-      const flowIdCount = flowIds.length;
-      let doneCount = 0;
-      if (!flowIds.length) {
+  triggerIn.on('trigger', async (conn, state) => {
+    const flows = await flowsIn.getValues(state);
+    let flowIds = flows.filter(flow => !!flow).map(flow => flow._id);
+    if (!flowIds.length) {
+      flowIds = [NODE.data.flowName || NODE.flow._id];
+    }
+    const flowIdCount = flowIds.length;
+    let doneCount = 0;
+    if (!flowIds.length) {
+      return;
+    }
+
+    const flowInstanceDetails = [];
+    flowIds.forEach((flowId) => {
+      if (!flowId) {
         return;
       }
-
-      flowIds.forEach((flowId) => {
-        if (!flowId) {
+      let messageHandler = (message) => {
+        if (message.flowId !== flowId) {
           return;
         }
-        let messageHandler = (message) => {
-          if (message.flowId !== flowId) {
-            return;
-          }
 
-          switch (message.method) {
-
-            case 'flowStarted':
-              if (++doneCount === flowIdCount) {
-                doneOut.trigger(state);
-              }
-              break;
-
-            case 'flowNotExist':
-              NODE.addStatus({
-                message: 'flow does not exist',
-                color: 'red'
+        switch (message.method) {
+          case 'flowStarted':
+            flowInstanceDetails.push({
+              flowId,
+              flowInstanceId: message.flowInstanceId
+            });
+            if (++doneCount === flowIdCount) {
+              state.set(NODE, {
+                flowInstanceDetails
               });
+              doneOut.trigger(state);
+            }
+            break;
 
-              break;
+          case 'flowNotExist':
+            NODE.error(new Error(`flow "${flowId}" does not exist`), state);
+            break;
 
-            default:
-              return;
+          default:
+            return;
+        }
 
-          }
+        process.removeListener('message', messageHandler);
+        messageHandler = null;
+      };
 
-          process.removeListener('message', messageHandler);
-          messageHandler = null;
-        };
-
-        process.on('message', messageHandler);
-        process.send({
-          method: 'startFlowById',
-          flowId
-        });
+      process.on('message', messageHandler);
+      process.send({
+        method: 'xible.flow.start',
+        flowId
       });
     });
+  });
+
+  instanceOut.on('trigger', async (conn, state, callback) => {
+    const thisState = state.get(NODE);
+    const flowInstances = await Promise.all(
+      thisState.flowInstanceDetails.map(
+        flowInstanceDetail =>
+          getFlowInstance(flowInstanceDetail.flowId, flowInstanceDetail.flowInstanceId)
+      )
+    );
+    callback(flowInstances);
   });
 };

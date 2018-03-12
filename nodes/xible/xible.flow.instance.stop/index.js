@@ -5,7 +5,7 @@ module.exports = (NODE) => {
 
   triggerIn.on('trigger', (conn, state) => {
     process.send({
-      method: 'xible.flow.stop'
+      method: 'xible.flow.instance.stop'
     });
   });
 };

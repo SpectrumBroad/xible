@@ -232,10 +232,12 @@ class XibleEditor extends EventEmitter {
     if (json.flowId && !this.flows[json.flowId]) {
       return;
     }
-    switch (json.method) {
-      case 'xible.removeAllStatuses':
 
-        this.loadedFlow.removeAllStatuses();
+    switch (json.method) {
+      case 'xible.flow.instance.removeAllStatuses':
+        if (this.loadedFlow && json.flowInstance.flowId === this.loadedFlow._id) {
+          this.loadedFlow.removeAllStatuses();
+        }
         break;
 
       case 'xible.node.addStatus':
@@ -288,16 +290,7 @@ class XibleEditor extends EventEmitter {
         break;
 
       case 'xible.flow.usage':
-        this.emit('flow.usage', json.flows);
-
-        // emit for every flow
-        for (let i = 0; i < json.flows.length; i += 1) {
-          const flow = this.flows[json.flows[i]._id];
-          if (flow) {
-            flow.emit('usage', json.flows[i]);
-          }
-        }
-
+        this.emit('flow.usage', json.usage);
         break;
     }
   }

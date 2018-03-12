@@ -1,0 +1,6 @@
+{
+  "xible.flow.instance": {
+    "color": "darkgoldenrod",
+    "extends": "object"
+  }
+}

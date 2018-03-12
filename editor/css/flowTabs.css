@@ -18,6 +18,7 @@
 	cursor: pointer;
 	position: relative;
 	border-left: 1px solid #000;
+	color: #eee;
 }
 
 .flowList li a {
@@ -30,6 +31,7 @@
 	height: 100%;
 	background-color: inherit;
 	text-decoration: none;
+	position: relative;
 }
 
 .flowList li.add {
@@ -40,29 +42,77 @@
 	color: red;
 }
 
-.flowList li.initializing a::before, .flowList li.started a::before, .flowList li.stopping a::before, .flowList li.starting a::before {
-	content: "";
+.flowList li .instance-count {
+	display: none;
 	position: absolute;
-	bottom: 0;
-	left: 0;
+	bottom: -20px;
+	left: 50%;
+	transform: translatex(-50%);
+	padding: 2px 3px;
+	background-color: #45679E;
+	border-radius: 4px;
+	z-index: 1;
+	white-space: nowrap;
+}
+
+.flowList li.open .instance-count {
+	bottom: -26px;
+}
+
+.flowList li .instance-count::after {
+	content: " instances";
+	display: inline;
+}
+
+.flowList li:hover .instance-count {
 	display: block;
-	height: 7px;
+}
+
+.flowList ul.states {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	display: flex;
 	width: 100%;
-	background-color: inherit;
-	border-bottom: 2px solid lime;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	flex-direction: row;
+	height: 2px;
+	overflow: hidden;
+}
+
+.flowList ul.states li {
+	flex-grow: 1;
+	flex-shrink: 1;
+	width: 100%;
+	border: none;
+}
+
+.flowList ul.states li {
+	display: block;
+	width: 100%;
+	height: 2px;
+	background-color: #000;
 	z-index: 1;
 }
 
-.flowList li.started.direct a::before {
-	border-bottom-color: #ddd;
+.flowList ul.states li.state-5 {
+	background-color: lime;
 }
 
-.flowList li.stopping a::before, .flowList li.starting a::before, .flowList li.initializing a::before {
-	border-bottom-color: darkorange;
+.flowList ul.states li.state-5.direct {
+	background-color: #ddd;
+}
+
+.flowList ul.states li.state-1,
+.flowList ul.states li.state-4,
+.flowList ul.states li.state-2 {
+	background-color: darkorange;
 }
 /*
-.flowList li.initialized a::before {
-	border-bottom-color: purple;
+.flowList ul.states li.state-3 {
+	background-color: purple;
 }
 */
 .flowList li.open {
@@ -83,22 +133,6 @@
 	left: 50%;
 	bottom: -8px;
 	transform: rotate(45deg) translatex(-50%);
-}
-
-.flowList li.started.open::before {
-	background-color: lime;
-}
-
-.flowList li.started.open.direct::before {
-	background-color: #ddd;
-}
-/*
-.flowList li.initialized.open::before {
-	background-color: purple;
-}
-*/
-.flowList li.stopping.open::before, .flowList li.starting.open::before, .flowList li.initializing.open::before {
-	background-color: darkorange;
 }
 
 .flowList li:not(.open):hover {

@@ -228,14 +228,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Initializes all nodes and typedefs found in a certain path, recursively,
-    * by running getStructures() on that path, and hosting editor contents if applicable.
+     * Initializes all nodes and typedefs found in a certain path, recursively,
+     * by running getStructures() on that path, and hosting editor contents if applicable.
      * Throws when run from a worker.
-    * @param {String} nodePath Path to the directory containting the nodes.
-    * If the directory does not exist, it will be created.
-    * @returns {Promise.<Object>}
-    * @private
-    */
+     * @param {String} nodePath Path to the directory containting the nodes.
+     * If the directory does not exist, it will be created.
+     * @returns {Promise.<Object>}
+     * @private
+     */
     static async initFromPath(nodePath) {
       if (XIBLE.child) {
         throw new Error('Cannot call Node.initFromPath() from worker');
@@ -272,8 +272,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
        * FlowInstances will construct the necessary nodes when that flowInstance is started.
        * Editor details are hosted here.
        */
-        for (const nodeName in structures.nodes) {
-          const structure = structures.nodes[nodeName];
+      for (const nodeName in structures.nodes) {
+        const structure = structures.nodes[nodeName];
 
         // Create default typeDefs for unknown input types.
         if (structure.inputs) {
@@ -301,20 +301,20 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           }
         }
 
-          XIBLE.addNode(structure);
+        XIBLE.addNode(structure);
 
         // Host editor contents if applicable
         if (structure.editorContentPath) {
-            structure.hostsEditorContent = true;
+          structure.hostsEditorContent = true;
 
           // nodeDebug(`hosting "/api/nodes/${nodeName}/editor"`);
-            EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, express.static(structure.editorContentPath, {
-              index: false
-            }));
-          }
+          EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, express.static(structure.editorContentPath, {
+            index: false
+          }));
         }
+      }
 
-        return structures;
+      return structures;
     }
 
     /**
@@ -446,9 +446,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       if (process.connected) {
         if (obj.message) {
           obj.message.nodeId = this._id;
-          if (this.flow) {
-            obj.message.flowId = this.flow._id;
-          }
+          obj.message.flowId = this.flow._id;
+          obj.message.flowInstanceId = this.flowInstance._id;
         }
         process.send(obj);
       }

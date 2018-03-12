@@ -1,18 +1,21 @@
 {
   "name": "xible.flow.start",
   "type": "action",
-  "description": "Starts another flow.",
+  "description": "Starts another flow. If no flows are provided and the flow field is left empty, a new instance on the current flow is started.",
   "inputs": {
     "trigger": {
       "type": "trigger"
     },
-    "flow": {
+    "flows": {
       "type": "xible.flow"
     }
   },
   "outputs": {
     "done": {
       "type": "trigger"
+    },
+    "instance": {
+      "type": "xible.flow.instance"
     }
   }
 }

@@ -7,7 +7,6 @@ const path = require('path');
 
 // lazy requires
 let sanitizePath;
-let fork;
 
 const flowDebug = debug('xible:flow');
 
@@ -17,15 +16,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   // default init level for flows
   const initLevel = XIBLE.Config.getValue('flows.initlevel');
-
-  // check inspect arguments so we can fork properly
-  let inspectPortNumberIncrement = 0;
-  let inspectLevel = 0;
-  if (process.execArgv.some(arg => arg.includes('--inspect='))) {
-    inspectLevel = 1;
-  } else if (process.execArgv.some(arg => arg.includes('--inspect-brk='))) {
-    inspectLevel = 2;
-  }
 
   /**
   * Flow class
@@ -39,13 +29,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.json = null;
       this.nodes = [];
       this.connectors = [];
-      this.usage = null;
-      this.runnable = true;
-      this.directed = false;
-      this.state = Flow.STATE_STOPPED;
       this.initLevel = initLevel;
-      this.timing = {};
-      this.params = {};
+      this.instances = [];
+      this.emptyInitInstance = null;
     }
 
     static get INITLEVEL_NONE() {
@@ -134,17 +120,35 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         // if a flow doesn't exist anymore, remove it from the statuses
         if (!flows[flowId]) {
           delete statuses[flowId];
-        } else if (statuses[flowId].running) {
-          flows[flowId].forceStart(statuses[flowId].params)
-          .catch((err) => {
-            flowDebug(`failed to start "${flowId}": ${err}`);
-          });
-        } else if (flows[flowId].initLevel === Flow.INITLEVEL_FLOW) {
-          flows[flowId].init();
+          continue;
         }
+
+        statuses[flowId].forEach(async (instanceStatus) => {
+          if (instanceStatus.state === XIBLE.FlowInstance.STATE_STARTED) {
+            try {
+              const instance = flows[flowId].createInstance({ params: instanceStatus.params });
+              instance._id = instanceStatus._id;
+              await instance.forceStart();
+            } catch (err) {
+              flowDebug(`failed to start "${flowId}": ${err}`);
+            }
+          }
+        });
       }
 
       flowDebug(`cleared ${preStatusesLength - Object.keys(statuses).length} statuses`);
+
+      // init a fresh copy for each flow
+      // if the initLevel for that flow requires this
+      /*
+      for (const flowId in flows) {
+        if (flows[flowId].initLevel === Flow.INITLEVEL_FLOW) {
+          flows[flowId].createEmptyInitInstance()
+          .catch(err => console.error(err));
+        }
+      }
+      */
+
       return flows;
     }
 
@@ -398,6 +402,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
         flowDebug(`saving "${this._id}"`);
         fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json, null, '\t'), () => {
+          this.emit('save');
           resolve(this);
         });
       });
@@ -405,20 +410,20 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Deletes a flow from the configured flows directory.
+    * Stops all instances first.
     * Rejects if this is not the master thread.
     * @return {Promise.<Flow>}
     */
     delete() {
-      return new Promise((resolve, reject) => {
+      return new Promise(async (resolve, reject) => {
         if (XIBLE.child || !this._id || !Flow.flowPath) {
           reject('not master, no _id or no flowPath specified');
           return;
         }
 
-        if (this.state !== Flow.STATE_STOPPED) {
-          reject('flow is not stopped');
-          return;
-        }
+        // stop all instances
+        await this.deleteAllInstances();
+        this.instances = [];
 
         flowDebug(`deleting "${this._id}"`);
         fs.unlink(`${Flow.flowPath}/${this._id}.json`, () => {
@@ -426,17 +431,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         });
 
         // update status
-        this.saveStatus(false);
+        this.saveStatus();
 
         // remove from Xible instance
         if (XIBLE) {
           delete XIBLE.flows[this._id];
         }
 
-        XIBLE.broadcastWebSocket({
-          method: 'xible.flow.delete',
-          flowId: this._id
-        });
+        this.emit('delete');
       });
     }
 
@@ -538,613 +540,134 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Saves the status (running or not) for this flow by calling Flow.saveStatuses().
-    * @param {Boolean} running Status of the flow.
-    * @param {Object} params Set of provided parameters for the flow.
+    * Saves the status for this flow by calling Flow.saveStatuses().
     */
-    saveStatus(running, params) {
+    saveStatus() {
       const statuses = Flow.getStatuses();
+      const startedInstances = this.instances
+      .filter(
+        instance =>
+          instance.state === XIBLE.FlowInstance.STATE_STARTED && !instance.directed
+      );
 
-      if (!running) {
+      if (!startedInstances.length) {
         delete statuses[this._id];
       } else {
-        const status = {
-          running: true
-        };
+        statuses[this._id] = startedInstances.map((instance) => {
+          const status = {
+            _id: instance._id,
+            state: instance.state
+          };
 
-        if (params) {
-          status.params = params;
-        }
+          if (instance.params && Object.keys(instance.params).length) {
+            status.params = instance.params;
+          }
 
-        statuses[this._id] = status;
+          return status;
+        });
       }
 
       Flow.saveStatuses(statuses);
     }
 
-    /**
-    * Starts a flow in direct mode, on a given set of nodes.
-    * @param {Node[]} nodes Array of nodes to direct. Any node outside this array will be ignored.
+    /*
+    createEmptyInitInstance() {
+      this.emptyInitInstance = this.createInstance();
+      return this.emptyInitInstance.init();
+    }
     */
-    direct(nodes) {
-      if (!XIBLE.child) {
-        if (this.state !== Flow.STATE_STARTED || !this.directed) {
-          return this.forceStart(null, nodes);
-        }
 
-        this.worker.send({
-          method: 'directNodes',
-          directNodes: nodes
-        });
-
-        return Promise.resolve(this);
+    createInstance({ params, directNodes }) {
+      if (!this.runnable) {
+        throw new Error(`Flow "${this._id}" is not runnable`);
       }
 
-      // cancel all output triggers
-      XIBLE.NodeOutput.prototype.trigger = () => {};
+      const createStart = process.hrtime();
 
-      // set the data accordingly
-      // init all of them
-      // and fetch the action nodes
-      const actionNodes = [];
-      const flowState = new FlowState();
+      const flowInstance = new XIBLE.FlowInstance(this, params, directNodes);
+      this.instances.push(flowInstance);
 
-      process.nextTick(() => {
-        for (let i = 0; i < nodes.length; i += 1) {
-          const realNode = this.getNodeById(nodes[i]._id);
-          if (!realNode) {
-            continue;
-          }
+      flowInstance.timing.createStart = createStart;
+      flowInstance.timing.createEnd = process.hrtime();
 
-          realNode.data = nodes[i].data;
-          realNode.emit('init', flowState);
+      this.emit('createInstance', { flowInstance });
+      return flowInstance;
+    }
 
-          if (realNode.type === 'action') {
-            actionNodes.push(realNode);
-          }
-        }
+    async deleteInstance(instance) {
+      if (!(instance instanceof XIBLE.FlowInstance)) {
+        throw new Error('argument "instance" must be instanceof FlowInstance');
+      }
 
-        // trigger the action nodes
-        for (let i = 0; i < actionNodes.length; i += 1) {
-          actionNodes[i].getInputs()
-          .filter(input => input.type === 'trigger')
-          .forEach((input) => {
-            input.emit('trigger', null, flowState);
-          });
-        }
-      });
+      const index = this.instances.indexOf(instance);
+      if (index === -1) {
+        throw new Error('argument "instance" is not instance of this flow');
+      }
 
-      return Promise.resolve(this);
+      this.instances.splice(index, 1);
+
+      if (instance.state !== XIBLE.FlowInstance.STATE_STOPPED) {
+        await instance.forceStop(false);
+      }
+
+      this.emit('deleteInstance', { flowInstance: instance });
+      return null;
     }
 
     /**
-    * Starts a flow. Stops the flow first if it is already started.
-    * If the flow is already starting, the returned promise resolves when it has finished starting.
-    * @param {Object} params
-    * @param {Node[]} directNodes nodes to direct
-    * @return {Promise}
-    */
-    forceStart(params, directNodes) {
-      const startFlow = () => this.start(params, directNodes);
-
-      switch (this.state) {
-        case Flow.STATE_INITIALIZING:
-          return new Promise((resolve) => {
-            this.once('initialized', () => {
-              if (
-                this.state === Flow.STATE_INITIALIZING ||
-                this.state === Flow.STATE_INITIALIZED
-              ) {
-                resolve(startFlow());
-                return;
-              }
-              resolve(this);
-            });
-          });
-
-        case Flow.STATE_INITIALIZED:
-          return startFlow();
-
-        case Flow.STATE_STOPPED:
-          return this.init()
-          .then(startFlow);
-
-        case Flow.STATE_STOPPING:
-          return new Promise((resolve) => {
-            this.once('stopped', () => {
-              if (
-                this.state === Flow.STATE_STARTING ||
-                this.state === Flow.STATE_STARTED
-              ) {
-                resolve(this);
-              }
-              resolve(this.forceStart(params, directNodes));
-            });
-          });
-
-        case Flow.STATE_STARTED:
-          return this.stop()
-          .then(() => this.forceStart(params, directNodes));
-
-        case Flow.STATE_STARTING:
-          return new Promise((resolve) => {
-            this.once('started', () => resolve(this));
-          });
-      }
-
-      return Promise.reject(new Error('Flow in unknown state'));
+     * Returns the instance on this flow for the given id.
+     * @param {String} id The _id of the FlowInstance to return.
+     * @returns {FlowInstance|null}
+     */
+    getInstanceById(id) {
+      return this.instances.find(instance => instance._id === id);
     }
 
-    static get STATE_STOPPED() {
-      return 0;
+    /**
+     * Stops all instances for this flow.
+     * @returns {Promise.<Flow>} Returns the current flow for daisy chaining.
+     */
+    async stopAllInstances() {
+      await Promise.all(this.instances.map(instance => instance.forceStop()));
+      return this;
     }
 
-    static get STATE_STOPPING() {
-      return 1;
+    /**
+     * Deletes all instances for this flow.
+     * @returns {Promise.<Flow>} Returns the current flow for daisy chaining.
+     */
+    async deleteAllInstances() {
+      await Promise.all(this.instances.slice().map(instance => instance.delete()));
+      return this;
     }
 
-    static get STATE_INITIALIZING() {
-      return 2;
-    }
+    emit(eventName, obj) {
+      super.emit(eventName, obj);
 
-    static get STATE_INITIALIZED() {
-      return 3;
-    }
-
-    static get STATE_STARTING() {
-      return 4;
-    }
-
-    static get STATE_STARTED() {
-      return 5;
-    }
-
-    init() {
-      this.timing = {
-        initStart: process.hrtime()
+      const broadcastWebSocketObj = {
+        method: `xible.flow.${eventName}`,
+        flow: this
       };
 
-      if (!this.runnable) {
-        return Promise.reject('not runnable');
+      if (obj && typeof obj === 'object') {
+        Object.assign(broadcastWebSocketObj, obj);
       }
 
-      if (XIBLE.child) {
-        throw new Error('cannot init a flow from a worker');
-      }
-
-      // check and set the correct state
-      if (this.state !== Flow.STATE_STOPPED) {
-        return Promise.reject('cannot init; flow is not stopped');
-      }
-      this.state = Flow.STATE_INITIALIZING;
-
-      return new Promise((resolve, reject) => {
-        flowDebug('initializing flow from master');
-
-        XIBLE.broadcastWebSocket({
-          method: 'xible.flow.initializing',
-          flowId: this._id,
-          directed: this.directed
-        });
-
-        if (!fork) {
-          fork = require('child_process').fork;
-        }
-
-        let flow;
-        const execArgv = [];
-        if (inspectLevel === 1) {
-          execArgv.push(`--inspect=0.0.0.0:${9229 + (inspectPortNumberIncrement += 1)}`);
-        } else if (inspectLevel === 2) {
-          execArgv.push(`--inspect-brk=0.0.0.0:${9229 + (inspectPortNumberIncrement += 1)}`);
-        }
-        this.worker = fork(`${__dirname}/../../child.js`, {
-          execArgv
-        });
-        this.worker.on('message', (message) => {
-          switch (message.method) {
-            case 'initializing':
-              if (this.worker && this.worker.connected) {
-                const initializingDiff = process.hrtime(this.timing.initStart);
-
-                flowDebug(`flow/worker initializing in ${(initializingDiff[0] * 1000) + (initializingDiff[1] / 1e6)}ms`);
-
-                this.worker.send({
-                  method: 'init',
-                  configPath: XIBLE.configPath,
-                  config: XIBLE.Config.getAll(),
-                  flow: this.json,
-                  nodes: XIBLE.nodes
-                });
-              } else {
-                flowDebug('flow/worker has init, but no such worker in master');
-                reject('no such worker in master');
-              }
-
-              break;
-
-            case 'initialized': {
-              this.timing.initEnd = process.hrtime();
-              const initializedDiff = process.hrtime(this.timing.initStart);
-              flowDebug(`flow/worker initialized in ${(initializedDiff[0] * 1000) + (initializedDiff[1] / 1e6)}ms`);
-
-              this.state = Flow.STATE_INITIALIZED;
-              resolve(this);
-              this.emit('initialized');
-
-              XIBLE.broadcastWebSocket({
-                method: 'xible.flow.initialized',
-                flowId: this._id,
-                directed: this.directed
-              });
-
-              break;
-            }
-
-            case 'started':
-              this.state = Flow.STATE_STARTED;
-              this.emit('started');
-
-              XIBLE.broadcastWebSocket({
-                method: 'xible.flow.started',
-                flowId: this._id,
-                directed: this.directed
-              });
-
-              break;
-
-            case 'startFlowById':
-              flow = XIBLE.getFlowById(message.flowId);
-              if (flow) {
-                flow.forceStart().then(() => {
-                  if (this.worker && this.worker.connected) {
-                    this.worker.send({
-                      method: 'flowStarted',
-                      flowId: message.flowId
-                    });
-                  }
-                });
-              } else if (this.worker && this.worker.connected) {
-                this.worker.send({
-                  method: 'flowNotExist',
-                  flowId: message.flowId
-                });
-              }
-
-              break;
-
-            case 'getFlowById': {
-              flow = XIBLE.getFlowById(message.flowId);
-              let returnFlow = null;
-              if (flow) {
-                returnFlow = {
-                  _id: flow._id,
-                  name: flow.name,
-                  runnable: flow.runnable,
-                  directed: flow.directed,
-                  state: flow.state,
-                  initLevel: flow.initLevel,
-                  timing: flow.timing
-                };
-              }
-              this.worker.send({
-                method: 'returnFlow',
-                flowId: message.flowId,
-                flow: returnFlow
-              });
-              break;
-            }
-
-            case 'stop':
-              this.forceStop();
-              break;
-
-            case 'broadcastWebSocket':
-              XIBLE.broadcastWebSocket(message.message);
-              break;
-
-            case 'usage':
-              this.usage = message.usage;
-              break;
-          }
-        });
-
-        this.worker.on('exit', () => {
-          this.state = Flow.STATE_STOPPED;
-          this.worker = null;
-          this.usage = null;
-
-          this.emit('stopped');
-          XIBLE.broadcastWebSocket({
-            method: 'xible.flow.stopped',
-            flowId: this._id
-          });
-
-          flowDebug('worker exited');
-
-          if (this.initLevel === Flow.INITLEVEL_FLOW) {
-            this.init()
-            .catch(err => console.error(err));
-          }
-        });
-
-        this.worker.on('disconnect', () => {
-          flowDebug('worker disconnected from master');
-          this.usage = null;
-
-          // cleanup all open statuses
-          XIBLE.broadcastWebSocket({
-            method: 'xible.flow.removeAllStatuses',
-            flowId: this._id
-          });
-        });
-      });
+      XIBLE.broadcastWebSocket(broadcastWebSocketObj);
     }
 
-    /**
-    * Starts a flow. Rejects if flow is not stopped
-    * Note that the behaviour is different when called from a worker process
-    * @param {Object} params
-    * @param {Node[]} directNodes nodes to direct
-    * @fires Node#trigger
-    * @fires Node#init
-    * @return {Promise}
-    */
-    start(params, directNodes) {
-      if (!this.runnable) {
-        return Promise.reject('not runnable');
-      }
-
-      if (!XIBLE.child) {
-        // check and set the correct state
-        if (this.state !== Flow.STATE_INITIALIZED) {
-          return Promise.reject('cannot start; flow is not initialized');
-        }
-        this.state = Flow.STATE_STARTING;
-
-        this.timing.startStart = process.hrtime();
-
-        return new Promise((resolve) => {
-          // let client now we're starting up the flow
-          XIBLE.broadcastWebSocket({
-            method: 'xible.flow.starting',
-            flowId: this._id,
-            directed: !!directNodes
-          });
-
-          flowDebug('starting flow from master');
-
-          // save the status
-          if (!directNodes) {
-            this.saveStatus(true, params);
-            this.directed = false;
-          } else {
-            this.directed = true;
-          }
-
-          if (this.worker && this.worker.connected) {
-            this.worker.on('message', (message) => {
-              switch (message.method) {
-                case 'started': {
-                  this.timing.startEnd = process.hrtime();
-                  const startedDiff = process.hrtime(this.timing.startStart);
-                  flowDebug(`flow/worker started in ${(startedDiff[0] * 1000) + (startedDiff[1] / 1e6)}ms`);
-
-                  resolve(this);
-                  break;
-                }
-              }
-            });
-
-            this.worker.send({
-              method: 'start',
-              directNodes,
-              params
-            });
-          }
-        });
-      }
-
-      flowDebug('starting flow from worker');
-
-      this.params = params || {};
-      const flowState = new FlowState();
-
-      process.nextTick(() => {
-        // init all nodes
-        for (let i = 0; i < this.nodes.length; i += 1) {
-          this.nodes[i].emit('init', flowState);
-        }
-
-        // trigger all event objects that are listening
-        for (let i = 0; i < this.nodes.length; i += 1) {
-          const node = this.nodes[i];
-          if (node.type === 'event') {
-            node.emit('triggerStartTime', 'input');
-            node.emit('trigger', flowState);
-          }
-        }
-      });
-
-      return Promise.resolve(this);
+    toJSON() {
+      return {
+        _id: this._id,
+        name: this._id,
+        nodes: this.nodes,
+        connectors: this.json.connectors,
+        viewState: this.json.viewState,
+        runnable: this.runnable
+      };
     }
 
-    /**
-    * Stops a flow.
-    * If the flow is in starting mode, it will stop it after it has finished starting.
-    * @return {Promise}
-    */
-    forceStop() {
-      const stopFlow = () => this.stop();
-
-      switch (this.state) {
-        case Flow.STATE_INITIALIZING:
-          return new Promise((resolve) => {
-            this.once('initialized', () => {
-              resolve(this.forceStop());
-            });
-          });
-
-        case Flow.STATE_INITIALIZED: case Flow.STATE_STARTED:
-          return stopFlow();
-
-        case Flow.STATE_STARTING:
-          return new Promise((resolve) => {
-            this.once('started', () => {
-              resolve(this.forceStop());
-            });
-          });
-
-        case Flow.STATE_STOPPED:
-          return Promise.resolve(this);
-
-        case Flow.STATE_STOPPING:
-          return new Promise((resolve) => {
-            this.once('stopped', () => {
-              resolve(this);
-            });
-          });
-      }
-
-      return Promise.reject(new Error('Flow in unknown state'));
-    }
-
-    /**
-    * Stops a flow. Will forcibly kill the flow if it is still running after 5 seconds.
-    * Note that the behaviour is different when called from a worker process.
-    * @return {Promise}
-    */
-    stop() {
-      if (XIBLE.child) {
-        flowDebug('stopping flow from worker');
-
-        // close any node that wants to
-        this.nodes.forEach(node => node.emit('close'));
-
-        flowDebug('stopped flow from worker');
-        process.exit(0);
-      }
-
-      if (this.state !== Flow.STATE_STARTED && this.state !== Flow.STATE_INITIALIZED) {
-        return Promise.reject('cannot stop; flow is not started or initialized');
-      }
-      this.state = Flow.STATE_STOPPING;
-
-      return new Promise((resolve) => {
-        this.saveStatus(false);
-
-        if (this.worker) {
-          XIBLE.broadcastWebSocket({
-            method: 'xible.flow.stopping',
-            flowId: this._id
-          });
-
-          flowDebug('stopping flow from master');
-          let killTimeout;
-
-          this.worker.once('exit', () => {
-            if (killTimeout) {
-              clearTimeout(killTimeout);
-              killTimeout = null;
-            }
-
-            resolve(this);
-          });
-
-          this.worker.on('disconnect', () => {
-            if (this.worker) {
-              flowDebug('killing worker the normal way');
-              this.worker.kill();
-            } else if (killTimeout) {
-              clearTimeout(killTimeout);
-              killTimeout = null;
-            }
-          });
-
-          this.worker.send({
-            method: 'stop'
-          });
-
-          this.worker.disconnect();
-
-          // forcibly kill after 5 seconds
-          killTimeout = setTimeout(() => {
-            flowDebug('killing worker from master using SIGKILL');
-            this.worker.kill('SIGKILL');
-
-            // cleanup all open statuses
-            XIBLE.broadcastWebSocket({
-              method: 'xible.flow.removeAllStatuses',
-              flowId: this._id
-            });
-
-            killTimeout = null;
-          }, 5000);
-        } else {
-          resolve(this);
-        }
-      });
-    }
   }
-
-  /**
-  * @class Tracks state within a flow.
-  * There should be no need to instantiate this class yourself.
-  * Initialized state is provided to various Node event listeners.
-  * @param {Object} [states={}]
-  */
-  function FlowState(states = {}) {
-    /**
-    * Sets a state for a given node.
-    * Freezes the object to disallow any future adjustments.
-    * @method set
-    * @memberof FlowState
-    * @instance
-    * @param {Node} node
-    * @param {Object} obj
-    */
-    this.set = function FlowStateSet(node, obj) {
-      if (!(node instanceof XIBLE.Node)) {
-        throw new Error('node must be instanceof Node');
-      } else if (!(obj instanceof Object)) {
-        throw new Error('obj must be instanceof Object');
-      }
-
-      Object.freeze(obj);
-      states[node._id] = obj;
-    };
-
-    /**
-    * Gets a state for a given node.
-    * @method get
-    * @memberof FlowState
-    * @instance
-    * @param {Node} node
-    * @returns {Object} The object stored in the state handler for the given node.
-    */
-    this.get = function FlowStateGet(node) {
-      if (!(node instanceof XIBLE.Node)) {
-        throw new Error('node must be instanceof Node');
-      }
-
-      return states[node._id];
-    };
-
-    /**
-    * Splits the flowState into a new FlowState.
-    * @method split
-    * @memberof FlowState
-    * @instance
-    * @returns {FlowState} The new flowState.
-    */
-    this.split = function FlowStateSplit() {
-      return new FlowState(Object.assign({}, states));
-    };
-
-    Object.freeze(this);
-  }
-
-  XIBLE.FlowState = FlowState;
 
   if (EXPRESS_APP) {
     require('./routes.js')(Flow, XIBLE, EXPRESS_APP);

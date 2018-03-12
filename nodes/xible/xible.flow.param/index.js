@@ -4,9 +4,19 @@ module.exports = (NODE) => {
   const defaultIn = NODE.getInputByName('default');
   const valueOut = NODE.getOutputByName('value');
 
+  let paramValue;
+
+  NODE.on('init', () => {
+    const flowInstanceParams = NODE.flowInstance.params;
+    if (flowInstanceParams[NODE.data.paramName]) {
+      paramValue = flowInstanceParams[NODE.data.paramName];
+      valueOut.type = typeof paramValue;
+    }
+  });
+
   valueOut.on('trigger', async (conn, state, callback) => {
-    if (NODE.flow.params[NODE.data.paramName]) {
-      callback(NODE.flow.params[NODE.data.paramName]);
+    if (paramValue) {
+      callback(paramValue);
       return;
     }
 

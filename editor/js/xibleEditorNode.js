@@ -72,7 +72,7 @@ class XibleEditorNode extends xibleWrapper.Node {
         related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
 
         related.nodes.forEach((node) => {
-          node._directSetDataListener = () => this.editor.loadedFlow.direct(related);
+          node._directSetDataListener = () => this.editor.loadedFlow.direct(related.nodes);
           node.on('setdata', node._directSetDataListener);
         });
 
@@ -88,7 +88,7 @@ class XibleEditorNode extends xibleWrapper.Node {
           connector.element.classList.add('nodirect');
         });
 
-        this.editor.loadedFlow.direct(related);
+        this.editor.loadedFlow.direct(related.nodes);
       });
     });
 

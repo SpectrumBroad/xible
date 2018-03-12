@@ -50,8 +50,6 @@ class XibleEditorFlow extends xibleWrapper.Flow {
   }
 
   undirect() {
-    super.undirect();
-
     this.nodes.forEach((node) => {
       node.element.classList.remove('nodirect');
 
@@ -64,11 +62,16 @@ class XibleEditorFlow extends xibleWrapper.Flow {
     this.connectors.forEach((connector) => {
       connector.element.classList.remove('nodirect');
     });
+
+    this.directedInstance = null;
   }
 
-  direct(related) {
-    super.direct(related);
+  async direct(directNodes) {
+    if (!this.directedInstance) {
+      this.directedInstance = await this.createInstance();
+    }
 
+    return this.directedInstance.direct(directNodes);
     // TODO: set related styling here instead of in XibleEditor where it is now
   }
 

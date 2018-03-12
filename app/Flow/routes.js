@@ -3,25 +3,7 @@
 module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
   // retrieve all flows
   EXPRESS_APP.get('/api/flows', (req, res) => {
-    const flows = XIBLE.getFlows();
-    const returnFlows = {};
-
-    for (const id in flows) {
-      const flow = flows[id];
-
-      returnFlows[id] = {
-        _id: id,
-        name: id,
-        nodes: flow.nodes,
-        connectors: flow.json.connectors,
-        viewState: flow.json.viewState,
-        runnable: flow.runnable,
-        directed: flow.directed,
-        state: flow.state
-      };
-    }
-
-    res.json(returnFlows);
+    const flows = res.json(XIBLE.getFlows());
   });
 
   // create a new flow
@@ -53,43 +35,6 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     next();
   });
 
-  // stop an existing flow
-  EXPRESS_APP.patch('/api/flows/:flowId/stop', async (req, res) => {
-    try {
-      await req.locals.flow.forceStop();
-      res.end();
-    } catch (err) {
-      console.error(err);
-      res.status(500).end();
-    }
-  });
-
-  // start an existing flow
-  EXPRESS_APP.patch('/api/flows/:flowId/start', async (req, res) => {
-    try {
-      await req.locals.flow.forceStart(req.body.params);
-      res.end();
-    } catch (err) {
-      console.error(err);
-      res.status(500).end();
-    }
-  });
-
-  // run part of a flow directly
-  EXPRESS_APP.patch('/api/flows/:flowId/direct', (req, res) => {
-    req.locals.flow.direct(req.body);
-    res.end();
-  });
-
-  // run part of a flow directly
-  EXPRESS_APP.patch('/api/flows/:flowId/undirect', (req, res) => {
-    // get the nodes that are allowed to run
-    req.locals.flow.undirect();
-
-    // output the flow id
-    res.end();
-  });
-
   // get an existing flow
   EXPRESS_APP.get('/api/flows/:flowId', (req, res) => {
     const flow = req.locals.flow;
@@ -116,7 +61,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     }
 
     const flow = req.locals.flow;
-    await flow.forceStop();
+    await flow.stopAllInstances();
 
     // init the newly provided json over the existing flow
     flow.initJson(req.body, true);
@@ -132,9 +77,87 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
   // delete an existing flow
   EXPRESS_APP.delete('/api/flows/:flowId', async (req, res) => {
-    const flow = req.locals.flow;
-    await flow.forceStop();
-    await flow.delete();
+    await req.locals.flow.delete();
+    res.end();
+  });
+
+  // stop all instances
+  EXPRESS_APP.patch('/api/flows/:flowId/stop', async (req, res) => {
+    await req.locals.flow.stopAllInstances();
+    res.end();
+  });
+
+  // return all instances on a flow
+  EXPRESS_APP.get('/api/flows/:flowId/instances', async (req, res) => {
+    res.json(req.locals.flow.instances);
+  });
+
+  // create a new flowInstance
+  EXPRESS_APP.post('/api/flows/:flowId/instances', async (req, res) => {
+    const instance = req.locals.flow.createInstance({
+      params: req.body.params,
+      directNodes: req.body.directNodes
+    });
+    if (req.body.start === true) {
+      await instance.forceStart();
+    }
+    res.json(instance);
+  });
+
+  // delete all flowInstances
+  EXPRESS_APP.delete('/api/flows/:flowId/instances', async (req, res) => {
+    await req.locals.flow.deleteAllInstances();
+    res.end();
+  });
+
+  // get an instance by a given id
+  EXPRESS_APP.param('flowInstanceId', (req, res, next, id) => {
+    const flowInstance = req.locals.flow.getInstanceById(id);
+
+    if (!flowInstance) {
+      res.status(404).end();
+      return;
+    }
+
+    req.locals.flowInstance = flowInstance;
+    next();
+  });
+
+  EXPRESS_APP.delete('/api/flows/:flowId/instances/:flowInstanceId', async (req, res) => {
+    try {
+      await req.locals.flowInstance.delete();
+      res.end();
+    } catch (err) {
+      console.error(err);
+      res.status(500).end();
+    }
+  });
+
+  // start a flowInstance
+  EXPRESS_APP.patch('/api/flows/:flowId/instances/:flowInstanceId/start', async (req, res) => {
+    try {
+      await req.locals.flowInstance.forceStart();
+      res.end();
+    } catch (err) {
+      console.error(err);
+      res.status(500).end();
+    }
+  });
+
+  // stop a flowInstance
+  EXPRESS_APP.patch('/api/flows/:flowId/instances/:flowInstanceId/stop', async (req, res) => {
+    try {
+      await req.locals.flowInstance.forceStop(req.body.delete);
+      res.end();
+    } catch (err) {
+      console.error(err);
+      res.status(500).end();
+    }
+  });
+
+  // run part of a flow directly
+  EXPRESS_APP.patch('/api/flows/:flowId/instances/:flowInstanceId/direct', (req, res) => {
+    req.locals.flowInstance.direct(req.body);
     res.end();
   });
 };

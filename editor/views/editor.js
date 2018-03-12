@@ -19,11 +19,11 @@ const editorView = (EL) => {
         This flow cannot be started because it contains nodes that don't exist in the given configuration.
       </p>
       <section class="buttons editor">
-        <button type="button" id="xibleFlowDeployButton">Deploy</button>
-        <button type="button" id="xibleFlowStartButton">Start</button>
-        <button type="button" id="xibleFlowStopButton">Stop</button>
-        <button type="button" id="xibleFlowSaveButton">Save</button>
-        <button type="button" id="xibleFlowDeleteButton">Delete</button>
+        <button type="button" id="xibleFlowDeployButton" disabled="disabled">Deploy</button>
+        <button type="button" id="xibleFlowStartButton" disabled="disabled">Start</button>
+        <button type="button" id="xibleFlowStopButton" disabled="disabled">Stop</button>
+        <button type="button" id="xibleFlowSaveButton" disabled="disabled">Save</button>
+        <button type="button" id="xibleFlowDeleteButton" disabled="disabled">Delete</button>
       </section>
       <section class="stats">
         <div>
@@ -95,20 +95,19 @@ const editorView = (EL) => {
 
   // hook buttons
   // deploy
-  document.getElementById('xibleFlowDeployButton').onclick = () => {
-    xibleEditor.loadedFlow
-    .save()
-    .then(flow => flow.start());
+  document.getElementById('xibleFlowDeployButton').onclick = async () => {
+    const flow = await xibleEditor.loadedFlow.save();
+    await flow.createInstance({ start: true });
   };
 
   // start
   document.getElementById('xibleFlowStartButton').onclick = () => {
-    xibleEditor.loadedFlow.start();
+    xibleEditor.loadedFlow.createInstance({ start: true });
   };
 
   // stop
   document.getElementById('xibleFlowStopButton').onclick = () => {
-    xibleEditor.loadedFlow.stop();
+    xibleEditor.loadedFlow.stopAllInstances();
   };
 
   // save
@@ -122,7 +121,7 @@ const editorView = (EL) => {
       return;
     }
 
-    if (window.confirm(`Are you sure you wan't to permanently delete flow "${xibleEditor.loadedFlow._id}"?`)) {
+    if (window.confirm(`Are you sure you want to permanently delete flow "${xibleEditor.loadedFlow._id}"?`)) {
       xibleEditor.loadedFlow.delete();
 
       const flowTab = document.querySelector(`.flowList>li[data-flowid="${xibleEditor.loadedFlow._id}"]`);
@@ -320,16 +319,51 @@ const editorView = (EL) => {
   });
 
   // update the usage charts
-  xibleEditor.on('flow.usage', (flows) => {
-    if (!xibleEditor.loadedFlow || !flows || !flows.length) {
+  xibleEditor.on('flow.usage', (usage) => {
+    if (!xibleEditor.loadedFlow || !usage) {
       return;
     }
 
     // only run this on the loaded flow
-    const flow = flows.find(flow => flow._id === xibleEditor.loadedFlow._id);
+    const flow = usage[xibleEditor.loadedFlow._id];
     if (!flow) {
       return;
     }
+
+    const combinedUsage = flow.reduce(
+      (acc, currentValue, currentIndex) => {
+        acc.cpu.user += currentValue.usage.cpu.user;
+        acc.cpu.system += currentValue.usage.cpu.system;
+        acc.cpu.percentage += currentValue.usage.cpu.percentage;
+
+        acc.memory.rss += currentValue.usage.memory.rss;
+        acc.memory.heapTotal += currentValue.usage.memory.heapTotal;
+        acc.memory.heapUsed += currentValue.usage.memory.heapUsed;
+        acc.memory.external += currentValue.usage.memory.external;
+
+        if (!currentIndex) {
+          acc.delay = currentValue.usage.delay;
+        } else {
+          acc.delay = ((acc.delay * currentIndex) + currentValue.usage.delay) / (currentIndex + 1);
+        }
+
+        return acc;
+      },
+      {
+        cpu: {
+          user: 0,
+          system: 0,
+          percentage: 0
+        },
+        memory: {
+          rss: 0,
+          heapTotal: 0,
+          heapUsed: 0,
+          external: 0
+        },
+        delay: 0
+      }
+    );
 
     while (memChart.data.datasets[0].data.length !== memChart.data.labels.length) {
       memChart.data.datasets[0].data.push(null);
@@ -349,15 +383,15 @@ const editorView = (EL) => {
       delayChart.data.datasets[0].data.shift();
     }
 
-    memChart.data.datasets[2].data.push(Math.round(flow.usage.memory.rss / 1024 / 1024));
-    memChart.data.datasets[1].data.push(Math.round(flow.usage.memory.heapTotal / 1024 / 1024));
-    memChart.data.datasets[0].data.push(Math.round(flow.usage.memory.heapUsed / 1024 / 1024));
+    memChart.data.datasets[2].data.push(Math.round(combinedUsage.memory.rss / 1024 / 1024));
+    memChart.data.datasets[1].data.push(Math.round(combinedUsage.memory.heapTotal / 1024 / 1024));
+    memChart.data.datasets[0].data.push(Math.round(combinedUsage.memory.heapUsed / 1024 / 1024));
     memChart.update(0);
 
-    cpuChart.data.datasets[0].data.push(flow.usage.cpu.percentage);
+    cpuChart.data.datasets[0].data.push(combinedUsage.cpu.percentage);
     cpuChart.update(0);
 
-    delayChart.data.datasets[0].data.push(flow.usage.delay);
+    delayChart.data.datasets[0].data.push(combinedUsage.delay);
     delayChart.update(0);
   });
 
@@ -515,6 +549,12 @@ const editorView = (EL) => {
       return;
     }
 
+    if (xibleEditor.browserSupport) {
+      document.getElementById('xibleFlowSaveButton').disabled = false;
+    }
+
+    document.getElementById('xibleFlowDeleteButton').disabled = false;
+
     if (!flow.runnable) {
       document.getElementById('flowNotRunnable').classList.remove('hidden');
       document.getElementById('xibleFlowStartButton').disabled = true;
@@ -530,7 +570,7 @@ const editorView = (EL) => {
     }
   }
 
-  function setFlowTabState(flow, li) {
+  async function setFlowTabState(flow, li) {
     li.classList.remove('notRunnable', 'initializing', 'initialized', 'started', 'starting', 'stopped', 'stopping', 'direct');
 
     if (!flow.runnable) {
@@ -541,39 +581,30 @@ const editorView = (EL) => {
       li.classList.add('direct');
     }
 
-    setLoadedFlowState(flow);
+    try {
+      const instances = await flow.getInstances();
+      const stateUl = li.querySelector('ul.states');
+      stateUl.innerHTML = '';
+      instances.forEach((instance) => {
+        const stateLi = stateUl.appendChild(document.createElement('li'));
+        stateLi.classList.add(`state-${instance.state}`);
+      });
 
-    switch (flow.state) {
-      case xibleWrapper.Flow.STATE_INITIALIZING:
-        li.classList.add('initializing');
-        break;
-
-      case xibleWrapper.Flow.STATE_INITIALIZED:
-        li.classList.add('initialized');
-        break;
-
-      case xibleWrapper.Flow.STATE_STARTING:
-        li.classList.add('starting');
-        break;
-
-      case xibleWrapper.Flow.STATE_STARTED:
-        li.classList.add('started');
-        break;
-
-      case xibleWrapper.Flow.STATE_STOPPING:
-        li.classList.add('stopping');
-        break;
-
-      case xibleWrapper.Flow.STATE_STOPPED:
-        li.classList.add('stopped');
-        break;
+      const instanceCountEl = li.querySelector('.instance-count');
+      instanceCountEl.innerHTML = instances.length;
+    } catch (err) {
     }
+
+    setLoadedFlowState(flow);
   }
 
   function createFlowTab(flow) {
     const li = flowListUl.appendChild(document.createElement('li'));
     li.setAttribute('data-flowId', flow._id);
     const a = li.appendChild(document.createElement('a'));
+    li.appendChild(document.createElement('div')).classList.add('instance-count');
+    const stateUl = a.appendChild(document.createElement('ul'));
+    stateUl.classList.add('states');
     a.appendChild(document.createTextNode(flow._id));
     a.setAttribute('title', flow._id);
     a.onclick = () => {
@@ -582,8 +613,8 @@ const editorView = (EL) => {
       resetCharts();
 
       Array.from(flowListUl.querySelectorAll('li.open'))
-      .forEach((li) => {
-        li.classList.remove('open');
+      .forEach((openLi) => {
+        openLi.classList.remove('open');
       });
       li.classList.add('open');
 
@@ -596,13 +627,13 @@ const editorView = (EL) => {
       // get all persistent websocket messages
       xibleWrapper.getPersistentWebSocketMessages()
       .then((messages) => {
-        let flowId;
+        let flowInstanceId;
         let nodeId;
         let statusId;
-        for (flowId in messages) {
-          for (nodeId in messages[flowId]) {
-            for (statusId in messages[flowId][nodeId]) {
-              xibleEditor.messageHandler(messages[flowId][nodeId][statusId]);
+        for (flowInstanceId in messages) {
+          for (nodeId in messages[flowInstanceId]) {
+            for (statusId in messages[flowInstanceId][nodeId]) {
+              xibleEditor.messageHandler(messages[flowInstanceId][nodeId][statusId]);
             }
           }
         }
@@ -630,35 +661,53 @@ const editorView = (EL) => {
 
     setFlowTabState(flow, li);
 
-    flow.on('loadJson', () => {
+    flow.on('initJson', () => {
       setFlowTabState(flow, li);
     });
 
-    flow.on('initializing', () => {
+    flow.getInstances()
+    .then((instances) => {
+      instances.forEach(instance => handleInstanceState(instance, flow, li));
+    })
+    .catch((err) => {});
+
+    flow.on('createInstance', ({ flowInstance }) => {
       setFlowTabState(flow, li);
+
+      handleInstanceState(flowInstance, flow, li);
     });
 
-    flow.on('initialized', () => {
-      setFlowTabState(flow, li);
-    });
-
-    flow.on('started', () => {
-      setFlowTabState(flow, li);
-    });
-
-    flow.on('starting', () => {
-      setFlowTabState(flow, li);
-    });
-
-    flow.on('stopping', () => {
-      setFlowTabState(flow, li);
-    });
-
-    flow.on('stopped', () => {
+    flow.on('deleteInstance', () => {
       setFlowTabState(flow, li);
     });
 
     return li;
+  }
+
+  function handleInstanceState(instance, flow, li) {
+    instance.on('initializing', () => {
+      setFlowTabState(flow, li);
+    });
+
+    instance.on('initialized', () => {
+      setFlowTabState(flow, li);
+    });
+
+    instance.on('started', () => {
+      setFlowTabState(flow, li);
+    });
+
+    instance.on('starting', () => {
+      setFlowTabState(flow, li);
+    });
+
+    instance.on('stopping', () => {
+      setFlowTabState(flow, li);
+    });
+
+    instance.on('stopped', () => {
+      setFlowTabState(flow, li);
+    });
   }
 
   // create button to add new flows
@@ -716,10 +765,10 @@ const editorView = (EL) => {
   function loadFlows() {
     flowListUl.classList.add('loading');
 
-    // ensure all flows tabs are gone
-    Array.from(flowListUl.querySelectorAll('li:not(.add)'))
-    .forEach((li) => {
-      flowListUl.removeChild(li);
+    // ensure all flow tabs are gone
+    Array.from(flowListUl.parentNode.querySelectorAll('#flowList > li:not(.add)'))
+    .forEach((flowListLi) => {
+      flowListUl.removeChild(flowListLi);
     });
 
     xibleEditor.getFlows()
