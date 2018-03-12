@@ -5,6 +5,45 @@ View.routes['/settings/editor'] = (EL) => {
     <section>
       <h1>Editor</h1>
 
+      <section id="settings">
+        <h2>Settings</h2>
+        <p class="warning">
+          Changing these values will impact your ability to change them back from this page.
+        </p>
+        <dl>
+          <dd class="checkbox">
+            <label for="settingsEditorSettingsAllowChange">
+              <input type="checkbox" value="true" id="settingsEditorSettingsAllowChange" data-configpath="editor.settings.allowchange" />
+              <span></span>
+            </label>
+          </dd>
+          <dt class="checkbox">
+            <label for="settingsEditorSettingsAllowChange">
+              Allow changing settings through the editor
+              <div>
+                This enables/disables the ability of changing settings through any of the API routes. Therefor the editor is affected as well.<br/>
+                By disabling this setting, you can only change the configuration from the commandline or by amending the config.json directly.
+              </div>
+            </label>
+          </dt>
+
+          <dd class="checkbox">
+            <label for="settingsEditorSettingsVisible">
+              <input type="checkbox" value="true" id="settingsEditorSettingsVisible" data-configpath="editor.settings.visible" />
+              <span></span>
+            </label>
+          </dd>
+          <dt class="checkbox">
+            <label for="settingsEditorSettingsVisible">
+              Settings visible through the editor
+              <div>
+                Disabling this setting does not imply that settings cannot be changed or read through the API routes.
+              </div>
+            </label>
+          </dt>
+        </dl>
+      </section>
+
       <section id="nodes">
         <h2>Nodes</h2>
         <dl>

@@ -6,6 +6,11 @@ module.exports = (Config, XIBLE, EXPRESS_APP) => {
   });
 
   EXPRESS_APP.put('/api/config/value', (req, res) => {
+    if (!Config.getValue('editor.settings.allowchange')) {
+      res.status(403).end();
+      return;
+    }
+
     const path = req.body.path;
     const value = req.body.value;
     if (typeof path !== 'string' || typeof value === 'undefined') {
@@ -18,6 +23,11 @@ module.exports = (Config, XIBLE, EXPRESS_APP) => {
   });
 
   EXPRESS_APP.delete('/api/config/value', (req, res) => {
+    if (!Config.getValue('editor.settings.allowchange')) {
+      res.status(403).end();
+      return;
+    }
+
     const path = req.body.path;
     if (typeof path !== 'string') {
       res.status(400).end();
@@ -28,11 +38,8 @@ module.exports = (Config, XIBLE, EXPRESS_APP) => {
     res.json(Config.getAll());
   });
 
-  EXPRESS_APP.get('/api/config/validatePermissions', (req, res) => {
-    Config
-    .validatePermissions()
-    .then((result) => {
-      res.json(result);
-    });
+  EXPRESS_APP.get('/api/config/validatePermissions', async (req, res) => {
+    const result = await Config.validatePermissions();
+    res.json(result);
   });
 };

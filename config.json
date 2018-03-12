@@ -1,5 +1,4 @@
 {
-
   "webserver": {
     "portnumber": 9600,
     "ssl": {
@@ -21,6 +20,10 @@
   },
 
   "editor": {
+    "settings": {
+      "visible": true,
+      "allowchange": true
+    },
     "nodes": {
       "statuses": {
         "max": null
@@ -46,7 +49,5 @@
       "allowpublish": true,
       "allowinstall": true
     }
-
   }
-
 }

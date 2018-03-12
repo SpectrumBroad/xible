@@ -20,6 +20,7 @@ View.routes['/settings'] = (EL) => {
       <section>
         <h1>Editor</h1>
         <ul>
+          <li><a href="/settings/editor#settings" onclick="settingsViewHolder.navigate('/settings/editor#settings'); return false;">Settings</a></li>
           <li><a href="/settings/editor#nodes" onclick="settingsViewHolder.navigate('/settings/editor#nodes'); return false;">Nodes</a></li>
           <li><a href="/settings/editor#flows" onclick="settingsViewHolder.navigate('/settings/editor#flows'); return false;">Flows</a></li>
           <li><a href="/settings/editor#viewstate" onclick="settingsViewHolder.navigate('/settings/editor#viewstate'); return false;">Viewstate</a></li>
@@ -91,15 +92,23 @@ View.routes['/settings'] = (EL) => {
       });
     });
 
+    // disable if necessary
+    xibleWrapper.Config.getValue('editor.settings.allowchange').then((allowChange) => {
+      Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
+      .forEach((input) => {
+        input.disabled = !allowChange;
+      });
+    });
+
     // set the right data in the data-configpath fields
     xibleWrapper.Config.getAll().then((config) => {
       Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
       .forEach((input) => {
         if (input.getAttribute('type') === 'checkbox') {
           input.checked = !!xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+        } else {
+          input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
         }
-
-        input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
       });
     });
   });
