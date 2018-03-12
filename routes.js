@@ -23,6 +23,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     res.status(404).end();
   });
 
+  // expose xibleWrapper to editor
+  EXPRESS_APP.get('/js/xibleWrapper.js', (req, res) => {
+    res.sendFile(`${__dirname}/node_modules/xible-wrapper/dist/index.js`);
+  });
+
   EXPRESS_APP.get('*', (req, res, next) => {
     // node editor content hosting
     if (/^\/api\/nodes\/[^/]+\/editor\//.test(req.path)) {
