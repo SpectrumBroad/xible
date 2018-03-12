@@ -314,29 +314,35 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         this.addNode(xibleNode);
 
         for (const name in node.inputs) {
-          if (!xibleNode.inputs[name]) {
+          const nodeInput = node.inputs[name];
+          let xibleNodeInput = xibleNode.inputs[name];
+          if (!xibleNodeInput) {
             flowDebug(`Node "${node.name}" does not have input "${name}"`);
 
-            xibleNode.addInput(name, node.inputs[name]);
+            xibleNodeInput = xibleNode.addInput(name, nodeInput);
             xibleNode.nodeExists = false;
             this.runnable = false;
           }
 
-          xibleNode.inputs[name]._id = node.inputs[name]._id;
-          xibleNode.inputs[name].global = node.inputs[name].global;
+          xibleNodeInput._id = nodeInput._id;
+          xibleNodeInput.global = nodeInput.global;
+          xibleNodeInput.type = nodeInput.type;
         }
 
         for (const name in node.outputs) {
-          if (!xibleNode.outputs[name]) {
+          const nodeOutput = node.outputs[name];
+          let xibleNodeOutput = xibleNode.outputs[name];
+          if (!xibleNodeOutput) {
             flowDebug(`Node "${node.name}" does not have output "${name}"`);
 
-            xibleNode.addOutput(name, node.outputs[name]);
+            xibleNodeOutput = xibleNode.addOutput(name, nodeOutput);
             xibleNode.nodeExists = false;
             this.runnable = false;
           }
 
-          xibleNode.outputs[name]._id = node.outputs[name]._id;
-          xibleNode.outputs[name].global = node.outputs[name].global || false;
+          xibleNodeOutput._id = nodeOutput._id;
+          xibleNodeOutput.global = nodeOutput.global || false;
+          xibleNodeOutput.type = nodeOutput.type;
         }
 
         // construct a dummy editorContents
@@ -352,12 +358,16 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       for (let i = 0; i < json.connectors.length; i += 1) {
         const origin = this.getOutputById(json.connectors[i].origin);
         if (!origin) {
-          throw new Error(`Cannot find output by id "${json.connectors[i].origin}"`);
+          flowDebug(`Cannot find output by id "${json.connectors[i].origin}"`);
+          this.runnable = false;
+          continue;
         }
 
         const destination = this.getInputById(json.connectors[i].destination);
         if (!destination) {
-          throw new Error(`Cannot find input by id "${json.connectors[i].destination}"`);
+          flowDebug(`Cannot find input by id "${json.connectors[i].destination}"`);
+          this.runnable = false;
+          continue;
         }
 
         const xibleConnector = {
@@ -371,11 +381,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       XIBLE.addFlow(this);
 
-      XIBLE.broadcastWebSocket({
-        method: 'xible.flow.loadJson',
-        runnable: this.runnable,
-        flowId: this._id
-      });
+      this.emit('initJson');
     }
 
     /**
