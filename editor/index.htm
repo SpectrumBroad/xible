@@ -38,7 +38,7 @@
 
 			<!--			<li><a href="/flows" onclick="mainViewHolder.navigate('/flows'); return false;"><span>&#xe059;</span>Flows</a></li> -->
 			<!--			<li><a href="/nodes" onclick="mainViewHolder.navigate('/nodes'); return false;"><span>&#xe044;</span>Nodes</a></li> -->
-			<li><a href="/settings" onclick="mainViewHolder.navigate('/settings'); return false;"><span>S</span>Settings</a></li>
+      <li id="navSettings"><a href="/settings" onclick="mainViewHolder.navigate('/settings'); return false;"><span>S</span>Settings</a></li>
 			<li class="editor"><a href="/editor" onclick="mainViewHolder.navigate('/editor'); return false;"><span>&#xe029;</span>Editor</a></li>
 			<li><a href="https://xible.io/docs" target="_blank" rel="noopener"><span>(</span>Docs</a></li>
 
@@ -58,10 +58,17 @@
 		xibleWrapper.on('error', (err) => {
 			console.log(err);
 		});
-		xibleWrapper.autoReconnect();
-		xibleWrapper.connect();
 
     xibleWrapper.on('open', () => {
+      xibleWrapper.Config.getValue('editor.settings.visible')
+      .then((settingsVisible) => {
+        if (!settingsVisible) {
+          document.getElementById('navSettings').style.display = 'none';
+        } else {
+          document.getElementById('navSettings').style.display = '';
+        }
+      });
+
       const connectionLost = document.getElementById('connectionLost');
       if (!connectionLost) {
         return;
