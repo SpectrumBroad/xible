@@ -24,6 +24,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return typeDefs;
     }
 
+    static getByName(name) {
+      return typeDefs[name];
+    }
+
     static add(typeDef) {
       if (!(typeDef instanceof TypeDef)) {
         typeDef = new TypeDef(typeDef);
