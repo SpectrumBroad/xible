@@ -1,23 +1,16 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let valuesIn = NODE.getInputByName('values');
+module.exports = (NODE) => {
+  const valuesIn = NODE.getInputByName('values');
 
-	let boolOut = NODE.getOutputByName('result');
-	boolOut.on('trigger', (conn, state, callback) => {
-
-		valuesIn.getValues(state).then((vals) => {
-
-			if (vals.length) {
-
-				var firstVal = vals[0];
-				callback(vals.every(val => val === firstVal));
-
-			} else {
-				callback(false);
-			}
-
-		});
-
-	});
-
+  const boolOut = NODE.getOutputByName('result');
+  boolOut.on('trigger', async (conn, state, callback) => {
+    const values = await valuesIn.getValues(state);
+    if (values.length) {
+      const firstValue = values[0];
+      callback(values.every(value => value === firstValue));
+    } else {
+      callback(false);
+    }
+  });
 };
