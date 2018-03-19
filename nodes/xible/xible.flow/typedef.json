@@ -1,6 +1,5 @@
 {
   "xible.flow": {
-    "color": "goldenrod",
-    "extends": "object"
+    "color": "goldenrod"
   }
 }

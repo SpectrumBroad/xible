@@ -1,6 +1,5 @@
 {
   "string": {
-    "color": "yellow",
-    "extends": "object"
+    "color": "yellow"
   }
 }
