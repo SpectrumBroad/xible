@@ -34,6 +34,12 @@ class XibleEditorFlow extends xibleWrapper.Flow {
     }
   }
 
+  stopAllInstances() {
+    const stopPromise = super.stopAllInstances();
+    this.undirect();
+    return stopPromise;
+  }
+
   initNodes(nodes) {
     this.nodes = [];
     nodes.forEach(node => this.addNode(new XibleEditorNode(node)));
