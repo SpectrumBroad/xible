@@ -301,21 +301,30 @@ module.exports = (XIBLE) => {
     /**
      * Starts a flow in direct mode, on a given set of nodes.
      * @param {Node[]} nodes Array of nodes to direct. Any node outside this array will be ignored.
+     * @returns {Promise.<Flow>}
      */
     async direct(nodes) {
+      if (XIBLE.child) {
+        throw new Error('should not be called from child');
+      }
+
+      if (this.state !== FlowInstance.STATE_STARTED || !this.directed) {
+        this.directNodes = nodes;
+        this.directed = true;
+        return this.forceStart();
+      }
+
+      this.worker.send({
+        method: 'directNodes',
+        directNodes: nodes
+      });
+
+      return this;
+    }
+
+    async directChild(nodes) {
       if (!XIBLE.child) {
-        if (this.state !== FlowInstance.STATE_STARTED || !this.directed) {
-          this.directNodes = nodes;
-          this.directed = true;
-          return this.forceStart();
-        }
-
-        this.worker.send({
-          method: 'directNodes',
-          directNodes: nodes
-        });
-
-        return this;
+        throw new Error('should not be called from master');
       }
 
       // cancel all output triggers

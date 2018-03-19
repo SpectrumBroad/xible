@@ -111,7 +111,7 @@ process.on('message', (message) => {
 
       let startPromise;
       if (message.directNodes) {
-        startPromise = flowInstance.direct(message.directNodes);
+        startPromise = flowInstance.directChild(message.directNodes);
       } else {
         startPromise = flowInstance.start();
       }
@@ -153,7 +153,7 @@ process.on('message', (message) => {
 
     case 'directNodes': {
       if (flowInstance) {
-        flowInstance.direct(message.directNodes);
+        flowInstance.directChild(message.directNodes);
       }
 
       break;
