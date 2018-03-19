@@ -179,6 +179,9 @@ View.routes['/flows'] = (EL) => {
   function setInstanceState(li, instance) {
     li.className = '';
     li.classList.add(`state-${instance.state}`);
+    if (instance.directed) {
+      li.classList.add('directed');
+    }
     li.innerHTML = instance.state;
   }
 /*

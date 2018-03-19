@@ -588,6 +588,9 @@ const editorView = (EL) => {
       instances.forEach((instance) => {
         const stateLi = stateUl.appendChild(document.createElement('li'));
         stateLi.classList.add(`state-${instance.state}`);
+        if (instance.directed) {
+          stateLi.classList.add('directed');
+        }
       });
 
       const instanceCountEl = li.querySelector('.instance-count');
