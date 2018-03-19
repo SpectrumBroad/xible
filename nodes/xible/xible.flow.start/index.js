@@ -66,6 +66,10 @@ module.exports = (NODE) => {
 
   instanceOut.on('trigger', async (conn, state, callback) => {
     const thisState = state.get(NODE);
+    if (!thisState || !thisState.flowInstanceDetails) {
+      return;
+    }
+
     const flowInstances = await Promise.all(
       thisState.flowInstanceDetails.map(
         flowInstanceDetail =>
