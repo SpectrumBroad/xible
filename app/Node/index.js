@@ -704,7 +704,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       if (obj) {
         if (typeof obj.type === 'string') {
           if (obj.type === 'global') {
-            throw new TypeError('you cannot define a input or output with type \'global\'');
+            throw new TypeError('you cannot define an input or output with type \'global\'');
           }
 
           this.type = obj.type;
