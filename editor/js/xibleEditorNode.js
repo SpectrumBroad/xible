@@ -212,13 +212,17 @@ class XibleEditorNode extends xibleWrapper.Node {
     duplicateXibleNode._id = xibleWrapper.generateObjectId();
 
     // create a unique id for the inputs
+    // and reset the type
     for (const name in duplicateXibleNode.inputs) {
       duplicateXibleNode.inputs[name]._id = xibleWrapper.generateObjectId();
+      duplicateXibleNode.inputs[name].setType(duplicateXibleNode.inputs[name].structureType);
     }
 
     // create a unique id for the outputs
+    // and reset the type
     for (const name in duplicateXibleNode.outputs) {
       duplicateXibleNode.outputs[name]._id = xibleWrapper.generateObjectId();
+      duplicateXibleNode.outputs[name].setType(duplicateXibleNode.outputs[name].structureType);
     }
 
     return duplicateXibleNode;
