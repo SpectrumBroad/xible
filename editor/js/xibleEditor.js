@@ -1040,7 +1040,7 @@ class XibleEditor extends EventEmitter {
     });
 
     // make a copy of all connectors between selected nodes
-    let processedOutputs = [];
+    let processedOutputs = {};
     const processedConnectors = [];
     selection.forEach((sel) => {
       if (!(sel instanceof XibleEditorNode)) {
@@ -1049,10 +1049,10 @@ class XibleEditor extends EventEmitter {
 
       sel.getOutputs()
       .forEach((output) => {
-        if (processedOutputs.indexOf(output._id) > -1) {
+        if (processedOutputs[output._id]) {
           return;
         }
-        processedOutputs.push(output._id);
+        processedOutputs[output._id] = true;
 
         output.connectors.forEach((conn) => {
           if (dupMap[conn.destination.node._id]) {
