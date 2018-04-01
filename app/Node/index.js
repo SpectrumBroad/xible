@@ -695,8 +695,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.name = null;
       this.type = null;
       this.singleType = false;
-      this.assignsOutputTypes = null;
-      this.assignsInputTypes = null;
+      this.assignsOutputTypes = [];
+      this.assignsInputTypes = [];
       this.maxConnectors = null;
       this.node = null;
       this.description = null;
