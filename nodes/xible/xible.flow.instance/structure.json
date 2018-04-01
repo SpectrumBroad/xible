@@ -6,6 +6,10 @@
     "instance": {
       "type": "xible.flow.instance"
     },
+    "params": {
+      "type": "object",
+      "description": "Returns the parameters provided for this instance."
+    },
     "state": {
       "type": "math.number",
       "description": "Returns the running state of the flow instance. 0=stopped, 1=stopping, 2=initializing, 3=initialized, 4=starting, 5=started."

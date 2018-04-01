@@ -21,6 +21,11 @@ module.exports = (NODE) => {
     callback(flowInstance.state);
   });
 
+  const paramsOut = NODE.getOutputByName('params');
+  paramsOut.on('trigger', async (conn, state, callback) => {
+    callback(NODE.flowInstance.params);
+  });
+
   const timingOut = NODE.getOutputByName('timing');
   timingOut.on('trigger', async (conn, state, callback) => {
     const flowInstance = await getFlowInstance(NODE.flow._id, NODE.flowInstance._id);
