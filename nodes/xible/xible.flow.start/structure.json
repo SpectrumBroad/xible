@@ -8,6 +8,10 @@
     },
     "flows": {
       "type": "xible.flow"
+    },
+    "params": {
+      "type": "object",
+      "description": "An object of which the key-value pairs are available on the newly started flow instance."
     }
   },
   "outputs": {

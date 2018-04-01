@@ -5,6 +5,7 @@ const getFlowInstance = require('../utils.js').getFlowInstance;
 module.exports = (NODE) => {
   const triggerIn = NODE.getInputByName('trigger');
   const flowsIn = NODE.getInputByName('flows');
+  const paramsIn = NODE.getInputByName('params');
   const doneOut = NODE.getOutputByName('done');
   const instanceOut = NODE.getOutputByName('instance');
 
@@ -20,11 +21,14 @@ module.exports = (NODE) => {
       return;
     }
 
+    const params = Object.assign({}, ...await paramsIn.getValues(state));
+
     const flowInstanceDetails = [];
     flowIds.forEach((flowId) => {
       if (!flowId) {
         return;
       }
+
       let messageHandler = (message) => {
         if (message.flowId !== flowId) {
           return;
@@ -59,7 +63,8 @@ module.exports = (NODE) => {
       process.on('message', messageHandler);
       process.send({
         method: 'xible.flow.start',
-        flowId
+        flowId,
+        params
       });
     });
   });
