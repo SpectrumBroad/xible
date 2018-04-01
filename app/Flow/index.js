@@ -577,6 +577,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
     */
 
+    /**
+     * Creates a new instance of this flow.
+     * This instance can be started/stopped etc.
+     * @param {Object} options
+     * @param {Object} options.params
+     * @param {Object} options.directNodes
+     * @returns {FlowInstance}
+     */
     createInstance({ params, directNodes }) {
       if (!this.runnable) {
         throw new Error(`Flow "${this._id}" is not runnable`);
@@ -594,14 +602,19 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return flowInstance;
     }
 
+    /**
+     * Delete the provided instance for this flow.
+     * @param {FlowInstance} instance
+     * @returns {Promise}
+     */
     async deleteInstance(instance) {
       if (!(instance instanceof XIBLE.FlowInstance)) {
-        throw new Error('argument "instance" must be instanceof FlowInstance');
+        throw new TypeError('argument "instance" must be instanceof FlowInstance');
       }
 
       const index = this.instances.indexOf(instance);
       if (index === -1) {
-        throw new Error('argument "instance" is not instance of this flow');
+        throw new TypeError('argument "instance" is not instance of this flow');
       }
 
       this.instances.splice(index, 1);
@@ -611,7 +624,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       this.emit('deleteInstance', { flowInstance: instance });
-      return null;
     }
 
     /**
