@@ -13,7 +13,7 @@ module.exports = (NODE) => {
   });
 
   const stateOut = NODE.getOutputByName('state');
-  stateOut.on('trigger', async (conn, satte, callback) => {
+  stateOut.on('trigger', async (conn, state, callback) => {
     const flowInstance = await getFlowInstance(NODE.flow._id, NODE.flowInstance._id);
     if (!flowInstance) {
       return;
