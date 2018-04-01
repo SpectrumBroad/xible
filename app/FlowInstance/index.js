@@ -443,14 +443,8 @@ module.exports = (XIBLE) => {
      */
     stop(deleteInstance = true) {
       if (XIBLE.child) {
-        flowInstanceDebug('stopping flowInstance from worker');
-
-        // close any node that wants to
-        this.flow.nodes.forEach(node => node.emit('close'));
-
-        flowInstanceDebug('stopped flowInstance from worker');
-        process.exit(0);
-        return null;
+        return this.stopChild();
+        // return Promise.reject(new Error('should not be called from child'));
       }
 
       if (
@@ -517,6 +511,21 @@ module.exports = (XIBLE) => {
           resolve(this);
         }
       });
+    }
+
+    stopChild() {
+      if (!XIBLE.child) {
+        throw new Error('should not be called from master');
+      }
+
+      flowInstanceDebug('stopping flowInstance from worker');
+
+      // close any node that wants to
+      this.flow.nodes.forEach(node => node.emit('close'));
+
+      flowInstanceDebug('stopped flowInstance from worker');
+      process.exit(0);
+      return null;
     }
 
     /**

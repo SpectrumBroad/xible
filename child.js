@@ -24,7 +24,7 @@ function requireNode(nodePath) {
         error: err
       });
     } else if (flowInstance) {
-      flowInstance.stop();
+      flowInstance.stopChild();
     }
 
     return null;
@@ -40,12 +40,12 @@ process.on('unhandledRejection', (reason) => {
       error: reason
     });
   } else if (flowInstance) {
-    flowInstance.stop();
+    flowInstance.stopChild();
   }
 });
 
 // init message handler
-process.on('message', (message) => {
+process.on('message', async (message) => {
   switch (message.method) {
     case 'init': {
       xible = new Xible({
@@ -72,8 +72,9 @@ process.on('message', (message) => {
       }
       structuredNodes = null;
 
-      xible.init()
-      .then(() => {
+      try {
+        await xible.init();
+
         flow = new xible.Flow();
         flow.initJson(message.flow);
 
@@ -83,21 +84,16 @@ process.on('message', (message) => {
             method: 'initialized'
           });
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
 
-        if (process.connected) {
-          process.send({
-            method: 'stop',
-            error: err
-          });
-        }
+        process.send({
+          method: 'initerr',
+          error: err
+        });
 
-        if (flow) {
-          flow.stop();
-        }
-      });
+        process.exit(0);
+      }
 
       break;
     }
@@ -109,23 +105,20 @@ process.on('message', (message) => {
       });
       flowInstance._id = message.flowInstanceId;
 
-      let startPromise;
-      if (message.directNodes) {
-        startPromise = flowInstance.directChild(message.directNodes);
-      } else {
-        startPromise = flowInstance.start();
-      }
+      try {
+        if (message.directNodes) {
+          await flowInstance.directChild(message.directNodes);
+        } else {
+          await flowInstance.start();
+        }
 
-      startPromise
-      .then(() => {
         // inform the master that we actually started
         if (process.connected) {
           process.send({
             method: 'started'
           });
         }
-      })
-      .catch((err) => {
+      } catch(err) {
         console.error(err);
 
         if (process.connected) {
@@ -136,16 +129,16 @@ process.on('message', (message) => {
         }
 
         if (flowInstance) {
-          flowInstance.stop();
+          flowInstance.stopChild();
         }
-      });
+      }
 
       break;
     }
 
     case 'stop': {
       if (flowInstance) {
-        flowInstance.stop();
+        flowInstance.stopChild();
       }
 
       break;
