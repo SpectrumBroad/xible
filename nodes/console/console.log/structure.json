@@ -7,7 +7,7 @@
       "type": "trigger"
     },
     "value": {
-      "type": null
+      "type": "object"
     }
   },
   "outputs": {

@@ -3,9 +3,7 @@
   "type": "object",
   "description": "Change data type into another.",
   "inputs": {
-    "values": {
-      "type": null
-    }
+    "values": {}
   },
   "outputs": {
     "result": {
