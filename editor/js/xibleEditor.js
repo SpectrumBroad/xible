@@ -140,7 +140,7 @@ class XibleEditor extends EventEmitter {
 
       // add description
       const descriptionEl = io.element.appendChild(document.createElement('p'));
-      descriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.type || 'any'));
+      descriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.structureType || 'any'));
       descriptionEl.appendChild(document.createTextNode(io.description || 'not described'));
 
       if (!io.description) {
