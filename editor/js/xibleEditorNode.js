@@ -673,29 +673,6 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
     this.enableHook();
   }
 
-  setSingleType(bool) {
-    super.setSingleType(bool);
-
-    // TODO: unhook eventlisteners when changing singleType
-
-    if (this.singleType) {
-      this.on('attach', (conn) => {
-        const connLoc = conn[this instanceof XibleEditorNodeInput ? 'origin' : 'destination'];
-        if (connLoc && connLoc.type) {
-          this.setType(connLoc.type);
-        }
-      });
-
-      this.on('detach', () => {
-        if (!this.connectors.length) {
-          this.setType(null);
-        }
-      });
-    }
-
-    this.verifyConnectors();
-  }
-
   setGlobal(global) {
     super.setGlobal(global);
 
