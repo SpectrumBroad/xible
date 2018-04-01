@@ -519,14 +519,14 @@ class XibleEditorNode extends xibleWrapper.Node {
       }
 
       // add the label
-      let placeholder = el.getAttribute('placeholder') || el.getAttribute('data-outputvalue');
+      let placeholder = el.getAttribute('placeholder') || el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
       const span = document.createElement('span');
 
       // try to fetch a placeholder for a select input
       if (!placeholder && el.nodeName === 'SELECTCONTAINER') {
         const selectEl = el.querySelector('select');
         if (selectEl) {
-          placeholder = selectEl.getAttribute('placeholder') || selectEl.getAttribute('data-outputvalue');
+          placeholder = selectEl.getAttribute('placeholder') || selectEl.getAttribute('data-output-value') || selectEl.getAttribute('data-outputvalue');
         }
       }
 
@@ -538,17 +538,17 @@ class XibleEditorNode extends xibleWrapper.Node {
       label.appendChild(span);
 
       // ensure hideif attached is hooked properly
-      const hideIfAttached = el.getAttribute('data-hideifattached');
+      const hideIfAttached = el.getAttribute('data-hide-if-attached') || el.getAttribute('data-hideifattached');
       if (hideIfAttached) {
-        label.setAttribute('data-hideifattached', hideIfAttached);
+        label.setAttribute('data-hide-if-attached', hideIfAttached);
       }
     });
   }
 
   convenienceOutputValue() {
-    const els = Array.from(this.editorContentEl.querySelectorAll('[data-outputvalue]'));
+    const els = Array.from(this.editorContentEl.querySelectorAll('[data-output-value], [data-outputvalue]'));
     els.forEach((el) => {
-      const attr = el.getAttribute('data-outputvalue');
+      const attr = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
       const type = el.getAttribute('type');
 
       // set the default value
@@ -615,9 +615,9 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   convenienceHideIfAttached() {
-    const els = Array.from(this.editorContentEl.querySelectorAll('[data-hideifattached]'));
+    const els = Array.from(this.editorContentEl.querySelectorAll('[data-hide-if-attached], [data-hideifattached]'));
     els.forEach((el) => {
-      const attr = el.getAttribute('data-hideifattached');
+      const attr = el.getAttribute('data-hide-if-attached') || el.getAttribute('data-hideifattached');
       let matchArray;
       const ioArray = [];
 
