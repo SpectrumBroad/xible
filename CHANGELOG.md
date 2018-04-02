@@ -8,8 +8,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Added the `xible.flow.param` node including applicable command line and REST API options. These allow parameters to be send when starting a flow. ([#45](https://github.com/SpectrumBroad/xible/issues/45))
 
+-   A flow can now be instantiated multiple times. ([#46](https://github.com/SpectrumBroad/xible/issues/46))
+
+-   Added `input.*` nodes to modify return values. ([#48](https://github.com/SpectrumBroad/xible/issues/48))
+
+-   Implemented `xible service restart` command to restart the xible service if it was installed. ([#51](https://github.com/SpectrumBroad/xible/issues/51))
+
+-   Connection closed messages is now visible on every view. ([#52](https://github.com/SpectrumBroad/xible/issues/52))
+
+### Changed
+-   `xible.flow.start` raises an error if a flow does not exist.
+
+-   `xible.flow.start` contains an output for the instance it created when starting a flow.
+
+-   If the extends keyword for a typedef is not set, it defaults to `object`.
+
+-   NodeOutputs that do not have a type set, will no longer be triggered to ensure only values within the extends chain of the calling NodeInput are returned. ([#49](https://github.com/SpectrumBroad/xible/issues/49))
+
 ### Fixed
 -   Configuring SSL now redirects plain HTTP requests to the configured SSL port, instead of `plain HTTP port + 1`.
+
+-   The node help page now properly shows the original (structure) type of the node inputs and outputs, instead of the active type.
 
 ## [0.9.1][]
 ### Fixed
