@@ -896,19 +896,6 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
         return;
       }
 
-      // we don't allow snap-in if the selected connectors are of multiple types,
-      // while the input/output only allows a single type to be connected
-      if (this.singleType) {
-        const multiType = this instanceof XibleEditorNodeInput ?
-          connectors
-          .some(conn => conn.origin.type !== connectors[0].origin.type) :
-          connectors
-          .some(conn => conn.destination.type !== connectors[0].destination.type);
-        if (multiType) {
-          return;
-        }
-      }
-
       const outGoing = this instanceof XibleEditorNodeOutput;
       const end = connectors[0][(outGoing ? 'origin' : 'destination')];
       if (
