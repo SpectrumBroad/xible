@@ -797,15 +797,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * @extends NodeIo
   */
   class NodeInput extends NodeIo {
-    constructor(...args) {
-      super(...args);
-
-      if (!this.type) {
-        this.type = 'object';
-        this.structureType = this.type;
-      }
-    }
-
     /**
     * Fetches all input values for this input.
     * @param {FlowState} state The flowstate at the time of calling.
