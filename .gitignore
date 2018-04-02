@@ -17,6 +17,7 @@ nodes/*
 !nodes/conditional
 !nodes/boolean
 !nodes/object
+!nodes/input
 ssl/
 docs/
 package-lock.json

@@ -1,20 +1,15 @@
 {
-  "name": "group",
+  "name": "input.group",
   "type": "object",
   "description": "Groups multiple input values together.",
   "inputs": {
     "any": {
-      "type": null,
-  		"singleType": true,
       "assignsOutputType": "grouped",
       "description": "The values to be grouped."
   	}
   },
   "outputs": {
     "grouped": {
-      "type": null,
-      "singleType": true,
-      "assignsInputType": "any",
       "description": "List of all values connected to the 'any' input."
     },
     "count": {

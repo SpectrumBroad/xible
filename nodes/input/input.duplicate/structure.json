@@ -1,0 +1,13 @@
+{
+  "name": "input.duplicate",
+  "type": "object",
+  "description": "Duplicates the input an x amount of times.",
+  "inputs": {
+    "any": {
+      "assignsOutputType": "duplicates"
+    }
+  },
+  "outputs": {
+    "duplicates": {}
+  }
+}

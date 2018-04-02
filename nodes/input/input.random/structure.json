@@ -1,0 +1,13 @@
+{
+  "name": "input.random",
+  "type": "object",
+  "description": "Returns a random value from the input(s).",
+  "inputs": {
+    "any": {
+      "assignsOutputType": "random"
+    }
+  },
+  "outputs": {
+    "random": {}
+  }
+}

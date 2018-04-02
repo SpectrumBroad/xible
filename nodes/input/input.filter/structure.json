@@ -1,11 +1,11 @@
 {
-  "name": "filter",
+  "name": "input.filter",
   "type": "object",
   "description": "Filters data based on an input condition.",
   "inputs": {
     "any": {
-      "type": null,
-      "description": "The values to filter based on the condition result."
+      "description": "The values to filter based on the condition result.",
+      "assignsOutputTypes": ["filtered", "item"]
     },
     "condition": {
       "type": "boolean"
@@ -13,12 +13,10 @@
   },
   "outputs": {
     "filtered": {
-      "type": null,
       "description": "Values from the 'any' input with a corresponding truthy condition."
     },
-    "dropped": {
-      "type": null,
-      "description": "Values from the 'any' input with a corresponding falsy condition."
+    "item": {
+      "description": "The current item being processed."
     }
   }
 }
