@@ -224,56 +224,65 @@ module.exports = (XIBLE) => {
     }
 
     /**
-     * Starts a flow. Rejects if flow is not stopped
-     * Note that the behaviour is different when called from a worker process
+     * Starts a flowInstance. Rejects if flow is not in a stopped state.
+     * Note that the behaviour is different when called from a worker process.
      * @param {Object} params
      * @param {Node[]} directNodes nodes to direct
-     * @fires Node#trigger
-     * @fires Node#init
      * @return {Promise}
      */
     start() {
-      if (!XIBLE.child) {
-        // check and set the correct state
-        if (this.state !== FlowInstance.STATE_INITIALIZED) {
-          return Promise.reject(new Error('cannot start; flowInstance is not initialized'));
-        }
-        this.state = FlowInstance.STATE_STARTING;
-
-        this.timing.startStart = process.hrtime();
-
-        return new Promise((resolve) => {
-          this.emit('starting');
-
-          flowInstanceDebug('starting flowInstance from master');
-
-          if (this.worker && this.worker.connected) {
-            this.worker.on('message', (message) => {
-              switch (message.method) {
-                case 'started': {
-                  this.timing.startEnd = process.hrtime();
-                  const startedDiff = process.hrtime(this.timing.startStart);
-                  flowInstanceDebug(`flowInstance/worker started in ${(startedDiff[0] * 1000) + (startedDiff[1] / 1e6)}ms`);
-
-                  if (!this.directed) {
-                    this.flow.saveStatus();
-                  }
-                  resolve(this);
-                  break;
-                }
-              }
-            });
-
-            this.worker.send({
-              method: 'start',
-              flowInstanceId: this._id,
-              directNodes: this.directNodes,
-              params: this.params
-            });
-          }
-        });
+      if (XIBLE.child) {
+        return this.startChild();
       }
 
+      // check and set the correct state
+      if (this.state !== FlowInstance.STATE_INITIALIZED) {
+        return Promise.reject(new Error('cannot start; flowInstance is not initialized'));
+      }
+      this.state = FlowInstance.STATE_STARTING;
+
+      this.timing.startStart = process.hrtime();
+
+      return new Promise((resolve) => {
+        this.emit('starting');
+
+        flowInstanceDebug('starting flowInstance from master');
+
+        if (this.worker && this.worker.connected) {
+          this.worker.on('message', (message) => {
+            switch (message.method) {
+              case 'started': {
+                this.timing.startEnd = process.hrtime();
+                const startedDiff = process.hrtime(this.timing.startStart);
+                flowInstanceDebug(`flowInstance/worker started in ${(startedDiff[0] * 1000) + (startedDiff[1] / 1e6)}ms`);
+
+                if (!this.directed) {
+                  this.flow.saveStatus();
+                }
+                resolve(this);
+                break;
+              }
+            }
+          });
+
+          this.worker.send({
+            method: 'start',
+            flowInstanceId: this._id,
+            directNodes: this.directNodes,
+            params: this.params
+          });
+        }
+      });
+    }
+
+    /**
+     * Starts a flowInstance from the worker process.
+     * @private
+     * @fires Node#trigger
+     * @fires Node#init
+     * @returns {Promise.<FlowInstance>} The current flow instance is returned upon completion.
+     */
+    async startChild() {
       flowInstanceDebug('starting flowInstance from worker');
 
       const flowState = new XIBLE.FlowState();
@@ -295,13 +304,14 @@ module.exports = (XIBLE) => {
         }
       });
 
-      return Promise.resolve(this);
+      return this;
     }
 
     /**
      * Starts a flow in direct mode, on a given set of nodes.
      * @param {Node[]} nodes Array of nodes to direct. Any node outside this array will be ignored.
-     * @returns {Promise.<Flow>}
+     * @throws {Error} Will throw if called from a child/worker.
+     * @returns {Promise.<FlowInstance>} The current flow instance is returned upon completion.
      */
     async direct(nodes) {
       if (XIBLE.child) {
@@ -322,6 +332,12 @@ module.exports = (XIBLE) => {
       return this;
     }
 
+    /**
+     * Directs the flowInstance from the worker.
+     * @private
+     * @throws {Error} Will throw if called from master.
+     * @returns {Promise.<FlowInstance>} The current flow instance is returned upon completion.
+     */
     async directChild(nodes) {
       if (!XIBLE.child) {
         throw new Error('should not be called from master');
@@ -513,6 +529,10 @@ module.exports = (XIBLE) => {
       });
     }
 
+    /**
+     * Stops the flowInstance from the worker.
+     * @private
+     */
     stopChild() {
       if (!XIBLE.child) {
         throw new Error('should not be called from master');
