@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The node help page now properly shows the original (structure) type of the node inputs and outputs, instead of the active type.
 
+## [0.9.4][]
+### Fixed
+-   The editor is working again properly after including the shrinkwrap which points to the right xible-wrapper version. ([#61](https://github.com/SpectrumBroad/xible/issues/61))
+
 ## [0.9.1][]
 ### Fixed
 -   `xible service install` is working again. ([#43](https://github.com/SpectrumBroad/xible/issues/43))
