@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.10.0][]
 ### Added
 -   Added the `xible.flow.param` node including applicable command line and REST API options. These allow parameters to be send when starting a flow. ([#45](https://github.com/SpectrumBroad/xible/issues/45))
 
@@ -30,11 +33,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The node help page now properly shows the original (structure) type of the node inputs and outputs, instead of the active type.
 
-## 0.9.4
+## 0.9.4 - 2018-04-03
 ### Fixed
 -   The editor is working again properly after including the shrinkwrap which points to the right xible-wrapper version. ([#61](https://github.com/SpectrumBroad/xible/issues/61))
 
-## [0.9.1][]
+## [0.9.1][] - 2017-12-20
 ### Fixed
 -   `xible service install` is working again. ([#43](https://github.com/SpectrumBroad/xible/issues/43))
 
@@ -42,7 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Navigating the settings page properly uses async requests again instead of reloading the entire page.
 
-## [0.9.0][]
+## [0.9.0][] - 2017-11-01
 ### Added
 -   Within the editor, optional input fields are now hidden unless the containing node is either hovered or selected. ([#36](https://github.com/SpectrumBroad/xible/issues/36))
 
@@ -67,7 +70,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Performance of node selector has been greatly improved, especially when there are many nodes installed.
 
-## [0.8.0][]
+## [0.8.0][] - 2017-09-10
 ### Added
 -   [Introduction](https://discuss.xible.io/t/on-the-introduction-of-typedefs/52) of [type definitions](https://xible.io/docs/guides/nodes/typedefs) for inputs and outputs. This allows types to extend other types and provide custom colors for those types. ([#17](https://github.com/SpectrumBroad/xible/issues/17))
 
@@ -81,7 +84,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 -   `log.console` node is now removed, after it was deprecated in favor of `console.log`. ([#27](https://github.com/SpectrumBroad/xible/issues/27))
 
-## [0.7.0][]
+## [0.7.0][] - 2017-08-20
 ### Added
 -   Flows can be [started](https://xible.io/docs/commandlinetools/xible#flow.start)/[stopped](https://xible.io/docs/commandlinetools/xible#flow.stop) and [deleted](https://xible.io/docs/commandlinetools/xible#flow.delete) using the cli. See the [xible cli documentation](https://xible.io/docs/commandlinetools/xible) for more information. ([#18](https://github.com/SpectrumBroad/xible/issues/18))
 
@@ -155,7 +158,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/SpectrumBroad/xible/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/SpectrumBroad/xible/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/SpectrumBroad/xible/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/SpectrumBroad/xible/compare/v0.7.0...v0.8.0
