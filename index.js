@@ -97,7 +97,7 @@ class Xible extends EventEmitter {
   }
 
   // load nodes and flows
-  init(obj) {
+  async init(obj) {
     xibleDebug('init');
 
     // get all installed nodes
@@ -109,7 +109,7 @@ class Xible extends EventEmitter {
     this.initStats();
 
     if (this.child) {
-      return Promise.resolve();
+      return null;
     }
 
     // write PID file
@@ -149,18 +149,18 @@ class Xible extends EventEmitter {
       require('./routes.js')(this, this.expressApp);
     }
 
-    return Promise.all([
+    await Promise.all([
       this.Node.initFromPath(`${__dirname}/nodes`),
       this.Node.initFromPath(this.resolvePath(nodesPath))
-    ]).then(() => {
-      // get all installed flows
-      if (!obj || !obj.nodeNames) {
-        const flowPath = this.Config.getValue('flows.path');
-        if (flowPath) {
-          this.Flow.init(this.resolvePath(flowPath));
-        }
+    ]);
+    
+    // get all installed flows
+    if (!obj || !obj.nodeNames) {
+      const flowPath = this.Config.getValue('flows.path');
+      if (flowPath) {
+        this.Flow.init(this.resolvePath(flowPath));
       }
-    });
+    }
   }
 
   initStats() {
