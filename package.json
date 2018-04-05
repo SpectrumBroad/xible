@@ -36,7 +36,8 @@
     "debug": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon ./bin/xible.js server start",
     "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/xible.js server start",
     "inspect-brk": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect-brk=0.0.0.0:9229 ./bin/xible.js server start",
-    "prepublishOnly": "npm shrinkwrap --only=prod"
+    "prepublishOnly": "npm shrinkwrap --only=prod",
+    "test": "./node_modules/.bin/mocha"
   },
   "bin": {
     "xible": "./bin/xible.js",
@@ -65,6 +66,8 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
-    "nodemon": "*"
+    "nodemon": "*",
+    "mocha": "*",
+    "supertest": "*"
   }
 }

@@ -20,3 +20,4 @@ nodes/*
 ssl/
 docs/
 package-lock.json
+test

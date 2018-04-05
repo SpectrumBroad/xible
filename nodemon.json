@@ -5,7 +5,8 @@
     "nodes/xible-np-*",
     "vault.json",
     "config.json",
-    "editor/*"
+    "editor/*",
+    "test/*"
   ],
   "execMap": {
     "js": "node"
