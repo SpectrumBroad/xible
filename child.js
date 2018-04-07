@@ -118,7 +118,7 @@ process.on('message', async (message) => {
             method: 'started'
           });
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err);
 
         if (process.connected) {

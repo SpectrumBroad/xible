@@ -15,7 +15,6 @@
     "comma-dangle": ["error", "never"],
     "no-underscore-dangle": "off",
     "no-mixed-operators": "off",
-    "no-param-reassign": "warn",
     "no-multi-assign": "warn",
     "default-case": "off",
     "strict": ["error", "global"],
