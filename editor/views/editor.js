@@ -319,7 +319,7 @@ const editorView = (EL) => {
   });
 
   // update the usage charts
-  xibleEditor.on('flow.usage', (usage) => {
+  function onFlowUsage(usage) {
     if (!xibleEditor.loadedFlow || !usage) {
       return;
     }
@@ -393,6 +393,11 @@ const editorView = (EL) => {
 
     delayChart.data.datasets[0].data.push(combinedUsage.delay);
     delayChart.update(0);
+  }
+  xibleEditor.on('flow.usage', onFlowUsage);
+
+  mainViewHolder.once('purge', () => {
+    xibleEditor.removeListener('flow.usage', onFlowUsage);
   });
 
   function resetCharts() {
@@ -596,6 +601,7 @@ const editorView = (EL) => {
       const instanceCountEl = li.querySelector('.instance-count');
       instanceCountEl.innerHTML = instances.length;
     } catch (err) {
+      console.error(err);
     }
 
     setLoadedFlowState(flow);
@@ -664,52 +670,58 @@ const editorView = (EL) => {
 
     setFlowTabState(flow, li);
 
-    flow.on('initJson', () => {
+    function flowOnInitJson() {
       setFlowTabState(flow, li);
-    });
+    }
+    flow.on('initJson', flowOnInitJson);
 
     flow.getInstances()
     .then((instances) => {
       instances.forEach(instance => handleInstanceState(instance, flow, li));
     })
-    .catch((err) => {});
+    .catch((err) => {
+      console.error(err);
+    });
 
-    flow.on('createInstance', ({ flowInstance }) => {
+    function flowOnCreateInstance({ flowInstance }) {
       setFlowTabState(flow, li);
 
       handleInstanceState(flowInstance, flow, li);
-    });
+    }
+    flow.on('createInstance', flowOnCreateInstance);
 
-    flow.on('deleteInstance', () => {
+    function flowOnDeleteInstance() {
       setFlowTabState(flow, li);
+    }
+    flow.on('deleteInstance', flowOnDeleteInstance);
+
+    mainViewHolder.once('purge', () => {
+      flow.removeListener('initJson', flowOnInitJson);
+      flow.removeListener('createInstance', flowOnCreateInstance);
+      flow.removeListener('deleteInstance', flowOnDeleteInstance);
     });
 
     return li;
   }
 
   function handleInstanceState(instance, flow, li) {
-    instance.on('initializing', () => {
+    function flowInstanceOnStateChange() {
       setFlowTabState(flow, li);
-    });
+    }
+    instance.on('initializing', flowInstanceOnStateChange);
+    instance.on('initialized', flowInstanceOnStateChange);
+    instance.on('started', flowInstanceOnStateChange);
+    instance.on('starting', flowInstanceOnStateChange);
+    instance.on('stopping', flowInstanceOnStateChange);
+    instance.on('stopped', flowInstanceOnStateChange);
 
-    instance.on('initialized', () => {
-      setFlowTabState(flow, li);
-    });
-
-    instance.on('started', () => {
-      setFlowTabState(flow, li);
-    });
-
-    instance.on('starting', () => {
-      setFlowTabState(flow, li);
-    });
-
-    instance.on('stopping', () => {
-      setFlowTabState(flow, li);
-    });
-
-    instance.on('stopped', () => {
-      setFlowTabState(flow, li);
+    mainViewHolder.once('purge', () => {
+      instance.removeListener('initializing', flowInstanceOnStateChange);
+      instance.removeListener('initialized', flowInstanceOnStateChange);
+      instance.removeListener('started', flowInstanceOnStateChange);
+      instance.removeListener('starting', flowInstanceOnStateChange);
+      instance.removeListener('stopping', flowInstanceOnStateChange);
+      instance.removeListener('stopped', flowInstanceOnStateChange);
     });
   }
 
@@ -732,8 +744,8 @@ const editorView = (EL) => {
     resetCharts();
 
     Array.from(document.querySelectorAll('.flowList>li.open'))
-    .forEach((li) => {
-      li.classList.remove('open');
+    .forEach((openLi) => {
+      openLi.classList.remove('open');
     });
 
     const flow = new XibleEditorFlow({
@@ -743,7 +755,8 @@ const editorView = (EL) => {
     flowTab.classList.add('open', 'loading');
     flowTab.firstChild.click();
 
-    flow.save(true).then(() => {
+    flow.save(true)
+    .then(() => {
       xibleEditor.flows[flow._id] = flow;
 
       flowTab.addEventListener('animationiteration', () => {
@@ -751,8 +764,10 @@ const editorView = (EL) => {
       }, {
         once: true
       });
-    }).catch((err) => {
+    })
+    .catch((err) => {
       // TODO: give feedback about what went wrong
+      console.error(err);
 
       flowTab.classList.add('notRunnable');
 
@@ -797,7 +812,7 @@ const editorView = (EL) => {
     loadTypeDefStyles();
   }
 
-  xibleWrapper.on('open', () => {
+  function xibleWrapperOnOpen() {
     // reload the flows
     loadFlows();
 
@@ -806,14 +821,22 @@ const editorView = (EL) => {
 
     // reload the nodes
     xibleEditor.nodeSelector.fill();
-  });
+  }
+  xibleWrapper.on('open', xibleWrapperOnOpen);
 
   // clear all flow statuses when connection closes
-  xibleWrapper.on('close', () => {
+  function xibleWrapperOnClose() {
     Array.from(flowListUl.querySelectorAll('li'))
     .forEach((li) => {
       li.classList.remove('started', 'starting', 'stopping', 'direct');
     });
+  }
+  xibleWrapper.on('close', xibleWrapperOnClose);
+
+  // cleanup when view is purged
+  mainViewHolder.once('purge', () => {
+    xibleWrapper.removeListener('open', xibleWrapperOnOpen);
+    xibleWrapper.removeListener('close', xibleWrapperOnClose);
   });
 };
 

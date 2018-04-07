@@ -49,7 +49,8 @@ View.routes['/settings'] = (EL) => {
     <div class="inner" id="settingsContent"></div>
   `;
 
-  const settingsViewHolder = window.settingsViewHolder = new ViewHolder(document.getElementById('settingsContent'), '/settings');
+  const settingsViewHolder = new ViewHolder(document.getElementById('settingsContent'), '/settings');
+  window.settingsViewHolder = settingsViewHolder;
   settingsViewHolder.on('load', (view) => {
     // unselect all buttons from #sub
     Array.from(document.querySelectorAll('#sub ul a'))
@@ -93,7 +94,8 @@ View.routes['/settings'] = (EL) => {
     });
 
     // disable if necessary
-    xibleWrapper.Config.getValue('editor.settings.allowchange').then((allowChange) => {
+    xibleWrapper.Config.getValue('editor.settings.allowchange')
+    .then((allowChange) => {
       Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
       .forEach((input) => {
         input.disabled = !allowChange;
@@ -101,7 +103,8 @@ View.routes['/settings'] = (EL) => {
     });
 
     // set the right data in the data-configpath fields
-    xibleWrapper.Config.getAll().then((config) => {
+    xibleWrapper.Config.getAll()
+    .then((config) => {
       Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
       .forEach((input) => {
         if (input.getAttribute('type') === 'checkbox') {
@@ -113,13 +116,15 @@ View.routes['/settings'] = (EL) => {
     });
   });
   settingsViewHolder.hookNavHandler();
-  settingsViewHolder.loadNav().catch(() => {
+  settingsViewHolder.loadNav()
+  .catch(() => {
     mainViewHolder.navigate('/settings/general');
   });
 
   // validate if the config can be altered
   const permissionsValidate = document.getElementById('validateWritePermissions');
-  xibleWrapper.Config.validatePermissions().then((result) => {
+  xibleWrapper.Config.validatePermissions()
+  .then((result) => {
     permissionsValidate.addEventListener('animationiteration', () => {
       permissionsValidate.classList.remove('loading');
     }, {

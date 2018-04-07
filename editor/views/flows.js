@@ -113,21 +113,30 @@ View.routes['/flows'] = (EL) => {
       }
     };
 
-    flow.on('deleteInstance', () => {
+    function flowOnDeleteInstance() {
       instanceLength -= 1;
       instancesTd.innerHTML = instanceLength;
-    });
+    }
+    flow.on('deleteInstance', flowOnDeleteInstance);
 
-    flow.on('createInstance', ({ flowInstance }) => {
+    function flowOnCreateInstance({ flowInstance }) {
       stateUl.appendChild(createInstanceCell(flowInstance));
       instanceLength += 1;
       instancesTd.innerHTML = instanceLength;
-    });
+    }
+    flow.on('createInstance', flowOnCreateInstance);
 
-    flow.on('delete', () => {
+    function flowOnDelete() {
       if (tr.parentNode) {
         tr.parentNode.removeChild(tr);
       }
+    }
+    flow.on('delete', flowOnDelete);
+
+    mainViewHolder.once('purge', () => {
+      flow.removeListener('deleteInstance', flowOnDeleteInstance);
+      flow.removeListener('createInstance', flowOnCreateInstance);
+      flow.removeListener('delete', flowOnDelete);
     });
 
     return tr;
@@ -143,34 +152,34 @@ View.routes['/flows'] = (EL) => {
       }
     };
 
-    instance.on('initializing', () => {
+    function flowInstanceOnStateChange() {
       setInstanceState(li, instance);
+    }
+
+    instance.on('initializing', flowInstanceOnStateChange);
+    instance.on('initialized', flowInstanceOnStateChange);
+    instance.on('started', flowInstanceOnStateChange);
+    instance.on('starting', flowInstanceOnStateChange);
+    instance.on('stopping', flowInstanceOnStateChange);
+    instance.on('stopped', flowInstanceOnStateChange);
+
+    mainViewHolder.once('purge', () => {
+      instance.removeListener('initializing', flowInstanceOnStateChange);
+      instance.removeListener('initialized', flowInstanceOnStateChange);
+      instance.removeListener('started', flowInstanceOnStateChange);
+      instance.removeListener('starting', flowInstanceOnStateChange);
+      instance.removeListener('stopping', flowInstanceOnStateChange);
+      instance.removeListener('stopped', flowInstanceOnStateChange);
     });
 
-    instance.on('initialized', () => {
-      setInstanceState(li, instance);
-    });
-
-    instance.on('started', () => {
-      setInstanceState(li, instance);
-    });
-
-    instance.on('starting', () => {
-      setInstanceState(li, instance);
-    });
-
-    instance.on('stopping', () => {
-      setInstanceState(li, instance);
-    });
-
-    instance.on('stopped', () => {
-      setInstanceState(li, instance);
-    });
-
-    instance.on('delete', () => {
+    function flowInstanceOnDelete() {
       if (li.parentNode) {
         li.parentNode.removeChild(li);
       }
+    }
+    instance.on('delete', flowInstanceOnDelete);
+    mainViewHolder.once('purge', () => {
+      instance.removeListener('delete', flowInstanceOnDelete);
     });
 
     return li;
@@ -184,7 +193,7 @@ View.routes['/flows'] = (EL) => {
     }
     li.innerHTML = instance.state;
   }
-/*
+  /*
   async function expandFlowRow(tr, flow) {
     const expandedTr = document.createElement('tr');
     const td = expandedTr.appendChild(document.createElement('td'));
@@ -201,6 +210,6 @@ View.routes['/flows'] = (EL) => {
       tr.parentNode.appendChild(expandedTr);
     }
   }
-*/
+  */
   populateFlows();
 };
