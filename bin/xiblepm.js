@@ -394,6 +394,22 @@ const cli = {
     }
   },
 
+  me() {
+    return this.user.whoami();
+  },
+  whoami() {
+    return this.user.whoami();
+  },
+  logout() {
+    return this.user.logout();
+  },
+  login() {
+    return this.user.login();
+  },
+  register() {
+    return this.user.add();
+  },
+
   user: {
     me() {
       return this.whoami();
