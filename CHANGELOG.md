@@ -17,7 +17,7 @@ Nothing notable at the moment.
 
 -   Implemented `xible service restart` command to restart the xible service if it was installed. ([#51](https://github.com/SpectrumBroad/xible/issues/51))
 
--   Connection closed messages is now visible on every view. ([#52](https://github.com/SpectrumBroad/xible/issues/52))
+-   Connection status messages are now visible on every view. ([#52](https://github.com/SpectrumBroad/xible/issues/52))
 
 ### Changed
 -   `xible.flow.start` raises an error if a flow does not exist.
