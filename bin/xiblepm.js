@@ -445,7 +445,10 @@ const cli = {
         return setUserToken(token);
       });
     },
-    add() {
+    register() {
+      this.add();
+    },
+    async add() {
       const newUser = new xible.Registry.User();
 
       return getUserInput('Enter your username: ')
