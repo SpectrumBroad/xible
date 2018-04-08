@@ -118,7 +118,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const preStatusesLength = Object.keys(statuses).length;
       for (const flowId in statuses) {
         // if a flow doesn't exist anymore, remove it from the statuses
-        if (!flows[flowId]) {
+        if (
+          !flows[flowId] ||
+          !Array.isArray(statuses[flowId])
+        ) {
           delete statuses[flowId];
           continue;
         }
