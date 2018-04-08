@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Added several shortcuts for `xiblepm user *` command line commands. ([#67](https://github.com/SpectrumBroad/xible/issues/67))
 
+### Changed
+-   Improved `xiblepm user add` registration process. ([#65](https://github.com/SpectrumBroad/xible/issues/65))
+
 ## [0.10.0][] - 2017-04-08
 ### Added
 -   Added the `xible.flow.param` node including applicable command line and REST API options. These allow parameters to be send when starting a flow. ([#45](https://github.com/SpectrumBroad/xible/issues/45))

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 /* eslint-disable no-throw-literal */
+/* eslint-disable no-await-in-loop */
 
 'use strict';
 
@@ -467,53 +468,68 @@ const cli = {
     async add() {
       const newUser = new xible.Registry.User();
 
-      return getUserInput('Enter your username: ')
-      .then((userName) => {
+      let userNameCorrect = false;
+      let userName;
+      while (!userNameCorrect) {
+        userName = await getUserInput('Enter your username: ');
         if (!userName) {
-          return Promise.reject('You need a username.');
+          console.error('You need to enter a username.');
         } else if (!/^[a-zA-Z0-9_-]{3,}$/.test(userName)) {
-          return Promise.reject('Your username may only contain upper and lower case letters, numbers, an underscore and a dash.\nIt must also be at least 3 characters long.');
+          console.error('Your username must be at least 3 characters long\n  and may only contain upper and lower case letters, numbers, an underscore and a dash.');
+        } else {
+          userNameCorrect = true;
         }
+      }
+      newUser.name = userName;
 
-        newUser.name = userName;
-        return getUserInput('Enter your email address: ');
-      })
-      .then((emailAddress) => {
+      let emailAddressCorrect = false;
+      let emailAddress;
+      while (!emailAddressCorrect) {
+        emailAddress = await getUserInput('Enter your email address: ');
         if (!emailAddress) {
-          return Promise.reject('You need an email address.');
+          console.error('You need to enter an email address.');
         } else if (!/^.+@.+\..+$/.test(emailAddress)) {
-          return Promise.reject('You need a valid email address.');
+          console.error('You need to enter a valid email address.');
+        } else {
+          emailAddressCorrect = true;
         }
+      }
+      newUser.emailAddress = emailAddress;
 
-        newUser.emailAddress = emailAddress;
-        return getUserInput('Enter your password: ', true);
-      })
-      .then((password) => {
+      let passwordCorrect = false;
+      let password;
+      while (!passwordCorrect) {
+        password = await getUserInput('Enter your password: ', true);
         if (!password) {
-          return Promise.reject('You need a password.');
+          console.error('You need to enter a password.');
+        } else if (password.length < 7) {
+          console.error('The password needs to be at least 7 characters long.');
+        } else if (password.toLowerCase() === emailAddress.toLowerCase()) {
+          console.error('The password may not equal the email address.');
+        } else if (
+          userName.toLowerCase().includes(password.toLowerCase()) ||
+          password.toLowerCase().includes(userName.toLowerCase())
+        ) {
+          console.error('The password may not be a significant part of the username, or the other way around.');
+        } else {
+          passwordCorrect = true;
         }
+      }
+      newUser.password = password;
 
-        newUser.password = password;
-        return getUserInput('Verify your password: ', true);
-      })
-      .then((password) => {
-        if (newUser.password !== password) {
-          return Promise.reject('Passwords do not match.');
-        }
+      const verifyPassword = await getUserInput('Verify your password: ', true);
+      if (password !== verifyPassword) {
+        throw 'Passwords do not match.';
+      }
 
-        return xible.Registry.User
-        .add(newUser)
-        .then((token) => {
-          if (!token) {
-            return Promise.reject('No token returned.');
-          }
+      const token = await xible.Registry.User.add(newUser);
+      if (!token) {
+        throw 'No token returned.';
+      }
 
-          return setUserToken(token);
-        });
-      });
+      return setUserToken(token);
     }
   }
-
 };
 
 cli.config = require('./config')(xible);
