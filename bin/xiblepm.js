@@ -122,7 +122,7 @@ function getUserInput(question, pwd) {
       input: process.stdin,
       output: stdOut,
       terminal: true
-      });
+    });
 
     rl.question(question, (value) => {
       stdOut.destroy();
@@ -474,7 +474,7 @@ const cli = {
       });
     },
     register() {
-      this.add();
+      return this.add();
     },
     async add() {
       const newUser = new xible.Registry.User();
