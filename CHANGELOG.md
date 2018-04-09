@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   Improved `xiblepm user add` registration process. ([#65](https://github.com/SpectrumBroad/xible/issues/65))
 
+### Fixed
+-   Individual password characters are no longer briefly visible on the windows command line ([#66](https://github.com/SpectrumBroad/xible/issues/66))
+
 ## [0.10.0][] - 2017-04-08
 ### Added
 -   Added the `xible.flow.param` node including applicable command line and REST API options. These allow parameters to be send when starting a flow. ([#45](https://github.com/SpectrumBroad/xible/issues/45))

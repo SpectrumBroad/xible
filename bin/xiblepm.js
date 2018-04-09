@@ -27,6 +27,7 @@ const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
 const Xible = require('../index.js');
+const Writable = require('stream').Writable;
 
 // option parsing
 const knownOpts = {
@@ -93,34 +94,45 @@ function setUserToken(token) {
   fs.writeFileSync(`${os.homedir()}/.xiblerc.json`, JSON.stringify(rc, null, '\t'));
 }
 
+class MutableWritable extends Writable {
+  constructor(...args) {
+    super(...args);
+    this.muted = false;
+
+    this.on('finish', () => {
+      if (this.muted) {
+        process.stdout.write('\n');
+      }
+    });
+  }
+
+  _write(chunk, encoding, callback) {
+    if (!this.muted) {
+      process.stdout.write(chunk, encoding);
+    }
+    callback();
+  }
+}
+
 function getUserInput(question, pwd) {
   return new Promise((resolve) => {
+    const stdOut = new MutableWritable();
+
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
-    });
-
-    if (pwd) {
-      const stdin = process.openStdin();
-      process.stdin.on('data', (char) => {
-        const charStr = `${char}`;
-        switch (charStr) {
-          case '\n':
-          case '\r':
-          case '\u0004':
-            stdin.pause();
-            break;
-          default:
-            process.stdout.write(`\u001b[2K\u001b[200D${question}`);
-            break;
-        }
+      output: stdOut,
+      terminal: true
       });
-    }
 
     rl.question(question, (value) => {
+      stdOut.destroy();
       rl.close();
       resolve(value);
     });
+
+    if (pwd) {
+      stdOut.muted = true;
+    }
   });
 }
 
@@ -132,7 +144,6 @@ if (userToken) {
 
 // cli context and commands
 const cli = {
-
   flow: {
     publish(flowName) {
       if (!flowName) {
