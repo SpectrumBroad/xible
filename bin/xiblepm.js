@@ -114,6 +114,12 @@ class MutableWritable extends Writable {
   }
 }
 
+/**
+ * Starts a command line prompt to get user input based based on a question.
+ * @param {String} question The question to ask.
+ * @param {Boolean} pwd Indicates whether the user input should be hidden on the command-line.
+ * @returns {Promise.<String>} A promise with the input text provided by the user.
+ */
 function getUserInput(question, pwd) {
   return new Promise((resolve) => {
     const stdOut = new MutableWritable();
@@ -333,6 +339,7 @@ const cli = {
                     try {
                       publishErr = JSON.parse(publishErr.data).message;
                     } catch (jsonParseErr) {
+                      // unable to get publish error
                     }
                   }
                   return Promise.reject(`Failed to publish nodepack "${nodePackName}": ${publishErr}`);
