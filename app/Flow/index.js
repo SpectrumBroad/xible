@@ -10,6 +10,18 @@ let sanitizePath;
 
 const flowDebug = debug('xible:flow');
 
+/**
+ * Does a very simple html encode of the input string.
+ * Only replaces double quote, greater than and less than.
+ * @param {String} str The String to html encode.
+ * @returns {String}
+ */
+function baseHtmlEncode(str) {
+  return str.replace(/"/g, '&quot;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+}
+
 module.exports = (XIBLE, EXPRESS_APP) => {
   // global output caching
   let globalOutputs = null; // caching
@@ -356,7 +368,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         if (!xibleNode.nodeExists) {
           xibleNode.editorContent = '';
           for (const key in xibleNode.data) {
-            xibleNode.editorContent += `<input type="text" placeholder="${key}" data-outputvalue="${key}" />`;
+            xibleNode.editorContent += `<input type="text" placeholder="${baseHtmlEncode(key)}" data-outputvalue="${baseHtmlEncode(key)}" />`;
           }
         }
       }
@@ -681,7 +693,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         runnable: this.runnable
       };
     }
-
   }
 
   if (EXPRESS_APP) {
