@@ -56,6 +56,10 @@ class XibleEditorFlow extends xibleWrapper.Flow {
   }
 
   undirect() {
+    if (this.directedInstance) {
+      this.directedInstance.stop();
+    }
+
     this.nodes.forEach((node) => {
       node.element.classList.remove('nodirect');
 
