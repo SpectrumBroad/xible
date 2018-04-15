@@ -3,7 +3,7 @@
 module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
   // retrieve all flows
   EXPRESS_APP.get('/api/flows', (req, res) => {
-    const flows = res.json(XIBLE.getFlows());
+    res.json(XIBLE.getFlows());
   });
 
   // create a new flow
