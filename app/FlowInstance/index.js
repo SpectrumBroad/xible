@@ -35,19 +35,19 @@ module.exports = (XIBLE) => {
     }
 
     init() {
+      if (XIBLE.child) {
+        return Promise.reject(new Error('cannot init a flowInstance from a worker'));
+      }
+
       delete this.timing.initEnd;
       delete this.timing.startStart;
       delete this.timing.startEnd;
 
       this.timing.initStart = process.hrtime();
 
-      if (XIBLE.child) {
-        return Promise.reject(new Error('cannot init a flow from a worker'));
-      }
-
       // check and set the correct state
       if (this.state !== FlowInstance.STATE_STOPPED) {
-        return Promise.reject(new Error('cannot init; flow is not stopped'));
+        return Promise.reject(new Error('cannot init; flowInstance is not stopped'));
       }
       this.state = FlowInstance.STATE_INITIALIZING;
 
@@ -80,6 +80,7 @@ module.exports = (XIBLE) => {
 
                 this.worker.send({
                   method: 'init',
+                  flowInstanceId: this._id,
                   configPath: XIBLE.configPath,
                   config: XIBLE.Config.getAll(),
                   flow: this.flow.json,
@@ -201,13 +202,6 @@ module.exports = (XIBLE) => {
 
           this.emit('stopped');
           flowInstanceDebug('worker exited');
-
-          /*
-          if (this.flow.initLevel === XIBLE.Flow.INITLEVEL_FLOW) {
-            this.init()
-            .catch(err => console.error(err));
-          }
-          */
         });
 
         this.worker.on('disconnect', () => {

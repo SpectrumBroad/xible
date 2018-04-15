@@ -55,15 +55,16 @@ class Xible extends EventEmitter {
 
     let appNames;
     if (this.child) {
-      appNames = ['Config', 'Flow', 'FlowInstance', 'FlowState', 'Node'];
+      appNames = ['Flow', 'FlowInstance', 'FlowState', 'Node'];
     } else {
       this.initWeb();
       this.persistentWebSocketMessages = {};
-      appNames = ['Config', 'CliQueue', 'Flow', 'FlowInstance', 'NodePack', 'Node', 'TypeDef', 'Registry'];
+      appNames = ['CliQueue', 'Flow', 'FlowInstance', 'NodePack', 'Node', 'TypeDef', 'Registry'];
     }
 
+    this.Config = require('./app/Config/index.js')(this, this.expressApp, configObj).Config;
     for (let i = 0; i < appNames.length; i += 1) {
-      Object.assign(this, require(`./app/${appNames[i]}`)(this, this.expressApp, (appNames[i] === 'Config' && configObj ? configObj : undefined)));
+      Object.assign(this, require(`./app/${appNames[i]}/index.js`)(this, this.expressApp));
     }
   }
 
@@ -173,7 +174,7 @@ class Xible extends EventEmitter {
           for (let i = 0; i < flows[flowId].instances.length; i += 1) {
             const instance = flows[flowId].instances[i];
             if (
-              instance.state !== this.FlowInstance.STATE_STARTED ||
+              instance.state === instance.STATE_STOPPED ||
               !instance.usage
             ) {
               continue;

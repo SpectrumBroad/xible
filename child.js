@@ -15,7 +15,7 @@ let xible;
 */
 function requireNode(nodePath) {
   try {
-    return require(nodePath);
+    return require(`${nodePath}/index.js`);
   } catch (err) {
     console.error(err);
     if (process.connected) {
@@ -29,6 +29,26 @@ function requireNode(nodePath) {
 
     return null;
   }
+}
+
+function initNodes(flowNodes, nodes) {
+  let structuredNodes = new Set();
+  let nodeName;
+  for (let i = 0; i < flowNodes.length; i += 1) {
+    nodeName = flowNodes[i].name;
+    if (structuredNodes.has(nodeName)) {
+      continue;
+    }
+    structuredNodes.add(nodeName);
+
+    // require the actual node and check it was loaded properly
+    const nodeConstr = nodes[nodeName];
+    nodeConstr.constructorFunction = requireNode(nodeConstr.path);
+    if (nodeConstr.constructorFunction) {
+      xible.addNode(nodeConstr);
+    }
+  }
+  structuredNodes = null;
 }
 
 // always stop on unhandled promise rejections
@@ -52,25 +72,7 @@ process.on('message', async (message) => {
         child: true
       }, message.config);
 
-      // init the proper nodes
-      let structuredNodes = new Set();
-      const flowNodes = message.flow.nodes;
-      let nodeName;
-      for (let i = 0; i < flowNodes.length; i += 1) {
-        nodeName = flowNodes[i].name;
-        if (structuredNodes.has(nodeName)) {
-          continue;
-        }
-        structuredNodes.add(nodeName);
-
-        // require the actual node and check it was loaded properly
-        const nodeConstr = message.nodes[nodeName];
-        nodeConstr.constructorFunction = requireNode(nodeConstr.path);
-        if (nodeConstr.constructorFunction) {
-          xible.addNode(nodeConstr);
-        }
-      }
-      structuredNodes = null;
+      initNodes(message.flow.nodes, message.nodes);
 
       try {
         await xible.init();
@@ -78,12 +80,8 @@ process.on('message', async (message) => {
         flow = new xible.Flow();
         flow.initJson(message.flow);
 
-        // inform the master that we initialized
-        if (process.connected) {
-          process.send({
-            method: 'initialized'
-          });
-        }
+        flowInstance = flow.createInstance();
+        flowInstance._id = message.flowInstanceId;
       } catch (err) {
         console.error(err);
 
@@ -95,21 +93,26 @@ process.on('message', async (message) => {
         process.exit(0);
       }
 
+      // inform the master that we initialized
+      if (process.connected) {
+        process.send({
+          method: 'initialized'
+        });
+      }
+
       break;
     }
 
     case 'start': {
-      flowInstance = flow.createInstance({
-        params: message.params,
-        directNodes: message.directNodes
-      });
-      flowInstance._id = message.flowInstanceId;
+      flowInstance.params = message.params || {};
+      flowInstance.directNodes = message.directNodes;
 
       try {
         if (message.directNodes) {
+          flowInstance.directed = true;
           await flowInstance.directChild(message.directNodes);
         } else {
-          await flowInstance.start();
+          await flowInstance.startChild();
         }
 
         // inform the master that we actually started

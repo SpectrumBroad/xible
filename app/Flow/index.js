@@ -155,14 +155,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       // init a fresh copy for each flow
       // if the initLevel for that flow requires this
-      /*
       for (const flowId in flows) {
         if (flows[flowId].initLevel === Flow.INITLEVEL_FLOW) {
           flows[flowId].createEmptyInitInstance()
           .catch(err => console.error(err));
         }
       }
-      */
 
       return flows;
     }
@@ -585,12 +583,26 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       Flow.saveStatuses(statuses);
     }
 
-    /*
     createEmptyInitInstance() {
       this.emptyInitInstance = this.createInstance();
+      const recreate = () => {
+        this.emptyInitInstance.removeListener('starting', recreate);
+        this.emptyInitInstance.removeListener('stopping', recreate);
+        this.emptyInitInstance.removeListener('stopped', recreate);
+        this.emptyInitInstance.removeListener('started', recreate);
+        this.emptyInitInstance.removeListener('delete', recreate);
+        this.emptyInitInstance = null;
+
+        this.createEmptyInitInstance();
+      };
+      this.emptyInitInstance.on('starting', recreate);
+      this.emptyInitInstance.on('stopping', recreate);
+      this.emptyInitInstance.on('stopped', recreate);
+      this.emptyInitInstance.on('started', recreate);
+      this.emptyInitInstance.on('delete', recreate);
+
       return this.emptyInitInstance.init();
     }
-    */
 
     /**
      * Creates a new instance of this flow.
@@ -600,9 +612,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * @param {Object} options.directNodes
      * @returns {FlowInstance}
      */
-    createInstance({ params, directNodes }) {
+    createInstance({ params, directNodes } = {}) {
       if (!this.runnable) {
         throw new Error(`Flow "${this._id}" is not runnable`);
+      }
+
+      if (this.initLevel === Flow.INITLEVEL_FLOW && this.emptyInitInstance) {
+        this.emptyInitInstance.params = params;
+        this.emptyInitInstance.directNodes = directNodes;
+        return this.emptyInitInstance;
       }
 
       const createStart = process.hrtime();
@@ -655,7 +673,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * @returns {Promise.<Flow>} Returns the current flow for daisy chaining.
      */
     async stopAllInstances() {
-      await Promise.all(this.instances.map(instance => instance.forceStop()));
+      await Promise.all(
+        this.instances.map((instance) => {
+          if (instance !== this.emptyInitInstance) {
+            return instance.forceStop();
+          }
+          return null;
+        })
+      );
       return this;
     }
 
