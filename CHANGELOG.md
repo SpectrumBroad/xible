@@ -12,9 +12,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Improved `xiblepm user add` registration process. ([#65](https://github.com/SpectrumBroad/xible/issues/65))
 
 ### Fixed
--   Individual password characters are no longer briefly visible on the windows command line ([#66](https://github.com/SpectrumBroad/xible/issues/66))
+-   Individual password characters are no longer briefly visible on the windows command line. ([#66](https://github.com/SpectrumBroad/xible/issues/66))
 
 -   Fixed potential XSS attack concerning flows downloaded from the registry where the nodes were not installed on the target machine.
+
+-   `input.duplicate` node with amount of duplicates set to '1' would throw 'already called back'. ([#68](https://github.com/SpectrumBroad/xible/issues/68))
 
 ## [0.10.0][] - 2017-04-08
 ### Added

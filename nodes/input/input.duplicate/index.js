@@ -18,6 +18,7 @@ module.exports = (NODE) => {
 
     if (duplicateAmount === 1) {
       callback(objs);
+      return;
     }
 
     let newObjArray = objs;
