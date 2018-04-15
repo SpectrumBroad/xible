@@ -55,8 +55,14 @@ td.state>ul>li.state-0 {
   background-color: black;
 }
 
-td.state>ul>li.state-1, td.state>ul>li.state-2, td.state>ul>li.state-3, td.state>ul>li.state-4 {
+td.state>ul>li.state-1,
+td.state>ul>li.state-2,
+td.state>ul>li.state-4 {
   background-color: darkorange;
+}
+
+td.state>ul>li.state-3 {
+  background-color: purple;
 }
 
 td.state>ul>li.state-5 {

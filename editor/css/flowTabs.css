@@ -106,8 +106,8 @@
 }
 
 .flowList ul.states li.state-1,
-.flowList ul.states li.state-4,
-.flowList ul.states li.state-2 {
+.flowList ul.states li.state-2,
+.flowList ul.states li.state-4 {
 	background-color: darkorange;
 }
 /*

@@ -1,6 +1,6 @@
 'use strict';
 
-const editorView = (EL) => {
+function editorView(EL) {
   const CHART_MAX_TICKS = 60;
 
   EL.innerHTML = `
@@ -826,10 +826,22 @@ const editorView = (EL) => {
 
   // clear all flow statuses when connection closes
   function xibleWrapperOnClose() {
-    Array.from(flowListUl.querySelectorAll('li'))
+    // remove state li's
+    Array.from(flowListUl.querySelectorAll('ul.states li'))
     .forEach((li) => {
-      li.classList.remove('started', 'starting', 'stopping', 'direct');
+      li.parentNode.removeChild(li);
     });
+
+    // reset instance counts
+    Array.from(flowListUl.querySelectorAll('.instance-count'))
+    .forEach((instanceCountEl) => {
+      instanceCountEl.innerHTML = '0';
+    });
+
+    // reset directed styling
+    if (xibleEditor.loadedFlow && xibleEditor.loadedFlow.directedInstance) {
+      xibleEditor.loadedFlow.undirect();
+    }
   }
   xibleWrapper.on('close', xibleWrapperOnClose);
 
@@ -838,7 +850,7 @@ const editorView = (EL) => {
     xibleWrapper.removeListener('open', xibleWrapperOnOpen);
     xibleWrapper.removeListener('close', xibleWrapperOnClose);
   });
-};
+}
 
 View.routes['/editor'] = editorView;
 View.routes['/editor/:flowName'] = editorView;
