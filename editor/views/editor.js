@@ -807,11 +807,6 @@ function editorView(EL) {
   flowEditorHolder.appendChild(xibleEditor.element);
 
   // socket connection
-  if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
-    loadFlows();
-    loadTypeDefStyles();
-  }
-
   function xibleWrapperOnOpen() {
     // reload the flows
     loadFlows();
@@ -822,6 +817,11 @@ function editorView(EL) {
     // reload the nodes
     xibleEditor.nodeSelector.fill();
   }
+
+  if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+    xibleWrapperOnOpen();
+  }
+
   xibleWrapper.on('open', xibleWrapperOnOpen);
 
   // clear all flow statuses when connection closes

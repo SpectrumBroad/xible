@@ -163,8 +163,6 @@ class XibleEditorNodeSelector {
 
     // hide the div
     div.classList.add('hidden');
-
-    this.fill();
   }
 
   /**

@@ -50,7 +50,7 @@ View.routes['/flows'] = (EL) => {
   const filterInput = document.getElementById('filter');
   const flowsTbody = document.getElementById('flowsTbody');
 
-  filterInput.addEventListener('input', () => {
+  function filterInputOnInput() {
     const filterValue = filterInput.value.toLowerCase();
 
     for (let i = 0; i < flowsTbody.rows.length; i += 1) {
@@ -63,14 +63,17 @@ View.routes['/flows'] = (EL) => {
         flowsTbody.rows[i].style.display = 'none';
       }
     }
-  });
+  }
+  filterInput.addEventListener('input', filterInputOnInput);
 
   async function populateFlows() {
     const flows = await xibleWrapper.Flow.getAll();
 
+    flowsTbody.innerHTML = '';
     for (const flowId in flows) {
       flowsTbody.appendChild(await createFlowRow(flows[flowId]));
     }
+    filterInputOnInput();
   }
 
   async function createFlowRow(flow) {
@@ -211,5 +214,15 @@ View.routes['/flows'] = (EL) => {
     }
   }
   */
-  populateFlows();
+
+  // clear all flow statuses when connection closes
+  function xibleWrapperOnOpen() {
+    populateFlows();
+  }
+
+  if (xibleWrapper.readyState === XibleWrapper.STATE_OPEN) {
+    xibleWrapperOnOpen();
+  }
+
+  xibleWrapper.on('open', xibleWrapperOnOpen);
 };
