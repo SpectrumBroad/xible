@@ -44,6 +44,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.initLevel = initLevel;
       this.instances = [];
       this.emptyInitInstance = null;
+      this._deleted = false;
     }
 
     static get INITLEVEL_NONE() {
@@ -434,6 +435,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           return;
         }
 
+        this._deleted = true;
+
         // stop all instances
         await this.deleteAllInstances();
         this.instances = [];
@@ -593,6 +596,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         this.emptyInitInstance.removeListener('delete', recreate);
         this.emptyInitInstance = null;
 
+        if (this._deleted) {
+          return;
+        }
         this.createEmptyInitInstance();
       };
       this.emptyInitInstance.on('starting', recreate);
