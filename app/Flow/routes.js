@@ -8,7 +8,12 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
   // create a new flow
   EXPRESS_APP.post('/api/flows', async (req, res) => {
-    if (!req.body || !req.body._id) {
+    if (
+      !req.body ||
+      !req.body._id ||
+      !Array.isArray(req.body.nodes) ||
+      !Array.isArray(req.body.connectors)
+    ) {
       res.status(400).end();
       return;
     }
