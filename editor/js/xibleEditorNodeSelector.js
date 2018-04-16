@@ -120,12 +120,14 @@ class XibleEditorNodeSelector {
 
     // open the node menu on double click
     const openOnMouseEvent = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
       if (
-        !event.ctrlKey && XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport &&
+        !event.ctrlKey && !event.shiftKey &&
+        XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport &&
         (event.target === XIBLE_EDITOR.element || event.target === XIBLE_EDITOR.element.firstChild)
       ) {
-        event.preventDefault();
-        event.stopPropagation();
         this.open(event);
       }
     };
@@ -417,6 +419,10 @@ class XibleEditorNodeSelector {
   hookNode(li, node) {
     // onmousedown so the user can drag the newly inserted node immediately
     li.addEventListener('mousedown', (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+
       const actionsOffset = this.xibleEditor.getOffsetPosition();
       const editorNode = this.xibleEditor.addNode(new XibleEditorNode(node));
       this.xibleEditor.loadedFlow.addNode(editorNode);

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Added several shortcuts for `xiblepm user *` command line commands. ([#67](https://github.com/SpectrumBroad/xible/issues/67))
 
+-   Alternative panning support without a scroll wheel by holding down `shift` and the left mouse button. ([#59](https://github.com/SpectrumBroad/xible/issues/59))
+
+-   Use `ctrl` to combine multiple area selectors in the editor. ([#69](https://github.com/SpectrumBroad/xible/issues/69))
+
 ### Changed
 -   Improved `xiblepm user add` registration process. ([#65](https://github.com/SpectrumBroad/xible/issues/65))
 

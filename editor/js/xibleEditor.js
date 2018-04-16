@@ -61,9 +61,9 @@ class XibleEditor extends EventEmitter {
 
     this.enableNodeSelector();
     this.enableZoom();
-    this.enablePan();
     this.enableHook();
     this.enableSelection();
+    this.enablePan();
   }
 
   describeNode(node) {
@@ -375,9 +375,9 @@ class XibleEditor extends EventEmitter {
   * @param {XibleEditorNode} node The Node to remove
   */
   deleteNode(node) {
-    let index;
-    if ((index = this.loadedFlow.nodes.indexOf(node)) > -1) {
-      this.loadedFlow.nodes.splice(index, 1);
+    const nodeIndex = this.loadedFlow.nodes.indexOf(node);
+    if (nodeIndex > -1) {
+      this.loadedFlow.nodes.splice(nodeIndex, 1);
     }
 
     this.deselect(node);
@@ -401,9 +401,9 @@ class XibleEditor extends EventEmitter {
   * @param {XibleEditorConnector} connector The Connector to remove
   */
   deleteConnector(connector) {
-    let index;
-    if ((index = this.loadedFlow.connectors.indexOf(connector)) > -1) {
-      this.loadedFlow.connectors.splice(index, 1);
+    const connectorIndex = this.loadedFlow.connectors.indexOf(connector);
+    if (connectorIndex > -1) {
+      this.loadedFlow.connectors.splice(connectorIndex, 1);
     }
 
     this.deselect(connector);
@@ -683,6 +683,11 @@ class XibleEditor extends EventEmitter {
       return;
     }
 
+    // deselect previous selection
+    if (!event.ctrlKey) {
+      this.deselect();
+    }
+
     // init the start positions of the drag
     const initPageX = event.pageX;
     const initPageY = event.pageY;
@@ -694,6 +699,9 @@ class XibleEditor extends EventEmitter {
 
     // create the area element
     let areaEl;
+
+    // store the selected nodes
+    const selectedNodes = new Set();
 
     // catch the mousemove event
     document.body.addEventListener('mousemove', this.areaMoveListener = (event) => {
@@ -743,8 +751,11 @@ class XibleEditor extends EventEmitter {
       areaEl.style.width = `${relativePageX}px`;
       areaEl.style.height = `${relativePageY}px`;
 
-      // deselect all previously selected nodes
-      this.deselect();
+      // deselect all previously selected nodes in this area
+      for (const selectedNode of selectedNodes) {
+        this.deselect(selectedNode);
+      }
+      selectedNodes.clear();
 
       // check what nodes fall within the selection
       for (let i = 0; i < this.loadedFlow.nodes.length; i += 1) {
@@ -757,6 +768,7 @@ class XibleEditor extends EventEmitter {
           nodeLeftAvg > areaElPageLeft && nodeLeftAvg < areaElPageLeft + relativePageX &&
           nodeTopAvg > areaElPageTop && nodeTopAvg < areaElPageTop + relativePageY
         ) {
+          selectedNodes.add(node);
           this.select(node);
         }
       }
@@ -771,21 +783,18 @@ class XibleEditor extends EventEmitter {
   enableSelection() {
     // mousedown
     document.body.addEventListener('mousedown', (event) => {
-      if (!this.loadedFlow) {
+      if (!this.loadedFlow || event.button !== 0 || event.shiftKey) {
         return;
       }
 
-      // drag handler
-      if (event.button === 0) {
-        // area selector
-        if (
-          !this.selection.length &&
-          (event.target === this.element || event.target === this.element.firstChild)
-        ) {
-          this.initAreaSelector(event);
-        } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
-          this.initDrag(event);
-        }
+      // area selector
+      if (
+        (!this.selection.length || event.ctrlKey) &&
+        (event.target === this.element || event.target === this.element.firstChild)
+      ) {
+        this.initAreaSelector(event);
+      } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
+        this.initDrag(event);
       }
     });
 
@@ -795,8 +804,7 @@ class XibleEditor extends EventEmitter {
         return;
       }
 
-      // if a drag never started or the mouse position never changed
-      if (!this.nodeDragListener || !this.nodeDragHasFired) {
+      if ((!this.nodeDragListener || !this.nodeDragHasFired) && !this.element.classList.contains('panning')) {
         // deselect
         if (
           (event.target === this.element.firstChild || event.target === this.element) &&
@@ -1141,53 +1149,55 @@ class XibleEditor extends EventEmitter {
 
     let mousePanFunction;
     this.element.addEventListener('mousedown', (event) => {
-      // if we are already panning, don't do anything
-      if (mousePanFunction) {
+      if (
+        mousePanFunction ||
+        (event.button === 0 && !event.shiftKey) ||
+        event.button > 1
+      ) {
         return;
       }
 
-      // we pan on scrollwheel
-      if (event.button === 1) {
-        // initial values based on current position
-        const initPageX = event.pageX;
-        const initPageY = event.pageY;
-        const initLeft = this.left;
-        const initTop = this.top;
-        const initBackgroundLeft = this.backgroundLeft;
-        const initBackgroundTop = this.backgroundTop;
+      // initial values based on current position
+      const initPageX = event.pageX;
+      const initPageY = event.pageY;
+      const initLeft = this.left;
+      const initTop = this.top;
+      const initBackgroundLeft = this.backgroundLeft;
+      const initBackgroundTop = this.backgroundTop;
 
-        this.element.classList.add('panning');
+      this.element.classList.add('panning');
 
-        // catch the mousemove event
-        document.body.addEventListener('mousemove', mousePanFunction = (event) => {
-          // check how much we moved since the initial mousedown event
-          const relativePageX = event.pageX - initPageX;
-          const relativePageY = event.pageY - initPageY;
+      // catch the mousemove event
+      document.body.addEventListener('mousemove', mousePanFunction = (event) => {
+        // check how much we moved since the initial mousedown event
+        const relativePageX = event.pageX - initPageX;
+        const relativePageY = event.pageY - initPageY;
 
-          // save the new position
-          this.left = initLeft + relativePageX;
-          this.top = initTop + relativePageY;
+        // save the new position
+        this.left = initLeft + relativePageX;
+        this.top = initTop + relativePageY;
 
-          // apply pan to background position as well
-          this.backgroundLeft = initBackgroundLeft + (event.pageX - initPageX);
-          this.backgroundTop = initBackgroundTop + (event.pageY - initPageY);
+        // apply pan to background position as well
+        this.backgroundLeft = initBackgroundLeft + (event.pageX - initPageX);
+        this.backgroundTop = initBackgroundTop + (event.pageY - initPageY);
 
-          this.transform();
-        });
+        this.transform();
+      });
 
-        event.preventDefault();
-      }
+      event.preventDefault();
     });
 
 
     // unhook eventhandler created on mousedown
     document.body.addEventListener('mouseup', () => {
-      if (mousePanFunction) {
-        document.body.removeEventListener('mousemove', mousePanFunction);
-        mousePanFunction = null;
-
-        this.element.classList.remove('panning');
+      if (!mousePanFunction) {
+        return;
       }
+
+      document.body.removeEventListener('mousemove', mousePanFunction);
+      mousePanFunction = null;
+
+      this.element.classList.remove('panning');
     });
   }
 

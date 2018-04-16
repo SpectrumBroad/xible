@@ -242,7 +242,7 @@
 
 .xible[data-flow] .editor:empty::before {
 	text-align: center;
-	content: "Double click anywhere on the canvas to add a node.\AYou may want to start with a \"xible.flow.onstart\" node.\AHold down the scroll wheel to move around.";
+	content: "Double click anywhere on the canvas to add a node.\AYou may want to start with a \"xible.flow.onstart\" node.\A\AHold down the scroll wheel to move around.\A Alternatively hold down shift and the left mouse button to pan around.";
 }
 
 .xible .editor>.connector {
