@@ -87,7 +87,7 @@ class XibleEditorNodeSelector {
             }
 
             // construct the new node and append to the list
-            const li = this.buildNode(nodeName, nodePack.nodes[i]);
+            const li = XibleEditorNodeSelector.buildNode(nodeName, nodePack.nodes[i]);
             li.classList.add('online');
             li.onclick = () => {
               // open the detailed confirmation view
@@ -382,7 +382,7 @@ class XibleEditorNodeSelector {
   * @param {xibleWrapper.Node} node
   * @returns {HTMLLIElement} The created HTML element, an LI.
   */
-  buildNode(nodeName, node) {
+  static buildNode(nodeName, node) {
     // list element containing the node heading and description
     const li = document.createElement('li');
 
@@ -468,7 +468,7 @@ class XibleEditorNodeSelector {
 
       Object.keys(nodes)
       .forEach((nodeName) => {
-        const li = this.buildNode(nodeName, nodes[nodeName]);
+        const li = XibleEditorNodeSelector.buildNode(nodeName, nodes[nodeName]);
         this.hookNode(li, nodes[nodeName]);
 
         if (visibleNodeNames) {
