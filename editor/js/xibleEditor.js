@@ -699,9 +699,11 @@ class XibleEditor extends EventEmitter {
 
     // create the area element
     let areaEl;
+    const boundings = new Map();
 
     // store the selected nodes
     const selectedNodes = new Set();
+    const alreadySelectedNodes = new Set(this.selection);
 
     // catch the mousemove event
     document.body.addEventListener('mousemove', this.areaMoveListener = (event) => {
@@ -720,6 +722,16 @@ class XibleEditor extends EventEmitter {
         areaEl.classList.add('area');
         areaEl.style.transform = `translate(${areaElLeft}px, ${areaElTop}px)`;
         this.element.appendChild(areaEl);
+
+        // populate the boundings
+        for (let i = 0; i < this.loadedFlow.nodes.length; i += 1) {
+          const node = this.loadedFlow.nodes[i];
+          const nodeBounding = node.element.getBoundingClientRect();
+          boundings.set(node, {
+            nodeLeftAvg: nodeBounding.left + nodeBounding.width / 2,
+            nodeTopAvg: nodeBounding.top + nodeBounding.height / 2
+          });
+        }
       }
 
       // the left and top position of the area element compared to the document/page
@@ -760,20 +772,26 @@ class XibleEditor extends EventEmitter {
       // check what nodes fall within the selection
       for (let i = 0; i < this.loadedFlow.nodes.length; i += 1) {
         const node = this.loadedFlow.nodes[i];
-        const nodeBounding = node.element.getBoundingClientRect();
-        const nodeLeftAvg = nodeBounding.left + nodeBounding.width / 2;
-        const nodeTopAvg = nodeBounding.top + nodeBounding.height / 2;
+        const nodeBounding = boundings.get(node);
+        const nodeLeftAvg = nodeBounding.nodeLeftAvg;
+        const nodeTopAvg = nodeBounding.nodeTopAvg;
 
         if (
           nodeLeftAvg > areaElPageLeft && nodeLeftAvg < areaElPageLeft + relativePageX &&
           nodeTopAvg > areaElPageTop && nodeTopAvg < areaElPageTop + relativePageY
         ) {
+          if (alreadySelectedNodes.has(node)) {
+            selectedNodes.delete(node);
+            this.deselect(node);
+          } else {
+            selectedNodes.add(node);
+            this.select(node);
+          }
+        } else if (alreadySelectedNodes.has(node) && !this.selection.includes(node)) {
           selectedNodes.add(node);
           this.select(node);
         }
       }
-
-      event.preventDefault();
     });
   }
 
