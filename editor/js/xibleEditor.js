@@ -792,6 +792,8 @@ class XibleEditor extends EventEmitter {
           this.select(node);
         }
       }
+
+      event.preventDefault();
     });
   }
 
