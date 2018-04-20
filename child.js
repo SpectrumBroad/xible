@@ -6,6 +6,19 @@ let flow;
 let flowInstance;
 let xible;
 
+// handle disconnects from master
+process.on('disconnect', () => {
+  if (flowInstance) {
+    try {
+      flowInstance.stopChild();
+    } catch (err) {
+      process.exit(0);
+    }
+  } else {
+    process.exit(0);
+  }
+});
+
 /**
 * Requires the path to a Node.
 * The try/catch prevents proper compilation by the v8 engine,
