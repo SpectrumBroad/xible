@@ -539,7 +539,6 @@ module.exports = (XIBLE) => {
 
       flowInstanceDebug('stopped flowInstance from worker');
       process.exit(0);
-      return null;
     }
 
     /**
