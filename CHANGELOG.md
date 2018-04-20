@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.11.0][] - 2018-04-21
 ### Added
 -   Added several shortcuts for `xiblepm user *` command line commands. ([#67](https://github.com/SpectrumBroad/xible/issues/67))
 
@@ -22,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   `input.duplicate` node with amount of duplicates set to '1' would throw 'already called back'. ([#68](https://github.com/SpectrumBroad/xible/issues/68))
 
-## [0.10.0][] - 2017-04-08
+## [0.10.0][] - 2018-04-08
 ### Added
 -   Added the `xible.flow.param` node including applicable command line and REST API options. These allow parameters to be send when starting a flow. ([#45](https://github.com/SpectrumBroad/xible/issues/45))
 
@@ -173,7 +176,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/SpectrumBroad/xible/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/SpectrumBroad/xible/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/SpectrumBroad/xible/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/SpectrumBroad/xible/compare/v0.8.0...v0.9.0
