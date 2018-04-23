@@ -37,7 +37,7 @@
     "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/xible.js server start",
     "inspect-brk": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect-brk=0.0.0.0:9229 ./bin/xible.js server start",
     "prepublishOnly": "npm shrinkwrap --only=prod",
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha --exit"
   },
   "bin": {
     "xible": "./bin/xible.js",
