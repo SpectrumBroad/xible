@@ -4,6 +4,8 @@ const fs = require('fs');
 const debug = require('debug')('xible:cliqueue');
 
 module.exports = (XIBLE) => {
+  let queueFileShouldExist = false;
+
   class CliQueue {
     /**
     * Inits and manages the queue file for remote CLI commands.
@@ -23,8 +25,14 @@ module.exports = (XIBLE) => {
         if (err) {
           throw err;
         }
+
+        queueFileShouldExist = true;
         debug('Queue file created');
         fs.watch(`${XIBLE.configPath}.queue`, (type) => {
+          if (!queueFileShouldExist) {
+            return;
+          }
+
           if (type !== 'change') {
             throw new Error('Queue file got renamed.');
           }
@@ -94,8 +102,15 @@ module.exports = (XIBLE) => {
       if (!XIBLE.configPath) {
         throw new Error('Cannot remove queue file, configPath not set.');
       }
-      fs.unlinkSync(`${XIBLE.configPath}.queue`);
-      debug('Queue file removed');
+
+      queueFileShouldExist = false;
+
+      try {
+        fs.unlinkSync(`${XIBLE.configPath}.queue`);
+        debug('Queue file removed');
+      } catch (err) {
+        // console.error(err);
+      }
     }
 
     static add(str) {

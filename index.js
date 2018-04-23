@@ -52,6 +52,8 @@ class Xible extends EventEmitter {
 
     this.secure = false;
     this.webSslPortNumber = null;
+    this.plainWebServer = null;
+    this.secureWebServer = null;
 
     let appNames;
     if (this.child) {
@@ -93,8 +95,12 @@ class Xible extends EventEmitter {
     if (!this.configPath) {
       throw new Error('Cannot remove PID file, configPath not set.');
     }
-    fs.unlinkSync(`${this.configPath}.pid`);
-    xibleDebug('PID file removed');
+    try {
+      fs.unlinkSync(`${this.configPath}.pid`);
+      xibleDebug('PID file removed');
+    } catch (err) {
+      // console.error(err);
+    }
   }
 
   // load nodes and flows
@@ -123,9 +129,7 @@ class Xible extends EventEmitter {
       process.exit(1);
     });
     process.on('exit', () => {
-      this.CliQueue.removeFile();
-      this.removePidFile();
-      xibleDebug('exit');
+      this.close();
     });
 
     this.startWeb();
@@ -142,7 +146,7 @@ class Xible extends EventEmitter {
 
           this.broadcastWebSocket(message);
         }
-      }, WEB_SOCKET_THROTTLE);
+      }, WEB_SOCKET_THROTTLE).unref();
     }
 
     // ensure catch all routes are loaded last
@@ -194,7 +198,7 @@ class Xible extends EventEmitter {
           method: 'xible.flow.usage',
           usage
         });
-      }, STAT_INTERVAL);
+      }, STAT_INTERVAL).unref();
 
       return;
     }
@@ -264,6 +268,37 @@ class Xible extends EventEmitter {
     return Xible.generateObjectId();
   }
 
+  /**
+   * Stops XIBLE.
+   * To do; this stops the webserver, removes the pid and cliqueue files.
+   */
+  close() {
+    this.stopWeb();
+    this.CliQueue.removeFile();
+    this.removePidFile();
+
+    // TODO: should stop all flow instances
+    xibleDebug('exit');
+  }
+
+  /**
+   * Stops the webserver.
+   */
+  stopWeb() {
+    xibleDebug('stopWeb');
+
+    if (this.plainWebServer) {
+      this.plainWebServer.close();
+    }
+
+    if (this.secureWebServer) {
+      this.secureWebServer.close();
+    }
+  }
+
+  /**
+   * Starts the webserver.
+   */
   startWeb() {
     xibleDebug('startWeb');
 
@@ -324,14 +359,14 @@ class Xible extends EventEmitter {
       expressDebug('starting spdy (https)');
       this.secure = true;
 
-      const secureWebServer = spdy.createServer({
+      this.secureWebServer = spdy.createServer({
         key: fs.readFileSync(webSslKeyPath),
         cert: fs.readFileSync(webSslKeyCert)
-      }, expressApp).listen(webSslPortNumber, () => onListen(secureWebServer));
+      }, expressApp).listen(webSslPortNumber, () => onListen(this.secureWebServer));
     }
 
     expressDebug('starting plain (http)');
-    const plainWebServer = expressApp.listen(webPortNumber, () => onListen(plainWebServer));
+    this.plainWebServer = expressApp.listen(webPortNumber, () => onListen(this.plainWebServer));
   }
 
   initWeb() {
