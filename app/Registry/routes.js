@@ -30,24 +30,31 @@ module.exports = (XIBLE_REGISTRY, XIBLE, EXPRESS_APP) => {
   });
 
   // get a node by a given name
-  EXPRESS_APP.param('nodePackName', (req, res, next, nodePackName) => {
+  EXPRESS_APP.param('regNodePackName', (req, res, next, nodePackName) => {
     req.locals.nodePackName = nodePackName;
-
     XIBLE_REGISTRY.NodePack
     .getByName(nodePackName)
     .then((nodePack) => {
+      if (!nodePack) {
+        res.status(404).end();
+        return;
+      }
+
       req.locals.nodePack = nodePack;
       next();
     })
-    .catch(() => res.status(404).end());
+    .catch((err) => {
+      console.error(err);
+      res.status(500).end();
+    });
   });
 
-  EXPRESS_APP.get('/api/registry/nodepacks/:nodePackName', (req, res) => {
+  EXPRESS_APP.get('/api/registry/nodepacks/:regNodePackName', (req, res) => {
     res.json(req.locals.nodePack);
   });
 
   // install a node
-  EXPRESS_APP.patch('/api/registry/nodepacks/:nodePackName/install', (req, res) => {
+  EXPRESS_APP.patch('/api/registry/nodepacks/:regNodePackName/install', (req, res) => {
     req.locals.nodePack
     .install()
     .then(() => {

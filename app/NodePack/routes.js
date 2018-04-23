@@ -19,11 +19,11 @@ module.exports = (NODE_PACK, XIBLE, EXPRESS_APP) => {
     next();
   });
 
-  EXPRESS_APP.get('/api/nodes/:nodePackName', (req, res) => {
+  EXPRESS_APP.get('/api/nodepacks/:nodePackName', (req, res) => {
     res.json(req.locals.nodePack);
   });
 
-  EXPRESS_APP.delete('/api/nodes/:nodePackName', async (req, res) => {
+  EXPRESS_APP.delete('/api/nodepacks/:nodePackName', async (req, res) => {
     await req.locals.nodePack.remove();
     res.json(req.locals.nodePack);
   });

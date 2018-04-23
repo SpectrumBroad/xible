@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
-## [0.11.0][] - 2018-04-21
+## [0.11.0][] - 2018-04-23
 ### Added
 -   Added several shortcuts for `xiblepm user *` command line commands. ([#67](https://github.com/SpectrumBroad/xible/issues/67))
 
@@ -24,6 +24,8 @@ Nothing notable at the moment.
 -   Fixed potential XSS attack concerning flows downloaded from the registry where the nodes were not installed on the target machine.
 
 -   `input.duplicate` node with amount of duplicates set to '1' would throw 'already called back'. ([#68](https://github.com/SpectrumBroad/xible/issues/68))
+
+-    Installing nodepacks from the registry through the editor works again. ([#70](https://github.com/SpectrumBroad/xible/issues/70))
 
 ## [0.10.0][] - 2018-04-08
 ### Added
