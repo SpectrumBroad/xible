@@ -13,8 +13,9 @@ module.exports = (NODE, XIBLE, EXPRESS_APP) => {
   });
 
   // get a node by a given id
-  EXPRESS_APP.param('nodeName', (req, res, next, name) => {
-    const node = XIBLE.getNodeByName(name);
+  EXPRESS_APP.param('nodeName', (req, res, next, nodeName) => {
+    const node = XIBLE.getNodeByName(nodeName);
+
     if (!node) {
       res.status(404).end();
       return;
