@@ -607,7 +607,7 @@ function editorView(EL) {
     setLoadedFlowState(flow);
   }
 
-  function createFlowTab(flow) {
+  function createFlowTab(flow, newFlow) {
     const li = flowListUl.appendChild(document.createElement('li'));
     li.setAttribute('data-flowId', flow._id);
     const a = li.appendChild(document.createElement('a'));
@@ -668,20 +668,22 @@ function editorView(EL) {
       a.click();
     }
 
-    setFlowTabState(flow, li);
-
     function flowOnInitJson() {
       setFlowTabState(flow, li);
     }
     flow.on('initJson', flowOnInitJson);
 
-    flow.getInstances()
-    .then((instances) => {
-      instances.forEach(instance => handleInstanceState(instance, flow, li));
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+    if (!newFlow) {
+      setFlowTabState(flow, li);
+
+      flow.getInstances()
+      .then((instances) => {
+        instances.forEach(instance => handleInstanceState(instance, flow, li));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    }
 
     function flowOnCreateInstance({ flowInstance }) {
       setFlowTabState(flow, li);
@@ -751,7 +753,7 @@ function editorView(EL) {
     const flow = new XibleEditorFlow({
       _id: flowName
     });
-    const flowTab = createFlowTab(flow);
+    const flowTab = createFlowTab(flow, true);
     flowTab.classList.add('open', 'loading');
     flowTab.firstChild.click();
 
@@ -771,11 +773,13 @@ function editorView(EL) {
 
       flowTab.classList.add('notRunnable');
 
-      flowTab.addEventListener('animationiteration', () => {
-        flowListUl.removeChild(flowTab);
-      }, {
-        once: true
-      });
+      setTimeout(() => {
+        flowTab.addEventListener('animationiteration', () => {
+          flowListUl.removeChild(flowTab);
+        }, {
+          once: true
+        });
+      }, 2000);
     });
   };
 
