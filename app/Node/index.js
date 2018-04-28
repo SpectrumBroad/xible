@@ -279,7 +279,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         if (structure.inputs) {
           for (const inputName in structure.inputs) {
             const input = structure.inputs[inputName];
-            if (typeof input.type === 'string' && input.type !== 'trigger' && !structures.typedefs[input.type]) {
+            if (typeof input.type === 'string' && input.type !== 'trigger' && !XIBLE.TypeDef.getByName(input.type)) {
               // nodeDebug(`creating default typedef for "${input.type}"`);
               structures.typedefs[input.type] = { name: input.type };
               XIBLE.TypeDef.add(structures.typedefs[input.type]);
@@ -292,7 +292,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         if (structure.outputs) {
           for (const outputName in structure.outputs) {
             const output = structure.outputs[outputName];
-            if (typeof output.type === 'string' && output.type !== 'trigger' && !structures.typedefs[output.type]) {
+            if (typeof output.type === 'string' && output.type !== 'trigger' && !XIBLE.TypeDef.getByName(output.type)) {
               // nodeDebug(`creating default typedef for "${output.type}"`);
               structures.typedefs[output.type] = { name: output.type };
               XIBLE.TypeDef.add(structures.typedefs[output.type]);
