@@ -154,15 +154,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       flowDebug(`cleared ${preStatusesLength - Object.keys(statuses).length} statuses`);
 
-      // init a fresh copy for each flow
-      // if the initLevel for that flow requires this
-      for (const flowId in flows) {
-        if (flows[flowId].initLevel === Flow.INITLEVEL_FLOW) {
-          flows[flowId].createEmptyInitInstance()
-          .catch(err => console.error(err));
-        }
-      }
-
       return flows;
     }
 
@@ -400,6 +391,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       XIBLE.addFlow(this);
 
       this.emit('initJson');
+
+      if (!XIBLE.child && this.initLevel === Flow.INITLEVEL_FLOW) {
+        if (this.emptyInitInstance) {
+          this.emptyInitInstance.delete();
+        } else {
+          this.createEmptyInitInstance();
+        }
+      }
     }
 
     /**
@@ -589,12 +588,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     createEmptyInitInstance() {
       this.emptyInitInstance = this.createInstance();
       const recreate = () => {
-        this.emptyInitInstance.removeListener('starting', recreate);
-        this.emptyInitInstance.removeListener('stopping', recreate);
-        this.emptyInitInstance.removeListener('stopped', recreate);
-        this.emptyInitInstance.removeListener('started', recreate);
-        this.emptyInitInstance.removeListener('delete', recreate);
-        this.emptyInitInstance = null;
+        if (this.emptyInitInstance) {
+          this.emptyInitInstance.removeListener('starting', recreate);
+          this.emptyInitInstance.removeListener('stopping', recreate);
+          this.emptyInitInstance.removeListener('stopped', recreate);
+          this.emptyInitInstance.removeListener('started', recreate);
+          this.emptyInitInstance.removeListener('delete', recreate);
+          this.emptyInitInstance = null;
+        }
 
         if (this._deleted) {
           return;
