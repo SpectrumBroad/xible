@@ -35,9 +35,7 @@ describe('/api/nodes', function () {
       .get('/api/nodes/non_existing_nodeName')
       .expect(404);
     });
-  });
 
-  describe('GET /:nodeName', function () {
     it('console.log should return node definition', function () {
       return supertest(xible.expressApp)
       .get('/api/nodes/console.log')
