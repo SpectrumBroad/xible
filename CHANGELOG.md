@@ -191,7 +191,8 @@ Nothing notable at the moment.
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/SpectrumBroad/xible/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/SpectrumBroad/xible/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/SpectrumBroad/xible/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/SpectrumBroad/xible/compare/v0.9.0...v0.9.1
