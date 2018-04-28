@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.11.1][] - 2018-04-28
+### Added
+-   TypeDef API route test cases.
+
+### Fixed
+-   The `store` node is working again now the input and output types are set properly.
+
+-   When the Flow initialization level is set to 1 (Flow), the pre initialized instance is now spawned correctly when saving/updating flows.
+
+-   Typedefs are properly checked on existance when multiple nodepack paths are initialized.
+
+-   Deleted flows no longer re-appear in the editor after the connection to the XIBLE server reconnects.
+
 ## [0.11.0][] - 2018-04-23
 ### Added
 -   Added several shortcuts for `xiblepm user *` command line commands. ([#67](https://github.com/SpectrumBroad/xible/issues/67))
