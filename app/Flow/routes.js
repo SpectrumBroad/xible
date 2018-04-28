@@ -18,13 +18,17 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
       return;
     }
 
-    const flow = new FLOW();
-    flow.initJson(req.body, true);
-    await flow.save();
+    try {
+      const flow = new FLOW();
+      flow.initJson(req.body, true);
+      await flow.save();
 
-    res.json({
-      _id: flow._id
-    });
+      res.json({
+        _id: flow._id
+      });
+    } catch (err) {
+      res.status(500).end();
+    }
   });
 
   // get a flow by a given id
