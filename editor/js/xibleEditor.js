@@ -190,22 +190,10 @@ class XibleEditor extends EventEmitter {
   * Gets the flows from the Xible API
   */
   getFlows() {
-    /*
-
-    TODO: should use XibleWrapper.flows.getAll() instead
-    return this.xibleWrapper.Flow.getAll()
-    .then((flows) => {
-      Object.keys(flows).forEach((flowId) => {
-        let flow = new XibleEditorFlow(flows[flowId]);
-        this.flows[flowId] = flow;
-      });
-
-      return this.flows;
-    });
-    */
     const req = this.xibleWrapper.http.request('GET', '/api/flows');
     return req.toObject(Object)
     .then((flows) => {
+      this.flows = {};
       for (const flowId in flows) {
         const flow = new XibleEditorFlow(flows[flowId]);
         this.flows[flowId] = flow;
