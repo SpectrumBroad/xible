@@ -41,6 +41,17 @@ describe('/api/flows', () => {
       .expect(200)
       .expect(res => res.body._id === 'new_test_flow');
     });
+
+    it('should fail on flow name', function () {
+      return supertest(xible.expressApp)
+      .post('/api/flows')
+      .send({
+        _id: 'new_test_flow ',
+        nodes: [],
+        connectors: []
+      })
+      .expect(400);
+  });
   });
 
   describe('GET /:flowId', () => {
