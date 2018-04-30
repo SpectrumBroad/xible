@@ -51,6 +51,7 @@ class Xible extends EventEmitter {
     }
 
     this.secure = false;
+    this.webPortNumber = null;
     this.webSslPortNumber = null;
     this.plainWebServer = null;
     this.secureWebServer = null;
@@ -313,6 +314,7 @@ class Xible extends EventEmitter {
 
     // init the webserver
     const webPortNumber = this.Config.getValue('webserver.portnumber') || 9600;
+    this.webPortNumber = webPortNumber;
     expressDebug(`starting on port: ${webPortNumber}`);
 
     const onListen = (webServer) => {
@@ -363,6 +365,10 @@ class Xible extends EventEmitter {
         key: fs.readFileSync(webSslKeyPath),
         cert: fs.readFileSync(webSslKeyCert)
       }, expressApp).listen(webSslPortNumber, () => onListen(this.secureWebServer));
+
+      expressApp.settings.port = webSslPortNumber;
+    } else {
+      expressApp.settings.port = webPortNumber;
     }
 
     expressDebug('starting plain (http)');
