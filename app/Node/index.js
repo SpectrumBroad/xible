@@ -41,6 +41,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.left = obj.left || 0;
       this.data = obj.data || {};
       this.flow = null;
+      this.flowInstance = null;
       this._id = obj._id;
 
       this._states = {};
