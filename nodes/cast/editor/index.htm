@@ -9,11 +9,13 @@
 </selectcontainer>
 <script>
   const castTypeSelect = document.querySelector('select');
+  const resultOut = this.getOutputByName('result');
+
   castTypeSelect.onchange = () => {
-    const resultOut = this.getOutputByName('result');
     resultOut.setType(castTypeSelect.value);
-    resultOut.on('detach', () => {
-      resultOut.setType(castTypeSelect.value);
-    })
   };
+
+  resultOut.on('detach', () => {
+    resultOut.setType(castTypeSelect.value);
+  });
 </script>
