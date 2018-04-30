@@ -12,7 +12,7 @@ const xible = new Xible({
   configPath: CONFIG_PATH
 });
 
-describe('/api/flows', () => {
+describe('/api/flows', function () {
   before(function () {
     return xible.init();
   });
@@ -21,16 +21,16 @@ describe('/api/flows', () => {
     return xible.close();
   });
 
-  describe('GET /', () => {
-    it('should return list of flows', () => {
+  describe('GET /', function () {
+    it('should return list of flows', function () {
       return supertest(xible.expressApp)
       .get('/api/flows')
       .expect(200);
     });
   });
 
-  describe('POST /:flowId', () => {
-    it('should create new flow', () => {
+  describe('POST /:flowId', function () {
+    it('should create new flow', function () {
       return supertest(xible.expressApp)
       .post('/api/flows')
       .send({
@@ -51,11 +51,11 @@ describe('/api/flows', () => {
         connectors: []
       })
       .expect(400);
-  });
+    });
   });
 
-  describe('GET /:flowId', () => {
-    it('existing should return flow', () => {
+  describe('GET /:flowId', function () {
+    it('existing should return flow', function () {
       return supertest(xible.expressApp)
       .get('/api/flows/new_test_flow')
       .expect(200)
@@ -63,8 +63,8 @@ describe('/api/flows', () => {
     });
   });
 
-  describe('POST /:flowId/instances', () => {
-    it('should create new instance', () => {
+  describe('POST /:flowId/instances', function () {
+    it('should create new instance', function () {
       return supertest(xible.expressApp)
       .post('/api/flows/new_test_flow/instances')
       .expect(200);
@@ -73,7 +73,7 @@ describe('/api/flows', () => {
 
   describe('POST /:flowId/instances', function () {
     this.timeout(20000);
-    it('should create and start new instance', () => {
+    it('should create and start new instance', function () {
       return supertest(xible.expressApp)
       .post('/api/flows/new_test_flow/instances')
       .send({ start: true })
@@ -81,14 +81,14 @@ describe('/api/flows', () => {
     });
   });
 
-  describe('DELETE /:flowId', () => {
-    it('should delete flow', () => {
+  describe('DELETE /:flowId', function () {
+    it('should delete flow', function () {
       return supertest(xible.expressApp)
       .delete('/api/flows/new_test_flow')
       .expect(200);
     });
 
-    it('should return 404', () => {
+    it('should return 404', function () {
       return supertest(xible.expressApp)
       .get('/api/flows/new_test_flow')
       .expect(404);
