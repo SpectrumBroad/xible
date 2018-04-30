@@ -1,6 +1,8 @@
 # XIBLE
 A visual programming language. Visit <https://xible.io> for more information.
 
+[![npm](http://img.shields.io/npm/v/xible.svg?style=flat-square)](http://www.npmjs.org/xible)
+
 ## Installation
 See the [installation documentation](https://xible.io/docs/installation) for details.
 
