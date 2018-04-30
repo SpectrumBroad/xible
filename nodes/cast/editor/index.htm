@@ -10,7 +10,10 @@
 <script>
   const castTypeSelect = document.querySelector('select');
   castTypeSelect.onchange = () => {
-    this.getOutputByName('result')
-    .setType(castTypeSelect.value);
+    const resultOut = this.getOutputByName('result');
+    resultOut.setType(castTypeSelect.value);
+    resultOut.on('detach', () => {
+      resultOut.setType(castTypeSelect.value);
+    })
   };
 </script>
