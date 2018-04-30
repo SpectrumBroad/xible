@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Added
+-   Nodes can now host their own routes through the API of XIBLE. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
+
+### Fixed
+-   `cast` node is working again now the output type is properly reset when all connectors detach.
 
 ## [0.11.1][] - 2018-04-28
 ### Added
