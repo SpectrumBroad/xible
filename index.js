@@ -404,27 +404,27 @@ class Xible extends EventEmitter {
   }
 
   setPersistentWebSocketMessage(message) {
-    if (!this.persistentWebSocketMessages[message.flowInstance]) {
-      this.persistentWebSocketMessages[message.flowInstance] = {};
+    if (!this.persistentWebSocketMessages[message.flowInstanceId]) {
+      this.persistentWebSocketMessages[message.flowInstanceId] = {};
     }
 
-    if (!this.persistentWebSocketMessages[message.flowInstance][message.nodeId]) {
-      this.persistentWebSocketMessages[message.flowInstance][message.nodeId] = {};
+    if (!this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId]) {
+      this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId] = {};
     }
 
-    this.persistentWebSocketMessages[message.flowInstance][message.nodeId][message.status._id] = message;
+    this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId][message.status._id] = message;
   }
 
   deletePersistentWebSocketMessage(message) {
-    if (!this.persistentWebSocketMessages[message.flowInstance]) {
+    if (!this.persistentWebSocketMessages[message.flowInstanceId]) {
       return;
     }
 
-    if (!this.persistentWebSocketMessages[message.flowInstance][message.nodeId]) {
+    if (!this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId]) {
       return;
     }
 
-    delete this.persistentWebSocketMessages[message.flowInstance][message.nodeId][message.status._id];
+    delete this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId][message.status._id];
   }
 
   broadcastWebSocket(message) {
@@ -471,16 +471,16 @@ class Xible extends EventEmitter {
 
         case 'xible.node.removeAllStatuses':
           if (
-            this.persistentWebSocketMessages[message.flowInstance] &&
-            this.persistentWebSocketMessages[message.flowInstance][message.nodeId]
+            this.persistentWebSocketMessages[message.flowInstanceId] &&
+            this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId]
           ) {
-            delete this.persistentWebSocketMessages[message.flowInstance][message.nodeId];
+            delete this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId];
           }
           break;
 
         case 'xible.flow.instance.removeAllStatuses':
-          if (this.persistentWebSocketMessages[message.flowInstance._id]) {
-            delete this.persistentWebSocketMessages[message.flowInstance._id];
+          if (this.persistentWebSocketMessages[message.flowInstanceId]) {
+            delete this.persistentWebSocketMessages[message.flowInstanceId];
           }
           break;
       }

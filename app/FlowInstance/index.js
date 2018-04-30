@@ -211,7 +211,8 @@ module.exports = (XIBLE) => {
           // cleanup all open statuses
           XIBLE.broadcastWebSocket({
             method: 'xible.flow.instance.removeAllStatuses',
-            flowInstance: this
+            flowInstanceId: this._id,
+            flowId: this.flow._id
           });
         });
       });
@@ -512,7 +513,8 @@ module.exports = (XIBLE) => {
             // cleanup all open statuses
             XIBLE.broadcastWebSocket({
               method: 'xible.flow.instance.removeAllStatuses',
-              flowInstance: this
+              flowInstanceId: this._id,
+              flowId: this.flow._id
             });
 
             killTimeout = null;
@@ -588,7 +590,9 @@ module.exports = (XIBLE) => {
 
       XIBLE.broadcastWebSocket({
         method: `xible.flow.instance.${eventName}`,
-        flowInstance: this
+        flowInstanceId: this._id,
+        flowInstance: this,
+        flowId: this.flow._id
       });
     }
 

@@ -223,7 +223,7 @@ class XibleEditor extends EventEmitter {
 
     switch (json.method) {
       case 'xible.flow.instance.removeAllStatuses':
-        if (this.loadedFlow && json.flowInstance.flowId === this.loadedFlow._id) {
+        if (this.loadedFlow && json.flowId === this.loadedFlow._id) {
           this.loadedFlow.removeAllStatuses();
         }
         break;
