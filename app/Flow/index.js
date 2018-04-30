@@ -7,6 +7,7 @@ const path = require('path');
 
 // lazy requires
 let sanitizePath;
+let express;
 
 const flowDebug = debug('xible:flow');
 
@@ -28,6 +29,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   // default init level for flows
   const initLevel = XIBLE.Config.getValue('flows.initlevel');
+
+  if (!XIBLE.child && !express) {
+    express = require('express');
+  }
 
   /**
   * Flow class
@@ -293,6 +298,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             top: node.top
           }));
 
+          if (!xibleNode) {
+            throw new Error(`Could not construct node '${node.name}'`);
+          }
+
           // check for data keys that should be vaulted
           // remove those from the json (the json is used for saving)
           // save the vault data thereafter
@@ -315,8 +324,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             Object.assign(xibleNode.data, xibleNode.vault.get());
           }
 
-          if (!xibleNode) {
-            throw new Error(`Could not construct node '${node.name}'`);
+          // host routes
+          if (!XIBLE.child && nodeConstr.routesPath) {
+            try {
+              const router = express.Router();
+              EXPRESS_APP.use(`/api/node-routes/${xibleNode._id}/`, router);
+              require(nodeConstr.routesPath)(xibleNode, router);
+            } catch (err) {
+              console.error(err);
+            }
           }
         }
 

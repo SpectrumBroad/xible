@@ -37,6 +37,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.description = obj.description;
       this.nodeExists = true;
       this.hostsEditorContent = obj.hostsEditorContent;
+      this.routesPath = obj.routesPath;
       this.top = obj.top || 0;
       this.left = obj.left || 0;
       this.data = obj.data || {};
@@ -178,6 +179,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         const typedefs = {};
         const structurePath = `${dirPath}/structure.json`;
         const typedefPath = `${dirPath}/typedef.json`;
+        const editorPath = `${dirPath}/editor`;
+        const routesPath = `${dirPath}/routes.js`;
 
         // check for structure.json
         fs.access(structurePath, fs.constants.R_OK, (err) => {
@@ -205,22 +208,22 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             }
 
             // check for editor contents
-            fs.stat(`${dirPath}/editor`, (statEditorErr, stat) => {
-              if (statEditorErr) {
+            fs.stat(editorPath, (statEditorErr, stat) => {
+              if (!statEditorErr) {
+                if (stat.isDirectory()) {
+                  structure.editorContentPath = editorPath;
+                }
+              }
+
+              fs.access(routesPath, fs.constants.R_OK, (routesAccessErr) => {
+                if (!routesAccessErr) {
+                  structure.routesPath = routesPath;
+                }
+
                 resolve({
                   node: structure,
                   typedefs
                 });
-                return;
-              }
-
-              if (stat.isDirectory()) {
-                structure.editorContentPath = `${dirPath}/editor`;
-              }
-
-              resolve({
-                node: structure,
-                typedefs
               });
             });
           });
