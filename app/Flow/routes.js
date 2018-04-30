@@ -12,7 +12,8 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
       !req.body ||
       !req.body._id ||
       !Array.isArray(req.body.nodes) ||
-      !Array.isArray(req.body.connectors)
+      !Array.isArray(req.body.connectors) ||
+      !FLOW.validateId(req.body._id)
     ) {
       res.status(400).end();
       return;
@@ -68,6 +69,9 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
       res.status(400).end();
       return;
     }
+
+    req.body._id = req.locals.flow._id;
+    req.body.name = req.locals.flow.name;
 
     const flow = req.locals.flow;
     await flow.stopAllInstances();
