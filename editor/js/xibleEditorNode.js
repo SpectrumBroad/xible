@@ -365,7 +365,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       const li = ul.appendChild(document.createElement('li'));
       li.setAttribute('data-statusid', status._id);
 
-      if (status.color) {
+      if (typeof status.color === 'string') {
         li.classList.add(status.color);
       }
 
@@ -380,7 +380,7 @@ class XibleEditorNode extends xibleWrapper.Node {
         messageLineSplit = null;
       }
 
-      if (status.timeout) {
+      if (typeof status.timeout === 'number') {
         this.statusTimeouts[status._id] = window.setTimeout(() => {
           this.removeStatusById(status._id);
         }, status.timeout);
