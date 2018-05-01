@@ -520,6 +520,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @param {String} status.message Text message to show.
     * @param {String} [status.color] Color for the indicator next to the text message.
     * If none provided, the CSS file of the editor decides on a appropriate default color.
+    * @param {String} [status.timeout] Timeout in milliseconds before the message should disappear.
+    * If none provided, the message will remain until the flow is stopped or
+    * this status is removed by calling removeStatusById().
     * @returns {Number} Returns an identifier,
     * which can be used to update the status through node.updateStatusById,
     * or remove it through removeStatusById.
@@ -543,7 +546,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Removes a progress bar referred to by it sidentifier.
+    * Removes a progress bar referred to by it sidentifier. Alias for removeStatusById().
     * @param {Number} statusId Identifier of the progress bar to remove.
     * @param {Number} [timeout]
     * The amount of time in milliseconds before actually removing the progress bar.
