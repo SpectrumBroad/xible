@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   Hexadecimal colors are now allowed in typedefs.
 
+-   `object.assign` node works on all target inputs, instead of just the first one.
+
 ### Fixed
 -   `cast` node is working again now the output type is properly reset when all connectors detach.
 
