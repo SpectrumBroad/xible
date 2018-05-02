@@ -6,10 +6,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   class TypeDef {
     constructor(obj) {
       if (!obj) {
-        throw new Error('Missing object argument');
+        throw new Error('Missing "object" argument');
       }
       if (!obj.name) {
-        throw new Error('Missing name property');
+        throw new Error('Missing "name" property');
       }
       if (obj) {
         Object.assign(this, obj);
