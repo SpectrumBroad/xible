@@ -5,15 +5,12 @@ module.exports = (NODE) => {
   const sourcesIn = NODE.getInputByName('sources');
 
   const objOut = NODE.getOutputByName('object');
-  objOut.on('trigger', (conn, state, callback) => {
-    Promise.all([targetIn.getValues(state), sourcesIn.getValues(state)])
-    .then(([targets, sources]) => {
-      let target = {};
-      if (targets.length) {
-        target = targets[0];
-      }
-      const assignedObj = Object.assign({}, target, ...sources);
-      callback(assignedObj);
-    });
+  objOut.on('trigger', async (conn, state, callback) => {
+    const [targets, sources] = await Promise.all([
+      targetIn.getValues(state),
+      sourcesIn.getValues(state)
+    ]);
+    const assigned = targets.map(target => Object.assign({}, target, ...sources));
+    callback(assigned);
   });
 };
