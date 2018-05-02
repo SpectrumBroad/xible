@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Nodes can now host their own routes through the API of XIBLE. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
 
+### Changed
+-   Hexadecimal colors are now allowed in typedefs.
+
 ### Fixed
 -   `cast` node is working again now the output type is properly reset when all connectors detach.
 

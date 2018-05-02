@@ -530,7 +530,12 @@ function editorView(EL) {
       typeDefStyleEl.setAttribute('type', 'text/css');
       let styleText = '';
       for (const type in typeDefs) {
-        if (typeDefs[type].color && /^\w+$/.test(typeDefs[type].color)) {
+        if (typeDefs[type].color &&
+          (
+            /^\w+$/.test(typeDefs[type].color) ||
+            /^#[a-f0-9]{6}$/i.test(typeDefs[type].color)
+          )
+        ) {
           styleText += `.xible .node>.io>ul>.${type.replace(/\./g, '\\.')} {border-color: ${typeDefs[type].color};}\n`;
         }
       }
