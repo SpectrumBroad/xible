@@ -603,13 +603,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     createEmptyInitInstance() {
       this.emptyInitInstance = this.createInstance();
+
       const recreate = () => {
         if (this.emptyInitInstance) {
-          this.emptyInitInstance.removeListener('starting', recreate);
-          this.emptyInitInstance.removeListener('stopping', recreate);
-          this.emptyInitInstance.removeListener('stopped', recreate);
-          this.emptyInitInstance.removeListener('started', recreate);
-          this.emptyInitInstance.removeListener('delete', recreate);
+          this.emptyInitInstance.removeEmptyInitInstanceListeners();
           this.emptyInitInstance = null;
         }
 
@@ -618,10 +615,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
         this.createEmptyInitInstance();
       };
-      this.emptyInitInstance.on('starting', recreate);
+
+      this.emptyInitInstance.removeEmptyInitInstanceListeners = function removeEmptyInitInstanceListeners() {
+        this.removeListener('stopping', recreate);
+        this.removeListener('stopped', recreate);
+        this.removeListener('delete', recreate);
+      };
+
       this.emptyInitInstance.on('stopping', recreate);
       this.emptyInitInstance.on('stopped', recreate);
-      this.emptyInitInstance.on('started', recreate);
       this.emptyInitInstance.on('delete', recreate);
 
       return this.emptyInitInstance.init();
@@ -641,9 +643,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       if (this.initLevel === Flow.INITLEVEL_FLOW && this.emptyInitInstance) {
-        this.emptyInitInstance.params = params;
-        this.emptyInitInstance.directNodes = directNodes;
-        return this.emptyInitInstance;
+        const emptyInitInstance = this.emptyInitInstance;
+        emptyInitInstance.params = params;
+        emptyInitInstance.directNodes = directNodes;
+        this.emptyInitInstance.removeEmptyInitInstanceListeners();
+        this.emptyInitInstance = null;
+        this.createEmptyInitInstance();
+        return emptyInitInstance;
       }
 
       const createStart = process.hrtime();
