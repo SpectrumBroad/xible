@@ -18,7 +18,8 @@ class XibleEditorNodeSelector {
     this.openXPosition = 0;
 
     // detail div for downloading new nodes
-    let detailDiv = this.detailDiv = document.body.appendChild(document.createElement('div'));
+    let detailDiv = document.body.appendChild(document.createElement('div'));
+    this.detailDiv = detailDiv;
     detailDiv.setAttribute('id', 'detailNodeSelector');
     detailDiv.classList.add('hidden');
     detailDiv.innerHTML = `
@@ -34,13 +35,16 @@ class XibleEditorNodeSelector {
     };
 
     // the div containing the node list
-    let div = this.div = document.body.appendChild(document.createElement('div'));
+    let div = document.body.appendChild(document.createElement('div'));
+    this.div = div;
     div.setAttribute('id', 'nodeSelector');
 
     // this list will be populated with the local installed nodes
-    const nodesUl = this.nodesUl = document.createElement('ul');
+    const nodesUl = document.createElement('ul');
+    this.nodesUl = nodesUl;
 
-    const filterInput = this.filterInput = div.appendChild(document.createElement('input'));
+    const filterInput = div.appendChild(document.createElement('input'));
+    this.filterInput = filterInput;
     filterInput.setAttribute('type', 'text');
     filterInput.setAttribute('placeholder', 'filter nodes');
     filterInput.addEventListener('input', () => {
@@ -57,7 +61,8 @@ class XibleEditorNodeSelector {
     div.appendChild(nodesUl);
 
     // create a search online button
-    const searchOnlineButton = this.searchOnlineButton = div.appendChild(document.createElement('button'));
+    const searchOnlineButton = div.appendChild(document.createElement('button'));
+    this.searchOnlineButton = searchOnlineButton;
     searchOnlineButton.setAttribute('type', 'button');
     searchOnlineButton.appendChild(document.createTextNode('search online'));
     searchOnlineButton.setAttribute('title', 'Search xible.io for nodes matching your filter');
@@ -67,7 +72,6 @@ class XibleEditorNodeSelector {
       }
 
       const filterInputValue = filterInput.value.toLowerCase();
-      const searchWords = this.getSearchWords();
 
       this.detailDiv.classList.add('hidden');
       searchOnlineButton.classList.add('loading');
@@ -210,7 +214,8 @@ class XibleEditorNodeSelector {
 
   /**
   * Runs setVisibility() on each item in the list.
-  * @param {String} className List of css class names that should be on the list element before making visible.
+  * @param {String} className List of css class names
+  * that should be on the list element before making visible.
   * @returns {Boolean} Whether there are any visible results or not.
   */
   setListsVisibility(className) {
@@ -237,7 +242,7 @@ class XibleEditorNodeSelector {
         visible += 1;
       } else if (className && !lis[i].classList.contains(className)) {
         lis[i].classList.add('hidden');
-      } else if (this.setListVisibility(lis[i], filterInputValue, searchWords)) {
+      } else if (XibleEditorNodeSelector.setListVisibility(lis[i], filterInputValue, searchWords)) {
         visible += 1;
       }
     }
@@ -258,11 +263,14 @@ class XibleEditorNodeSelector {
   * @param {String[]} searchWords Search keywords.
   * @returns {Boolean} Visible or not.
   */
-  setListVisibility(li, filterInputValue, searchWords) {
+  static setListVisibility(li, filterInputValue, searchWords) {
     const textContent = li.textContent.toLowerCase();
 
     li.classList.remove('headerMatchExact', 'headerMatchPartial');
-    if (!filterInputValue || searchWords.every(searchWord => textContent.indexOf(searchWord) > -1)) {
+    if (
+      !filterInputValue ||
+      searchWords.every(searchWord => textContent.indexOf(searchWord) > -1)
+    ) {
       // specify more relevant search results
       const headerTextContent = li.firstChild.textContent.toLowerCase();
       if (headerTextContent === filterInputValue) {
@@ -364,11 +372,7 @@ class XibleEditorNodeSelector {
       <section>
         <h1>nodes</h1>
         <ul>
-          ${
-            nodePack.nodes
-            .map(node => `<li>${node.name}</li>`)
-            .join('')
-          }
+          ${nodePack.nodes.map(node => `<li>${node.name}</li>`).join('')}
         </ul>
       </section>
       <section>
@@ -394,13 +398,13 @@ class XibleEditorNodeSelector {
     h1.setAttribute('title', nodeName);
 
     // scroll text if it overflows
-    li.addEventListener('mouseenter', (event) => {
+    li.addEventListener('mouseenter', () => {
       if (h1.scrollWidth > h1.offsetWidth) {
         h1.classList.add('overflow');
       }
     });
 
-    li.addEventListener('mouseleave', (event) => {
+    li.addEventListener('mouseleave', () => {
       h1.classList.remove('overflow');
     });
 
@@ -426,7 +430,12 @@ class XibleEditorNodeSelector {
       const actionsOffset = this.xibleEditor.getOffsetPosition();
       const editorNode = this.xibleEditor.addNode(new XibleEditorNode(node));
       this.xibleEditor.loadedFlow.addNode(editorNode);
-      editorNode.setPosition(((event.pageX - actionsOffset.left - this.xibleEditor.left) / this.xibleEditor.zoom) - (editorNode.element.firstChild.offsetWidth / 2), ((event.pageY - actionsOffset.top - this.xibleEditor.top) / this.xibleEditor.zoom) - (editorNode.element.firstChild.offsetHeight / 2));
+      editorNode.setPosition(
+        ((event.pageX - actionsOffset.left - this.xibleEditor.left) / this.xibleEditor.zoom) -
+        (editorNode.element.firstChild.offsetWidth / 2),
+        ((event.pageY - actionsOffset.top - this.xibleEditor.top) / this.xibleEditor.zoom) -
+        (editorNode.element.firstChild.offsetHeight / 2)
+      );
       this.xibleEditor.deselect();
       this.xibleEditor.select(editorNode);
       this.xibleEditor.initDrag(event);
@@ -471,7 +480,6 @@ class XibleEditorNodeSelector {
         });
       }
 
-
       Object.keys(nodes)
       .forEach((nodeName) => {
         const li = XibleEditorNodeSelector.buildNode(nodeName, nodes[nodeName]);
@@ -483,8 +491,6 @@ class XibleEditorNodeSelector {
 
         this.nodesUl.appendChild(li);
       });
-
-      // this.setListsVisibility();
 
       // make items visible that were so before
       if (visibleNodeNames) {
