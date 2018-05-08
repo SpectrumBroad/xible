@@ -8,10 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Nodes can now host their own routes through the API of XIBLE. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
 
+-   Starting a flow through the editor which uses `xible.flow.param` nodes will now request for the values of those parameters. ([#57](https://github.com/SpectrumBroad/xible/issues/57))
+
 ### Changed
 -   Hexadecimal colors are now allowed in typedefs.
 
 -   `object.assign` node works on all target inputs, instead of just the first one.
+
+-   Saving or deploying a flow while instances on it are running, prompts the sure to ensure it is okay that these running instances are stopped. ([#38](https://github.com/SpectrumBroad/xible/issues/38))
+
+-   Starting while instances are already running prompts the user to stop the running instances or leave them running.
 
 ### Fixed
 -   `cast` node is working again now the output type is properly reset when all connectors detach.

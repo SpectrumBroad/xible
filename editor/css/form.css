@@ -26,6 +26,43 @@ input:focus, select:focus {
 	padding: 2px;
 }
 
+/*
+input:invalid {
+	border-color: #dd0000;
+}
+*/
+
+button,
+input[type="button"],
+input[type="submit"] {
+	padding: 3px;
+	border: 2px solid #000;
+	border-width: 0 0 2px 0;
+	background-color: #45679E;
+	cursor: pointer;
+	text-align: left;
+	margin-bottom: 3px;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+button:focus,
+input[type="button"]:focus,
+input[type="submit"]:focus {
+	outline: none;
+	background-color: #5b7cb3;
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active {
+	outline: none;
+	border-width: 2px 0 0 0;
+	border-color: rgb(30, 30, 30);
+	background-color: #31599b;
+}
+
 input[type="checkbox"] {
 	opacity: 0;
 	position: absolute;

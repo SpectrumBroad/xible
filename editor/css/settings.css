@@ -2,30 +2,36 @@
 	flex-direction: column;
 }
 
-#settingsContent section {
+#settingsContent section,
+.prompt section {
 	border-bottom: 1px solid #393939;
 }
 
-#settingsContent dl {
+#settingsContent dl,
+.prompt dl {
 	overflow: auto;
 	margin: 8px 0;
 }
 
-#settingsContent dl>*:first-child {
+#settingsContent dl>*:first-child,
+.prompt dl>*:first-child {
 	margin-top: 0;
 }
 
-#settingsContent dt {
+#settingsContent dt,
+.prompt dt {
 	margin: 18px 0 6px;
 	padding: 0;
 }
 
-#settingsContent dt label div {
+#settingsContent dt label div,
+.prompt dt label div {
 	font-size: 0.9em;
 	color: #bbb;
 }
 
-#settingsContent dd {
+#settingsContent dd,
+.prompt dd {
 	margin: 0 0 18px;
 	padding: 0;
 }
@@ -33,22 +39,27 @@
 
 /* checkbox */
 
-#settingsContent dt.checkbox {
-	margin: 18px 0 6px;
-	float: left;
+#settingsContent dt.checkbox,
+.prompt dt.checkbox {
+	margin: 24px 0 6px;
 	clear: right;
 }
 
-#settingsContent dd.checkbox {
+#settingsContent dd.checkbox,
+.prompt dd.checkbox{
 	margin: 18px 0 6px;
 	float: left;
 	clear: left;
 }
 
-#settingsContent dd.checkbox span {
+#settingsContent dd.checkbox span,
+.prompt dd.checkbox span {
 	margin: 3px 8px 0 0;
 }
 
-#settingsContent dd.checkbox:first-child, #settingsContent dd.checkbox:first-child + dt.checkbox {
+#settingsContent dd.checkbox:first-child,
+.prompt dd.checkbox:first-child,
+#settingsContent dd.checkbox:first-child + dt.checkbox,
+.prompt dd.checkbox:first-child + dt.checkbox {
 	margin: 0 0 6px;
 }

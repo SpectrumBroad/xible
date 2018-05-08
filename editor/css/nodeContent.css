@@ -230,7 +230,9 @@ input[type="checkbox"]:focus~span::before {
 	background-color: #5b7cb3;
 }
 
-button, input[type="button"] {
+button,
+input[type="button"],
+input[type="submit"] {
 	padding: 3px;
 	border: 2px solid #000;
 	border-width: 0 0 2px 0;
@@ -239,13 +241,19 @@ button, input[type="button"] {
 	text-align: left;
 }
 
-button:hover, input[type="button"]:hover,
-button:focus, input[type="button"]:focus {
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+button:focus,
+input[type="button"]:focus,
+input[type="submit"]:focus {
 	outline: none;
 	background-color: #5b7cb3;
 }
 
-button:active, input[type="button"]:active {
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active {
 	outline: none;
 	border-width: 2px 0 0 0;
 	border-color: rgb(30, 30, 30);

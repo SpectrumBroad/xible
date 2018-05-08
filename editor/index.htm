@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="EN">
-
 <head>
   <title>XIBLE</title>
 
@@ -13,6 +12,7 @@
   <link rel="stylesheet" href="css/form.css" type="text/css" />
   <link rel="stylesheet" href="css/sub.css" type="text/css" />
   <link rel="stylesheet" href="css/flows.css" type="text/css" />
+  <link rel="stylesheet" href="css/prompt.css" type="text/css" />
 
   <!-- editor related css files -->
   <link rel="stylesheet" href="css/editor.css" type="text/css" />
@@ -27,6 +27,7 @@
   <script src="js/xibleWrapper.js"></script>
   <script src="js/Chart.min.js"></script>
   <script src="js/view.js"></script>
+  <script src="js/prompt.js"></script>
 </head>
 
 <body>
@@ -45,7 +46,7 @@
 
   <script>
     let locationPort = window.location.port || '';
-    if(locationPort) {
+    if (locationPort) {
       locationPort = `:${locationPort}`;
     }
     xibleWrapper = new XibleWrapper(`${window.location.protocol}//${window.location.hostname}${locationPort}`);
@@ -129,7 +130,5 @@
       mainViewHolder.navigate('/welcome');
     });
   </script>
-
 </body>
-
 </html>
