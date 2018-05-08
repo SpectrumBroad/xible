@@ -454,6 +454,9 @@ class XibleEditorNodeSelector {
     this.div.classList.add('loading');
     this.reset();
 
+    // reload the styles
+    this.xibleEditor.loadTypeDefStyles();
+
     // track all nodeNames currently visible
     let visibleNodeNames;
     if (Array.from(this.nodesUl.querySelectorAll('li.hidden')).length) {

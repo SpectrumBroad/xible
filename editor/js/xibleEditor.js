@@ -53,6 +53,8 @@ class XibleEditor extends EventEmitter {
     this.flows = {};
     this.loadedFlow = null;
 
+    this.typeDefStyleEl = null;
+
     // check how far the clocks of server and client are off from eachother
     // in ms
     this.serverClientDateDifference = 0;
@@ -200,6 +202,42 @@ class XibleEditor extends EventEmitter {
       }
 
       return this.flows;
+    });
+  }
+
+  /**
+  * Loads the style information (color) associated with typeDefs
+  */
+  loadTypeDefStyles() {
+    xibleWrapper.TypeDef.getAll()
+    .then((typeDefs) => {
+      // remove existing style el
+      if (this.typeDefStyleEl && this.typeDefStyleEl.parentNode) {
+        this.typeDefStyleEl.parentNode.removeChild(this.typeDefStyleEl);
+      }
+
+      // create new style el
+      this.typeDefStyleEl = document.createElement('style');
+      this.typeDefStyleEl.setAttribute('type', 'text/css');
+      let styleText = '';
+      for (const type in typeDefs) {
+        if (typeDefs[type].color &&
+          (
+            /^\w+$/.test(typeDefs[type].color) ||
+            /^#[a-f0-9]{6}$/i.test(typeDefs[type].color)
+          )
+        ) {
+          styleText += `.xible .node>.io>ul>.${type.replace(/\./g, '\\.')} {border-color: ${typeDefs[type].color};}\n`;
+        }
+      }
+      if (!styleText) {
+        return;
+      }
+
+      // add to head
+      this.typeDefStyleEl.appendChild(document.createTextNode(styleText));
+      const head = document.head || document.getElementsByTagName('head')[0];
+      head.appendChild(this.typeDefStyleEl);
     });
   }
 

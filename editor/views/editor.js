@@ -678,44 +678,6 @@ function editorView(EL) {
   }
   document.getElementById('zoomFitButton').onclick = zoomFit;
 
-  let typeDefStyleEl = null;
-
-  /**
-  * Loads the style information (color) associated with typeDefs
-  */
-  function loadTypeDefStyles() {
-    xibleWrapper.TypeDef.getAll()
-    .then((typeDefs) => {
-      // remove existing style el
-      if (typeDefStyleEl && typeDefStyleEl.parentNode) {
-        typeDefStyleEl.parentNode.removeChild(typeDefStyleEl);
-      }
-
-      // create new style el
-      typeDefStyleEl = document.createElement('style');
-      typeDefStyleEl.setAttribute('type', 'text/css');
-      let styleText = '';
-      for (const type in typeDefs) {
-        if (typeDefs[type].color &&
-          (
-            /^\w+$/.test(typeDefs[type].color) ||
-            /^#[a-f0-9]{6}$/i.test(typeDefs[type].color)
-          )
-        ) {
-          styleText += `.xible .node>.io>ul>.${type.replace(/\./g, '\\.')} {border-color: ${typeDefs[type].color};}\n`;
-        }
-      }
-      if (!styleText) {
-        return;
-      }
-
-      // add to head
-      typeDefStyleEl.appendChild(document.createTextNode(styleText));
-      const head = document.head || document.getElementsByTagName('head')[0];
-      head.appendChild(typeDefStyleEl);
-    });
-  }
-
   // add the flow names to the flow tab list
   const flowListUl = document.getElementById('flowList');
 
@@ -1000,9 +962,6 @@ function editorView(EL) {
   function xibleWrapperOnOpen() {
     // reload the flows
     loadFlows();
-
-    // reload the typeDef styles
-    loadTypeDefStyles();
 
     // reload the nodes
     xibleEditor.nodeSelector.fill();
