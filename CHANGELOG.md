@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   `cast` node is working again now the output type is properly reset when all connectors detach.
 
+-   Installing a nodepack through the editor now properly reloads the typedefs. This ensures that the colors on inputs &amp; outputs are working, and that connectors work across the inheritance chain of a newly added typedef.
+
 ## [0.11.1][] - 2018-04-28
 ### Added
 -   TypeDef API route test cases.
