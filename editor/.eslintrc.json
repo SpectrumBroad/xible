@@ -21,7 +21,8 @@
     "XibleEditorConnector": false,
     "XibleWrapper": false,
     "XibleEditorNodeSelector": false,
-    "EventEmitter": false
+    "EventEmitter": false,
+    "customPrompt": false
   },
   "rules": {
     "global-require": "off",
