@@ -843,6 +843,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
            * since we cannot guarantee that the type matches this input.
            */
           if (!conn.origin.type) {
+            // all done
+            if (++callbacksReceived === connLength) {  // eslint-disable-line
+              resolve(values);
+            }
+
             continue;
           }
 
