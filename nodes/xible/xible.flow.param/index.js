@@ -11,6 +11,8 @@ module.exports = (NODE) => {
     if (flowInstanceParams[NODE.data.paramName]) {
       paramValue = flowInstanceParams[NODE.data.paramName];
       valueOut.type = typeof paramValue;
+    } else if (defaultIn.isConnected()) {
+      valueOut.type = defaultIn.type;
     }
   });
 
