@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Starting while instances are already running prompts the user to stop the running instances or leave them running.
 
+-   The `xible.flow.param` node has been renamed to `xible.flow.instance.param`. The parameter (value) is assigned and therefore specific to the instance, not the flow.
+
 ### Fixed
 -   `cast` node is working again now the output type is properly reset when all connectors detach.
 

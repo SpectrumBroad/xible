@@ -1,7 +1,7 @@
 {
-  "name": "xible.flow.param",
+  "name": "xible.flow.instance.param",
   "type": "object",
-  "description": "Returns the value for a provided parameter to this flow.",
+  "description": "Returns the value for a provided parameter to this flow instance.",
   "inputs": {
     "default": {
       "description": "Specifies the default value to return when the parameter itself is not provided.",

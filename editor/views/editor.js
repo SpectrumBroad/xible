@@ -95,7 +95,7 @@ function editorView(EL) {
 
   function getParamNames(flow) {
     const paramNames = [];
-    const paramNodes = flow.getNodesByName('xible.flow.param');
+    const paramNodes = flow.getNodesByName('xible.flow.instance.param');
     for (let i = 0; i < paramNodes.length; i += 1) {
       const inputEl = paramNodes[i].editorContentEl.querySelector('input');
       if (inputEl && inputEl.value) {
