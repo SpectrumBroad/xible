@@ -1,15 +1,15 @@
 {
   "name": "variable.value",
   "type": "object",
-  "description": "Extracts the value from a variable.",
+  "description": "Extracts the values from one or more variables.",
   "inputs": {
-    "variable": {
+    "variables": {
       "type": "variable"
     }
   },
   "outputs": {
-    "value": {
-      "type": null
+    "values": {
+      "type": "object"
     }
   }
 }

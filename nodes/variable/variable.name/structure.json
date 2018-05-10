@@ -1,14 +1,14 @@
 {
   "name": "variable.name",
   "type": "object",
-  "description": "Extracts the name from a variable.",
+  "description": "Extracts the name from one or more variables.",
   "inputs": {
-    "variable": {
+    "variables": {
       "type": "variable"
     }
   },
   "outputs": {
-    "name": {
+    "names": {
       "type": "string"
     }
   }
