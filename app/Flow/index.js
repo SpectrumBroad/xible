@@ -374,7 +374,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         if (!xibleNode.nodeExists) {
           xibleNode.editorContent = '';
           for (const key in xibleNode.data) {
-            xibleNode.editorContent += `<input type="text" placeholder="${baseHtmlEncode(key)}" data-outputvalue="${baseHtmlEncode(key)}" />`;
+            xibleNode.editorContent += `<input type="text" placeholder="${baseHtmlEncode(key)}" data-outputvalue="${baseHtmlEncode(key)}" required="required" />`;
           }
         }
       }
