@@ -12,10 +12,11 @@ module.exports = (NODE) => {
     });
   });
 
-  NODE.getOutputByName('error').on('trigger', (conn, state, callback) => {
+  NODE.getOutputByName('error')
+  .on('trigger', async (conn, state) => {
     const nodeState = state.get(NODE);
     const error = (nodeState && nodeState.error) || null;
 
-    callback(error);
+    return error;
   });
 };

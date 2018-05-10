@@ -69,7 +69,7 @@ module.exports = (NODE) => {
     });
   });
 
-  instanceOut.on('trigger', async (conn, state, callback) => {
+  instanceOut.on('trigger', async (conn, state) => {
     const thisState = state.get(NODE);
     if (!thisState || !thisState.flowInstanceDetails) {
       return;
@@ -81,6 +81,7 @@ module.exports = (NODE) => {
           getFlowInstance(flowInstanceDetail.flowId, flowInstanceDetail.flowInstanceId)
       )
     );
-    callback(flowInstances);
+
+    return flowInstances;
   });
 };

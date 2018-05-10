@@ -6,16 +6,15 @@ module.exports = (NODE) => {
   const variableOut = NODE.getOutputByName('variable');
   const valuesOut = NODE.getOutputByName('values');
 
-  variableOut.on('trigger', async (conn, state, callback) => {
+  variableOut.on('trigger', async (conn, state) => {
     const values = await valuesIn.getValues(state);
-    callback({
+    return {
       name: NODE.data.name,
       values
-    });
+    };
   });
 
-  valuesOut.on('trigger', async (conn, state, callback) => {
-    const values = await valuesIn.getValues(state);
-    callback(values);
+  valuesOut.on('trigger', async (conn, state) => {
+    return valuesIn.getValues(state);
   });
 };

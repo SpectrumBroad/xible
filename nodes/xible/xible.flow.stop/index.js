@@ -3,7 +3,7 @@
 module.exports = (NODE) => {
   const triggerIn = NODE.getInputByName('trigger');
 
-  triggerIn.on('trigger', (conn, state) => {
+  triggerIn.on('trigger', () => {
     process.send({
       method: 'xible.flow.stop'
     });

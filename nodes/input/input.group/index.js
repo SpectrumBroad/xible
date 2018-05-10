@@ -4,14 +4,12 @@ module.exports = (NODE) => {
   const anyIn = NODE.getInputByName('any');
 
   const groupedOut = NODE.getOutputByName('grouped');
-  groupedOut.on('trigger', (conn, state, callback) => {
-    anyIn.getValues(state).then((vals) => {
-      callback(vals);
-    });
+  groupedOut.on('trigger', async (conn, state) => {
+    return anyIn.getValues(state);
   });
 
   const countOut = NODE.getOutputByName('count');
-  countOut.on('trigger', (conn, state, callback) => {
-    callback(anyIn.connectors.length);
+  countOut.on('trigger', async () => {
+    return anyIn.connectors.length;
   });
 };

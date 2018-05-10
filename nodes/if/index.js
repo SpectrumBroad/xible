@@ -6,17 +6,12 @@ module.exports = (NODE) => {
   const thenOut = NODE.getOutputByName('then');
   const elseOut = NODE.getOutputByName('else');
 
-  triggerIn.on('trigger', (conn, state) => {
-    conditionIn.getValues(state).then((bools) => {
-      if (bools.length) {
-        if (bools.some(bool => !bool)) {
-          elseOut.trigger(state);
-        } else {
-          thenOut.trigger(state);
-        }
-      } else {
-        elseOut.trigger(state);
-      }
-    });
+  triggerIn.on('trigger', async (conn, state) => {
+    const bools = await conditionIn.getValues(state);
+    if (!bools.length || bools.some(bool => !bool)) {
+      elseOut.trigger(state);
+    } else {
+      thenOut.trigger(state);
+    }
   });
 };

@@ -12,10 +12,8 @@ function templateStringParser(str, vars) {
 module.exports = (NODE) => {
   const stringOut = NODE.getOutputByName('result');
   const varsIn = NODE.getInputByName('variables');
-  stringOut.on('trigger', (conn, state, callback) => {
-    varsIn.getValues(state)
-    .then((vars) => {
-      callback(templateStringParser(NODE.data.value || '', vars));
-    });
+  stringOut.on('trigger', async (conn, state) => {
+    const vars = await varsIn.getValues(state);
+    return templateStringParser(NODE.data.value || '', vars);
   });
 };

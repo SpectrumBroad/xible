@@ -4,12 +4,12 @@ module.exports = (NODE) => {
   const anyIn = NODE.getInputByName('any');
 
   const anyOut = NODE.getOutputByName('random');
-  anyOut.on('trigger', async (conn, state, callback) => {
+  anyOut.on('trigger', async (conn, state) => {
     const objs = await anyIn.getValues(state);
     if (!objs.length) {
       return;
     }
 
-    callback(objs[Math.floor(Math.random() * objs.length)]);
+    return objs[Math.floor(Math.random() * objs.length)];
   });
 };

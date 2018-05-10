@@ -2,7 +2,7 @@
 
 module.exports = (NODE) => {
   const stringOut = NODE.getOutputByName('result');
-  stringOut.on('trigger', (conn, state, callback) => {
-    callback(NODE.data.value === 'true');
+  stringOut.on('trigger', async () => {
+    return NODE.data.value === 'true';
   });
 };

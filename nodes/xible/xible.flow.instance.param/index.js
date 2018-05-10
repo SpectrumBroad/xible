@@ -16,14 +16,13 @@ module.exports = (NODE) => {
     }
   });
 
-  valueOut.on('trigger', async (conn, state, callback) => {
+  valueOut.on('trigger', async (conn, state) => {
     if (paramValue) {
-      callback(paramValue);
-      return;
+      return paramValue;
     }
 
     const defaults = await defaultIn.getValues(state);
     const defaultValue = defaults.length ? defaults[0] : undefined;
-    callback(defaultValue);
+    return defaultValue;
   });
 };

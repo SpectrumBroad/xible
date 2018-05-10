@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Starting a flow through the editor which uses `xible.flow.param` nodes will now request for the values of those parameters. ([#57](https://github.com/SpectrumBroad/xible/issues/57))
 
+-   NodeOutput triggered functions can now return promises instead of relying on the callback parameter. ([#73](https://github.com/SpectrumBroad/xible/issues/73))
+
 ### Changed
 -   Hexadecimal colors are now allowed in typedefs.
 

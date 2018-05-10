@@ -4,7 +4,7 @@ module.exports = (NODE) => {
   const anyIn = NODE.getInputByName('any');
 
   const duplicatesOut = NODE.getOutputByName('duplicates');
-  duplicatesOut.on('trigger', async (conn, state, callback) => {
+  duplicatesOut.on('trigger', async (conn, state) => {
     const objs = await anyIn.getValues(state);
     if (!objs.length) {
       return;
@@ -12,13 +12,11 @@ module.exports = (NODE) => {
 
     const duplicateAmount = +NODE.data.duplicateAmount;
     if (isNaN(duplicateAmount) || duplicateAmount < 1) {
-      callback();
       return;
     }
 
     if (duplicateAmount === 1) {
-      callback(objs);
-      return;
+      return objs;
     }
 
     let newObjArray = objs;
@@ -26,6 +24,6 @@ module.exports = (NODE) => {
       newObjArray = newObjArray.concat(objs);
     }
 
-    callback(newObjArray);
+    return newObjArray;
   });
 };

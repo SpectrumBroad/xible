@@ -3,13 +3,13 @@
 module.exports = (NODE) => {
   const versionsOut = NODE.getOutputByName('versions');
 
-  versionsOut.on('trigger', (conn, state, callback) => {
+  versionsOut.on('trigger', async (conn, state) => {
     const packageJson = require('../../../package.json');
-    callback(
-      Object.assign({
+    return Object.assign(
+      {
         xible: packageJson.version
       },
-      process.versions)
+      process.versions
     );
   });
 };

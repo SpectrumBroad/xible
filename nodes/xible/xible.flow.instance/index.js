@@ -4,26 +4,26 @@ const getFlowInstance = require('../utils.js').getFlowInstance;
 
 module.exports = (NODE) => {
   const flowInstanceOut = NODE.getOutputByName('instance');
-  flowInstanceOut.on('trigger', async (conn, state, callback) => {
+  flowInstanceOut.on('trigger', async (conn, state) => {
     const flowInstance = await getFlowInstance(NODE.flow._id, NODE.flowInstance._id);
     if (!flowInstance) {
       return;
     }
-    callback(flowInstance);
+    return flowInstance;
   });
 
   const stateOut = NODE.getOutputByName('state');
-  stateOut.on('trigger', async (conn, state, callback) => {
+  stateOut.on('trigger', async (conn, state) => {
     const flowInstance = await getFlowInstance(NODE.flow._id, NODE.flowInstance._id);
     if (!flowInstance) {
       return;
     }
-    callback(flowInstance.state);
+    return flowInstance.state;
   });
 
   const paramsOut = NODE.getOutputByName('params');
-  paramsOut.on('trigger', async (conn, state, callback) => {
-    callback(NODE.flowInstance.params);
+  paramsOut.on('trigger', async (conn, state) => {
+    return NODE.flowInstance.params;
   });
 
   const timingOut = NODE.getOutputByName('timing');
@@ -32,6 +32,6 @@ module.exports = (NODE) => {
     if (!flowInstance) {
       return;
     }
-    callback(flowInstance.timing);
+    return flowInstance.timing;
   });
 };

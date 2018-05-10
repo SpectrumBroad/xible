@@ -852,15 +852,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           }
 
           let calledBack = false;
-
-          conn.origin.node.emit('triggerStartTime', 'output');
-          conn.origin.emit('trigger', conn, state, (value) => { // eslint-disable-line
+          const callbackFn = (value) => { // eslint-disable-line
             // verify that this callback wasn't already made.
             if (calledBack) {
               throw new Error('Already called back');
             }
             calledBack = true;
-
+  
             // we only send arrays between nodes
             // we don't add non existant values
             // we concat everything
@@ -871,12 +869,23 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 values.push(value);
               }
             }
-
+  
             // all done
             if (++callbacksReceived === connLength) {  // eslint-disable-line
               resolve(values);
             }
-          });
+          };
+
+          conn.origin.node.emit('triggerStartTime', 'output');
+          const listeners = conn.origin.listeners('trigger');
+          for (let li = 0; li < listeners.length; li += 1) {
+            const ret = Reflect.apply(listeners[li], this, [conn, state, callbackFn]);
+
+            // handle promises
+            if (ret && typeof ret.then === 'function') {
+              ret.then(callbackFn);
+            }
+          }
         }
       });
     }

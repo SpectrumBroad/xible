@@ -6,21 +6,19 @@ module.exports = (NODE) => {
   const falseIn = NODE.getInputByName('if false');
 
   const valueOut = NODE.getOutputByName('value');
-  valueOut.on('trigger', (conn, state, callback) => {
-    conditionIn.getValues(state)
-    .then((bools) => {
-      if (bools.length) {
-        let input;
-        if (bools.some(bool => !bool)) {
-          input = falseIn;
-        } else {
-          input = trueIn;
-        }
-        input.getValues(state)
-        .then(values => callback(values));
-      } else {
-        callback(null);
-      }
-    });
+  valueOut.on('trigger', async (conn, state) => {
+    const bools = await conditionIn.getValues(state);
+    if (!bools.length) {
+      return;
+    }
+
+    let input;
+    if (bools.some(bool => !bool)) {
+      input = falseIn;
+    } else {
+      input = trueIn;
+    }
+
+    return input.getValues(state);
   });
 };

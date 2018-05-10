@@ -5,7 +5,7 @@ module.exports = (NODE) => {
   const conditionIn = NODE.getInputByName('condition');
 
   const filteredOut = NODE.getOutputByName('filtered');
-  filteredOut.on('trigger', async (conn, state, callback) => {
+  filteredOut.on('trigger', async (conn, state) => {
     if (!conditionIn.isConnected()) {
       return;
     }
@@ -23,14 +23,14 @@ module.exports = (NODE) => {
       }
       return null;
     }));
-    callback(filteredValues.filter(value => value !== undefined && value !== null));
+    return filteredValues.filter(value => value !== undefined && value !== null);
   });
 
   const itemOut = NODE.getOutputByName('item');
-  itemOut.on('trigger', (conn, state, callback) => {
+  itemOut.on('trigger', async (conn, state) => {
     const thisState = state.get(NODE);
     if (thisState && thisState.value !== undefined && thisState.value !== null) {
-      callback(thisState.value);
+      return thisState.value;
     }
   });
 };

@@ -28,36 +28,33 @@ module.exports = (NODE) => {
     });
   });
 
-  valueOut.on('trigger', (conn, state, callback) => {
+  valueOut.on('trigger', async (conn, state) => {
     // state handling (if refresh complete was used)
     const thisState = state.get(NODE);
     if (thisState) {
-      callback(thisState.values);
-      return;
+      return thisState.values;
     }
 
     // callback immeditialy if we already have this value(s) in store
     if (used) {
-      callback(values);
-      return;
+      return values;
     }
 
     // wait to callback when we're currently refreshing the value(s)
     if (refreshing) {
-      valueOut.once('triggerdone', () => {
-        callback(values);
+      return new Promise((resolve) => {
+        valueOut.once('triggerdone', () => {
+          resolve(values);
+        });
       });
-
-      return;
     }
 
     // perform a refresh of all inputs and return those values
     refreshing = true;
-    valueIn.getValues(state).then((vals) => {
-      values = vals;
-      used = true;
-      refreshing = false;
-      callback(values);
-    });
+    values = await valueIn.getValues(state);
+    used = true;
+    refreshing = false;
+
+    return values;
   });
 };

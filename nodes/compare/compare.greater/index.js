@@ -1,30 +1,18 @@
-module.exports = function(NODE) {
+'use strict';
 
-	let aIn = NODE.getInputByName('a');
-	let bIn = NODE.getInputByName('b');
+module.exports = (NODE) => {
+  const aIn = NODE.getInputByName('a');
+  const bIn = NODE.getInputByName('b');
 
-	let boolOut = NODE.getOutputByName('result');
+  const boolOut = NODE.getOutputByName('result');
+  boolOut.on('trigger', async (conn, state) => {
+    const [as, bs] = await Promise.all([aIn.getValues(state), bIn.getValues(state)]);
+    if (!as.length || !bs.length) {
+      return false;
+    }
 
-	boolOut.on('trigger', (conn, state, callback) => {
-
-		aIn.getValues(state).then((as) => {
-
-			bIn.getValues(state).then((bs) => {
-
-				if (as.length && bs.length) {
-
-					let minA = Math.min.apply(null, as);
-					let maxB = Math.max.apply(null, bs);
-					callback(minA > maxB);
-
-				} else {
-					callback(false);
-				}
-
-			});
-
-		});
-
-	});
-
+    const minA = Math.min.apply(null, as);
+    const maxB = Math.max.apply(null, bs);
+    return minA > maxB;
+  });
 };
