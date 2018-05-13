@@ -9,7 +9,7 @@ Nothing notable at the moment.
 
 ## [0.12.0][] - 2018-05-13
 ### Added
--   Nodes can now host their own routes through the API of XIBLE. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
+-   Nodes can now host their own routes through the API of XIBLE. Have a look at the new [routes documentation](https://xible.io/docs/guides/nodes/routes) on how to use them. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
 
 -   Starting a flow through the editor which uses `xible.flow.param` nodes will now request for the values of those parameters. ([#57](https://github.com/SpectrumBroad/xible/issues/57))
 

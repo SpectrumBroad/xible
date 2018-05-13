@@ -40,7 +40,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.routesPath = obj.routesPath;
       this.top = obj.top || 0;
       this.left = obj.left || 0;
+
+      /**
+       * An object map which contains all data coming from the editor,
+       * combined with the data from the vault.
+       * @type {Object}
+       */
       this.data = obj.data || {};
+
       this.flow = null;
       this.flowInstance = null;
       this._id = obj._id;
@@ -895,11 +902,16 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   * This event is emitted after a node calls getValues() on one of its inputs.
   * The event is fired for each of the outputs connected to the input
   * where getValues() was called upon.
+  * The functions which are called by this event
+  * should return a Promise or use the callback function to return their value.
   * @event NodeOutput#trigger
   * @param {Connector} conn The connector responsible for the trigger.
   * @param {FlowState} state The state provided from the calling node.
   * @param {Function} callback Use the callback function to return your value.
   * You can only callback once, otherwise an Error is thrown.
+  * The same error is thrown if both a Promise is returned and
+  * the callback is used.
+  * @returns {Promise} Return a promise to return the value.
   */
 
   /**
