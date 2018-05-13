@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.12.0][] - 2018-05-13
 ### Added
 -   Nodes can now host their own routes through the API of XIBLE. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
 
@@ -27,6 +30,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   `cast` node is working again now the output type is properly reset when all connectors detach.
 
 -   Installing a nodepack through the editor now properly reloads the typedefs. This ensures that the colors on inputs &amp; outputs are working, and that connectors work across the inheritance chain of a newly added typedef.
+
+-   Flow instances stop if there is no more work to be done. Also, XIBLE exists properly after calling `xible.close()`.
 
 ## [0.11.1][] - 2018-04-28
 ### Added
@@ -212,7 +217,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/SpectrumBroad/xible/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/SpectrumBroad/xible/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/SpectrumBroad/xible/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/SpectrumBroad/xible/compare/v0.9.1...v0.10.0
