@@ -128,6 +128,10 @@ process.on('message', async (message) => {
           await flowInstance.startChild();
         }
 
+        if (!flowInstance.directed) {
+          process.channel.unref();
+        }
+
         // inform the master that we actually started
         if (process.connected) {
           process.send({

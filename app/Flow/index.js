@@ -610,7 +610,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           this.emptyInitInstance = null;
         }
 
-        if (this._deleted) {
+        if (this._deleted || XIBLE.stopping) {
           return;
         }
         this.createEmptyInitInstance();

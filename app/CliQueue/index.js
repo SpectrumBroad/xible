@@ -5,6 +5,7 @@ const debug = require('debug')('xible:cliqueue');
 
 module.exports = (XIBLE) => {
   let queueFileShouldExist = false;
+  let watcher;
 
   class CliQueue {
     /**
@@ -13,6 +14,10 @@ module.exports = (XIBLE) => {
     static init() {
       if (!XIBLE.configPath) {
         throw new Error('Cannot init PID file, configPath not set.');
+      }
+
+      if (watcher) {
+        throw new Error('Already watching.');
       }
 
       // tracks where in the file we're at
@@ -28,7 +33,7 @@ module.exports = (XIBLE) => {
 
         queueFileShouldExist = true;
         debug('Queue file created');
-        fs.watch(`${XIBLE.configPath}.queue`, (type) => {
+        watcher = fs.watch(`${XIBLE.configPath}.queue`, (type) => {
           if (!queueFileShouldExist) {
             return;
           }
@@ -92,6 +97,16 @@ module.exports = (XIBLE) => {
           });
         });
       });
+    }
+
+    /**
+     * Stops watching the queue file.
+     */
+    static close() {
+      if (watcher) {
+        watcher.close();
+        watcher = null;
+      }
     }
 
     /**

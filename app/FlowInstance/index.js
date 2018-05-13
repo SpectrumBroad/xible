@@ -70,6 +70,7 @@ module.exports = (XIBLE) => {
         this.worker = fork(`${__dirname}/../../child.js`, {
           execArgv
         });
+
         this.worker.on('message', (message) => {
           switch (message.method) {
             case 'initializing':
@@ -202,6 +203,10 @@ module.exports = (XIBLE) => {
 
           this.emit('stopped');
           flowInstanceDebug('worker exited');
+
+          if (this.flow && this.flow.instances.includes(this)) {
+            this.delete();
+          }
         });
 
         this.worker.on('disconnect', () => {
@@ -465,7 +470,10 @@ module.exports = (XIBLE) => {
         return Promise.reject(new Error('cannot stop; flowInstance is not started or initialized'));
       }
       this.state = FlowInstance.STATE_STOPPING;
-      this.flow.saveStatus();
+
+      if (!XIBLE.stopping) {
+        this.flow.saveStatus();
+      }
 
       if (deleteInstance) {
         this.on('stopped', () => {

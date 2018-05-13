@@ -56,6 +56,9 @@ class Xible extends EventEmitter {
     this.plainWebServer = null;
     this.secureWebServer = null;
 
+    // tracks whether this XIBLE instance is stopping.
+    this.stopping = false;
+
     let appNames;
     if (this.child) {
       appNames = ['Flow', 'FlowInstance', 'FlowState', 'Node'];
@@ -108,6 +111,8 @@ class Xible extends EventEmitter {
   async init(obj) {
     xibleDebug('init');
 
+    this.stopping = false;
+
     // get all installed nodes
     const nodesPath = this.Config.getValue('nodes.path');
     if (!nodesPath) {
@@ -123,12 +128,16 @@ class Xible extends EventEmitter {
     // write PID file
     this.writePidFile();
     this.CliQueue.init();
+
+    // handle SIG
     process.on('SIGINT', () => {
       process.exit(1);
     });
     process.on('SIGTERM', () => {
       process.exit(1);
     });
+
+    // gracefully exit
     process.on('exit', () => {
       this.close();
     });
@@ -159,7 +168,7 @@ class Xible extends EventEmitter {
       this.Node.initFromPath(`${__dirname}/nodes`),
       this.Node.initFromPath(this.resolvePath(nodesPath))
     ]);
-    
+
     // get all installed flows
     if (!obj || !obj.nodeNames) {
       const flowPath = this.Config.getValue('flows.path');
@@ -241,7 +250,7 @@ class Xible extends EventEmitter {
           }
         });
       }
-    }, STAT_INTERVAL);
+    }, STAT_INTERVAL).unref();
   }
 
   static resolvePath(path) {
@@ -274,12 +283,20 @@ class Xible extends EventEmitter {
    * To do; this stops the webserver, removes the pid and cliqueue files.
    */
   close() {
+    this.stopping = true;
+
+    const flows = this.getFlows();
+    for (const flowId in flows) {
+      flows[flowId].deleteAllInstances();
+    }
+    
     this.stopWeb();
+    this.CliQueue.close();
     this.CliQueue.removeFile();
     this.removePidFile();
 
     // TODO: should stop all flow instances
-    xibleDebug('exit');
+    xibleDebug('close');
   }
 
   /**
@@ -287,6 +304,10 @@ class Xible extends EventEmitter {
    */
   stopWeb() {
     xibleDebug('stopWeb');
+
+    if (this.webSocketServer) {
+      this.webSocketServer.close();
+    }
 
     if (this.plainWebServer) {
       this.plainWebServer.close();
@@ -452,7 +473,7 @@ class Xible extends EventEmitter {
           if (message.status.timeout) {
             setTimeout(() => {
               this.deletePersistentWebSocketMessage(message);
-            }, message.status.timeout);
+            }, message.status.timeout).unref();
           }
 
           break;
