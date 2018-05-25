@@ -385,6 +385,10 @@ const cli = {
       return this.upgrade(...args);
     },
     async upgrade(nodePackName) {
+      if (!xible.Config.getValue('registry.nodepacks.allowinstall')) {
+        throw 'Your config does not allow to install or upgrade nodepacks from the registry';
+      }
+
       if (!nodePackName) {
         throw 'The nodepack name must be provided';
       }
