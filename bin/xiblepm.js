@@ -381,6 +381,9 @@ const cli = {
       await nodePack.remove();
       log(`Nodepack "${nodePackName}" removed`);
     },
+    async update(...args) {
+      return this.upgrade(...args);
+    },
     async upgrade(nodePackName) {
       if (!nodePackName) {
         throw 'The nodepack name must be provided';
