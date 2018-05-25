@@ -378,7 +378,7 @@ const cli = {
         throw `Nodepack "${nodePackName}" is not installed`;
       }
 
-      nodePack.remove();
+      await nodePack.remove();
       log(`Nodepack "${nodePackName}" removed`);
     },
     async upgrade(nodePackName) {
