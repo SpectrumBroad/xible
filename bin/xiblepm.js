@@ -390,15 +390,19 @@ const cli = {
       }
 
       if (!nodePackName) {
-        throw 'The nodepack name must be provided';
+        const nodePacks = await xible.NodePack.getAll();
+        return Promise.all(Object.keys(nodePacks).map(async (nodePackName) => {
+          await nodePacks[nodePackName].remove();
+          await this.install(nodePackName);
+        }));
       }
 
       const nodePack = await xible.NodePack.getByName(nodePackName);
       if (nodePack) {
-        nodePack.remove();
+        await nodePack.remove();
       }
 
-      await this.install(nodePackName);
+      return this.install(nodePackName);
     },
     search(str) {
       if (!str) {

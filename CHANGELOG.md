@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Added
+-   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go.
 
 ## [0.12.0][] - 2018-05-13
 ### Added
