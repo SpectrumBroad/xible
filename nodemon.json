@@ -6,7 +6,8 @@
     "vault.json",
     "config.json",
     "editor/*",
-    "test/*"
+    "test/*",
+    "bin/*"
   ],
   "execMap": {
     "js": "node"
