@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go.
 
+-   Implemented commandline `xible server stop` to stop a running XIBLE server. ([#76](https://github.com/SpectrumBroad/xible/issues/76))
+
 -   Support for textareas in node editor contents. ([#75](https://github.com/SpectrumBroad/xible/issues/75))
 
 ## [0.12.0][] - 2018-05-13

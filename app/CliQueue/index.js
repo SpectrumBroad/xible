@@ -85,6 +85,9 @@ module.exports = (XIBLE) => {
                     case 'flow.delete':
                       flow.delete();
                       break;
+                    case 'server.stop':
+                      XIBLE.close();
+                      break;
                     default:
                       debug(`Unhandled method "${obj.method}"`);
                       break;

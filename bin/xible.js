@@ -444,13 +444,20 @@ const cli = {
     start() {
       // init xible
       return xible.init();
+    },
+    stop() {
+      return xible.CliQueue.add({
+        method: 'server.stop'
+      });
     }
   },
 
   start() {
     return this.server.start();
+  },
+  stop() {
+    return this.server.stop();
   }
-
 };
 
 cli.config = require('./config')(xible);
