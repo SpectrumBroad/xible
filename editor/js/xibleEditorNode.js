@@ -180,6 +180,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       this.convenienceLabel();
       this.convenienceHideIfAttached();
       this.convenienceOutputValue();
+      this.convenienceTextAreaSetup();
 
       // run script elements
       Array.from(shadow.querySelectorAll('script'))
@@ -488,7 +489,7 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   getRootInputElements() {
-    return Array.from(this.editorContentEl.querySelectorAll(':host>input, :host>selectcontainer'));
+    return Array.from(this.editorContentEl.querySelectorAll(':host>input, :host>selectcontainer, :host>textarea'));
   }
 
   /**
@@ -545,6 +546,22 @@ class XibleEditorNode extends xibleWrapper.Node {
     });
   }
 
+  convenienceTextAreaSetup() {
+    const els = Array.from(this.editorContentEl.querySelectorAll('textarea'));
+    els.forEach((el) => {
+      el.addEventListener('keydown', (event) => {
+        if (event.keyCode === 9) {
+          event.preventDefault();
+
+          const selectionStart = el.selectionStart;
+          el.value = `${el.value.substring(0, selectionStart)}\t${el.value.substring(el.selectionEnd)}`;
+          el.selectionStart = selectionStart + 1;
+          el.selectionEnd = selectionStart + 1;
+        }
+      });
+    });
+  }
+
   convenienceOutputValue() {
     const els = Array.from(this.editorContentEl.querySelectorAll('[data-output-value], [data-outputvalue]'));
     els.forEach((el) => {
@@ -552,21 +569,24 @@ class XibleEditorNode extends xibleWrapper.Node {
       const type = el.getAttribute('type');
 
       // set the default value
-      if (this.data[attr]) {
-        if (type === 'checkbox' && el.getAttribute('value') === this.data[attr]) {
+      const value = this.data[attr];
+      if (value) {
+        if (type === 'checkbox' && el.getAttribute('value') === value) {
           el.checked = true;
         } else if (el.nodeName === 'SELECT') {
           Array.from(el.querySelectorAll('option')).forEach((option) => {
-            if ((option.getAttribute('value') || option.textContent) === this.data[attr]) {
+            if ((option.getAttribute('value') || option.textContent) === value) {
               option.selected = true;
             } else {
               option.selected = false;
             }
           });
+        } else if (el.nodeName === 'TEXTAREA') {
+          el.appendChild(document.createTextNode(value));
         } else {
-          el.setAttribute('value', this.data[attr]);
+          el.setAttribute('value', value);
         }
-      } else if (typeof this.data[attr] === 'undefined') {
+      } else if (value === undefined) {
         if (type === 'checkbox') {
           el.checked = false;
         } else {

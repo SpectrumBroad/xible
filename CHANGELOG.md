@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go.
 
+-   Support for textareas in node editor contents. ([#75](https://github.com/SpectrumBroad/xible/issues/75))
+
 ## [0.12.0][] - 2018-05-13
 ### Added
 -   Nodes can now host their own routes through the API of XIBLE. Have a look at the new [routes documentation](https://xible.io/docs/guides/nodes/routes) on how to use them. ([#71](https://github.com/SpectrumBroad/xible/issues/71))

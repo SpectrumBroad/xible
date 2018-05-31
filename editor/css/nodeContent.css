@@ -1,6 +1,7 @@
 input,
 button,
-select {
+select,
+textarea {
 	box-sizing: border-box;
 	border: 2px solid #3E3E3E;
 	display: block;
@@ -130,7 +131,8 @@ if only...
 }
 
 input~span,
-selectcontainer~span {
+selectcontainer~span,
+textarea~span {
 	display: none;
 	box-sizing: border-box;
 	position: absolute;
@@ -152,7 +154,8 @@ selectcontainer~span {
 /* vertical align for contents of the above */
 
 input~span::before,
-selectcontainer~span::before {
+selectcontainer~span::before,
+textarea~span::before {
 	content: "";
 	display: inline-block;
 	height: 100%;
@@ -160,20 +163,25 @@ selectcontainer~span::before {
 }
 
 input~span.unknown,
-selectcontainer~span.unknown {
+selectcontainer~span.unknown,
+textarea~span.unknown {
 	color: #888;
 }
 
 input:hover,
 input:focus,
 selectcontainer:hover select,
-selectcontainer select:focus {
+selectcontainer select:focus,
+textarea:hover,
+textarea:focus {
 	border-radius: 0 6px 6px 0;
 }
 
 input:hover~span,
 input:focus~span,
-selectcontainer:hover~span {
+selectcontainer:hover~span,
+textarea:hover~span,
+textarea:focus~span {
 	display: block;
 }
 
@@ -322,6 +330,7 @@ selectcontainer::after {
 }
 
 input:focus,
+textarea:focus,
 .node>.content select:focus {
 	outline: none;
 	border: 2px solid #45679E;
@@ -331,7 +340,8 @@ input:focus,
 	user-select: text;
 }
 
-input:hover {
+input:hover,
+textarea:hover {
 	-webkit-user-select: text;
 	-moz-user-select: text;
 	-ms-user-select: text;
