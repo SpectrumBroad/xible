@@ -287,10 +287,18 @@ module.exports = (XIBLE) => {
 
       const flowState = new XIBLE.FlowState();
 
+      /* Assign the flowInstance to each node.
+       * This will not cause problems with multiple instances of the same flow,
+       * since each of those instances runs in its own process
+       * with its own unique copy of this.flow.
+       */
+      for (let i = 0; i < this.flow.nodes.length; i += 1) {
+        this.flow.nodes[i].flowInstance = this;
+      }
+
       process.nextTick(() => {
         // init all nodes
         for (let i = 0; i < this.flow.nodes.length; i += 1) {
-          this.flow.nodes[i].flowInstance = this;
           this.flow.nodes[i].emit('init', flowState);
         }
 
