@@ -19,6 +19,9 @@ You can use this to deviate from the default registry stored in your config file
 
 -   Added several string nodes such as `string.replace`. ([#74](https://github.com/SpectrumBroad/xible/issues/74))
 
+### Changed
+-   Flow instances that exited on their own, no longer auto start when XIBLE restarts.
+
 ## [0.12.0][] - 2018-05-13
 ### Added
 -   Nodes can now host their own routes through the API of XIBLE. Have a look at the new [routes documentation](https://xible.io/docs/guides/nodes/routes) on how to use them. ([#71](https://github.com/SpectrumBroad/xible/issues/71))
