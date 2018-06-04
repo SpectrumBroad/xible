@@ -455,23 +455,21 @@ const cli = {
     me() {
       return this.whoami();
     },
-    whoami() {
+    async whoami() {
       const token = getUserToken();
 
       if (!token) {
         log('Not logged in.');
-        return Promise.resolve();
+        return;
       }
 
-      return xible.Registry.User
-      .getByToken(token)
-      .then((user) => {
+      const user = await xible.Registry.User.getByToken(token);
         if (!user) {
           log('Not logged in.');
           return;
         }
+
         log(user.name);
-      });
     },
     logout() {
       setUserToken(null);
