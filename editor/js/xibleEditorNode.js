@@ -582,6 +582,7 @@ class XibleEditorNode extends xibleWrapper.Node {
             }
           });
         } else if (el.nodeName === 'TEXTAREA') {
+          el.innerHTML = '';
           el.appendChild(document.createTextNode(value));
         } else {
           el.setAttribute('value', value);
