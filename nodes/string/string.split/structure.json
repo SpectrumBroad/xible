@@ -1,0 +1,15 @@
+{
+  "name": "string.split",
+  "type": "object",
+  "description": "Splits the input strings into an array of strings by separating the string into substrings, using a specified separator string to determine where to make each split.",
+  "inputs": {
+    "strings": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "strings": {
+      "type": "string"
+    }
+  }
+}

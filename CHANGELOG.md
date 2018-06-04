@@ -17,6 +17,8 @@ You can use this to deviate from the default registry stored in your config file
 
 -   Support for textareas in node editor contents. ([#75](https://github.com/SpectrumBroad/xible/issues/75))
 
+-   Added several string nodes such as `string.replace`. ([#74](https://github.com/SpectrumBroad/xible/issues/74))
+
 ## [0.12.0][] - 2018-05-13
 ### Added
 -   Nodes can now host their own routes through the API of XIBLE. Have a look at the new [routes documentation](https://xible.io/docs/guides/nodes/routes) on how to use them. ([#71](https://github.com/SpectrumBroad/xible/issues/71))

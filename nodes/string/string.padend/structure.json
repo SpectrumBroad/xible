@@ -1,0 +1,15 @@
+{
+  "name": "string.padend",
+  "type": "object",
+  "description": "Pads the given strings with another string (repeated, if needed) so that the resulting string reaches the given length. The padding is applied from the end (right) of the given strings.",
+  "inputs": {
+    "strings": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "padded strings": {
+      "type": "string"
+    }
+  }
+}

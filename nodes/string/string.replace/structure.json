@@ -1,0 +1,16 @@
+{
+  "name": "string.replace",
+  "type": "object",
+  "description": "Replaces each input string according to an exact string match or regular expression.",
+  "inputs": {
+    "strings": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "strings": {
+      "type": "string",
+      "description": "Every input string with the replacement applied to it."
+    }
+  }
+}

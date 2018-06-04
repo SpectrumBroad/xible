@@ -1,0 +1,15 @@
+{
+  "name": "string.substring",
+  "type": "object",
+  "description": "Returns the part of the string(s) between the start and end indexes, or to the end of the string.",
+  "inputs": {
+    "strings": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "strings": {
+      "type": "string"
+    }
+  }
+}
