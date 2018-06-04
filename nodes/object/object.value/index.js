@@ -9,7 +9,7 @@ module.exports = (NODE) => {
     if (!key) {
       return;
     }
-    const objs = await bjsIn.getValues(state);
+    const objs = await objsIn.getValues(state);
     return objs
     .filter(obj => Object.prototype.hasOwnProperty.call(obj, key))
     .map(obj => obj[key]);
