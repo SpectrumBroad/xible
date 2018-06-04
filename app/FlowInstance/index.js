@@ -201,6 +201,8 @@ module.exports = (XIBLE) => {
           this.worker = null;
           this.usage = null;
 
+          this.flow.saveStatus();
+
           this.emit('stopped');
           flowInstanceDebug('worker exited');
 
@@ -479,9 +481,7 @@ module.exports = (XIBLE) => {
       }
       this.state = FlowInstance.STATE_STOPPING;
 
-      if (!XIBLE.stopping) {
-        this.flow.saveStatus();
-      }
+      this.flow.saveStatus();
 
       if (deleteInstance) {
         this.on('stopped', () => {

@@ -574,6 +574,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Saves the status for this flow by calling Flow.saveStatuses().
     */
     saveStatus() {
+      if (XIBLE.stopping) {
+        return;
+      }
+
       const statuses = Flow.getStatuses();
       const startedInstances = this.instances
       .filter(
