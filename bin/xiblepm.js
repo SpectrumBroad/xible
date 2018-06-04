@@ -403,6 +403,7 @@ const cli = {
         return Promise.all(Object.keys(nodePacks).map(async (nodePackName) => {
           await nodePacks[nodePackName].remove();
           await this.install(nodePackName);
+          log(`Upgraded ${nodePackName}`);
         }));
       }
 
@@ -411,7 +412,8 @@ const cli = {
         await nodePack.remove();
       }
 
-      return this.install(nodePackName);
+      await this.install(nodePackName);
+      log(`Upgraded ${nodePackName}`);
     },
     search(str) {
       if (!str) {
