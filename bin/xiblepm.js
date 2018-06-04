@@ -471,34 +471,47 @@ const cli = {
 
         log(user.name);
     },
-    logout() {
+    async logout() {
+      const token = getUserToken();
+      if (!token) {
+        throw 'You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.';
+      }
+
+      const regUser = await xible.Registry.User.getByToken(token);
+      if (regUser) {
+        await regUser.deleteToken(token);
+      }
+
       setUserToken(null);
-      return Promise.resolve();
     },
-    login() {
+    async login() {
+      const oldToken = getUserToken();
+
       const user = new xible.Registry.User();
 
-      return getUserInput('Enter your username: ')
-      .then((userName) => {
+      const userName = await getUserInput('Enter your username: ');
         user.name = userName;
-        return getUserInput('Enter your password: ', true);
-      })
-      .then((password) => {
-        if (!password) {
-          return Promise.reject('You need to enter a password.');
-        }
 
+      const password = await getUserInput('Enter your password: ', true);
+        if (!password) {
+        throw 'You need to enter a password.';
+        }
         user.password = password;
 
-        return user.getToken();
-      })
-      .then((token) => {
+      const token = await user.getToken();
         if (!token) {
-          return Promise.reject('No token returned.');
+        throw 'No token returned.';
+      }
+
+      // logout old user if this concerns the same user
+      if (oldToken) {
+        const oldUser = await xible.Registry.User.getByToken(oldToken);
+        if (oldUser && oldUser.name === user.name) {
+          await oldUser.deleteToken(oldToken);
+        }
         }
 
         return setUserToken(token);
-      });
     },
     register() {
       return this.add();
