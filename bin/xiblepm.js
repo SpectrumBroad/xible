@@ -464,12 +464,12 @@ const cli = {
       }
 
       const user = await xible.Registry.User.getByToken(token);
-        if (!user) {
-          log('Not logged in.');
-          return;
-        }
+      if (!user) {
+        log('Not logged in.');
+        return;
+      }
 
-        log(user.name);
+      log(user.name);
     },
     async logout() {
       const token = getUserToken();
@@ -490,16 +490,16 @@ const cli = {
       const user = new xible.Registry.User();
 
       const userName = await getUserInput('Enter your username: ');
-        user.name = userName;
+      user.name = userName;
 
       const password = await getUserInput('Enter your password: ', true);
-        if (!password) {
+      if (!password) {
         throw 'You need to enter a password.';
-        }
-        user.password = password;
+      }
+      user.password = password;
 
       const token = await user.getToken();
-        if (!token) {
+      if (!token) {
         throw 'No token returned.';
       }
 
@@ -509,9 +509,9 @@ const cli = {
         if (oldUser && oldUser.name === user.name) {
           await oldUser.deleteToken(oldToken);
         }
-        }
+      }
 
-        return setUserToken(token);
+      return setUserToken(token);
     },
     register() {
       return this.add();
@@ -535,6 +535,14 @@ const cli = {
 
       let emailAddressCorrect = false;
       let emailAddress;
+
+      log('The XIBLE registry needs your email address for the following reasons;');
+      log(' - Notify you about packages published using your account.');
+      log(' - Validate your account, reset your password and help keep your account secure.');
+      log(' - Contact you in special circumstances related to your account or packages.');
+      log(' - Contact you about legal requests, like DMCA takedown request and privacy complaints.');
+      log(' - Announce service changes and features.');
+
       while (!emailAddressCorrect) {
         emailAddress = await getUserInput('Enter your email address: ');
         if (!emailAddress) {
@@ -556,12 +564,12 @@ const cli = {
         } else if (password.length < 7) {
           console.error('The password needs to be at least 7 characters long.');
         } else if (password.toLowerCase() === emailAddress.toLowerCase()) {
-          console.error('The password may not equal the email address.');
+          console.error('The password cannot equal the email address.');
         } else if (
           userName.toLowerCase().includes(password.toLowerCase()) ||
           password.toLowerCase().includes(userName.toLowerCase())
         ) {
-          console.error('The password may not be a significant part of the username, or the other way around.');
+          console.error('The password cannot be a significant part of the username, or the other way around.');
         } else {
           passwordCorrect = true;
         }
