@@ -454,14 +454,16 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @private
     */
     sendProcessMessage(obj) {
-      if (process.connected) {
-        if (obj.message) {
-          obj.message.nodeId = this._id;
-          obj.message.flowId = this.flow._id;
-          obj.message.flowInstanceId = this.flowInstance._id;
-        }
-        process.send(obj);
+      if (!process.connected) {
+        return;
       }
+
+      if (obj.message) {
+        obj.message.nodeId = this._id;
+        obj.message.flowId = this.flow._id;
+        obj.message.flowInstanceId = this.flowInstance._id;
+      }
+      process.send(obj);
     }
 
     /**
