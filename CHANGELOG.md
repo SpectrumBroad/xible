@@ -19,6 +19,8 @@ You can use this to deviate from the default registry stored in your config file
 
 -   Added several string nodes such as `string.replace`. ([#74](https://github.com/SpectrumBroad/xible/issues/74))
 
+-   The editor now keeps track of all messages shared by nodes. To save space in the editor, the resource graphs and this new log functionality share the same area and can be toggled. ([#63](https://github.com/SpectrumBroad/xible/issues/63))
+
 ### Changed
 -   Flow instances that exited on their own, no longer auto start when XIBLE restarts.
 
