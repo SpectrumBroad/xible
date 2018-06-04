@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The commandline `xiblepm nodepack update` has been introduced as an alias for `xiblepm nodepack upgrade`.
 
+-   All `xiblepm` commands that interact with the registry now support the optional `--registry` parameter.
+You can use this to deviate from the default registry stored in your config file.
+
 -   Implemented commandline `xible server stop` to stop a running XIBLE server. ([#76](https://github.com/SpectrumBroad/xible/issues/76))
 
 -   Support for textareas in node editor contents. ([#75](https://github.com/SpectrumBroad/xible/issues/75))

@@ -33,7 +33,8 @@ const Writable = require('stream').Writable;
 const knownOpts = {
   config: String,
   altname: String,
-  force: Boolean
+  force: Boolean,
+  registry: String
 };
 const shortHands = {
   c: '--config',
@@ -44,10 +45,18 @@ const remain = opts.argv.remain;
 const context = remain.shift() || 'help';
 const command = remain.shift();
 
+const configTmp = {};
+if (opts.registry) {
+  configTmp.registry = {
+    url: opts.registry
+  };
+}
+
 // get a xible instance
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
 const xible = new Xible({
-  configPath: CONFIG_PATH
+  configPath: CONFIG_PATH,
+  configTmp
 });
 
 const {
