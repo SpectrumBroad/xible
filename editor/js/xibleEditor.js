@@ -269,6 +269,25 @@ class XibleEditor extends EventEmitter {
       case 'xible.node.addStatus':
         if (node) {
           node.addStatus(json.status);
+
+          // TODO: this needs to be handled by the view, not XibleEditor.
+          const logUl = document.querySelector('#log ul');
+          const logLi = document.createElement('li');
+          if (logUl.firstChild) {
+            logUl.insertBefore(logLi, logUl.firstChild);
+          } else {
+            logUl.appendChild(logLi);
+          }
+
+          if (json.status.color) {
+            logLi.classList.add(json.status.color);
+          }
+
+          const dateSpan = logLi.appendChild(document.createElement('span'));
+          dateSpan.classList.add('date');
+          dateSpan.innerHTML = new Date().toISOString();
+
+          logLi.appendChild(document.createTextNode(json.status.message));
         }
 
         break;

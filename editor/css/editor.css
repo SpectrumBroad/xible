@@ -64,6 +64,84 @@
 	outline: 0;
 }
 
+#log {
+	font-family: 'Courier New', Courier, monospace;
+	height: 100%;
+	flex-shrink: 1;
+}
+
+#log ul {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	height: 100%;
+	position: relative;
+}
+
+#log ul:empty::after {
+	display: block;
+	content: "...";
+	position: absolute;
+	top: 20%;
+	font-style: italic;
+	width: 100%;
+	text-align: center;
+	color: #bbb;
+}
+
+#log ul::-webkit-scrollbar {
+	width: 4px;
+	background-color: #000;
+}
+
+#log ul::-webkit-scrollbar-thumb {
+	width: 4px;
+	background-color: #282828;
+}
+
+#log ul::-webkit-scrollbar-thumb:hover {
+	width: 4px;
+	background-color: #383838;
+}
+
+#sub #log li {
+	color: #eee;
+	font-weight: 400;
+	font-size: 0.9em;
+}
+
+#sub #log li .date {
+	display: inline;
+	color: #bbb;
+	margin-right: 5px;
+}
+
+#sub #log li::before {
+	display: block;
+	content: '';
+	margin: 1px 6px 1px 2px;
+	width: 9px;
+	height: 9px;
+	border-radius: 3px;
+	background-color: silver;
+	float: left;
+}
+
+#sub #log li.green::before {
+	background-color: lime;
+}
+
+#sub #log li.blue::before {
+	background-color: darkturquoise;
+}
+
+#sub #log li.red::before {
+	background-color: red;
+}
+
+#sub #log li.orange::before {
+	background-color: darkorange;
+}
+
 .stats div {
 	position: relative;
 	height: 100px;

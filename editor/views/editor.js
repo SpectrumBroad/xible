@@ -25,13 +25,24 @@ function editorView(EL) {
         <button type="button" id="xibleFlowSaveButton" disabled="disabled">Save</button>
         <button type="button" id="xibleFlowDeleteButton" disabled="disabled">Delete</button>
       </section>
-      <section class="stats">
+      <ul class="tablist">
+        <li class="open">
+          <a id="logOpenA" href="#logs" data-section-class="log">log</a>
+        </li>
+        <li>
+          <a id="statsOpenA" href="#resources" data-section-class="stats">resources</a>
+        </li>
+      </ul>
+      <section id="log" class="tabcontents log">
+        <ul></ul>
+      </section>
+      <section class="tabcontents stats" style="display: none;">
         <div>
           <canvas id="cpuChart"></canvas>
         </div>
         <label id="cpu">cpu</label>
       </section>
-      <section class="stats">
+      <section class="tabcontents stats" style="display: none;">
         <div>
           <canvas id="memChart"></canvas>
         </div>
@@ -39,7 +50,7 @@ function editorView(EL) {
         <label id="heapTotal">heap total</label>
         <label id="heapUsed">heap used</label>
       </section>
-      <section class="stats">
+      <section class="tabcontents stats" style="display: none;">
         <div>
           <canvas id="delayChart"></canvas>
         </div>
@@ -92,6 +103,38 @@ function editorView(EL) {
     document.getElementById('xibleFlowDeployButton').disabled = true;
     document.getElementById('xibleFlowSaveButton').disabled = true;
   }
+
+  // flip between logs and stats
+  const logOpenEl = document.getElementById('logOpenA');
+  const statsOpenEl = document.getElementById('statsOpenA');
+  const logUl = document.querySelector('#log ul');
+
+  function switchSubTab(event) {
+    event.preventDefault();
+
+    Array.from(this.parentNode.parentNode.querySelectorAll('.open'))
+    .forEach((el) => {
+      el.classList.remove('open');
+    });
+
+    Array.from(this.parentNode.parentNode.parentNode.querySelectorAll('section.tabcontents'))
+    .forEach((section) => {
+      section.style.display = 'none';
+    });
+
+    this.parentNode.classList.add('open');
+
+    const sectionClass = this.getAttribute('data-section-class');
+    Array.from(this.parentNode.parentNode.parentNode.querySelectorAll(`section.tabcontents.${sectionClass}`))
+    .forEach((section) => {
+      section.style.display = '';
+    });
+
+    return false;
+  }
+
+  logOpenEl.addEventListener('click', switchSubTab);
+  statsOpenEl.addEventListener('click', switchSubTab);
 
   function getParamNames(flow) {
     const paramNames = [];
@@ -753,6 +796,7 @@ function editorView(EL) {
       mainViewHolder.navigate(`/editor/${flow._id}`, true);
 
       resetCharts();
+      logUl.innerHTML = '';
 
       Array.from(flowListUl.querySelectorAll('li.open'))
       .forEach((openLi) => {
