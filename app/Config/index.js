@@ -11,7 +11,7 @@ const configDebug = debug('xible:config');
 
 const DEFAULT_PATH = `${__dirname}/../../config.json`;
 
-module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
+module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
   function createConfig(path) {
     configDebug(`creating "${path}"`);
 
@@ -67,7 +67,32 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
     return JSON.parse(configContents);
   }
 
+  /**
+   * A deep version of Object.assign().
+   * Does not support arrays at the moment.
+   * @param {Object} target
+   * @param {...Object} objs
+   * @returns {Object} Returns the assigned object.
+   */
+  function objectAssignDeep(target, ...objs) {
+    for (let i = 0; i < objs.length; i += 1) {
+      const keys = Object.keys(target);
+      const objDelete = Object.assign({}, objs[i]);
+      for (const key of keys) {
+        if (typeof target[key] === 'object' && target[key] !== null && objs[i][key]) {
+          delete objDelete[key];
+          objectAssignDeep(target[key], objs[i][key]);
+        }
+      }
+
+      Object.assign(target, objDelete);
+    }
+
+    return target;
+  }
+
   let config;
+  const tmpConfig = CONFIG_TMP || {};
   let configPath;
   if (CONFIG_OBJ) {
     config = CONFIG_OBJ;
@@ -136,11 +161,40 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
     }
 
     /**
+    * Sets a value in the temporary loaded configuration only.
+    * Does not store the value to the config file.
+    * If any part of the path does not exist, it is created.
+    * Assigning a value through this method overrides the value from the same original config,
+    * but only for this session/instance as the value is not stored.
+    * @param {String} path the json path, dot notated, in the config.
+    * @param {String|Number|Boolean|Date} value the value to set.
+    */
+    static setTmpValue(path, value) {
+      if (['string', 'number', 'boolean', 'date'].indexOf(typeof value) === -1) {
+        throw new Error('Param "value" should be of type "string", "number", "boolean" or "date"');
+      }
+
+      const pathSplit = path.split('.');
+      let sel = tmpConfig;
+
+      for (let i = 0; i < pathSplit.length - 1; i += 1) {
+        const part = pathSplit[i];
+        if (sel.hasOwnProperty(part)) { // eslint-disable-line
+          sel = sel[part];
+        } else {
+          sel = sel[part] = {};
+        }
+      }
+
+      sel[pathSplit.pop()] = value;
+    }
+
+    /**
     * Sets a value in the configuration.
     * If any part of the path does not exist, it is created.
     * Results are written of the the config path if that's how xible was loaded.
     * @param {String} path the json path, dot notated, in the config.
-    * @param {String|Number|Boolean|Date} value the value to set
+    * @param {String|Number|Boolean|Date} value the value to set.
     */
     static setValue(path, value) {
       if (['string', 'number', 'boolean', 'date'].indexOf(typeof value) === -1) {
@@ -176,7 +230,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
 
     static getValue(path) {
       const pathSplit = path.split('.');
-      let sel = config;
+      let sel = this.getAll();
 
       for (let i = 0; i < pathSplit.length; i += 1) {
         const part = pathSplit[i];
@@ -191,7 +245,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ) => {
     }
 
     static getAll() {
-      return config;
+      return objectAssignDeep(config, tmpConfig);
     }
   }
 

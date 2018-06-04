@@ -31,18 +31,18 @@ function handleBroadcastWebSocketError(err) {
 let broadcastWebSocketMessagesThrottle = [];
 
 class Xible extends EventEmitter {
-  constructor(obj, configObj) {
+  constructor({ configPath, configTmp, child }, configObj) {
     super();
 
     this.nodes = {};
     this.flows = {};
 
-    if (typeof obj.configPath === 'string') {
-      this.configPath = this.resolvePath(obj.configPath);
+    if (typeof configPath === 'string') {
+      this.configPath = this.resolvePath(configPath);
     }
 
     this.child = false;
-    if (obj.child) {
+    if (child) {
       this.child = true;
     }
 
@@ -68,7 +68,7 @@ class Xible extends EventEmitter {
       appNames = ['CliQueue', 'Flow', 'FlowInstance', 'NodePack', 'Node', 'TypeDef', 'Registry'];
     }
 
-    this.Config = require('./app/Config/index.js')(this, this.expressApp, configObj).Config;
+    this.Config = require('./app/Config/index.js')(this, this.expressApp, configObj, configTmp).Config;
     for (let i = 0; i < appNames.length; i += 1) {
       Object.assign(this, require(`./app/${appNames[i]}/index.js`)(this, this.expressApp));
     }
