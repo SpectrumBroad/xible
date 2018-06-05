@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+
+## [0.13.0][] - 2018-06-05
 ### Added
 -   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go.
 
@@ -234,7 +236,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.13.0...HEAD
+[0.12.0]: https://github.com/SpectrumBroad/xible/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/SpectrumBroad/xible/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/SpectrumBroad/xible/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/SpectrumBroad/xible/compare/v0.10.0...v0.11.0
