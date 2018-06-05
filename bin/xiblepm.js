@@ -219,7 +219,6 @@ const cli = {
           // publish
           return xible.Registry.Flow
           .publish(flowJson)
-          .catch(publishErr => Promise.reject(`Failed to publish flow "${flow._id}": ${publishErr}`))
           .then((publishedFlow) => {
             log(`Published flow "${publishedFlow._id}".`);
           });
