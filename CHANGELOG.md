@@ -9,7 +9,7 @@ Nothing notable at the moment.
 
 ## [0.13.0][] - 2018-06-05
 ### Added
--   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go.
+-   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go. ([#42](https://github.com/SpectrumBroad/xible/issues/42))
 
 -   The commandline `xiblepm nodepack update` has been introduced as an alias for `xiblepm nodepack upgrade`.
 
