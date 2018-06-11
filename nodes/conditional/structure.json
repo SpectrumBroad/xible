@@ -7,12 +7,12 @@
       "type": "boolean"
     },
     "if true": {
-      "desciption": "If the condition is truthy, this input is passed to the 'value' output.",
+      "description": "If the condition is truthy, this input is passed to the 'value' output.",
       "assignsOutputType": "value",
       "assignsInputType": "if false"
     },
     "if false": {
-      "desciption": "If the condition is falsy, this input is passed to the 'value' output.",
+      "description": "If the condition is falsy, this input is passed to the 'value' output.",
       "assignsOutputType": "value",
       "assignsInputType": "if true"
     }
