@@ -4,7 +4,8 @@
   "description": "Splits the input strings into an array of strings by separating the string into substrings, using a specified separator string to determine where to make each split.",
   "inputs": {
     "strings": {
-      "type": "string"
+      "type": "string",
+      "description": "The strings to split. Hides the 'string' field if attached."
     }
   },
   "outputs": {

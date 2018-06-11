@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Added
+-   It is now possible to specify the input string directly for the `string.split` node.
 
 ## [0.13.0][] - 2018-06-05
 ### Added

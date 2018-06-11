@@ -1,6 +1,14 @@
 <input
   type="text"
   required="required"
+  placeholder="string"
+  data-description="Input string to split. You can also use the 'strings' input to provide one or multiple strings. In that case, this field will be hidden."
+  data-output-value="str"
+  data-hide-if-attached="input[name=strings]"
+/>
+<input
+  type="text"
+  required="required"
   placeholder="seperator"
   data-output-value="seperator"
 />
