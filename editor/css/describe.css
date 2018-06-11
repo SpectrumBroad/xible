@@ -53,6 +53,7 @@
 .xible>.describe .node {
 	left: 50%;
 	transform: translateX(-50%) scale(2);
+	transform-origin: center 0;
 }
 
 .xible>.describe .node>h1 {
