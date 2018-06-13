@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   It is now possible to specify the input string directly for the `string.split` node.
 
+### Fixed
+-   When viewing a node in help/describe mode, it now properly zooms/scales in Firefox. ([#82](https://github.com/SpectrumBroad/xible/issues/82))
+
 ## [0.13.0][] - 2018-06-05
 ### Added
 -   The commandline `xiblepm nodepack upgrade` can now be used to upgrade all installed nodepacks in one go. ([#42](https://github.com/SpectrumBroad/xible/issues/42))
