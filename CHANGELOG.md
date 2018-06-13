@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   It is now possible to specify the input string directly for the `string.split` node.
 
+### Changed
+-   XIBLE now throws an error if it is already running according to the PID file. Similarly, CLI commands which require that XIBLE is running will throw an error if that is not the case.
+
 ### Fixed
 -   When viewing a node in help/describe mode, it now properly zooms/scales in Firefox. ([#82](https://github.com/SpectrumBroad/xible/issues/82))
 

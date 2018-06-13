@@ -131,10 +131,15 @@ module.exports = (XIBLE) => {
       }
     }
 
-    static add(str) {
+    static async add(str) {
+      if (!(await XIBLE.verifyPidIsRunning())) {
+        throw new Error('XIBLE is not running.');
+      }
+
       if (typeof str !== 'string') {
         str = JSON.stringify(str);
       }
+
       return new Promise((resolve, reject) => {
         fs.appendFile(`${XIBLE.configPath}.queue`, `${str}\n`, {
           mode: 0o600

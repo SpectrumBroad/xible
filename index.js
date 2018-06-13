@@ -107,9 +107,37 @@ class Xible extends EventEmitter {
     }
   }
 
+  /**
+   * Verifies whether a XIBLE instance is running on the PID file.
+   * @returns {Promise.<Boolean>}
+   */
+  verifyPidIsRunning() {
+    return new Promise((resolve) => {
+      fs.readFile(`${this.configPath}.pid`, (err, pid) => {
+        if (err) {
+          resolve(false);
+          return;
+        }
+
+        let running;
+        try {
+          running = process.kill(pid, 0);
+        } catch (killErr) {
+          running = killErr.code === 'EPERM';
+        }
+
+        resolve(running);
+      });
+    });
+  }
+
   // load nodes and flows
   async init(obj) {
     xibleDebug('init');
+
+    if (await this.verifyPidIsRunning()) {
+      throw new Error('XIBLE is already running.');
+    }
 
     this.stopping = false;
 
