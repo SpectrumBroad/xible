@@ -141,16 +141,16 @@ class XibleEditor extends EventEmitter {
       io.element = clonedNode;
 
       // add description
-      const descriptionEl = io.element.appendChild(document.createElement('p'));
-      descriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.structureType || 'any'));
-      descriptionEl.appendChild(document.createTextNode(io.description || 'not described'));
+      const ioDescriptionEl = io.element.appendChild(document.createElement('p'));
+      ioDescriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.structureType || 'any'));
+      ioDescriptionEl.appendChild(document.createTextNode(io.description || 'not described'));
 
       if (!io.description) {
-        descriptionEl.classList.add('none');
+        ioDescriptionEl.classList.add('none');
       }
 
-      if (descriptionEl.scrollHeight > descriptionEl.offsetHeight) {
-        descriptionEl.classList.add('overflow');
+      if (ioDescriptionEl.scrollHeight > ioDescriptionEl.offsetHeight) {
+        ioDescriptionEl.classList.add('overflow');
       }
     });
 
@@ -167,15 +167,15 @@ class XibleEditor extends EventEmitter {
 
         // this is actually not allowed
         // a label may not contain a block element
-        const descriptionEl = label.appendChild(document.createElement('p'));
-        descriptionEl.appendChild(document.createTextNode(description || 'not described'));
+        const labelDescriptionEl = label.appendChild(document.createElement('p'));
+        labelDescriptionEl.appendChild(document.createTextNode(description || 'not described'));
 
         if (!description) {
-          descriptionEl.classList.add('none');
+          labelDescriptionEl.classList.add('none');
         }
 
-        if (descriptionEl.scrollHeight > descriptionEl.offsetHeight) {
-          descriptionEl.classList.add('overflow');
+        if (labelDescriptionEl.scrollHeight > labelDescriptionEl.offsetHeight) {
+          labelDescriptionEl.classList.add('overflow');
         }
       });
     });
