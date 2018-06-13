@@ -27,7 +27,7 @@ module.exports = (NODE) => {
   });
 
   const timingOut = NODE.getOutputByName('timing');
-  timingOut.on('trigger', async (conn, state, callback) => {
+  timingOut.on('trigger', async (conn, state) => {
     const flowInstance = await getFlowInstance(NODE.flow._id, NODE.flowInstance._id);
     if (!flowInstance) {
       return;
