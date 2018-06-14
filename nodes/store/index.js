@@ -43,7 +43,7 @@ module.exports = (NODE) => {
     // wait to callback when we're currently refreshing the value(s)
     if (refreshing) {
       return new Promise((resolve) => {
-        valueOut.once('triggerdone', () => {
+        NODE.once('refreshed', () => {
           resolve(values);
         });
       });
@@ -54,6 +54,8 @@ module.exports = (NODE) => {
     values = await valueIn.getValues(state);
     used = true;
     refreshing = false;
+
+    NODE.emit('refreshed');
 
     return values;
   });
