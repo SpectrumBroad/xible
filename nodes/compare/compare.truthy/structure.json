@@ -1,0 +1,15 @@
+{
+  "name": "compare.truthy",
+  "type": "object",
+  "description": "Validates that all input values are truthy when evaluated in a boolean context.",
+  "inputs": {
+    "values": {
+      "type": "object"
+    }
+  },
+  "outputs": {
+    "truthy": {
+      "type": "boolean"
+    }
+  }
+}

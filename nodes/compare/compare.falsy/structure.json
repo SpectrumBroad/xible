@@ -1,0 +1,15 @@
+{
+  "name": "compare.falsy",
+  "type": "object",
+  "description": "Validates that all input values are falsy when evaluated in a boolean context.",
+  "inputs": {
+    "values": {
+      "type": "object"
+    }
+  },
+  "outputs": {
+    "falsy": {
+      "type": "boolean"
+    }
+  }
+}
