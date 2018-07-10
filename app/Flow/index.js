@@ -546,22 +546,21 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @return {NodeOutput[]} The global nodeOutputs.
     */
     getGlobalOutputsByType(type) {
-      let outputs = [];
-
       if (globalOutputs) {
-        outputs = globalOutputs.filter(globalOutput => globalOutput.type === type);
-      } else {
-        globalOutputs = [];
-        for (let i = 0; i < this.nodes.length; i += 1) {
-          const node = this.nodes[i];
-          for (const name in node.outputs) {
-            const output = node.outputs[name];
-            if (output.global) {
-              globalOutputs.push(output);
+        return globalOutputs.filter(globalOutput => globalOutput.type === type);
+      }
 
-              if (output.type === type) {
-                outputs.push(output);
-              }
+      const outputs = [];
+      globalOutputs = [];
+      for (let i = 0; i < this.nodes.length; i += 1) {
+        const node = this.nodes[i];
+        for (const name in node.outputs) {
+          const output = node.outputs[name];
+          if (output.global) {
+            globalOutputs.push(output);
+
+            if (output.type === type) {
+              outputs.push(output);
             }
           }
         }
