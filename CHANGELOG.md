@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   XIBLE now throws an error if it is already running according to the PID file. Similarly, CLI commands which require that XIBLE is running will throw an error if that is not the case.
 
+-   The `input.group` node has been replaced by the `input.concat` node.
+
 ### Fixed
 -   When viewing a node in help/describe mode, it now properly zooms/scales in Firefox. ([#82](https://github.com/SpectrumBroad/xible/issues/82))
 

@@ -1,0 +1,20 @@
+{
+  "name": "input.concat",
+  "type": "object",
+  "description": "Merges multiple input values together.",
+  "inputs": {
+    "any": {
+      "assignsOutputType": "merged",
+      "description": "The values to be grouped."
+  	}
+  },
+  "outputs": {
+    "merged": {
+      "description": "List of all values connected to the 'any' input."
+    },
+    "count": {
+      "type": "math.number",
+      "description": "The amount of connectors to the 'any' input."
+    }
+  }
+}
