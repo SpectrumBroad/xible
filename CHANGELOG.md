@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Added the `compare.truthy` and `compare.falsy` nodes to verify how objects evaluate in a boolean context.
 
+-   The `string.template` node now supports passing object keys as variables.
+
 ### Changed
 -   XIBLE now throws an error if it is already running according to the PID file. Similarly, CLI commands which require that XIBLE is running will throw an error if that is not the case.
 

@@ -1,10 +1,15 @@
 {
   "name": "string.template",
   "type": "object",
-  "description": "Parses a template string with input variables. Variables can be addressed by their name like so: ${variableName}",
+  "description": "Parses a template string with input variables. Variables can be addressed by their name like so: ${variableName}. Similar for objects; ${keyName}",
   "inputs": {
+    "objects": {
+      "type": "object",
+      "description": "Object values can be addressed by their key in the template string."
+    },
     "variables": {
-      "type": "variable"
+      "type": "variable",
+      "description": "Variables can be addressed by their name in the template string."
     }
   },
   "outputs": {
