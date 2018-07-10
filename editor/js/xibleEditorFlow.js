@@ -10,6 +10,15 @@ class XibleEditorFlow extends xibleWrapper.Flow {
     });
   }
 
+  removeGlobalConnectors() {
+    this.nodes.forEach((node) => {
+      node.getOutputs().forEach((output) => {
+        output.connectors.filter(conn => conn.global)
+        .forEach(globalConn => globalConn.delete());
+      });
+    });
+  }
+
   setGlobalFromOutput(output) {
     // if we have another global of this type, ignore
     let globalOutputsByType = this.getGlobalOutputs()
@@ -25,7 +34,7 @@ class XibleEditorFlow extends xibleWrapper.Flow {
     for (let i = 0; i < this.nodes.length; i += 1) {
       this.nodes[i].getInputs().forEach((input) => {
         if (
-          input.type === output.type && !input.connectors.length &&
+          input.type === output.type && !input.connectors.filter(conn => !conn.global).length &&
           input.global !== false
         ) {
           input.setGlobal(output.global ? true : undefined);
@@ -86,7 +95,9 @@ class XibleEditorFlow extends xibleWrapper.Flow {
   }
 
   // TODO: simply have XibleEditor set viewState to loadedFlow directly?
-  toJson(nodes, connectors) {
+  toJson(...args) {
+    this.removeGlobalConnectors();
+
     // the viewstate
     this.setViewState({
       left: this.editor.left,
@@ -96,6 +107,6 @@ class XibleEditorFlow extends xibleWrapper.Flow {
       backgroundTop: this.editor.backgroundTop
     });
 
-    return super.toJson(nodes, connectors);
+    return super.toJson(...args);
   }
 }

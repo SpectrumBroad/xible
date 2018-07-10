@@ -9,6 +9,10 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 
     super(Object.assign({}, obj, { element: el }));
 
+    if (this.global) {
+      el.classList.add('global');
+    }
+
     // selection handlers
     path.addEventListener('mousedown', event => this.editor.toggleSelectionOnMouseEvent(event, this));
     path.addEventListener('mouseup', event => this.editor.toggleSelectionOnMouseEvent(event, this));

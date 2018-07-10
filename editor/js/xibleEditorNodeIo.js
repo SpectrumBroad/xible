@@ -21,10 +21,19 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
       }
 
       this.setGlobal(globalValue);
+
+      if (globalValue) {
+        this.viewGlobalConnectors(this);
+      } else {
+        this.node.flow.removeGlobalConnectors();
+      }
     });
 
-    // enable mousedown -> mousemove handler for creating new connections
+    // enable listeners
     this.enableHook();
+    this.enableAttach();
+    this.snapConnectorsOnHover();
+    this.viewGlobalConnectorsOnHover();
   }
 
   setGlobal(global) {
@@ -77,6 +86,10 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
     this.element.style.display = '';
   }
 
+  /**
+   * Enables creating a new connector when
+   * a NodeIo is being dragged.
+   */
   enableHook() {
     const el = this.element;
 
@@ -194,6 +207,14 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
         once: true
       });
     });
+  }
+
+  /**
+   * Enables the listener for attaching a connector
+   * to a NodeIo where mouseup occurs.
+   */
+  enableAttach() {
+    const el = this.element;
 
     // handle whenever someone drops a new connector on this nodeio
     el.addEventListener('mouseup', () => {
@@ -242,6 +263,15 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
         this.node.editor.dummyXibleNode = null;
       });
     });
+  }
+
+  /**
+   * Enables snap behaviour on the NodeIo.
+   * This snaps a dragged connector directly to a NodeIo
+   * which is being hovered.
+   */
+  snapConnectorsOnHover() {
+    const el = this.element;
 
     // handle snap-to whenever a new connector is hovered over this io
     el.addEventListener('mouseover', () => {
@@ -290,6 +320,58 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
         connectors.forEach(conn => conn.setOrigin(this.node.editor.dummyIo));
       }
     });
+  }
+
+  viewGlobalConnectorsOnHover() {
+    const el = this.element;
+
+    el.addEventListener('mouseover', () => {
+      if (!this.global) {
+        return;
+      }
+
+      const nodeOutputs = this.node.flow.getGlobalOutputsByType(this.type);
+      for (let i = 0; i < nodeOutputs.length; i += 1) {
+        nodeOutputs[i].viewGlobalConnectors(this);
+      }
+    });
+
+    el.addEventListener('mouseout', () =>
+      this.node.flow.removeGlobalConnectors()
+    );
+  }
+
+  viewGlobalConnectors(highlightIo) {
+    if (!this.global) {
+      return;
+    }
+
+    if (this instanceof XibleEditorNodeInput) {
+      const nodeOutputs = this.node.flow.getGlobalOutputsByType(this.type);
+      for (let i = 0; i < nodeOutputs.length; i += 1) {
+        nodeOutputs[i].viewGlobalConnectors(this);
+      }
+      return;
+    }
+
+    const nodeInputs = this.node.flow.getGlobalInputsByType(this.type);
+    for (let i = 0; i < nodeInputs.length; i += 1) {
+      const nodeInput = nodeInputs[i];
+      if (nodeInput.connectors.filter(conn => !conn.global).length) {
+        return;
+      }
+
+      const conn = this.node.editor.addConnector(new XibleEditorConnector({
+        origin: this,
+        destination: nodeInput,
+        type: this.type,
+        global: true
+      }));
+
+      if (this === highlightIo || nodeInput === highlightIo) {
+        conn.element.classList.add('highlight');
+      }
+    }
   }
 };
 

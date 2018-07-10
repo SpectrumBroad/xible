@@ -332,6 +332,14 @@
 	pointer-events: none;
 }
 
+.xible .editor>.connector.global {
+	z-index: 2;
+}
+
+.xible .editor>.connector.global.highlight {
+	z-index: 3;
+}
+
 .xible .editor>.connector>path {
 	stroke: #fff;
 	stroke-width: 3px;
@@ -339,6 +347,14 @@
 	pointer-events: all;
 }
 
+.xible .editor>.connector.global>path {
+	stroke-width: 20px;
+	opacity: 0.4;
+}
+
+.xible .editor>.connector.global.highlight>path {
+	opacity: 0.8;
+}
 
 /*
 .xible .editor>.connector.selected {
@@ -370,7 +386,7 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	z-index: 2;
+	z-index: 4;
 	border: 2px solid #000;
 	text-align: center;
 }
@@ -390,12 +406,12 @@
 }
 
 .xible .node:hover {
-	z-index: 3;
+	z-index: 6;
 }
 
 .xible .node.selected {
 	border-color: gold;
-	z-index: 4;
+	z-index: 5;
 }
 
 .xible .node.nodirect {
