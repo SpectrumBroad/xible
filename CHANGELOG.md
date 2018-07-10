@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   It is now possible to specify the input string directly for the `string.split` node.
 
+-   Added the `object.include-keys` and `object.exclude-keys` nodes. These can be used to strip unwanted keys from objects.
+
 -   Added the `compare.truthy` and `compare.falsy` nodes to verify how objects evaluate in a boolean context.
 
 ### Changed
