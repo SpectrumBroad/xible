@@ -162,8 +162,6 @@ class XibleEditorNode extends xibleWrapper.Node {
         templateEl = template.querySelector('template');
         templateEl = document.body.appendChild(template.querySelector('template'));
         templateEl.setAttribute('id', `xible-node-${this.name}`);
-      } else {
-        console.log('done', this.name)
       }
 
       const templateContent = templateEl.content;
