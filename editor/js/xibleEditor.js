@@ -27,7 +27,9 @@ class XibleEditor extends EventEmitter {
 
     // check for browser support
     this.browserSupportItems = {
-      attachShadow: typeof this.element.attachShadow === 'function'
+      attachShadow: typeof this.element.attachShadow === 'function',
+      templateElement: 'content' in document.createElement('template'),
+      linkImport: 'import' in document.createElement('link')
     };
     this.browserSupport = true;
     for (const item in this.browserSupportItems) {
