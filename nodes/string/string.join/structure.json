@@ -1,0 +1,17 @@
+{
+  "name": "string.join",
+  "type": "object",
+  "description": "Joins all input strings together, with an optional seperator between each of them.",
+  "inputs": {
+    "strings": {
+      "type": "string",
+      "description": "The input strings to join together."
+    }
+  },
+  "outputs": {
+    "string": {
+      "type": "string",
+      "description": "The joined output string."
+    }
+  }
+}
