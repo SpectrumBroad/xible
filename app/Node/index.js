@@ -458,6 +458,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         return;
       }
 
+      if (!this.flowInstance) {
+        return;
+      }
+
       if (obj.message) {
         obj.message.nodeId = this._id;
         obj.message.flowId = this.flow._id;
