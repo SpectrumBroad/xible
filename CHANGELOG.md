@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The `string.template` node now supports passing object keys as variables for string expansion.
 
+-   Support for `script type="module"` in node editor contents. Note that these script elements are untouched when they are processed by the browser. Script elements that do not contain the `type="module"` directive will be evaluated like tever before, with the document argument attached to the shadow root and `this` referring to the node itself.
+
 ### Changed
 -   XIBLE now throws an error if it is already running according to the PID file. Similarly, CLI commands which require that XIBLE is running will throw an error if that is not the case.
 

@@ -122,7 +122,8 @@ class XibleEditorNode extends xibleWrapper.Node {
 
   getAndProcessEditorContent() {
     const proc = () => {
-      this.getEditorContent().then((data) => {
+      this.getEditorContent()
+      .then((data) => {
         this.processEditorContent(data);
       });
     };
@@ -146,34 +147,44 @@ class XibleEditorNode extends xibleWrapper.Node {
         return;
       }
 
+      this.element.appendChild(div);
+
       // create the shadow and set the contents including the nodeContent.css
       const shadow = div.attachShadow({
         mode: 'open'
       });
-      shadow.innerHTML = `<style>@import url("css/nodeContent.css");</style>${this.editorContent}`;
+      shadow.xibleNode = this;
 
-      // check if style element has loaded
-      let stylesLoaded = false;
-      let scriptsLoaded = false;
-      let emittedLoad = false;
+      let templateEl = document.getElementById(`xible-node-${this.name}`);
+      if (!templateEl) {
+        const textTemplate = `<template><style>@import url("css/nodeContent.css");</style>${content}</template>`;
+        const template = new DOMParser().parseFromString(textTemplate, 'text/html');
+        templateEl = template.querySelector('template');
+        templateEl = document.body.appendChild(template.querySelector('template'));
+        templateEl.setAttribute('id', `xible-node-${this.name}`);
+      } else {
+        console.log('done', this.name)
+      }
 
-      // emit a load event
-      const checkForEmitLoad = () => {
-        if (!emittedLoad && stylesLoaded && scriptsLoaded) {
-          this.emit('editorContentLoad');
-          emittedLoad = true;
-        }
-      };
+      const templateContent = templateEl.content;
 
-      // hook an eventlistener to check if the style element has loaded
-      const styleEl = shadow.querySelector('style');
-      styleEl.onload = () => {
-        stylesLoaded = true;
-        checkForEmitLoad();
-      };
+      // remove scripts that don't have a type set (to module)
+      // so we can evaulate them in a seperate function with a specific document argument.
+      const scripts = Array.from(templateContent.querySelectorAll('script:not([type])'))
+      .map((scriptEl) => {
+        const scriptContent = scriptEl.textContent;
+        scriptEl.parentNode.removeChild(scriptEl);
+
+        return scriptContent;
+      });
+
+      shadow.appendChild(templateContent.cloneNode(true));
+
+      scripts.forEach((script) => {
+        new Function('document', script).call(this, shadow);
+      });
 
       // append the div & shadowroot to the node
-      this.element.appendChild(div);
       this.editorContentEl = shadow;
 
       // trigger some convenience stuff
@@ -182,14 +193,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       this.convenienceOutputValue();
       this.convenienceTextAreaSetup();
 
-      // run script elements
-      Array.from(shadow.querySelectorAll('script'))
-      .forEach((scriptEl) => {
-        new Function('window', 'document', scriptEl.textContent).call(this, null, shadow); // eslint-disable-line no-new-func
-      });
-
-      scriptsLoaded = true;
-      checkForEmitLoad();
+      this.emit('editorContentLoad');
     };
 
     if (this.editor) {
