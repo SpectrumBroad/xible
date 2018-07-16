@@ -77,7 +77,11 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     await flow.stopAllInstances();
 
     // init the newly provided json over the existing flow
-    flow.initJson(req.body, true);
+    try {
+      flow.initJson(req.body, true);
+    } catch (err) {
+      console.error(err);
+    }
 
     // save it to file
     await flow.save();
