@@ -1,0 +1,23 @@
+{
+  "name": "input.map",
+  "type": "object",
+  "description": "Maps data.",
+  "inputs": {
+    "any": {
+      "description": "The values to map.",
+      "assignsOutputTypes": ["item"]
+    },
+    "mapped": {
+      "description": "The new/mapped item.",
+      "assignsOutputTypes": ["mapped"]
+    }
+  },
+  "outputs": {
+    "mapped": {
+      "description": "Values from the 'mapped' input."
+    },
+    "item": {
+      "description": "The current item being processed."
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "input.length",
+  "type": "object",
+  "description": "Returns the amount of input items",
+  "inputs": {
+    "any": {
+    }
+  },
+  "outputs": {
+    "length": {
+      "type": "math.number"
+    }
+  }
+}

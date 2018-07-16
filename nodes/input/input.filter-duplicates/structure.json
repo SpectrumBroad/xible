@@ -1,0 +1,18 @@
+{
+  "name": "input.filter-duplicates",
+  "type": "object",
+  "description": "Filters duplicates from the inputs. Also exposes the duplicates for further processing.",
+  "inputs": {
+    "values": {
+      "assignsOutputTypes": ["filtered", "duplicates"]
+    }
+  },
+  "outputs": {
+    "filtered": {
+      "description": "A list of input values stripped of duplicate values."
+    },
+    "duplicates": {
+      "description": "A unique list of duplicates."
+    }
+  }
+}

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Added the `object.include-keys` and `object.exclude-keys` nodes. These can be used to strip unwanted keys from objects.
 
+-   Added the `input.filter-duplicates`, `input.length`, `input.for-each` and `input.map` nodes.
+
 -   Added the `compare.truthy` and `compare.falsy` nodes to verify how objects evaluate in a boolean context.
 
 -   The `string.template` node now supports passing object keys as variables for string expansion.

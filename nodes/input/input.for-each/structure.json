@@ -1,0 +1,24 @@
+{
+  "name": "input.for-each",
+  "type": "action",
+  "description": "Loops over the input values and allows you to further process them seperately.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "any": {
+      "assignsOutputType": "object",
+      "description": "The items to be processed."
+    }
+  },
+  "outputs": {
+    "trigger": {
+      "type": "trigger",
+      "description": "Triggers once per item being processed."
+    },
+    "item": {
+      "type": "object",
+      "description": "The current item being processed."
+    }
+  }
+}
