@@ -1,0 +1,18 @@
+{
+  "name": "input.object.filter-duplicates",
+  "type": "object",
+  "description": "Filters duplicates from the inputs, where duplication filtering is based on object key verification.",
+  "inputs": {
+    "values": {
+      "assignsOutputTypes": ["filtered", "duplicates"]
+    }
+  },
+  "outputs": {
+    "filtered": {
+      "description": "A list of input values stripped of duplicate values."
+    },
+    "duplicates": {
+      "description": "A unique list of duplicates."
+    }
+  }
+}

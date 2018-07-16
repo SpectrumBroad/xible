@@ -1,0 +1,21 @@
+{
+  "name": "input.object.group",
+  "description": "Groups objects together based on a object key.",
+  "inputs": {
+    "trigger": {
+      "type": "trigger"
+    },
+    "objects": {
+      "type": "object"
+    }
+  },
+  "outputs": {
+    "trigger": {
+      "type": "trigger",
+      "description": "Triggered for each group."
+    },
+    "grouped": {
+      "type": "object"
+    }
+  }
+}
