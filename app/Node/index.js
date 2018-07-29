@@ -871,10 +871,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               throw new Error('Already called back');
             }
             calledBack = true;
-  
-            // we only send arrays between nodes
-            // we don't add non existant values
-            // we concat everything
+
+            /* we only send arrays between nodes
+             * we don't add non existant values
+             * we concat everything
+             */
             if (value !== undefined) {
               if (Array.isArray(value)) {
                 values = values.concat(value);
@@ -882,7 +883,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 values.push(value);
               }
             }
-  
+
             // all done
             if (++callbacksReceived === connLength) {  // eslint-disable-line
               resolve(values);
