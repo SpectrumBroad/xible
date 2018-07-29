@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.14.0][] - 2018-07-29
 ### Added
 -   It is now possible to specify the input string directly for the `string.split` node.
 
@@ -262,7 +265,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/SpectrumBroad/xible/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/SpectrumBroad/xible/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/SpectrumBroad/xible/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/SpectrumBroad/xible/compare/v0.11.0...v0.11.1
