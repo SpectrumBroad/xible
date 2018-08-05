@@ -20,8 +20,70 @@
   box-sizing: border-box;
 }
 
-#flowsTable .instances {
+#flowsTable tr.expand, #flowsTable tr.instances {
+  background-color: #333;
+}
+
+#flowsTable tr.instances td {
+  border-top: none;
+}
+
+#flowsTable .instance-count {
   text-align: right;
+}
+
+#flowsTable ul.instances, #flowsTable ul.timing, #flowsTable ul.stats {
+  display: flex;
+  flex-direction: row;
+  font-size: 1em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+#flowsTable ul.instances>li {
+  display: block;
+  box-sizing: border-box;
+  width: 25%;
+  border-right: 1px solid #222;
+  padding: 6px;
+}
+
+#flowsTable ul.timing {
+  position: relative;
+}
+
+#flowsTable ul.timing>li {
+  display: block;
+  box-sizing: border-box;
+  width: 33.3%;
+  border-right: 1px solid #222;
+  padding: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#flowsTable ul.timing>li.startDate:hover {
+  position: absolute;
+  overflow: visible;
+  width: 100%;
+  background-color: #333;
+  text-align: center;
+  border-right: none;
+}
+
+#flowsTable ul.timing>li:last-child, #flowsTable ul.stats>li:last-child {
+  border-right: none;
+}
+
+#flowsTable ul.stats>li {
+  display: block;
+  box-sizing: border-box;
+  width: 33.3%;
+  border-right: 1px solid #222;
+  padding: 6px;
 }
 
 td.state>ul {
@@ -48,20 +110,20 @@ td.state>ul>li {
   border-width: 0 1px 1px 0;
   color: transparent;
   opacity: 0.7;
-  cursor: pointer;
+  cursor: default;
 }
 
-td.state>ul>li.state-0 {
+td.state>ul>li.state-0, .state.state-0 {
   background-color: black;
 }
 
-td.state>ul>li.state-1,
-td.state>ul>li.state-2,
-td.state>ul>li.state-4 {
+td.state>ul>li.state-1, .state.state-1,
+td.state>ul>li.state-2, .state.state-2,
+td.state>ul>li.state-4, .state.state-4 {
   background-color: darkorange;
 }
 
-td.state>ul>li.state-3 {
+td.state>ul>li.state-3, .state.state-3 {
   background-color: purple;
 }
 
@@ -69,8 +131,29 @@ td.state>ul>li.state-5 {
   background-color: lime;
 }
 
-td.state>ul>li.state-5.directed {
+.state.state-5 {
+  background-color: limegreen;
+}
+
+td.state>ul>li.state-5.directed, .state.state-5.directed {
   background-color: #ddd;
+}
+
+ul.instances button {
+  float: right;
+  margin-right: 0;
+}
+
+ul.instances .state {
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: #000;
+  text-align: center;
+  overflow: hidden;
+}
+
+ul.instances .state.state-3 {
+  color: #ccc;
 }
 
 table button {
