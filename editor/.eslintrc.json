@@ -22,7 +22,8 @@
     "XibleWrapper": false,
     "XibleEditorNodeSelector": false,
     "EventEmitter": false,
-    "customPrompt": false
+    "customPrompt": false,
+    "createResourceCharts": false
   },
   "rules": {
     "global-require": "off",
