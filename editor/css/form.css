@@ -1,4 +1,7 @@
-input, button, select {
+input,
+button,
+select,
+textarea {
 	box-sizing: border-box;
 	border: 1px solid #111;
 	display: block;
@@ -11,6 +14,8 @@ input, button, select {
 	font-family: robotothin;
 	padding: 3px;
 	margin: 0;
+	-webkit-appearance: none;
+	-moz-appearance: none;
 	appearance: none;
 	position: relative;
 }
