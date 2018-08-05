@@ -40,9 +40,12 @@ module.exports = (XIBLE) => {
       }
 
       delete this.timing.initEnd;
+      delete this.timing.startDate;
       delete this.timing.startStart;
       delete this.timing.startEnd;
 
+
+      this.timing.initDate = Date.now();
       this.timing.initStart = process.hrtime();
 
       // check and set the correct state
@@ -243,6 +246,7 @@ module.exports = (XIBLE) => {
       }
       this.state = FlowInstance.STATE_STARTING;
 
+      this.timing.startDate = Date.now();
       this.timing.startStart = process.hrtime();
 
       return new Promise((resolve) => {

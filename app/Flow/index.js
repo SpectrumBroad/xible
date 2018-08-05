@@ -660,6 +660,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const flowInstance = new XIBLE.FlowInstance(this, params, directNodes);
       this.instances.push(flowInstance);
 
+      flowInstance.timing.createDate = Date.now();
       flowInstance.timing.createStart = createStart;
       flowInstance.timing.createEnd = process.hrtime();
 
