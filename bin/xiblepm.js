@@ -298,9 +298,22 @@ const cli = {
           }
 
           // verify that we have a name
-          const nodePackName = packageJson.name;
+          let nodePackName = packageJson.name;
           if (!nodePackName) {
             reject('Could not locate "name" property in "package.json"');
+            return;
+          }
+
+          // remove preceeding 'xible-...' from the nodepack name.
+          nodePackName = nodePackName.toLowerCase();
+          if (nodePackName.substring(0, 15) === 'xible-nodepack-') {
+            nodePackName = nodePackName.substring(15);
+          } else if (nodePackName.substring(0, 9) === 'xible-np-') {
+            nodePackName = nodePackName.substring(9);
+          }
+
+          if (!nodePackName) {
+            reject('The nodepack name in "package.json" is empty.');
             return;
           }
 
@@ -350,6 +363,8 @@ const cli = {
                       // unable to get publish error
                     }
                   }
+
+                  logError(publishErr);
                   return Promise.reject(`Failed to publish nodepack "${nodePackName}": ${publishErr}`);
                 });
               });
