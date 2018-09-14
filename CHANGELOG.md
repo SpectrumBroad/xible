@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Fixed
+-   When publishing a nodepack (which already exists), the package.json `name` attribute is now stripped of preceeding 'xible-np-' or 'xible-nodepack-' strings before matching it against the registry to see if the publisher is the same. Prior to this, the registry would return a http 403 which would show up as 'Unsuccessful statuscode returned' in the cli.
 
 ## [0.14.0][] - 2018-07-29
 ### Added
