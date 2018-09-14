@@ -38,7 +38,7 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 
   setOrigin(origin) {
     if (this.origin && this.origin.connectors.indexOf(this) > -1) {
-      this.origin.node.removeListener('position', this.originDrawFn);
+      this.origin.node.removeListener('position', this._originDrawFn);
     }
 
     super.setOrigin(origin);
@@ -50,14 +50,14 @@ class XibleEditorConnector extends xibleWrapper.Connector {
     this.draw();
 
     // redraw on move of origin
-    this.origin.node.on('position', this.originDrawFn = this.draw.bind(this));
+    this.origin.node.on('position', this._originDrawFn = this.draw.bind(this));
 
     return origin;
   }
 
   setDestination(destination) {
     if (this.destination && this.destination.connectors.indexOf(this) > -1) {
-      this.destination.node.removeListener('position', this.destinationDrawFn);
+      this.destination.node.removeListener('position', this._destinationDrawFn);
 
       // find global conns with same type
       if (this.destination.global !== false && this.destination.connectors.length === 1 && this.destination.type && document.querySelector(`.output>.${this.destination.type.replace(/\./g, '\\.')}.global`)) {
@@ -73,8 +73,8 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 
     this.draw();
 
-    // redraw on move of origin
-    this.destination.node.on('position', this.destinationDrawFn = this.draw.bind(this));
+    // redraw on move of destination
+    this.destination.node.on('position', this._destinationDrawFn = this.draw.bind(this));
 
     return destination;
   }
