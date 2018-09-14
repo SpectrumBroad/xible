@@ -446,6 +446,52 @@ const cli = {
           });
         });
       });
+    },
+    async init(nodeName) {
+      if (!nodeName) {
+        throw 'A nodeName needs to be provided.';
+      }
+
+      if (!fs.existsSync('package.json')) {
+        throw 'A package.json needs to exist, specifying the nodepack name.';
+      }
+
+      if (fs.existsSync('structure.json')) {
+        throw 'A structure.json already exists here.';
+      }
+
+      if (fs.existsSync('index.js')) {
+        throw 'An index.js already exists here.';
+      }
+
+      if (fs.existsSync('typedef.json')) {
+        throw 'A typedef.json already exists here.';
+      }
+
+      if (fs.existsSync(nodeName)) {
+        throw `${nodeName} already exists here.`;
+      }
+
+      // create the nodes' directory structure
+      fs.mkdirSync(nodeName, 0o644);
+      fs.mkdirSync(`${nodeName}/editor`, 0o644);
+
+      // write the structure.json
+      fs.writeFileSync(`${nodeName}/structure.json`, JSON.stringify({
+        name: nodeName,
+        type: null,
+        description: 'A new node created by xiblepm init. Do not forget to adjust this description and set the type in structure.json.',
+        inputs: {},
+        outputs: {}
+      }, null, '  '), { mode: 0o644 });
+
+      // write the index.js
+      fs.writeFileSync(`${nodeName}/index.js`, `'use strict';
+
+module.exports = (NODE) => {
+
+});
+      `, { mode: 0o644 });
     }
   },
 
