@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Added
+-   The `timing` object for flow instances now also contains the `createDate`, `initDate` and `startDate` properties. These contain a Date.now() property for their respective dates. This allows you to track exactly when a flow instance was started.
+
 -   Use `xiblepm nodepack init` to create a default node structure. This is useful for starting the development of a new node within a nodepack. ([#81](https://github.com/SpectrumBroad/xible/issues/81))
 
 ### Fixed
