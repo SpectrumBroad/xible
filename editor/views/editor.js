@@ -328,14 +328,24 @@ function editorView(EL) {
       return;
     }
 
-    if (window.confirm(`Are you sure you want to permanently delete flow "${xibleEditor.loadedFlow._id}"?`)) {
-      xibleEditor.loadedFlow.delete();
+    const deletePrompt = customPrompt(`
+      <h1>Stop instance</h1>
+      <p>
+        Are you sure you want to permanently delete flow &quot;<span style="font-weight: bold;"></span>&quot;?
+      </p>
+    `, 'Confirm');
+
+    deletePrompt.form.querySelector('span').appendChild(document.createTextNode(xibleEditor.loadedFlow._id));
+
+    deletePrompt.form.addEventListener('submit', async () => {
+      deletePrompt.remove();
+      await xibleEditor.loadedFlow.delete();
 
       const flowTab = document.querySelector(`.flowList>li[data-flowid="${xibleEditor.loadedFlow._id}"]`);
       if (flowTab) {
         flowTab.parentNode.removeChild(flowTab);
       }
-    }
+    });
   };
 
   const { cpuChart, memChart, delayChart } = createResourceCharts(document.getElementById('cpuChart'), document.getElementById('memChart'), document.getElementById('delayChart'));
