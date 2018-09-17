@@ -30,6 +30,9 @@ function editorView(EL) {
         <li>
           <a id="statsOpenA" href="#resources" data-section-class="stats">resources</a>
         </li>
+        <li style="display: none;">
+          <a id="instancesOpenA" href="#instances" data-section-class="instances">instances</a>
+        </li>
       </ul>
       <section id="log" class="tabcontents log">
         <ul></ul>
@@ -53,6 +56,9 @@ function editorView(EL) {
           <canvas id="delayChart"></canvas>
         </div>
         <label id="delay">event loop delay</label>
+      </section>
+      <section id="instances" class="tabcontents instances" style="display: none;">
+        <ul></ul>
       </section>
     </div>
     <div id="flowEditorHolder">
@@ -105,7 +111,9 @@ function editorView(EL) {
   // flip between logs and stats
   const logOpenEl = document.getElementById('logOpenA');
   const statsOpenEl = document.getElementById('statsOpenA');
+  const instancesOpenEl = document.getElementById('instancesOpenA');
   const logUl = document.querySelector('#log ul');
+  const instancesUl = document.querySelector('#instances ul');
 
   function switchSubTab(event) {
     event.preventDefault();
@@ -133,6 +141,7 @@ function editorView(EL) {
 
   logOpenEl.addEventListener('click', switchSubTab);
   statsOpenEl.addEventListener('click', switchSubTab);
+  instancesOpenEl.addEventListener('click', switchSubTab);
 
   function getParamNames(flow) {
     const paramNames = [];
@@ -506,6 +515,19 @@ function editorView(EL) {
     }
   }
 
+  async function fillInstances(flow) {
+    instancesUl.innerHTML = '';
+    const instances = await flow.getInstances();
+    instances.forEach(instance => createInstance(instance));
+  }
+
+  function createInstance(instance) {
+    const instanceLi = instancesUl.appendChild(document.createElement('li'));
+    const paramsTextarea = instanceLi.appendChild(document.createElement('textarea'));
+    paramsTextarea.disabled = true;
+    paramsTextarea.appendChild(document.createTextNode(JSON.stringify(instance.params, null, '  ')));
+  }
+
   async function setFlowTabState(flow, li) {
     li.classList.remove('notRunnable', 'initializing', 'initialized', 'started', 'starting', 'stopped', 'stopping', 'direct');
 
@@ -564,6 +586,8 @@ function editorView(EL) {
       }
 
       setLoadedFlowState(flow);
+
+      // fillInstances(flow);
 
       // get all persistent websocket messages
       xibleWrapper.getPersistentWebSocketMessages()
