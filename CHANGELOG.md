@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   When publishing a nodepack (which already exists), the package.json `name` attribute is now stripped of preceeding 'xible-np-' or 'xible-nodepack-' strings before matching it against the registry to see if the publisher is the same. Prior to this, the registry would return a http 403 which would show up as 'Unsuccessful statuscode returned' in the cli.
 
+-   When initially navigating to the flows overview and after that head over to the editor, the flows would show up empty. This is now fixed. ([#77](https://github.com/SpectrumBroad/xible/issues/77))
+
 ## [0.14.0][] - 2018-07-29
 ### Added
 -   It is now possible to specify the input string directly for the `string.split` node.
