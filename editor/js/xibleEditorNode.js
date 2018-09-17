@@ -25,6 +25,13 @@ class XibleEditorNode extends xibleWrapper.Node {
       outputList
     }), ignoreData);
 
+    /*
+     * Increase max listeners limit.
+     * Especially the 'position' event handler can be hooked plenty of times,
+     * depending on the amount of connectors for a node.
+     */
+    this.setMaxListeners(1000);
+
     headerEl.appendChild(document.createTextNode(this.name));
 
     // add additional content
