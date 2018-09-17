@@ -93,6 +93,7 @@
 #nodeSelector>button:disabled,
 #detailNodeSelector>button:disabled {
 	background-color: #ccc;
+	color: #aaa;
 }
 
 #nodeSelector>input:focus {

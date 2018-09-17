@@ -1,3 +1,10 @@
+#xibleFlowCreateButton::before {
+  font-family: awesome;
+	display: block;
+	margin-bottom: 6px;
+	content: "\f067";
+}
+
 #flowsTable {
   width: 100%;
   border-spacing: 0;
@@ -42,12 +49,34 @@
   flex-wrap: wrap;
 }
 
+#flowsTable ul.stats label {
+  font-size: 0.7em;
+}
+
 #flowsTable ul.instances>li {
   display: block;
   box-sizing: border-box;
   width: 25%;
   border-right: 1px solid #222;
   padding: 6px;
+}
+
+@media (max-width: 1279px) and (min-height: 1px) {
+  #flowsTable ul.instances>li {
+    width: 33.3%;
+  }
+}
+
+@media (max-width: 959px) and (min-height: 1px) {
+  #flowsTable ul.instances>li {
+    width: 50%;
+  }
+}
+
+@media (max-width: 719px) and (min-height: 1px) {
+  #flowsTable ul.instances>li {
+    width: 100%;
+  }
 }
 
 #flowsTable ul.timing {
@@ -135,9 +164,16 @@ td.state>ul>li.state-5 {
   background-color: limegreen;
 }
 
-td.state>ul>li.state-5.directed, .state.state-5.directed {
+td.state>ul>li.state-5.directed,
+.state.state-5.directed {
   background-color: #ddd;
 }
+
+td.state>ul>li.error,
+.state.error {
+  background-color: #c00;
+}
+
 
 ul.instances button {
   float: right;
@@ -152,7 +188,8 @@ ul.instances .state {
   overflow: hidden;
 }
 
-ul.instances .state.state-3 {
+ul.instances .state.state-3,
+ul.instances .state.state-0 {
   color: #ccc;
 }
 
@@ -163,6 +200,10 @@ table button {
   padding: 4px 6px;
   margin: 0 4px;
   cursor: pointer;
+}
+
+#flowsTable th.instances {
+  text-align: right;
 }
 
 #flowsTable .actions {

@@ -7,6 +7,9 @@ View.routes['/flows'] = (EL) => {
       <p id="connectionLost" class="status loading alert hidden">
         Connection lost
       </p>
+      <section class="buttons">
+        <button type="button" id="xibleFlowCreateButton">Create</button>
+      </section>
       <section>
         <h1>Filter</h1>
         <form>
@@ -16,9 +19,10 @@ View.routes['/flows'] = (EL) => {
       <!--
       <section>
         <h1>Registry</h1>
-        <ul>
-          <li><a href="" onclick="">Search</a></li>
-        </ul>
+        <form>
+          <input type="text" placeholder="search" id="search" />
+          <button type="submit">Search</button>
+        </form>
       </section>
       -->
     </div>
@@ -47,6 +51,16 @@ View.routes['/flows'] = (EL) => {
     </div>
   `;
 
+  document.getElementById('xibleFlowCreateButton').addEventListener('click', async () => {
+    await mainViewHolder.navigate('/editor');
+    const addButton = document.querySelector('#flowList>.add a');
+    if (!addButton) {
+      return;
+    }
+
+    addButton.click();
+  });
+
   const filterInput = document.getElementById('filter');
   const flowsTbody = document.getElementById('flowsTbody');
 
@@ -74,32 +88,49 @@ View.routes['/flows'] = (EL) => {
   async function populateFlows() {
     const flows = await xibleWrapper.Flow.getAll();
 
+    // if this view is already loaded,
+    // this will remove eventlisteners.
+    mainViewHolder.emit('purge');
     flowsTbody.innerHTML = '';
+
     for (const flowId in flows) {
-      flowsTbody.appendChild(await createFlowRow(flows[flowId]));
+      await createFlowRow(flows[flowId]);
     }
     filterInputOnInput();
   }
 
   async function createFlowRow(flow) {
-    const tr = document.createElement('tr');
+    const tr = flowsTbody.appendChild(document.createElement('tr'));
+    tr._flow = flow;
     tr.appendChild(document.createElement('td')).appendChild(document.createTextNode(flow._id));
 
-    tr.addEventListener('click', (event) => {
-      if (event.target && XibleEditor.inputElementNameList.includes(event.target.nodeName)) {
+    function trOnClick(event) {
+      if (event && event.target && XibleEditor.inputElementNameList.includes(event.target.nodeName)) {
         return;
       }
 
       if (tr.classList.contains('expand')) {
+        mainViewHolder.navigate('/flows', true);
         closeFlowRow(tr);
       } else {
-        Array.from(tr.parentNode.querySelectorAll('.expand')).forEach((expandedTr) => {
+        Array.from(flowsTbody.querySelectorAll('.expand')).forEach((expandedTr) => {
           closeFlowRow(expandedTr);
         });
+
+        mainViewHolder.navigate(`/flows/${encodeURIComponent(flow._id)}`, true);
         tr.classList.add('expand');
-        expandFlowRow(tr, flow);
+        return expandFlowRow(tr);
       }
-    });
+    }
+
+    tr.addEventListener('click', trOnClick);
+
+    // if in path, load it immediately
+    const pathSplit = window.location.pathname.split('/');
+    if (pathSplit.length > 1 && pathSplit[2] === encodeURIComponent(flow._id)) {
+      await trOnClick();
+      tr.scrollIntoView(true);
+    }
 
     const instances = await flow.getInstances();
     let instanceLength = instances.length;
@@ -116,6 +147,12 @@ View.routes['/flows'] = (EL) => {
 
     const actionTd = tr.appendChild(document.createElement('td'));
     actionTd.classList.add('actions');
+
+    const editButton = actionTd.appendChild(document.createElement('button'));
+    editButton.innerHTML = 'Edit';
+    editButton.onclick = () => {
+      mainViewHolder.navigate(`/editor/${encodeURIComponent(flow._id)}`);
+    };
 
     const startButton = actionTd.appendChild(document.createElement('button'));
     startButton.innerHTML = 'Start';
@@ -154,7 +191,12 @@ View.routes['/flows'] = (EL) => {
       if (tr.classList.contains('expand')) {
         const instanceLi = document.querySelector(`ul.instances>li.instance-${flowInstance._id}`);
         if (instanceLi) {
-          instanceLi.parentNode.removeChild(instanceLi);
+          setTimeout(() => {
+            if (!instanceLi.parentNode) {
+              return;
+            }
+            instanceLi.parentNode.removeChild(instanceLi);
+          }, 10000);
         }
       }
     }
@@ -204,6 +246,18 @@ View.routes['/flows'] = (EL) => {
     flowInstance.on('stopping', flowInstanceOnStateChange);
     flowInstance.on('stopped', flowInstanceOnStateChange);
 
+    function flowInstanceOnDelete() {
+      if (li.parentNode) {
+        li.parentNode.removeChild(li);
+      }
+    }
+    flowInstance.on('delete', flowInstanceOnDelete);
+
+    function flowInstanceOnError(err) {
+      setInstanceState(tr, flowInstance, err);
+    }
+    flowInstance.on('error', flowInstanceOnError);
+
     mainViewHolder.once('purge', () => {
       flowInstance.removeListener('initializing', flowInstanceOnStateChange);
       flowInstance.removeListener('initialized', flowInstanceOnStateChange);
@@ -211,37 +265,46 @@ View.routes['/flows'] = (EL) => {
       flowInstance.removeListener('starting', flowInstanceOnStateChange);
       flowInstance.removeListener('stopping', flowInstanceOnStateChange);
       flowInstance.removeListener('stopped', flowInstanceOnStateChange);
-    });
 
-    function flowInstanceOnDelete() {
-      if (li.parentNode) {
-        li.parentNode.removeChild(li);
-      }
-    }
-    flowInstance.on('delete', flowInstanceOnDelete);
-    mainViewHolder.once('purge', () => {
       flowInstance.removeListener('delete', flowInstanceOnDelete);
+
+      flowInstance.removeListener('error', flowInstanceOnError);
     });
 
     return li;
   }
 
-  function setInstanceState(tr, flowInstance) {
-    const li = tr.querySelector(`td.state li.instance-${flowInstance._id}`);
-    if (li) {
-      li.className = '';
-      li.classList.add(`instance-${flowInstance._id}`, `state-${flowInstance.state}`);
-      if (flowInstance.directed) {
-        li.classList.add('directed');
+  function setInstanceState(tr, flowInstance, err) {
+    if (tr) {
+      const li = tr.querySelector(`td.state li.instance-${flowInstance._id}`);
+      if (li) {
+        li.className = '';
+        li.classList.add(`instance-${flowInstance._id}`, `state-${flowInstance.state}`);
+        if (err) {
+          li.classList.add('error');
+        } else if (flowInstance.directed) {
+          li.classList.add('directed');
+        }
+        li.innerHTML = flowInstance.state;
       }
-      li.innerHTML = flowInstance.state;
     }
 
-    const instanceLiState = document.querySelector(`ul.instances>li.instance-${flowInstance._id} .state`);
-    if (instanceLiState) {
+    const instanceLi = document.querySelector(`ul.instances>li.instance-${flowInstance._id}`);
+    if (instanceLi) {
+      const instanceLiState = instanceLi.querySelector('.state');
+      if (flowInstance.state < 2) {
+        instanceLi.querySelector('button').disabled = true;
+      } else {
+        instanceLi.querySelector('button').disabled = false;
+      }
+
+      const hadErrorClass = instanceLiState.classList.contains('error');
       instanceLiState.className = 'state';
       instanceLiState.classList.add(`state-${flowInstance.state}`);
-      if (flowInstance.directed) {
+      if (err || (hadErrorClass && flowInstance.state < 2)) {
+        instanceLiState.classList.add('error');
+        instanceLiState.innerHTML = 'error';
+      } else if (flowInstance.directed) {
         instanceLiState.classList.add('directed');
         instanceLiState.innerHTML = 'directed';
       } else {
@@ -275,12 +338,7 @@ View.routes['/flows'] = (EL) => {
     const stateEl = li.appendChild(document.createElement('div'));
     stateEl.classList.add('state', `state-${instance.state}`);
     stateEl.setAttribute('title', 'State');
-    if (instance.directed) {
-      stateEl.classList.add('directed');
-      stateEl.innerHTML = 'directed';
-    } else {
-      stateEl.appendChild(document.createTextNode(['stopped', 'stopping', 'initializing', 'initialized', 'starting', 'started'][instance.state]));
-    }
+    setInstanceState(null, instance);
 
     // timings
     const now = Date.now();
@@ -308,7 +366,13 @@ View.routes['/flows'] = (EL) => {
     const paramsTextarea = li.appendChild(document.createElement('textarea'));
     paramsTextarea.disabled = true;
     paramsTextarea.setAttribute('rows', 5);
-    paramsTextarea.appendChild(document.createTextNode(instance.params ? JSON.stringify(instance.params, null, '  ') : ''));
+
+    li._flowInstanceParamsUpdateListener = () => {
+      paramsTextarea.innerHTML = '';
+      paramsTextarea.appendChild(document.createTextNode(instance.params ? JSON.stringify(instance.params, null, '  ') : ''));
+    };
+    li._flowInstanceParamsUpdateListener();
+    instance.on('starting', li._flowInstanceParamsUpdateListener);
 
     // resource charts
     const resourceUl = li.appendChild(document.createElement('ul'));
@@ -354,15 +418,13 @@ View.routes['/flows'] = (EL) => {
 
     xibleWrapper.on('message', usageHandler);
 
-    flow.on('delete', () => {
+    li._instance = instance;
+    li._flowInstanceDeleteListener = () => {
       xibleWrapper.removeListener('message', usageHandler);
       clearInterval(updateInstanceTimingsInterval);
-    });
-
-    instance.on('delete', () => {
-      xibleWrapper.removeListener('message', usageHandler);
-      clearInterval(updateInstanceTimingsInterval);
-    });
+    };
+    instance.on('delete', li._flowInstanceDeleteListener);
+    flow.on('delete', li._flowInstanceDeleteListener);
   }
 
   function updateInstanceTimings(instanceLi, instance) {
@@ -418,24 +480,39 @@ View.routes['/flows'] = (EL) => {
     startupDurationLi.innerHTML = `${createTime + initTime + startTime}ms`;
   }
 
-  async function expandFlowRow(tr, flow) {
+  async function expandFlowRow(tr) {
     const expandedTr = document.createElement('tr');
     expandedTr.classList.add('instances');
-    const td = expandedTr.appendChild(document.createElement('td'));
-    td.setAttribute('colspan', 4);
-
-    const ul = td.appendChild(document.createElement('ul'));
-    ul.classList.add('instances');
-    const instances = await flow.getInstances();
-    instances.forEach((instance) => {
-      flowRowAddInstance(ul, flow, instance);
-    });
+    expandedTr.innerHTML = `
+      <td colspan="4" class="loading">
+        <ul class="instances"></ul>
+      </td>
+    `;
+    const td = expandedTr.querySelector('td');
 
     if (tr.nextSibling) {
       tr.parentNode.insertBefore(expandedTr, tr.nextSibling);
     } else {
       tr.parentNode.appendChild(expandedTr);
     }
+
+    const ul = td.querySelector('ul');
+    const instances = await tr._flow.getInstances();
+    instances.forEach((instance) => {
+      flowRowAddInstance(ul, tr._flow, instance);
+    });
+
+    td.addEventListener('animationiteration', () => {
+      td.classList.remove('loading');
+    }, {
+      once: true
+    });
+
+    tr._purgeCloseFlowRowListener = () => {
+      closeFlowRow(tr);
+    };
+
+    mainViewHolder.once('purge', tr._purgeCloseFlowRowListener);
   }
 
   function closeFlowRow(tr) {
@@ -444,7 +521,20 @@ View.routes['/flows'] = (EL) => {
     }
     tr.classList.remove('expand');
 
+    const flow = tr._flow;
+    mainViewHolder.removeListener('purge', tr._purgeCloseFlowRowListener);
+    delete tr._purgeCloseFlowRowListener;
+
     if (tr.nextSibling && tr.nextSibling.classList.contains('instances')) {
+      Array.from(tr.nextSibling.querySelectorAll('ul.instances>li'))
+      .forEach((li) => {
+        flow.removeListener('delete', li._flowInstanceDeleteListener);
+        li._instance.removeListener('delete', li._flowInstanceDeleteListener);
+        li._instance.removeListener('starting', li._flowInstanceParamsUpdateListener);
+        delete li._instance;
+        delete li._flowInstanceDeleteListener;
+        delete li._flowInstanceParamsUpdateListener;
+      });
       tr.parentNode.removeChild(tr.nextSibling);
     }
   }
