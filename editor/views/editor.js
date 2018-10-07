@@ -371,6 +371,7 @@ function editorView(EL) {
 
   mainViewHolder.once('purge', () => {
     xibleEditor.removeListener('flow.usage', onFlowUsage);
+    xibleEditor.loadedFlow = null;
   });
 
   function resetCharts() {
