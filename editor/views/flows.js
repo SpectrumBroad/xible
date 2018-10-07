@@ -549,4 +549,7 @@ View.routes['/flows'] = (EL) => {
   }
 
   xibleWrapper.on('open', xibleWrapperOnOpen);
+  mainViewHolder.once('purge', () => {
+    xibleWrapper.removeListener('open', xibleWrapperOnOpen);
+  });
 };
