@@ -35,9 +35,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Added the `input.object.filter-duplicates` and `input.object.group` nodes. These allow duplication filtering and grouping based on an object key.
 
--   Added the `string.join` node, which allows you to join multiple strings together. A seperator can be introduced between the strings.
+-   Added the `string.join` node, which allows you to join multiple strings together. A separator can be introduced between the strings.
 
--   Support for `script type="module"` in node editor contents. Note that these script elements are untouched when they are processed by the browser. Script elements that do not contain the `type="module"` directive will be evaluated like tever before, with the document argument attached to the shadow root and `this` referring to the node itself.
+-   Support for `script type="module"` in node editor contents. Note that these script elements are untouched when they are processed by the browser. Script elements that do not contain the `type="module"` directive will be evaluated like ever before, with the document argument attached to the shadow root and `this` referring to the node itself.
 
 ### Changed
 -   XIBLE now throws an error if it is already running according to the PID file. Similarly, CLI commands which require that XIBLE is running will throw an error if that is not the case.
