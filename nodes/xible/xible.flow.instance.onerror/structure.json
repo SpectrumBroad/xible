@@ -1,5 +1,5 @@
 {
-  "name": "xible.node.onerror",
+  "name": "xible.flow.instance.on-error",
   "type": "event",
   "description": "Triggered whenever a node in the flow triggers an error.",
   "outputs": {

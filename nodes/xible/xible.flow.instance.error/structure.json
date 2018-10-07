@@ -1,14 +1,9 @@
 {
-  "name": "xible.node.error",
+  "name": "xible.flow.instance.error",
   "type": "action",
   "description": "Trigger a node error event.",
   "inputs": {
     "trigger": {
-      "type": "trigger"
-    }
-  },
-  "outputs": {
-    "done": {
       "type": "trigger"
     }
   }

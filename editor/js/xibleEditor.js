@@ -62,7 +62,7 @@ class XibleEditor extends EventEmitter {
     // in ms
     this.serverClientDateDifference = 0;
     xibleWrapper.getServerClientDateDifference()
-    .then(ms => this.serverClientDateDifference = ms);
+    .then((ms) => { this.serverClientDateDifference = ms; });
 
     this.enableNodeSelector();
     this.enableZoom();
@@ -249,9 +249,13 @@ class XibleEditor extends EventEmitter {
   * @param {Object} json The message Object
   */
   messageHandler(json) {
+    if (!this.loadedFlow) {
+      return;
+    }
+
     // get the node for this message
     let node;
-    if (json.nodeId && this.loadedFlow) {
+    if (json.nodeId) {
       node = this.loadedFlow.getNodeById(json.nodeId);
       if (!node) {
         return;
@@ -264,16 +268,14 @@ class XibleEditor extends EventEmitter {
 
     switch (json.method) {
       case 'xible.flow.instance.removeAllStatuses':
-        if (this.loadedFlow && json.flowId === this.loadedFlow._id) {
+        if (json.flowId === this.loadedFlow._id) {
           this.loadedFlow.removeAllStatuses();
         }
         break;
 
-      case 'xible.node.addStatus':
-        if (node) {
-          node.addStatus(json.status);
-
-          // TODO: this needs to be handled by the view, not XibleEditor.
+      // TODO: this needs to be handled by the view, not XibleEditor.
+      case 'xible.flow.instance.error':
+        if (json.flowId === this.loadedFlow._id) {
           const logUl = document.querySelector('#log ul');
           const logLi = document.createElement('li');
           if (logUl.firstChild) {
@@ -281,60 +283,69 @@ class XibleEditor extends EventEmitter {
           } else {
             logUl.appendChild(logLi);
           }
-
-          if (json.status.color) {
-            logLi.classList.add(json.status.color);
-          }
+          logLi.classList.add('red');
 
           const dateSpan = logLi.appendChild(document.createElement('span'));
           dateSpan.classList.add('date');
           dateSpan.innerHTML = new Date().toISOString();
 
-          logLi.appendChild(document.createTextNode(json.status.message));
+          if (json.error.stack) {
+            json.error.stack.split('\n').forEach((stackLine) => {
+              logLi.appendChild(document.createTextNode(stackLine));
+              logLi.appendChild(document.createElement('br'));
+            });
+          } else {
+            logLi.appendChild(document.createTextNode(`${json.error.constructorName} json.error.message`));
+          }
         }
-
         break;
 
-      case 'xible.node.updateStatusById':
-        if (node) {
-          node.updateStatusById(json.status._id, json.status);
+      case 'xible.node.addStatus': {
+        node.addStatus(json.status);
+
+        // TODO: this needs to be handled by the view, not XibleEditor.
+        const logUl = document.querySelector('#log ul');
+        const logLi = document.createElement('li');
+        if (logUl.firstChild) {
+          logUl.insertBefore(logLi, logUl.firstChild);
+        } else {
+          logUl.appendChild(logLi);
         }
 
+        if (json.status.color) {
+          logLi.classList.add(json.status.color);
+        }
+
+        const dateSpan = logLi.appendChild(document.createElement('span'));
+        dateSpan.classList.add('date');
+        dateSpan.innerHTML = new Date().toISOString();
+
+        logLi.appendChild(document.createTextNode(json.status.message));
+        break;
+      }
+
+      case 'xible.node.updateStatusById':
+        node.updateStatusById(json.status._id, json.status);
         break;
 
       case 'xible.node.addProgressBar':
-        if (node) {
-          node.addProgressBar(json.status);
-        }
-
+        node.addProgressBar(json.status);
         break;
 
       case 'xible.node.updateProgressBarById':
-        if (node) {
-          node.updateProgressBarById(json.status._id, json.status);
-        }
-
+        node.updateProgressBarById(json.status._id, json.status);
         break;
 
       case 'xible.node.removeStatusById':
-        if (node) {
-          node.removeStatusById(json.status._id, json.status.timeout);
-        }
-
+        node.removeStatusById(json.status._id, json.status.timeout);
         break;
 
       case 'xible.node.removeAllStatuses':
-        if (node) {
-          node.removeAllStatuses();
-        }
-
+        node.removeAllStatuses();
         break;
 
       case 'xible.node.setTracker':
-        if (node) {
-          node.setTracker(json.status);
-        }
-
+        node.setTracker(json.status);
         break;
 
       case 'xible.flow.usage':
@@ -526,7 +537,7 @@ class XibleEditor extends EventEmitter {
     do {
       actionsOffsetTop += el.offsetTop;
       actionsOffsetLeft += el.offsetLeft;
-    } while ((el = el.offsetParent));
+    } while (el = el.offsetParent);
 
     return {
       left: actionsOffsetLeft,
@@ -636,22 +647,24 @@ class XibleEditor extends EventEmitter {
     }
 
     // catch the mousemove event
-    document.body.addEventListener('mousemove', this.nodeDragListener = (event) => {
+    document.body.addEventListener('mousemove', this.nodeDragListener = (mouseMoveEvent) => {
       // check if mouse actually moved
       // see crbug.com/327114
-      if (initPageX === event.pageX && initPageY === event.pageY) {
+      if (initPageX === mouseMoveEvent.pageX && initPageY === mouseMoveEvent.pageY) {
         return;
       }
+
+      mouseMoveEvent.preventDefault();
 
       this.nodeDragHasFired = true;
 
       // check how much we moved since the initial mousedown event
-      const relativePageX = (event.pageX - initPageX) / this.zoom;
-      const relativePageY = (event.pageY - initPageY) / this.zoom;
+      const relativePageX = (mouseMoveEvent.pageX - initPageX) / this.zoom;
+      const relativePageY = (mouseMoveEvent.pageY - initPageY) / this.zoom;
 
       // save the values for the next trigger of this function
-      initPageX = event.pageX;
-      initPageY = event.pageY;
+      initPageX = mouseMoveEvent.pageX;
+      initPageY = mouseMoveEvent.pageY;
 
       // update position of each of the selection items that cares
       for (let i = 0; i < this.selection.length; i += 1) {
@@ -716,8 +729,6 @@ class XibleEditor extends EventEmitter {
           previousSpliceConnector.element.classList.remove('splice');
         }
       }
-
-      event.preventDefault();
     });
   }
 
@@ -754,14 +765,16 @@ class XibleEditor extends EventEmitter {
     const alreadySelectedNodes = new Set(this.selection);
 
     // catch the mousemove event
-    document.body.addEventListener('mousemove', this.areaMoveListener = (event) => {
+    document.body.addEventListener('mousemove', this.areaMoveListener = (mouseMoveEvent) => {
       if (!this.loadedFlow) {
         return;
       }
 
+      mouseMoveEvent.preventDefault();
+
       // check how much we moved since the initial mousedown event
-      let relativePageX = event.pageX - initPageX;
-      let relativePageY = event.pageY - initPageY;
+      let relativePageX = mouseMoveEvent.pageX - initPageX;
+      let relativePageY = mouseMoveEvent.pageY - initPageY;
 
       if (Math.abs(relativePageY) < 3 && Math.abs(relativePageX) < 3) {
         return;
@@ -840,8 +853,6 @@ class XibleEditor extends EventEmitter {
           this.select(node);
         }
       }
-
-      event.preventDefault();
     });
   }
 
@@ -1236,18 +1247,18 @@ class XibleEditor extends EventEmitter {
       this.element.classList.add('panning');
 
       // catch the mousemove event
-      document.body.addEventListener('mousemove', mousePanFunction = (event) => {
+      document.body.addEventListener('mousemove', mousePanFunction = (mouseMoveEvent) => {
         // check how much we moved since the initial mousedown event
-        const relativePageX = event.pageX - initPageX;
-        const relativePageY = event.pageY - initPageY;
+        const relativePageX = mouseMoveEvent.pageX - initPageX;
+        const relativePageY = mouseMoveEvent.pageY - initPageY;
 
         // save the new position
         this.left = initLeft + relativePageX;
         this.top = initTop + relativePageY;
 
         // apply pan to background position as well
-        this.backgroundLeft = initBackgroundLeft + (event.pageX - initPageX);
-        this.backgroundTop = initBackgroundTop + (event.pageY - initPageY);
+        this.backgroundLeft = initBackgroundLeft + (mouseMoveEvent.pageX - initPageX);
+        this.backgroundTop = initBackgroundTop + (mouseMoveEvent.pageY - initPageY);
 
         this.transform();
       });

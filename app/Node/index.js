@@ -655,8 +655,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Either this or the state argument should be provided.
     * @param {FlowState} state Flowstate at point of the error.
     * Either this or the err.state argument should be provided.
+    * @deprecated Deprecated since version 0.15.0.
     */
     error(err, state) {
+      console.warn('Node.error() is deprecated. Use throw instead');
+
       if (!(state instanceof XIBLE.FlowState) && !(err.state instanceof XIBLE.FlowState)) {
         throw new Error('state should be provided and instance of FlowState');
       }
@@ -676,8 +679,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         timeout: 7000
       });
 
-      if (this.flow) {
-        this.flow.emit('error', err);
+      if (this.flowInstance) {
+        this.flowInstance.emit('error', err);
       }
     }
 

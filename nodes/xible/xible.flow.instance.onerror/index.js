@@ -2,7 +2,7 @@
 
 module.exports = (NODE) => {
   NODE.on('init', (state) => {
-    NODE.flow.on('error', (error) => {
+    NODE.flowInstance.on('error', (error) => {
       const errState = error.state || state;
       errState.set(NODE, {
         error

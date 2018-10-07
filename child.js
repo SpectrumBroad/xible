@@ -27,21 +27,7 @@ process.on('disconnect', () => {
 * @returns {Function|null}
 */
 function requireNode(nodePath) {
-  try {
-    return require(`${nodePath}/index.js`);
-  } catch (err) {
-    console.error(err);
-    if (process.connected) {
-      process.send({
-        method: 'stop',
-        error: err
-      });
-    } else if (flowInstance) {
-      flowInstance.stopChild();
-    }
-
-    return null;
-  }
+  return require(`${nodePath}/index.js`);
 }
 
 function initNodes(flowNodes, nodes) {
@@ -64,18 +50,40 @@ function initNodes(flowNodes, nodes) {
   structuredNodes = null;
 }
 
-// always stop on unhandled promise rejections
-process.on('unhandledRejection', (reason) => {
-  console.error(reason);
+function passableError(err) {
+  return {
+    constructorName: err.constructor ? err.constructor.name : undefined,
+    code: err.code,
+    message: err.message,
+    stack: err.stack
+  };
+}
+
+// error handling
+let errorTrapped = false;
+async function onError(err) {
+  if (flowInstance.listenerCount('error') && !errorTrapped) {
+    errorTrapped = true;
+    flowInstance.emit('error', err);
+    return;
+  }
+
+  console.error(err);
   if (process.connected) {
     process.send({
       method: 'stop',
-      error: reason
+      error: passableError(err)
     });
+
+    process.exit(1);
   } else if (flowInstance) {
-    flowInstance.stopChild();
+    await flowInstance.stopChild(1);
   }
-});
+}
+
+// always stop on unhandled promise rejections
+process.on('unhandledRejection', onError);
+process.on('uncaughtException', onError);
 
 // init message handler
 process.on('message', async (message) => {
@@ -85,9 +93,9 @@ process.on('message', async (message) => {
         child: true
       }, message.config);
 
-      initNodes(message.flow.nodes, message.nodes);
-
       try {
+        initNodes(message.flow.nodes, message.nodes);
+
         await xible.init();
 
         flow = new xible.Flow();
@@ -96,14 +104,13 @@ process.on('message', async (message) => {
         flowInstance = flow.createInstance();
         flowInstance._id = message.flowInstanceId;
       } catch (err) {
-        console.error(err);
-
+        console.error(err)
         process.send({
           method: 'initerr',
-          error: err
+          error: passableError(err)
         });
 
-        process.exit(0);
+        process.exit(1);
       }
 
       // inform the master that we initialized
@@ -144,7 +151,7 @@ process.on('message', async (message) => {
         if (process.connected) {
           process.send({
             method: 'stop',
-            error: err
+            error: passableError(err)
           });
         }
 

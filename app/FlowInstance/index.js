@@ -32,6 +32,13 @@ module.exports = (XIBLE) => {
       this.params = params || {};
       this.directNodes = directNodes;
       this.directed = !!directNodes;
+
+      if (!XIBLE.child) {
+        this.on('error', () => {
+          // we can safely ignore this
+          // this.emit() takes care of sending the error over websocket connections.
+        });
+      }
     }
 
     init() {
@@ -114,7 +121,20 @@ module.exports = (XIBLE) => {
               break;
 
             case 'stop':
+              if (message.error) {
+                this.emit('error', message.error);
+              }
               this.forceStop();
+              break;
+
+            case 'initerr':
+              this.flow.initLevel = XIBLE.Flow.INITLEVEL_NONE;
+              if (this.flow.emptyInitInstance) {
+                this.flow.emptyInitInstance.removeEmptyInitInstanceListeners();
+              }
+              if (message.error) {
+                this.emit('error', message.error);
+              }
               break;
 
             case 'xible.flow.start':
@@ -549,7 +569,7 @@ module.exports = (XIBLE) => {
      * Stops the flowInstance from the worker.
      * @private
      */
-    stopChild() {
+    stopChild(exitCode) {
       if (!XIBLE.child) {
         throw new Error('should not be called from master');
       }
@@ -560,7 +580,7 @@ module.exports = (XIBLE) => {
       this.flow.nodes.forEach(node => node.emit('close'));
 
       flowInstanceDebug('stopped flowInstance from worker');
-      process.exit(0);
+      process.exit(exitCode || 0);
     }
 
     /**
@@ -605,15 +625,21 @@ module.exports = (XIBLE) => {
       return Promise.reject(new Error('Flow in unknown state'));
     }
 
-    emit(eventName, ...params) {
-      super.emit(eventName, ...params);
+    emit(eventName, ...args) {
+      super.emit(eventName, ...args);
 
-      XIBLE.broadcastWebSocket({
+      const wsObj = {
         method: `xible.flow.instance.${eventName}`,
         flowInstanceId: this._id,
         flowInstance: this,
         flowId: this.flow._id
-      });
+      };
+
+      if (eventName === 'error') {
+        wsObj.error = args[0];
+      }
+
+      XIBLE.broadcastWebSocket(wsObj);
     }
 
     toJSON() {
