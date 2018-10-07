@@ -36,6 +36,12 @@
 	padding: 0;
 }
 
+#settingsContent dd.error,
+.prompt dd.error {
+	padding: 4px;
+	border-radius: 6px;
+}
+
 
 /* checkbox */
 

@@ -12,6 +12,7 @@ function editorView(EL) {
       </p>
       <p id="browserSupportAttachShadow" class="status alert hidden">
         Your browser does not support the necessary features to enable all editor functionality.
+        <a href="#">Details</a>
       </p>
       <p id="flowNotRunnable" class="status alert hidden">
         This flow cannot be started because it contains nodes that don't exist in the given configuration.
@@ -102,6 +103,84 @@ function editorView(EL) {
   const browserSupportAttachShadowEl = document.getElementById('browserSupportAttachShadow');
   if (!xibleEditor.browserSupport) {
     browserSupportAttachShadowEl.classList.remove('hidden');
+
+    browserSupportAttachShadowEl.querySelector('a').addEventListener('click', (event) => {
+      event.preventDefault();
+
+      const detailPrompt = customPrompt(`
+        <h1>Browser support</h1>
+        <p class="warning">
+          The XIBLE editor requires several browser features which have not landed in every major browser yet.
+        </p>
+        <section id="browserSupportDetails">
+          <h2>Details</h2>
+          <dl>
+            <dt>
+              <label>
+                Shadow DOM v1
+                <div>
+                  Method of establishing and maintaining functional boundaries between DOM trees and how these trees interact with each other within a document, thus enabling better functional encapsulation within the DOM & CSS.
+                  <a href="https://caniuse.com/#feat=shadowdomv1" target="_blank" rel="noopener">caniuse.com</a>
+                </div>
+              </label>
+            </dt>
+            <dd id="browserSupport_attachShadow">
+            </dd>
+
+            <dt>
+              <label>
+                HTML templates
+                <div>
+                  Method of declaring a portion of reusable markup that is parsed but not rendered until cloned.
+                  <a href="https://caniuse.com/#feat=template" target="_blank" rel="noopener">caniuse.com</a>
+                </div>
+              </label>
+            </dt>
+            <dd id="browserSupport_templateElement">
+            </dd>
+
+            <dt>
+              <label>
+                HTML imports
+                <div>
+                  Method of including and reusing HTML documents in other HTML documents.
+                  <a href="https://caniuse.com/#feat=imports" target="_blank" rel="noopener">caniuse.com</a>
+                </div>
+              </label>
+            </dt>
+            <dd id="browserSupport_linkImport">
+            </dd>
+
+            <dt>
+              <label>
+                JavaScript modules via script tag
+                <div>
+                  Loading JavaScript module scripts using &lt;script type=&quot;module&quot;&gt;
+                  <a href="https://caniuse.com/#feat=es6-module" target="_blank" rel="noopener">caniuse.com</a>
+                </div>
+              </label>
+            </dt>
+            <dd id="browserSupport_scriptModule">
+            </dd>
+          </dl>
+        </section>
+        <input type="button" value="Close" />
+      `, true);
+
+      for (const browserSupportItem in xibleEditor.browserSupportItems) {
+        const supported = xibleEditor.browserSupportItems[browserSupportItem];
+        const ddEl = detailPrompt.form.querySelector(`#browserSupport_${browserSupportItem}`);
+        ddEl.appendChild(document.createTextNode(supported ? 'Supported' : 'Not supported'));
+
+        if (!supported) {
+          ddEl.classList.add('error');
+        }
+      }
+
+      detailPrompt.form.querySelector('input').addEventListener('click', () => {
+        detailPrompt.remove();
+      });
+    });
 
     // disable buttons that require input from content in the browser
     document.getElementById('xibleFlowDeployButton').disabled = true;

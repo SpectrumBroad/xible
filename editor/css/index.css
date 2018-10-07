@@ -134,6 +134,7 @@ nav>ul>li>a {
 }
 
 nav>ul>li>a:hover {
+	text-decoration: none;
 	color: #fff;
 	background-color: #5b7cb3;
 }
@@ -190,4 +191,39 @@ header {
 
 header span {
 	color: #aaa;
+}
+
+a {
+	color: #eee;
+	text-decoration: underline;
+}
+
+a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+
+p.hidden {
+	display: none;
+}
+
+p.status, p.warning, dd.warning {
+	border: 1px solid rgba(255, 140, 0, 0.6);
+	background-color: rgba(255, 140, 0, 0.2);
+	padding: 4px;
+	border-radius: 6px;
+}
+
+p.alert, p.error, dd.alert, dd.error {
+	border: 1px solid rgba(255, 0, 0, 0.6);
+	background-color: rgba(255, 0, 0, 0.2);
+	padding: 4px;
+	border-radius: 6px;
+}
+
+p.success, dd.success {
+	border: 1px solid rgba(0, 255, 0, 0.6);
+	background-color: rgba(0, 255, 0, 0.2);
+	padding: 4px;
+	border-radius: 6px;
 }
