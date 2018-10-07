@@ -16,6 +16,10 @@
   height: 56px;
 }
 
+#flowsTable tr.instances {
+  height: auto;
+}
+
 #flowsTable th {
   padding: 0 8px;
   text-align: left;
