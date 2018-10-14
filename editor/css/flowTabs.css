@@ -136,5 +136,5 @@
 }
 
 .flowList li:not(.open):hover {
-	background-image: linear-gradient(to top, #282828, transparent 80%);
+	background-image: linear-gradient(to top, #323232, transparent 80%);
 }
