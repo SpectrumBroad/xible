@@ -349,7 +349,7 @@ const cli = {
                 .publish({
                   name: nodePackName,
                   registry: {
-                    url: `https://registry.npmjs.com/${nodePackName}`
+                    url: `https://registry.npmjs.com/${packageJson.name}`
                   }
                 })
                 .then((publishedNodePack) => {
