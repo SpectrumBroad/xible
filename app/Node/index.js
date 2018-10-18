@@ -928,7 +928,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   */
   class NodeOutput extends NodeIo {
     /**
-    * Triggers an output with type === 'trigger'
+    * Triggers an output with type === 'trigger'.
     * @param {FlowState} state The flowstate at the time of calling.
     * @fires NodeInput#trigger
     * @throws {Error} Throws whenever this.type !== 'trigger'.
