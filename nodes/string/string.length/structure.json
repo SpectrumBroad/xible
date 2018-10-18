@@ -1,0 +1,14 @@
+{
+  "name": "string.length",
+  "description": "Returns the length of all input strings combined.",
+  "inputs": {
+    "strings": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "length": {
+      "type": "math.number"
+    }
+  }
+}
