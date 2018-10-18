@@ -644,22 +644,22 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Raises an error on the node, bubbled to the flow.
+    * Throws an error, with the current state and node appended to the Error object.
     * Calls setTracker() on the node with the error message.
-    * If the flow contains an "error" event listener, the flow will not stop.
-    * This behaviour is demonstrated by including a "xible.node.onerror" node in the flow.
-    * Note that throwing an error using "throw" will always stop the flow.
-    * Raising an error in a node should not trigger any outputs.
+    * If the flowInstance contains an "error" event listener, the flow will not stop,
+    * unless thrown more than once.
+    * This behaviour is demonstrated by including a "xible.flow.instance.on-error" node in the flow.
+    * The differences between regular throwing and this method include;
+    * * The current state is appended to the Error object.
+    * * The current node is appended to the Error object.
+    * * setTracker is invoked so the editor can visualize where the error originated.
     * @param {Error} err An error object to raise.
     * @param {FlowState} err.state Flowstate at point of the error.
     * Either this or the state argument should be provided.
     * @param {FlowState} state Flowstate at point of the error.
     * Either this or the err.state argument should be provided.
-    * @deprecated Deprecated since version 0.15.0.
     */
     error(err, state) {
-      console.warn('Node.error() is deprecated. Use throw instead');
-
       if (!(state instanceof XIBLE.FlowState) && !(err.state instanceof XIBLE.FlowState)) {
         throw new Error('state should be provided and instance of FlowState');
       }
@@ -679,9 +679,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         timeout: 7000
       });
 
-      if (this.flowInstance) {
-        this.flowInstance.emit('error', err);
-      }
+      throw err;
     }
 
     /**
