@@ -64,10 +64,27 @@
 	outline: 0;
 }
 
+#sub ul.tablist {
+	margin-bottom: -10px;
+}
+
 #log {
-	font-family: 'Courier New', Courier, monospace;
+	display: flex;
+	flex-direction: column;
 	height: 100%;
 	flex-shrink: 1;
+}
+
+#log>form {
+	flex-grow: 0;
+	padding: 0;
+}
+
+#log button {
+	display: inline;
+	width: auto;
+	margin: 4px;
+	padding: 6px 0;
 }
 
 #log ul {
@@ -75,6 +92,7 @@
 	overflow-y: scroll;
 	height: 100%;
 	position: relative;
+	font-family: 'Courier New', Courier, monospace;
 }
 
 #log ul:empty::after {

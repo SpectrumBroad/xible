@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   `string.length` node to find the length of all input strings combined.
 
+-   The log in the editor can now be cleared using the "clear" button.
+
 ### Changed
 -   Improved error handling. Throwing an error can now be intercepted by dedicated xible nodes (formerly `xible.node.onerror`). Using `node.error(err, state)` instead of simply throwing remains a valid use as it provides more details as to where the error originated. The `xible.node.error` and `xible.node.onerror` nodes have been renamed to `xible.flow.instance.error` and `xible.flow.instance.on-error` respectively. ([#80](https://github.com/SpectrumBroad/xible/issues/80))
 

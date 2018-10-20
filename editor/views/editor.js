@@ -36,6 +36,10 @@ function editorView(EL) {
         </li>
       </ul>
       <section id="log" class="tabcontents log">
+        <form class="buttons">
+          <button id="logClearButton" type="button">clear</button>
+          <!-- <label class="required"><input type="checkbox" value="true" />wrap<span></span></label> -->
+        </form>
         <ul></ul>
       </section>
       <section class="tabcontents stats" style="display: none;">
@@ -221,6 +225,12 @@ function editorView(EL) {
   logOpenEl.addEventListener('click', switchSubTab);
   statsOpenEl.addEventListener('click', switchSubTab);
   instancesOpenEl.addEventListener('click', switchSubTab);
+
+  // clear log button
+  const logClearButton = document.getElementById('logClearButton');
+  logClearButton.onclick = () => {
+    logUl.innerHTML = '';
+  };
 
   function getParamNames(flow) {
     const paramNames = [];
