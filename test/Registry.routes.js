@@ -14,9 +14,10 @@ const xible = new Xible({
 
 describe('/api/registry', function () {
   before(function () {
+    this.timeout(10000);
     return xible.init();
   });
-  
+
   after(function () {
     return xible.close();
   });

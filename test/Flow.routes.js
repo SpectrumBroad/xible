@@ -14,6 +14,7 @@ const xible = new Xible({
 
 describe('/api/flows', function () {
   before(function () {
+    this.timeout(10000);
     return xible.init();
   });
 
