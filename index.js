@@ -119,6 +119,10 @@ class Xible extends EventEmitter {
           return;
         }
 
+        if (!pid.length) {
+          resolve(false);
+        }
+
         let running;
         try {
           running = process.kill(pid, 0);
@@ -317,7 +321,7 @@ class Xible extends EventEmitter {
     for (const flowId in flows) {
       flows[flowId].deleteAllInstances();
     }
-    
+
     this.stopWeb();
     this.CliQueue.close();
     this.CliQueue.removeFile();
