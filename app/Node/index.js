@@ -789,6 +789,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @returns {Boolean} True if connected, false if not.
     */
     isConnected() {
+      return this.getConnectors().length;
+    }
+
+    /**
+     * Returns a list of all connectors to a NodeIo, including global connections.
+     * @returns {Connector[]} An array of connectors.
+     */
+    getConnectors() {
       let conns = this.connectors;
 
       // check global outputs
@@ -796,11 +804,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         conns = this.node.flow.getGlobalOutputsByType(this.type);
       }
 
-      if (conns.length) {
-        return true;
-      }
-
-      return false;
+      return conns;
     }
   }
 
