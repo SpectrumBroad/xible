@@ -95,7 +95,8 @@ module.exports = (XIBLE) => {
                   configPath: XIBLE.configPath,
                   config: XIBLE.Config.getAll(),
                   flow: this.flow.json,
-                  nodes: XIBLE.nodes
+                  nodes: XIBLE.nodes,
+                  typeDefs: XIBLE.TypeDef.getAll()
                 });
               } else {
                 flowInstanceDebug('flow/worker has init, but no such worker in master');

@@ -98,6 +98,11 @@ process.on('message', async (message) => {
 
         await xible.init();
 
+        // add the typedefs
+        for (const typeDefName in message.typeDefs) {
+          xible.TypeDef.add(message.typeDefs[typeDefName]);
+        }
+
         flow = new xible.Flow();
         flow.initJson(message.flow);
 

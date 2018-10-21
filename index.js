@@ -61,7 +61,7 @@ class Xible extends EventEmitter {
 
     let appNames;
     if (this.child) {
-      appNames = ['Flow', 'FlowInstance', 'FlowState', 'Node'];
+      appNames = ['Flow', 'FlowInstance', 'FlowState', 'Node', 'TypeDef'];
     } else {
       this.initWeb();
       this.persistentWebSocketMessages = {};

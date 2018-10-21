@@ -9,6 +9,7 @@ const path = require('path');
 let express;
 
 const nodeDebug = debug('xible:node');
+const typeSymbol = Symbol('typedef');
 
 module.exports = (XIBLE, EXPRESS_APP) => {
   /**
@@ -627,6 +628,24 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
+     * Relates the given typeDef to a javascript Constructor.
+     * This allows XIBLE to filter input values based on type in the extends chain.
+     * @param {Constructor} constr The constructor to relate the typeDef to.
+     * @param {String|TypeDef} type Type to relate to the constructor.
+     */
+    setTypeDef(constr, typeDef) { // eslint-disable-line class-methods-use-this
+      if (typeof typeDef === 'string') {
+        typeDef = XIBLE.TypeDef.getByName(typeDef);
+      }
+
+      if (!(typeDef instanceof XIBLE.TypeDef)) {
+        throw new TypeError('Argument "typeDef" expected to be string or instanceof TypeDef');
+      }
+
+      constr[typeSymbol] = typeDef;
+    }
+
+    /**
     * Triggers this.error(), but only allows a string argument as error.
     * @param {String} err The error message.
     * @param {FlowState} state Flowstate at point of the failure.
@@ -715,6 +734,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       this.name = null;
       this.type = null;
+      this.typeDef = null;
       this.structureType = null;
       this.assignsOutputTypes = [];
       this.assignsInputTypes = [];
@@ -771,7 +791,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     toJSON() {
-      const ignore = ['domain', '_events', '_eventsCount', '_maxListeners', 'node', 'connectors'];
+      const ignore = ['domain', '_events', '_eventsCount', '_maxListeners', 'typeDef', 'node', 'connectors'];
       const jsonObj = {};
       const objectKeys = Object.keys(this);
       for (let i = 0; i < objectKeys.length; i += 1) {
@@ -823,6 +843,20 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   */
   class NodeInput extends NodeIo {
     /**
+     * Checks whether any given value matches the typeDef on this NodeInput.
+     * Also returns true if the given value equals undefined or null.
+     * When there is no typeDef related to the constructor of the value, this also returns true.
+     * @params {*} value The value to match against the typeDef.
+     * @returns {Boolean}
+     */
+    matchesTypeDef(value) {
+      return value === undefined
+      || value === null
+      || !value.constructor[typeSymbol]
+      || this.typeDef.matches(value.constructor[typeSymbol]);
+    }
+
+    /**
     * Fetches all input values for this input.
     * @param {FlowState} state The flowstate at the time of calling.
     * @fires NodeOutput#trigger
@@ -833,6 +867,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     */
     getValues(state) {
       Node.flowStateCheck(state);
+
+      if (!this.typeDef) {
+        this.typeDef = XIBLE.TypeDef.getByName(this.type);
+      }
 
       return new Promise((resolve) => {
         let conns = this.connectors;
@@ -870,7 +908,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           }
 
           let calledBack = false;
-          const callbackFn = (value) => { // eslint-disable-line
+          const callbackFn = (cbValue) => { // eslint-disable-line no-loop-func
             // verify that this callback wasn't already made.
             if (calledBack) {
               throw new Error('Already called back');
@@ -880,12 +918,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             /* we only send arrays between nodes
              * we don't add non existant values
              * we concat everything
+             * values must match this typeDef if a typeDef is set on their constructor
              */
-            if (value !== undefined) {
-              if (Array.isArray(value)) {
-                values = values.concat(value);
-              } else {
-                values.push(value);
+            if (cbValue !== undefined) {
+              if (Array.isArray(cbValue)) {
+                values = values.concat(cbValue.filter(value => this.matchesTypeDef(value)));
+              } else if (this.matchesTypeDef(cbValue)) {
+                values.push(cbValue);
               }
             }
 

@@ -1,0 +1,17 @@
+{
+  "name": "input.filter-type",
+  "type": "object",
+  "description": "Filters data based on the given type.",
+  "inputs": {
+    "any": {
+      "type": "object",
+      "description": "The values to filter."
+    }
+  },
+  "outputs": {
+    "filtered": {
+      "type": "object",
+      "description": "Filtered values from the 'any' input."
+    }
+  }
+}

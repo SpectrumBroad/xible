@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   `string.length` node to find the length of all input strings combined.
 
+-   TypeDefs can be related to javascript constructors, so that it is now possible for XIBLE to filter input values based on the typeDef in the extends chain. The typeDef of a value can be set by assigning a typeDef to the constructor of that value using [`Node.setTypeDef(Constr, type)`](https://xible.io/docs/api/node#node.setTypeDef). As a result, node inputs and outputs can now be connected as long as either side is in the extends chain of the other side. If an output is lower in the extends chain than the input, the values will be filtered to match at least the extends level of the input.
+
+-   Added a `input.filter-type` node to return values from a specific type only.
+
 -   The log in the editor can now be cleared using the "clear" button.
 
 ### Changed

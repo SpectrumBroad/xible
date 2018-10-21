@@ -1,0 +1,18 @@
+<input
+	type="text"
+	placeholder="type"
+	data-output-value="filterType"
+  required="required"
+  list="types"
+	value="object"
+/>
+<script>
+  const filterTypeSelect = document.querySelector('input');
+	const anyIn = this.getInputByName('any');
+  const filteredOut = this.getOutputByName('filtered');
+
+  filterTypeSelect.oninput = () => {
+    anyIn.setType(filterTypeSelect.value);
+		filteredOut.setType(filterTypeSelect.value);
+  };
+</script>
