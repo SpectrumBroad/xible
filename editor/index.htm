@@ -53,7 +53,7 @@
     xibleWrapper.on('error', (err) => {
       console.log(err);
     });
-  
+
     xibleWrapper.on('open', () => {
       xibleWrapper.Config.getValue('editor.settings.visible')
       .then((settingsVisible) => {

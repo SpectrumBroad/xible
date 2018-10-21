@@ -278,11 +278,7 @@ class XibleEditor extends EventEmitter {
         if (json.flowId === this.loadedFlow._id) {
           const logUl = document.querySelector('#log ul');
           const logLi = document.createElement('li');
-          if (logUl.firstChild) {
-            logUl.insertBefore(logLi, logUl.firstChild);
-          } else {
-            logUl.appendChild(logLi);
-          }
+          logUl.appendChild(logLi);
           logLi.classList.add('red');
 
           const dateSpan = logLi.appendChild(document.createElement('span'));
@@ -290,13 +286,12 @@ class XibleEditor extends EventEmitter {
           dateSpan.innerHTML = new Date().toISOString();
 
           if (json.error.stack) {
-            json.error.stack.split('\n').forEach((stackLine) => {
-              logLi.appendChild(document.createTextNode(stackLine));
-              logLi.appendChild(document.createElement('br'));
-            });
+            logLi.appendChild(document.createTextNode(json.error.stack));
           } else {
-            logLi.appendChild(document.createTextNode(`${json.error.constructorName} json.error.message`));
+            logLi.appendChild(document.createTextNode(`${json.error.constructorName} ${json.error.message}`));
           }
+
+          logLi.scrollIntoView(false);
         }
         break;
 
@@ -306,11 +301,7 @@ class XibleEditor extends EventEmitter {
         // TODO: this needs to be handled by the view, not XibleEditor.
         const logUl = document.querySelector('#log ul');
         const logLi = document.createElement('li');
-        if (logUl.firstChild) {
-          logUl.insertBefore(logLi, logUl.firstChild);
-        } else {
-          logUl.appendChild(logLi);
-        }
+        logUl.appendChild(logLi);
 
         if (json.status.color) {
           logLi.classList.add(json.status.color);
@@ -321,6 +312,8 @@ class XibleEditor extends EventEmitter {
         dateSpan.innerHTML = new Date().toISOString();
 
         logLi.appendChild(document.createTextNode(json.status.message));
+
+        logLi.scrollIntoView(false);
         break;
       }
 
