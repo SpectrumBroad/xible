@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
 ### Added
--   The `timing` object for flow instances now also contains the `createDate`, `initDate` and `startDate` properties. These contain a Date.now() property for their respective dates. This allows you to track exactly when a flow instance was started.
+-   The `timing` object for flow instances now also contains the `createDate`, `initDate` and `startDate` properties. These contain a `Date.now()` property for their respective dates. This allows you to track exactly when a flow instance was started.
 
 -   On the 'flows' view, you can now select a flow to view the details of that flow. This includes state, parameters, resource graphs and more.
 
