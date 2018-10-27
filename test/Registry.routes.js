@@ -40,10 +40,16 @@ describe('/api/registry', function () {
 
   describe('PATCH /nodepacks/stream/install', function () {
     this.timeout(120000);
-    it('should install nodepack', function () {
-      return supertest(xible.expressApp)
+    it('should install nodepack', async function () {
+      const res = await supertest(xible.expressApp)
       .patch('/api/registry/nodepacks/stream/install')
       .expect(200);
+
+      // cleanup
+      await supertest(xible.expressApp)
+      .delete('/api/nodepacks/stream');
+
+      return res;
     });
   });
 });
