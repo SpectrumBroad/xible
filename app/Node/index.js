@@ -853,7 +853,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return value === undefined
       || value === null
       || !value.constructor[typeSymbol]
-      || this.typeDef.matches(value.constructor[typeSymbol]);
+      || (this.typeDef && this.typeDef.matches(value.constructor[typeSymbol]));
     }
 
     /**
