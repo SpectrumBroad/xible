@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Changed
+-   The `xible config list` command now returns a human readable key-value list. The key nesting is identified by dots, must like json paths and how `xible config set` and `xible config get` already worked. A `xible config json` command has been added which sticks to the previous behaviour and simply prints the actual JSON (formatted) config. ([#23](https://github.com/SpectrumBroad/xible/issues/23))
 
 ## [0.15.0][] - 2018-10-27
 ### Added

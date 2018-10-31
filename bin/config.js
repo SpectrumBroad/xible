@@ -4,6 +4,27 @@ const {
   log
 } = require('./log');
 
+/**
+ * Returns a given object as a human readable key value list.
+ * @param {Object} obj
+ * @returns {String[]}
+ */
+function configList(obj, pre) {
+  let returnArr = [];
+  pre = pre ? `${pre}.` : '';
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      returnArr.push(`${pre}${key} = "${obj[key].replace(/"/g, '\\"')}"`);
+    } else if (typeof obj[key] !== 'object') {
+      returnArr.push(`${pre}${key} = ${obj[key]}`);
+    } else {
+      returnArr = returnArr.concat(configList(obj[key], `${pre}${key}`));
+    }
+  }
+
+  return returnArr;
+}
+
 module.exports = XIBLE => (
   {
     set(arg, value) {
@@ -41,8 +62,12 @@ module.exports = XIBLE => (
       log(XIBLE.Config.getValue(arg));
       return Promise.resolve();
     },
-    list() {
+    json() {
       log(JSON.stringify(XIBLE.Config.getAll(), null, '\t'));
+      return Promise.resolve();
+    },
+    list() {
+      log(configList(XIBLE.Config.getAll()).join('\n'));
       return Promise.resolve();
     }
   }
