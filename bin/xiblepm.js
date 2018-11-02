@@ -655,7 +655,9 @@ cli.config = require('./config')(xible);
 
 function printUsage(path) {
   if (context !== 'help') {
-    if (cli[context]) {
+    if (cli[context] && !command) {
+      logError('A command is required for this context\n');
+    } else if (cli[context]) {
       logError(`Unrecognized command: "${command}"\n`);
     } else {
       logError(`Unrecognized context: "${context}"\n`);
