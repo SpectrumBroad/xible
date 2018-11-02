@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
 ### Added
+-   Some of the nodes that came with XIBLE by default have been moved to their own respective nodepacks. ([#79](https://github.com/SpectrumBroad/xible/issues/79))
+
+-   Several nodepacks are now installed by default when installing a fresh copy of XIBLE. ([#78](https://github.com/SpectrumBroad/xible/issues/78))
+
 -   When logging in on the registry using the `xiblepm user login` command, the user gets confirmed which user is now logged on, including the registry url. The same goes for adding a new account using `xiblepm user add`.
 
 ### Changed

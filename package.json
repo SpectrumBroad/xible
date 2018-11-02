@@ -32,6 +32,7 @@
     "javascript"
   ],
   "scripts": {
+    "install": "node ./bin/xible-postinstall.js",
     "start": "node ./bin/xible.js server start",
     "debug": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon ./bin/xible.js server start",
     "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/xible.js server start",
