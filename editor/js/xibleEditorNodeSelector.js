@@ -123,7 +123,7 @@ class XibleEditorNodeSelector {
     });
 
     // open the node menu on double click
-    const openOnMouseEvent = (event) => {
+    this._openOnMouseEvent = (event) => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -135,31 +135,14 @@ class XibleEditorNodeSelector {
         this.open(event);
       }
     };
-    this.xibleEditor.element.addEventListener('contextmenu', openOnMouseEvent);
-    this.xibleEditor.element.addEventListener('dblclick', openOnMouseEvent);
+    this.xibleEditor.element.addEventListener('contextmenu', this._openOnMouseEvent);
+    this.xibleEditor.element.addEventListener('dblclick', this._openOnMouseEvent);
 
     // hide the nodeSelector element if selection moves elsewhere
-    let mouseDownEventHandler;
-    document.body.addEventListener('mousedown', mouseDownEventHandler = (event) => {
+    document.body.addEventListener('mousedown', this._mouseDownEventHandler = (event) => {
       if (!div.classList.contains('hidden') && !div.contains(event.target) && !detailDiv.contains(event.target)) {
         this.close();
       }
-    });
-
-    // clean out elements/handlers hooked to document.body
-    // when this view gets removed
-    mainViewHolder.once('purge', () => {
-      if (detailDiv && detailDiv.parentNode) {
-        document.body.removeChild(detailDiv);
-        detailDiv = null;
-      }
-
-      if (div && div.parentNode) {
-        document.body.removeChild(div);
-        div = null;
-      }
-
-      document.body.removeEventListener('mousedown', mouseDownEventHandler);
     });
 
     // check what the default hide of the node selector is
@@ -169,6 +152,26 @@ class XibleEditorNodeSelector {
 
     // hide the div
     div.classList.add('hidden');
+  }
+
+  /**
+   * Destroy this instance of the node selector.
+   */
+  destroy() {
+    if (this.detailDiv && this.detailDiv.parentNode) {
+      document.body.removeChild(this.detailDiv);
+      this.detailDiv = null;
+    }
+
+    if (this.div && this.div.parentNode) {
+      document.body.removeChild(this.div);
+      this.div = null;
+    }
+
+    this.xibleEditor.element.removeEventListener('contextmenu', this._openOnMouseEvent);
+    this.xibleEditor.element.removeEventListener('dblclick', this._openOnMouseEvent);
+
+    document.body.removeEventListener('mousedown', this._mouseDownEventHandler);
   }
 
   /**
@@ -436,9 +439,12 @@ class XibleEditorNodeSelector {
         ((event.pageY - actionsOffset.top - this.xibleEditor.top) / this.xibleEditor.zoom) -
         (editorNode.element.firstChild.offsetHeight / 2)
       );
+
       this.xibleEditor.deselect();
       this.xibleEditor.select(editorNode);
       this.xibleEditor.initDrag(event);
+
+      event.stopPropagation();
 
       this.close();
     });

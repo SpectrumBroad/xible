@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   The `xible config list` command now returns a human readable key-value list. The key nesting is identified by dots, must like json paths and how `xible config set` and `xible config get` already worked. A `xible config json` command has been added which sticks to the previous behaviour and simply prints the actual JSON (formatted) config. ([#23](https://github.com/SpectrumBroad/xible/issues/23))
 
+### Fixed
+-   Improved selection handling in the editor.
+
 ## [0.15.0][] - 2018-10-27
 ### Added
 -   The `timing` object for flow instances now also contains the `createDate`, `initDate` and `startDate` properties. These contain a `Date.now()` property for their respective dates. This allows you to track exactly when a flow instance was started.

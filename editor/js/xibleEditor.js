@@ -7,14 +7,15 @@ class XibleEditor extends EventEmitter {
     this.xibleWrapper = xibleWrapper;
 
     // remove all editor statuses when connection closes
-    xibleWrapper.on('close', () => {
+    xibleWrapper.on('close', this._xibleWrapperCloseListener = () => {
       if (!this.loadedFlow) {
         return;
       }
       this.loadedFlow.removeAllStatuses();
     });
 
-    xibleWrapper.on('message', (message) => {
+    xibleWrapper.on('message', this._xibleWrapperMessageListener = (message) => {
+      console.log('msg')
       this.messageHandler(message);
     });
 
@@ -185,6 +186,12 @@ class XibleEditor extends EventEmitter {
 
     node.editor = this;
     node.emit('append');
+  }
+
+  disableNodeSelector() {
+    if (this.nodeSelector) {
+      this.nodeSelector.destroy();
+    }
   }
 
   enableNodeSelector() {
@@ -849,13 +856,24 @@ class XibleEditor extends EventEmitter {
     });
   }
 
+  disableSelection() {
+    document.body.removeEventListener('mousedown', this._selectionMouseDownListener);
+    document.body.removeEventListener('mousedown', this._selectionMouseUpListener);
+    document.body.removeEventListener('keydown', this._selectionKeyDownListener);
+  }
+
   /**
   * This methods enables the ability of selecting items in the editor.
   */
   enableSelection() {
     // mousedown
-    document.body.addEventListener('mousedown', (event) => {
+    document.body.addEventListener('mousedown', this._selectionMouseDownListener = (event) => {
       if (!this.loadedFlow || event.button !== 0 || event.shiftKey) {
+        return;
+      }
+
+      if (this.element !== event.target && !this.element.contains(event.target)) {
+        this.deselect();
         return;
       }
 
@@ -867,11 +885,13 @@ class XibleEditor extends EventEmitter {
         this.initAreaSelector(event);
       } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
         this.initDrag(event);
+      } else {
+        this.deselect();
       }
     });
 
     // mouseup
-    document.body.addEventListener('mouseup', (event) => {
+    document.body.addEventListener('mouseup', this._selectionMouseUpListener = (event) => {
       if (!this.loadedFlow) {
         return;
       }
@@ -947,7 +967,7 @@ class XibleEditor extends EventEmitter {
     });
 
     // key handlers
-    document.body.addEventListener('keydown', (event) => {
+    document.body.addEventListener('keydown', this._selectionKeyDownListener = (event) => {
       if (!this.loadedFlow || XibleEditor.isInputElement(event.target)) {
         return;
       }
@@ -1018,9 +1038,8 @@ class XibleEditor extends EventEmitter {
         case 'c':
           if (event.ctrlKey && this.selection.length) {
             this.copySelection = this.duplicate(this.selection);
+            event.preventDefault();
           }
-
-          event.preventDefault();
 
           break;
 
@@ -1173,6 +1192,10 @@ class XibleEditor extends EventEmitter {
     return newSelection;
   }
 
+  disableZoom() {
+    this.element.removeEventListener('wheel', this._zoomWheelListener);
+  }
+
   /**
   * Enables zooming using the scrollwheel in the editor.
   */
@@ -1180,7 +1203,7 @@ class XibleEditor extends EventEmitter {
     this.zoom = 1;
 
     // trigger zoom from scrollwheel
-    this.element.addEventListener('wheel', (event) => {
+    this.element.addEventListener('wheel', this._zoomWheelListener = (event) => {
       // prevent default browser action; scroll
       event.preventDefault();
 
@@ -1210,6 +1233,11 @@ class XibleEditor extends EventEmitter {
     });
   }
 
+  disablePan() {
+    this.element.removeEventListener('mousedown', this._panMouseDownListener);
+    document.body.removeEventListener('mouseup', this._panMouseUpListener);
+  }
+
   /**
   * Enables panning by holding down the scrollwheel.
   */
@@ -1220,7 +1248,7 @@ class XibleEditor extends EventEmitter {
     this.backgroundTop = 0;
 
     let mousePanFunction;
-    this.element.addEventListener('mousedown', (event) => {
+    this.element.addEventListener('mousedown', this._panMouseDownListener = (event) => {
       if (
         mousePanFunction ||
         (event.button === 0 && !event.shiftKey) ||
@@ -1261,7 +1289,7 @@ class XibleEditor extends EventEmitter {
 
 
     // unhook eventhandler created on mousedown
-    document.body.addEventListener('mouseup', () => {
+    document.body.addEventListener('mouseup', this._panMouseUpListener = () => {
       if (!mousePanFunction) {
         return;
       }
@@ -1273,10 +1301,14 @@ class XibleEditor extends EventEmitter {
     });
   }
 
+  disableHook() {
+    document.body.removeEventListener('mouseup', this._hookMouseUpListener);
+  }
+
   // enable hooking of connectors
   enableHook() {
     // triggered when shuffling completes
-    document.body.addEventListener('mouseup', () => {
+    document.body.addEventListener('mouseup', this._hookMouseUpListener = () => {
       if (!this.dummyXibleConnectors || !this.dummyXibleNode) {
         return;
       }
@@ -1291,6 +1323,19 @@ class XibleEditor extends EventEmitter {
       // ensure we deselect the dummyXibleNode
       this.deselect();
     });
+  }
+
+  destroy() {
+    this.disableSelection();
+    this.disableHook();
+    this.disablePan();
+    this.disableZoom();
+    this.disableNodeSelector();
+
+    this.xibleWrapper.removeListener('close', this._xibleWrapperCloseListener);
+    this.xibleWrapper.removeListener('message', this._xibleWrapperMessageListener);
+
+    this.loadedFlow = null;
   }
 
   static get inputElementNameList() {
