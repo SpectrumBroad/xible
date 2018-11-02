@@ -15,7 +15,6 @@ class XibleEditor extends EventEmitter {
     });
 
     xibleWrapper.on('message', this._xibleWrapperMessageListener = (message) => {
-      console.log('msg')
       this.messageHandler(message);
     });
 
