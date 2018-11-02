@@ -571,7 +571,13 @@ module.exports = (NODE) => {
         }
       }
 
-      return setUserToken(token);
+      await setUserToken(token);
+
+      const strippedRegUrl = getStrippedRegistryUrl();
+      log(`Logged in as "${userName}" on "${strippedRegUrl}".`);
+    },
+    create() {
+      return this.add();
     },
     register() {
       return this.add();
@@ -646,7 +652,10 @@ module.exports = (NODE) => {
         throw 'No token returned.';
       }
 
-      return setUserToken(token);
+      await setUserToken(token);
+
+      const strippedRegUrl = getStrippedRegistryUrl();
+      log(`Logged in as "${userName}" on "${strippedRegUrl}".`);
     }
   }
 };
