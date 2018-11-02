@@ -75,16 +75,17 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   };
 
   /**
-  * Installs a nodepack from a registry.
-  * @returns {Promise}
-  */
-  xibleRegistry.NodePack.prototype.install = function nodePackInstall() {
+   * Installs a nodepack from a registry.
+   * @param {String} [nodePath] An alternative path to the path fetched from config.
+   * @returns {Promise}
+   */
+  xibleRegistry.NodePack.prototype.install = function nodePackInstall(nodePath) {
     if (!XIBLE.Config.getValue('registry.nodepacks.allowinstall')) {
       return Promise.reject('Your config does not allow to install nodepacks from the registry');
     }
 
     let tmpRegDir;
-    let nodePath = XIBLE.Config.getValue('nodes.path');
+    nodePath = nodePath || XIBLE.Config.getValue('nodes.path');
     if (!nodePath) {
       return Promise.reject('no "nodes.path" configured');
     }
