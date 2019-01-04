@@ -69,7 +69,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           reject(err);
           return;
         }
-        resolve();
+
+        resolve(XIBLE.Flow.initOneFromPath(flowPath, `${this._id}.json`, true));
       });
     });
   };

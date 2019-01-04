@@ -160,31 +160,31 @@ if (userToken) {
 // cli context and commands
 const cli = {
   flow: {
-    publish(flowName) {
+    async publish(flowName) {
       if (!flowName) {
-        return Promise.reject('The flow name must be provided');
+        throw 'The flow name must be provided';
       }
 
       if (!xible.Config.getValue('registry.flows.allowpublish')) {
-        return Promise.reject('Your config does not allow to publish flows to the registry');
+        throw 'Your config does not allow to publish flows to the registry';
       }
 
       let flowPath = xible.Config.getValue('flows.path');
       if (!flowPath) {
-        return Promise.reject('no "flows.path" configured');
+        throw 'no "flows.path" configured';
       }
       flowPath = xible.resolvePath(flowPath);
-      xible.Flow.initFromPath(flowPath, true);
+      await xible.Flow.initFromPath(flowPath, true);
       const flow = xible.getFlowById(flowName);
       if (!flow) {
-        return Promise.reject(`No such flow "${flowName}"`);
+        throw `No such flow "${flowName}"`;
       }
 
       let flowJson = flow.json;
       const altFlowId = opts.altname;
       if (altFlowId) {
         if (!xible.Flow.validateId(altFlowId)) {
-          return Promise.reject('flow _id/name cannot contain reserved/unsave characters');
+          throw 'flow _id/name cannot contain reserved/unsave characters';
         }
         flowJson = Object.assign({}, flowJson);
         flowJson._id = altFlowId;
@@ -194,7 +194,7 @@ const cli = {
       // verify that we have a token
       const token = getUserToken();
       if (!token) {
-        return Promise.reject('You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.');
+        throw 'You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.';
       }
 
       // verify that we're logged in
@@ -225,38 +225,45 @@ const cli = {
         });
       });
     },
-    install(flowName) {
+    async install(flowName) {
       if (!flowName) {
-        return Promise.reject('The flow name must be provided');
+        throw 'The flow name must be provided';
       }
 
       if (!xible.Config.getValue('registry.flows.allowinstall')) {
-        return Promise.reject('Your config does not allow to install flows from the registry');
+        throw 'Your config does not allow to install flows from the registry';
       }
 
-      const altFlowId = opts.altname;
+      const altFlowName = opts.altname;
+      if (altFlowName && !xible.Flow.validateId(altFlowName)) {
+        throw 'flow _id/name cannot contain reserved/unsave characters';
+      }
+
       let flowPath = xible.Config.getValue('flows.path');
       if (!flowPath) {
-        return Promise.reject('no "flows.path" configured');
+        throw 'no "flows.path" configured';
       }
       flowPath = xible.resolvePath(flowPath);
-      xible.Flow.initFromPath(flowPath);
-      const flow = xible.getFlowById(altFlowId || flowName);
+      await xible.Flow.initFromPath(flowPath);
+      const flow = xible.getFlowById(altFlowName || flowName);
 
       // check if the flow already exists
       if (flow && !opts.force) {
-        return Promise.reject('A flow already exists by this name. Provide --force to overwrite.');
+        throw 'A flow already exists by this name. Provide --force to overwrite.';
       }
 
-      return xible.Registry.Flow
-      .getByName(flowName)
-      .then((registryFlow) => {
-        if (!registryFlow) {
-          return Promise.reject(`Flow "${flowName}" does not exist`);
-        }
-        return registryFlow.install(altFlowId)
-        .then(() => log(`Installed flow "${altFlowId || registryFlow.name}"`));
+      const registryFlow = await xible.Registry.Flow.getByName(flowName);
+      if (!registryFlow) {
+        throw `Flow "${flowName}" does not exist`;
+      }
+
+      xible.CliQueue.add({
+        method: 'registry.flow.install',
+        registryFlowName: flowName,
+        altFlowName
       });
+
+      log(`Installed flow "${altFlowName || registryFlow.name}"`);
     },
     search(str) {
       if (!str) {

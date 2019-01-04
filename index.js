@@ -205,7 +205,7 @@ class Xible extends EventEmitter {
     if (!obj || !obj.nodeNames) {
       const flowPath = this.Config.getValue('flows.path');
       if (flowPath) {
-        this.Flow.init(this.resolvePath(flowPath));
+        await this.Flow.init(this.resolvePath(flowPath));
       }
     }
   }

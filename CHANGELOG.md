@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The `xiblepm nodepack publish` command now informs the user of the published version, after completion. ([#44](https://github.com/SpectrumBroad/xible/issues/44))
 
+-   The UI now allows users to search and install flows from the registry. This feature can be found in the 'Flows' section of your XIBLE installation. ([#20](https://github.com/SpectrumBroad/xible/issues/20))
+
 ### Changed
 -   The `xible config list` command now returns a human readable key-value list. The key nesting is identified by dots, must like json paths and how `xible config set` and `xible config get` already worked. A `xible config json` command has been added which sticks to the previous behaviour and simply prints the actual JSON (formatted) config. ([#23](https://github.com/SpectrumBroad/xible/issues/23))
 

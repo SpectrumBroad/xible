@@ -68,12 +68,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Init flows from a given path.
     * This will parse all json files except for _status.json into flows.
     * Note that a path cannot be initiated twice because it is used for saveStatuses()
-    * @param {String} path The path to the directory containing the flows.
+    * @param {String} flowPath The path to the directory containing the flows.
     * @param {Boolean} cleanVault Indicates whether the json data from each flow
     * needs vault sanitizing.
-    * @return {Object.<String, Flow>} List of flows by their _id.
+    * @return {Promise.<Object.<String, Flow>>} List of flows by their _id.
     */
-    static initFromPath(flowPath, cleanVault) {
+    static async initFromPath(flowPath, cleanVault) {
       flowDebug(`init flows from "${flowPath}"`);
       if (this.flowPath) {
         throw new Error(`cannot init multiple flow paths. "${this.flowPath}" already init`);
@@ -98,37 +98,77 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         files = [];
       }
 
-      // get the flows and load them
-      for (let i = 0; i < files.length; i += 1) {
-        const filepath = `${flowPath}/${files[i]}`;
-
-        // only fetch json files but ignore _status.json and hidden files
-        if (files[i].substring(0, 1) !== '_' && files[i].substring(0, 1) !== '.' && fs.statSync(filepath).isFile() && path.extname(filepath) === '.json') {
-          try {
-            const json = JSON.parse(fs.readFileSync(filepath));
-            if (json._id) {
-              const flow = new Flow(XIBLE);
-              flow.initJson(json, cleanVault);
-              flows[flow._id] = flow;
-            }
-          } catch (err) {
-            flowDebug(`could not init "${filepath}": ${err.stack}`);
+      await Promise.all(files.map(async (file) => {
+        try {
+          const flow = await this.initOneFromPath(flowPath, file, cleanVault);
+          if (flow) {
+            flows[flow._id] = flow;
           }
+        } catch (err) {
+          flowDebug(`could not init "${file}": ${err.stack}`);
         }
-      }
+      }));
 
       return flows;
+    }
+
+    /**
+     * Init a single flow from a given path and filename.
+     * This will parse the json file into a flows.
+     * @param {String} flowPath The path to the directory containing the fileName.
+     * @param {String} fileName The name of the file to to parse.
+     * @param {Boolean} cleanVault Indicates whether the json data from each flow
+     * needs vault sanitizing.
+     * @returns {Promise.<Flow>} A single Flow object.
+     * @since 0.16.0
+     */
+    static initOneFromPath(flowPath, fileName, cleanVault) {
+      return new Promise((resolve, reject) => {
+        if (flowPath !== this.flowPath) {
+          reject(new Error(`flowPath "${this.flowPath}" already initialized and differs from "${flowPath}"`));
+          return;
+        }
+
+        const filePath = `${flowPath}/${fileName}`;
+
+        if (
+          fileName.substring(0, 1) !== '_'
+          && fileName.substring(0, 1) !== '.'
+          && fs.statSync(filePath).isFile()
+          && path.extname(filePath) === '.json'
+        ) {
+          fs.readFile(filePath, { encoding: 'utf8' }, (err, data) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+
+            try {
+              const json = JSON.parse(data);
+              if (json._id) {
+                const flow = new Flow();
+                flow.initJson(json, cleanVault);
+                resolve(flow);
+              }
+            } catch (flowParseErr) {
+              reject(flowParseErr);
+            }
+          });
+        } else {
+          resolve();
+        }
+      });
     }
 
     /**
     * Initializes all flows from a given path, by running them through initFromPath().
     * Processes the related flow statuses and starts/inits where necessary.
     * @param {String} flowPath The path to the directory containing the flows.
-    * @return {Object.<String, Flow>} List of flows by their _id.
+    * @returns {Promise.<Object.<String, Flow>>} List of flows by their _id.
     * @since 0.5.0
     */
-    static init(flowPath) {
-      const flows = this.initFromPath(flowPath);
+    static async init(flowPath) {
+      const flows = await this.initFromPath(flowPath);
 
       // start all flows which had status running before
       // also do some cleaning while we're at it

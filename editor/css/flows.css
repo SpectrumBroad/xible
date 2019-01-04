@@ -1,18 +1,56 @@
 #xibleFlowCreateButton::before {
   font-family: awesome;
-	display: block;
-	margin-bottom: 6px;
-	content: "\f067";
+  display: block;
+  margin-bottom: 6px;
+  content: "\f067";
 }
 
-#flowsTable {
+#flowsContent h2 {
+  cursor: pointer;
+}
+
+#flowsContent h2 span {
+  font-family: awesome;
+  font-size: 0.9em;
+  opacity: 0.5;
+}
+
+#flowsContent h2:hover span {
+  opacity: 1.0;
+}
+
+#flowsInstalledSection>div,
+#flowsRegistrySection>div {
+  display: none;
+}
+
+#flowsInstalledSection h2 span::before,
+#flowsRegistrySection h2 span::before {
+  display: inline;
+  content: '\f13a';
+}
+
+#flowsInstalledSection.open>div,
+#flowsRegistrySection.open>div {
+  display: block;
+}
+
+#flowsInstalledSection.open h2 span::before,
+#flowsRegistrySection.open h2 span::before {
+  display: inline;
+  content: '\f139';
+}
+
+#flowsTable,
+#registryFlowsTable {
   width: 100%;
   border-spacing: 0;
   font-size: 0.7em;
   table-layout: fixed;
 }
 
-#flowsTable tr {
+#flowsTable tr,
+#registryFlowsTable tr {
   height: 56px;
 }
 
@@ -20,12 +58,14 @@
   height: auto;
 }
 
-#flowsTable th {
+#flowsTable th,
+#registryFlowsTable th {
   padding: 0 8px;
   text-align: left;
 }
 
-#flowsTable td {
+#flowsTable td,
+#registryFlowsTable td {
   border-top: 1px solid #222;
   padding: 0 8px;
   box-sizing: border-box;
@@ -210,10 +250,12 @@ table button {
   text-align: right;
 }
 
-#flowsTable .actions {
+#flowsTable .actions,
+#registryFlowsTable .actions {
   text-align: right;
 }
 
-#flowsTable td.actions {
+#flowsTable td.actions
+#registryFlowsTable td.actions {
   padding: 0 8px;
 }

@@ -16,40 +16,83 @@ View.routes['/flows'] = (EL) => {
           <input type="text" placeholder="filter" id="filter" />
         </form>
       </section>
-      <!--
       <section>
         <h1>Registry</h1>
-        <form>
-          <input type="text" placeholder="search" id="search" />
+        <form id="subRegistryFlowSearchForm">
+          <input type="text" placeholder="search" id="subRegistrySearchInput" />
           <button type="submit">Search</button>
         </form>
       </section>
-      -->
     </div>
     <div class="inner" id="flowsContent">
       <section>
         <h1>Flows</h1>
-        <table id="flowsTable">
-          <colgroup>
-            <col style="width: 20%;" />
-            <col style="width: 10%;" />
-            <col style="width: 30%;" />
-            <col style="width: 40%;" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>name</th>
-              <th class="instances">instances</th>
-              <th>state</th>
-              <th class="actions">actions</th>
-            </tr>
-          </thead>
-          <tbody id="flowsTbody">
-          </tbody>
-        </table>
+        <section id="flowsInstalledSection" class="open">
+          <h2 id="flowsInstalledHeading">Installed <span></span></h2>
+          <div>
+            <table id="flowsTable">
+              <colgroup>
+                <col style="width: 20%;" />
+                <col style="width: 10%;" />
+                <col style="width: 30%;" />
+                <col style="width: 40%;" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>name</th>
+                  <th class="instances">instances</th>
+                  <th>state</th>
+                  <th class="actions">actions</th>
+                </tr>
+              </thead>
+              <tbody id="flowsTbody">
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section id="flowsRegistrySection">
+          <h2 id="flowsRegistryHeading">Registry <span></span></h2>
+          <form id="registryFlowSearchForm">
+            <input type="text" placeholder="search" id="registrySearchInput" />
+          </form>
+          <div>
+            <p id="registryFlowsNoResultsWarning" class="warning" style="display: none;">
+              Your search yielded no results.
+            </p>
+            <table id="registryFlowsTable" style="display: none;">
+              <colgroup>
+                <col style="width: 60%;" />
+                <col style="width: 40%;" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>name</th>
+                  <th class="actions">actions</th>
+                </tr>
+              </thead>
+              <tbody id="registryFlowsTbody">
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </div>
   `;
+
+  const flowsInstalledHeading = document.getElementById('flowsInstalledHeading');
+  const flowsInstalledSection = document.getElementById('flowsInstalledSection');
+  const flowsRegistryHeading = document.getElementById('flowsRegistryHeading');
+  const flowsRegistrySection = document.getElementById('flowsRegistrySection');
+  const registryFlowsNoResultsWarning = document.getElementById('registryFlowsNoResultsWarning');
+  const registryFlowsTable = document.getElementById('registryFlowsTable');
+
+  flowsInstalledHeading.addEventListener('click', () => {
+    flowsInstalledSection.classList.toggle('open');
+  });
+
+  flowsRegistryHeading.addEventListener('click', () => {
+    flowsRegistrySection.classList.toggle('open');
+  });
 
   document.getElementById('xibleFlowCreateButton').addEventListener('click', async () => {
     await mainViewHolder.navigate('/editor');
@@ -61,25 +104,115 @@ View.routes['/flows'] = (EL) => {
     addButton.click();
   });
 
+  const registryFlowsTbody = document.getElementById('registryFlowsTbody');
+  const subRegistryFlowSearchInput = document.getElementById('subRegistrySearchInput');
+  const registryFlowSearchInput = document.getElementById('registrySearchInput');
+  const subRegistryFlowSearchForm = document.getElementById('subRegistryFlowSearchForm');
+  const registryFlowSearchForm = document.getElementById('registryFlowSearchForm');
+
+  async function installFlowByName(flowName) {
+    await xibleWrapper.Registry.installFlowByName(flowName);
+    await populateFlows();
+
+    mainViewHolder.navigate(`/flows/${encodeURIComponent(flowName)}`);
+  }
+
+  async function searchRegistryFlows(searchString) {
+    registryFlowsTbody.innerHTML = '';
+    flowsInstalledSection.classList.remove('open');
+    flowsRegistrySection.classList.add('open');
+
+    searchString = searchString.trim();
+    if (!searchString) {
+      return;
+    }
+
+    registryFlowSearchForm.classList.add('loading');
+    registryFlowsNoResultsWarning.style.display = 'none';
+    registryFlowsTable.style.display = 'none';
+
+    const foundFlows = await xibleWrapper.Registry.searchFlows(searchString);
+
+    registryFlowSearchForm.addEventListener('animationiteration', () => {
+      registryFlowSearchForm.classList.remove('loading');
+    }, { once: true });
+    registryFlowsTable.style.display = '';
+
+    const flowIds = Object.keys(foundFlows);
+    if (!flowIds.length) {
+      registryFlowsNoResultsWarning.style.display = '';
+      return;
+    }
+
+    for (const flowId of flowIds) {
+      const tr = registryFlowsTbody.appendChild(document.createElement('tr'));
+      tr.appendChild(document.createElement('td')).appendChild(document.createTextNode(flowId));
+
+      const actionTd = tr.appendChild(document.createElement('td'));
+      actionTd.classList.add('actions');
+      const installButton = actionTd.appendChild(document.createElement('button'));
+      installButton.innerHTML = 'Install';
+      installButton.onclick = async () => {
+        const existingFlow = await xibleWrapper.Flow.getById(flowId);
+        if (!existingFlow) {
+          installFlowByName(flowId);
+        } else {
+          const overwritePrompt = customPrompt(`
+            <h1>Flow already exists</h1>
+            <p>
+              A flow named &quot;<span style="font-weight: bold;"></span>&quot; already exists.
+              Do you wish to overwrite this flow?
+            </p>
+          `, 'Confirm');
+
+          overwritePrompt.form.querySelector('span').appendChild(document.createTextNode(flowId));
+
+          overwritePrompt.form.addEventListener('submit', () => {
+            overwritePrompt.remove();
+            installFlowByName(flowId);
+          });
+        }
+      };
+    }
+  }
+
+  subRegistryFlowSearchForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    searchRegistryFlows(subRegistryFlowSearchInput.value);
+  });
+
+  registryFlowSearchForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    searchRegistryFlows(registryFlowSearchInput.value);
+  });
+
+  subRegistryFlowSearchInput.addEventListener('input', () => {
+    registryFlowSearchInput.value = subRegistryFlowSearchInput.value;
+  });
+
+  registryFlowSearchInput.addEventListener('input', () => {
+    subRegistryFlowSearchInput.value = registryFlowSearchInput.value;
+  });
+
   const filterInput = document.getElementById('filter');
   const flowsTbody = document.getElementById('flowsTbody');
 
   function filterInputOnInput() {
     const filterValue = filterInput.value.toLowerCase().trim();
-
-    for (let i = 0; i < flowsTbody.rows.length; i += 1) {
+    const rows = [...flowsTbody.rows, ...registryFlowsTbody.rows];
+    for (let i = 0; i < rows.length; i += 1) {
       if (
         !filterValue || (
-          !flowsTbody.rows[i].classList.contains('instances') &&
-          flowsTbody.rows[i].cells[0].innerText.toLowerCase().includes(filterValue)
+          !rows[i].classList.contains('instances') &&
+          rows[i].cells[0].innerText.toLowerCase().includes(filterValue)
         ) || (
-          flowsTbody.rows[i].classList.contains('instances') &&
-          flowsTbody.rows[i].previousSibling.style.display !== 'none'
+          rows[i].classList.contains('instances') &&
+          rows[i].previousSibling.style.display !== 'none'
         )
       ) {
-        flowsTbody.rows[i].style.display = '';
+        rows[i].style.display = '';
       } else {
-        flowsTbody.rows[i].style.display = 'none';
+        rows[i].style.display = 'none';
       }
     }
   }

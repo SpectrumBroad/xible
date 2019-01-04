@@ -45,7 +45,7 @@ module.exports = (XIBLE) => {
           // get the latest contents of the queue file
           fs.readFile(`${XIBLE.configPath}.queue`, {
             encoding: 'utf8'
-          }, (readQueueErr, data) => {
+          }, async (readQueueErr, data) => {
             // handle errors reading the queue file
             if (readQueueErr) {
               debug(readQueueErr);
@@ -85,6 +85,16 @@ module.exports = (XIBLE) => {
                     case 'flow.delete':
                       flow.delete();
                       break;
+                    case 'registry.flow.install': {
+                      if (obj.registryFlowName) {
+                        const registryFlow = await XIBLE.Registry.Flow.getByName(obj.registryFlowName);
+                        if (!registryFlow) {
+                          continue;
+                        }
+                        registryFlow.install(obj.altFlowName);
+                      }
+                      break;
+                    }
                     case 'server.stop':
                       XIBLE.close();
                       break;

@@ -65,4 +65,40 @@ module.exports = (XIBLE_REGISTRY, XIBLE, EXPRESS_APP) => {
       res.status(500).end();
     });
   });
+
+  // returns a list of online flows
+  EXPRESS_APP.get('/api/registry/flows', async (req, res) => {
+    const searchString = req.query.search;
+    let flows;
+    if (!searchString) {
+      flows = await XIBLE_REGISTRY.Flow.getAll()
+    } else {
+      flows = await XIBLE_REGISTRY.Flow.search(searchString);
+    }
+
+    res.json(flows);
+  });
+
+  // get a flow by a given name
+  EXPRESS_APP.param('regFlowName', async (req, res, next, flowName) => {
+    req.locals.flowName = flowName;
+    const flow = await XIBLE_REGISTRY.Flow.getByName(flowName);
+    if (!flow) {
+      res.status(404).end();
+      return;
+    }
+
+    req.locals.flow = flow;
+    next();
+  });
+
+  EXPRESS_APP.get('/api/registry/flows/:regFlowName', (req, res) => {
+    res.json(req.locals.flow);
+  });
+
+  // install a flow
+  EXPRESS_APP.patch('/api/registry/flows/:regFlowName/install', async (req, res) => {
+    await req.locals.flow.install();
+    res.end();
+  });
 };
