@@ -1,13 +1,14 @@
 {
   "ignore": [
-    "flows/*",
-    "nodes/xible-nodepack-*",
-    "nodes/xible-np-*",
+    ".git",
+    "flows",
     "vault.json",
     "config.json",
-    "editor/*",
-    "test/*",
-    "bin/*"
+    "editor",
+    "test",
+    "bin",
+    "node_modules",
+    "nodes"
   ],
   "execMap": {
     "js": "node"
