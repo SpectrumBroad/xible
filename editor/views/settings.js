@@ -30,10 +30,10 @@ View.routes['/settings'] = (EL) => {
       <section>
         <h1>Security</h1>
         <ul>
-          <li><a href="#">Users</a></li>
+          <li><a href="/settings/security#users">Users</a></li>
           <li><a href="#">Groups</a></li>
           <li><a href="#">Permissions</a></li>
-          <li><a href="#">Tokens</a></li>
+          <li><a href="/settings/security#tokens">Tokens</a></li>
         </ul>
       </section>
       -->
