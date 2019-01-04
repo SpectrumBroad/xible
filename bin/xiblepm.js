@@ -353,7 +353,7 @@ const cli = {
                   }
                 })
                 .then((publishedNodePack) => {
-                  log(`Published nodepack "${publishedNodePack.name}".`);
+                  log(`Published nodepack "${publishedNodePack.name}"@${publishedNodePack.version}`);
                 })
                 .catch((publishErr) => {
                   if (publishErr.statusCode === 400 && publishErr.data) {

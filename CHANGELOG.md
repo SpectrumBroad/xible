@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   When logging in on the registry using the `xiblepm user login` command, the user gets confirmed which user is now logged on, including the registry url. The same goes for adding a new account using `xiblepm user add`.
 
+-   The `xiblepm nodepack publish` command now informs the user of the published version, after completion. ([#44](https://github.com/SpectrumBroad/xible/issues/44))
+
 ### Changed
 -   The `xible config list` command now returns a human readable key-value list. The key nesting is identified by dots, must like json paths and how `xible config set` and `xible config get` already worked. A `xible config json` command has been added which sticks to the previous behaviour and simply prints the actual JSON (formatted) config. ([#23](https://github.com/SpectrumBroad/xible/issues/23))
 
