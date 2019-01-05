@@ -130,7 +130,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
             // fork npm to install the registry url
             const fork = require('child_process').spawn;
-            const npm = fork('npm', ['install', '--no-save', tarballUrl], {
+            const npm = fork('npm', ['install', '--no-save', '--global', 'false', tarballUrl], {
               cwd: tmpRegDir,
               shell: true
             });
