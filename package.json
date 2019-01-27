@@ -32,7 +32,6 @@
     "javascript"
   ],
   "scripts": {
-    "install": "node ./bin/xible-postinstall.js",
     "start": "node ./bin/xible.js server start",
     "debug": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon ./bin/xible.js server start",
     "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/xible.js server start",
@@ -60,7 +59,19 @@
     "spdy": "*",
     "sanitize-filename": "*",
     "fs-extra": "*",
-    "strip-ansi": "*"
+    "strip-ansi": "*",
+    "xible-np-xible": "*",
+    "xible-np-core": "*",
+    "xible-np-compare": "*",
+    "xible-np-console": "*",
+    "xible-np-input": "*",
+    "xible-np-object": "*",
+    "xible-np-string": "*",
+    "xible-nodepack-math": "*",
+    "xible-nodepack-stream": "*",
+    "xible-nodepack-filesystem": "*",
+    "xible-nodepack-process": "*",
+    "xible-nodepack-timing": "*"
   },
   "devDependencies": {
     "eslint": "^4.3.0",
