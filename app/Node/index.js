@@ -106,71 +106,74 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
     }
 
-    static getStructures(structuresPath) {
-      return new Promise((resolve) => {
-        const files = this.getFiles(structuresPath);
-        const structures = {
-          nodes: {},
-          typedefs: {}
-        };
-        let loadedCounter = 0;
+    static async getStructures(structuresPath) {
+      // setup the return values
+      const structures = {
+        nodes: {},
+        typedefs: {}
+      };
 
-        if (!files.length) {
-          resolve(structures);
+      // first check if the given path is a structure itself
+      try {
+        const structure = await this.getStructure(structuresPath);
+        if (structure.typedefs) {
+          Object.assign(structures.typedefs, structure.typedefs);
         }
+        if (structure.node) {
+          structures.nodes[structure.node.name] = structure.node;
+        }
+      } catch (getStructureErr) {
+        // if this path does not concern a structure itself, check subdirs
+        return new Promise((resolve) => {
+          const files = this.getFiles(structuresPath);
+          let loadedCounter = 0;
 
-        function checkAndResolve() {
-          if (++loadedCounter === files.length) { // eslint-disable-line
+          if (!files.length) {
             resolve(structures);
           }
-        }
 
-        for (let i = 0; i < files.length; i += 1) {
-          if (files[i] === 'node_modules' || files[i].substring(0, 1) === '.') {
-            checkAndResolve();
-            continue;
+          function checkAndResolve() {
+            if (++loadedCounter === files.length) { // eslint-disable-line
+              resolve(structures);
+            }
           }
 
-          const normalizedPath = path.resolve(structuresPath, files[i]);
-          fs.stat(normalizedPath, (err, stat) => {
-            if (err) {
-              nodeDebug(`Could not stat "${normalizedPath}": ${err}`);
+          for (let i = 0; i < files.length; i += 1) {
+            if (files[i] === 'node_modules' || files[i].substring(0, 1) === '.') {
               checkAndResolve();
-              return;
+              continue;
             }
 
-            if (!stat.isDirectory()) {
-              checkAndResolve();
-              return;
-            }
-
-            this.getStructure(normalizedPath)
-            .then((structure) => {
-              if (structure.node) {
-                structures.nodes[structure.node.name] = structure.node;
-              }
-              if (structure.typedefs) {
-                Object.assign(structures.typedefs, structure.typedefs);
-              }
-              checkAndResolve();
-            }).catch((getStructureErr) => {
-              // process subdirs instead
-              this.getStructures(normalizedPath)
-              .then((nestedStructures) => {
-                if (!Object.keys(nestedStructures).length) {
-                  nodeDebug(getStructureErr);
-                  checkAndResolve();
-                  return;
-                }
-
-                Object.assign(structures.nodes, nestedStructures.nodes);
-                Object.assign(structures.typedefs, nestedStructures.typedefs);
+            const normalizedPath = path.resolve(structuresPath, files[i]);
+            fs.stat(normalizedPath, async (err, stat) => {
+              if (err) {
+                nodeDebug(`Could not stat "${normalizedPath}": ${err}`);
                 checkAndResolve();
-              });
+                return;
+              }
+
+              if (!stat.isDirectory()) {
+                checkAndResolve();
+                return;
+              }
+
+              // process subdirs
+              const nestedStructures = await this.getStructures(normalizedPath);
+              if (!Object.keys(nestedStructures).length) {
+                nodeDebug(getStructureErr);
+                checkAndResolve();
+                return;
+              }
+
+              Object.assign(structures.nodes, nestedStructures.nodes);
+              Object.assign(structures.typedefs, nestedStructures.typedefs);
+              checkAndResolve();
             });
-          });
-        }
-      });
+          }
+        });
+      }
+
+      return structures;
     }
 
     /**
