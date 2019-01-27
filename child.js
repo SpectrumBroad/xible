@@ -109,7 +109,7 @@ process.on('message', async (message) => {
         flowInstance = flow.createInstance();
         flowInstance._id = message.flowInstanceId;
       } catch (err) {
-        console.error(err)
+        console.error(err);
         process.send({
           method: 'initerr',
           error: passableError(err)
