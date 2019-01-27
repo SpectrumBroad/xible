@@ -61,7 +61,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
       if (!loadTries && createConfig(path)) {
         return loadConfig(path);
       }
-      throw new Error('failed to load config');
+      throw new Error(`failed to load config: ${err}`);
     }
 
     return JSON.parse(configContents);
