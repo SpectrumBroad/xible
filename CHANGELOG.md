@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Noting noteworthy right now.
 
+## [0.16.1][] - 2019-02-01
+### Fixed
+-   Various `xible node` cli commands are functioning again.
+
 ## [0.16.0][] - 2019-01-30
 ### Added
 -   Some of the nodes that came with XIBLE by default have been moved to their own respective nodepacks. ([#79](https://github.com/SpectrumBroad/xible/issues/79))
@@ -311,7 +315,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.16.1...HEAD
+[0.16.1]: https://github.com/SpectrumBroad/xible/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/SpectrumBroad/xible/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/SpectrumBroad/xible/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/SpectrumBroad/xible/compare/v0.13.0...v0.14.0

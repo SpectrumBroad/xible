@@ -78,12 +78,13 @@ async function loadNodes() {
 }
 
 /**
-* Returns the found node by the given nodeId,
-* or null if not found.
-* @param {String} nodeId
-*/
-function getNodeById(nodeId) {
-  const flows = getFlows();
+ * Returns the found node by the given nodeId,
+ * or null if not found.
+ * @param {String} nodeId
+ * @returns {Promise.<XIBLE.Node>}
+ */
+async function getNodeById(nodeId) {
+  const flows = await getFlows();
   for (const flowId in flows) {
     const flow = flows[flowId];
     const node = flow.getNodeById(nodeId);
@@ -98,7 +99,7 @@ let loadedFlows = false;
 /**
 * Loads all flows.
 */
-function loadFlows() {
+async function loadFlows() {
   if (loadedFlows) {
     return;
   }
@@ -107,31 +108,31 @@ function loadFlows() {
     throw 'no "flows.path" configured';
   }
   flowPath = xible.resolvePath(flowPath);
-  xible.Flow.initFromPath(flowPath);
+  await xible.Flow.initFromPath(flowPath);
   loadedFlows = true;
 }
 
 /**
 * Returns a flow by the given id/name.
 * Rejects if no flows.path is configured in the xible instance.
-* @returns {XIBLE.Flow[]}
+* @returns {Promise.<XIBLE.Flow[]>}
 */
-function getFlows() {
-  loadFlows();
+async function getFlows() {
+  await loadFlows();
   return xible.getFlows();
 }
 
 /**
 * Returns a flow by the given id/name.
 * Rejects if no flows.path is configured in the xible instance.
-* @returns {XIBLE.Flow}
+* @returns {Promise.<XIBLE.Flow>}
 */
-function getFlowById(flowId) {
+async function getFlowById(flowId) {
   if (!flowId) {
     throw 'The flow name must be provided';
   }
 
-  loadFlows();
+  await loadFlows();
   return xible.getFlowById(flowId);
 }
 
@@ -210,7 +211,7 @@ const cli = {
       }
 
       // find out where nodeId resides
-      const node = getNodeById(nodeId);
+      const node = await getNodeById(nodeId);
       if (!node) {
         throw `No node found with node-id "${nodeId}"`;
       }
@@ -246,7 +247,7 @@ const cli = {
       }
 
       // find out where nodeId resides
-      const node = getNodeById(nodeId);
+      const node = await getNodeById(nodeId);
       if (!node) {
         throw `No node found with node-id "${nodeId}"`;
       }
@@ -282,7 +283,7 @@ const cli = {
       }
 
       // find out where nodeId resides
-      const node = getNodeById(nodeId);
+      const node = await getNodeById(nodeId);
       if (!node) {
         throw `No node found with node-id "${nodeId}"`;
       }
