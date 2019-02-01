@@ -299,7 +299,7 @@ const cli = {
       let dataValue = '';
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
-        dataValue = node.vault.get() || {};
+        dataValue = (node.vault.get() || {})[arg];
       } else {
         dataValue = node.data[arg];
       }

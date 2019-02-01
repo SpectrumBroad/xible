@@ -11,6 +11,8 @@ Noting noteworthy right now.
 ### Fixed
 -   Various `xible node` cli commands are functioning again.
 
+-   The cli command `xible node get <data>` now properly fetches only the specified data field when that particular bit of data is stored in the vault.
+
 ## [0.16.0][] - 2019-01-30
 ### Added
 -   Some of the nodes that came with XIBLE by default have been moved to their own respective nodepacks. ([#79](https://github.com/SpectrumBroad/xible/issues/79))
