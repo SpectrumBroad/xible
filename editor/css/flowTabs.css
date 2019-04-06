@@ -51,12 +51,18 @@
 	padding: 2px 3px;
 	background-color: #45679E;
 	border-radius: 4px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	box-sizing: border-box;
+	min-width: 100%;
 	z-index: 1;
 	white-space: nowrap;
 }
 
 .flowList li.open .instance-count {
 	bottom: -26px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
 }
 
 .flowList li .instance-count::after {
