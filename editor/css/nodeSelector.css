@@ -1,289 +1,289 @@
 #nodeSelector,
 #detailNodeSelector {
-	position: absolute;
-	display: block;
-	margin: 0;
-	padding: 0;
-	background-color: #eee;
-	font-size: 13px;
-	width: 200px;
-	text-align: left;
-	box-shadow: 0 0 8px rgba(0, 0, 0, 1);
-	border: 1px solid #000;
-	box-sizing: border-box;
-	z-index: 1;
-	contain: content;
+  position: absolute;
+  display: block;
+  margin: 0;
+  padding: 0;
+  background-color: #eee;
+  font-size: 13px;
+  width: 200px;
+  text-align: left;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 1);
+  border: 1px solid #000;
+  box-sizing: border-box;
+  z-index: 1;
+  contain: content;
 }
 
 #nodeSelector.loading::after {
-	background-color: #777;
-	bottom: auto;
-	top: 0;
+  background-color: #777;
+  bottom: auto;
+  top: 0;
 }
 
 #detailNodeSelector code {
-	background-color:#000;
-	color:#fff;
+  background-color:#000;
+  color:#fff;
 }
 
 #nodeSelector>input,
 #nodeSelector>button,
 #detailNodeSelector>button {
-	box-sizing: border-box;
-	width: 100%;
-	border: none;
-	padding: 12px;
-	font-size: 14px;
-	background-color: inherit;
-	font-family: inherit;
-	transition: background-color 0.1s ease-in;
-	color: inherit;
-	text-align: inherit;
-	border-radius: 0;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  padding: 12px;
+  font-size: 14px;
+  background-color: inherit;
+  font-family: inherit;
+  transition: background-color 0.1s ease-in;
+  color: inherit;
+  text-align: inherit;
+  border-radius: 0;
 }
 
 #nodeSelector a,
 #detailNodeSelector a {
-	color: #45679E;
+  color: #45679E;
 }
 
 #nodeSelector a:hover,
 #detailNodeSelector a:hover {
-	color: #5b7cb3;
+  color: #5b7cb3;
 }
 
 #nodeSelector>button,
 #detailNodeSelector>button {
-	background-color: #45679E;
-	border: 2px solid #000;
-	border-width: 0 0 2px 0;
-	cursor: pointer;
-	color: #fff;
-	margin-bottom: 0;
+  background-color: #45679E;
+  border: 2px solid #000;
+  border-width: 0 0 2px 0;
+  cursor: pointer;
+  color: #fff;
+  margin-bottom: 0;
 }
 
 #detailNodeSelector>button.cancel {
-	background-color: #888;
+  background-color: #888;
 }
 
 #nodeSelector>button:hover,
 #nodeSelector>button:focus,
 #detailNodeSelector>button:hover,
 #detailNodeSelector>button:focus {
-	outline: none;
-	background-color: #5b7cb3;
+  outline: none;
+  background-color: #5b7cb3;
 }
 
 #detailNodeSelector>button.cancel:hover,
 #detailNodeSelector>button.cancel:focus {
-	background-color: #555;
+  background-color: #555;
 }
 
 #nodeSelector>button:active,
 #detailNodeSelector>button:active {
-	outline: none;
-	border-width: 2px 0 0 0;
-	border-color: rgb(30, 30, 30);
-	background-color: #31599b;
+  outline: none;
+  border-width: 2px 0 0 0;
+  border-color: rgb(30, 30, 30);
+  background-color: #31599b;
 }
 
 #detailNodeSelector>button.cancel:active {
-	background-color: #333;
+  background-color: #333;
 }
 
 #nodeSelector>button:disabled,
 #detailNodeSelector>button:disabled {
-	background-color: #ccc;
-	color: #aaa;
+  background-color: #ccc;
+  color: #aaa;
 }
 
 #nodeSelector>input:focus {
-	-webkit-appearance: none;
-	appearance: none;
-	outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
 }
 
 #nodeSelector.noresults {
-	background-color: #f77878;
-	color: #fff;
+  background-color: #f77878;
+  color: #fff;
 }
 
 #nodeSelector>ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	display: flex;
-	flex-flow: column;
-	width: 100%;
-	max-height: 38vh;
-	overflow-y: auto;
-	contain: content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  max-height: 38vh;
+  overflow-y: auto;
+  contain: content;
 }
 
 #nodeSelector.hidden,
 #detailNodeSelector.hidden {
-	display: none;
+  display: none;
 }
 
 #nodeSelector>ul>li {
-	display: block;
-	margin: 0;
-	padding: 12px;
-	border-top: 1px solid #ccc;
-	cursor: pointer;
-	position: relative;
-	order: 3;
-	contain: content;
+  display: block;
+  margin: 0;
+  padding: 12px;
+  border-top: 1px solid #ccc;
+  cursor: pointer;
+  position: relative;
+  order: 3;
+  contain: content;
 }
 
 #nodeSelector>ul>li:first-child {
-	border-top: none;
+  border-top: none;
 }
 
 #nodeSelector>ul>li.headerMatchPartial {
-	order: 2;
+  order: 2;
 }
 
 #nodeSelector>ul>li.headerMatchExact {
-	order: 1;
+  order: 1;
 }
 
 #nodeSelector>ul>li.hidden {
-	display: none;
+  display: none;
 }
 
 #nodeSelector>ul>li.max {
-	background-color: #ccc;
-	cursor: default;
+  background-color: #ccc;
+  cursor: default;
 
 }
 
 #nodeSelector>ul>li.online::before {
-	content: "\f019";
-	font-size: 30px;
-	color: #d8d8d8;
-	box-sizing: border-box;
-	font-family: awesome;
-	display: flex;
-	align-items: center;
-	position: absolute;
-	z-index: -1;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	padding: 12px;
+  content: "\f019";
+  font-size: 30px;
+  color: #d8d8d8;
+  box-sizing: border-box;
+  font-family: awesome;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 12px;
 }
 
 #nodeSelector>ul>li:hover {
-	background-color: #45679E;
-	color: #fff;
+  background-color: #45679E;
+  color: #fff;
 }
 
 #nodeSelector>ul>li.max:hover {
-	background-color: #ccc;
-	color: #000;
+  background-color: #ccc;
+  color: #000;
 }
 
 #nodeSelector>ul>li>h1,
 #detailNodeSelector h1 {
-	font-size: inherit;
-	font-weight: bold;
-	padding: 0;
-	margin: 0;
-	text-transform: uppercase;
-	box-sizing: border-box;
-	width: 100%;
-	overflow-x: hidden;
-	text-overflow: ellipsis;
-	position: relative;
-	white-space: nowrap;
+  font-size: inherit;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  white-space: nowrap;
 }
 
 #nodeSelector>ul>li>h1 {
-	direction: rtl;
+  direction: rtl;
 }
 
 #detailNodeSelector section {
-	margin: 8px 0 0;
+  margin: 8px 0 0;
 }
 
 #detailNodeSelector section:first-of-type {
-	margin: 0;
+  margin: 0;
 }
 
 @keyframes scroll {
-	0% {
-		transform: translateX(0%);
-	}
-	100% {
-		transform: translateX(50%);
-	}
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(50%);
+  }
 }
 
 #nodeSelector>ul>li>h1.overflow {
-	color: transparent;
-	text-overflow: clip;
+  color: transparent;
+  text-overflow: clip;
 }
 
 #nodeSelector>ul>li>h1.overflow::before {
-	display: block;
-	content: "\00a0" attr(title) "\00a0" attr(title);
-	position: absolute;
-	box-sizing: border-box;
-	right: 0;
-	top: 0;
-	color: #fff;
-	text-transform: inherit;
-	transform: translateX(0%);
-	-webkit-animation: scroll 8s linear 0.2s infinite normal forwards;
-	animation: scroll 8s linear 0.2s infinite normal forwards;
+  display: block;
+  content: "\00a0" attr(title) "\00a0" attr(title);
+  position: absolute;
+  box-sizing: border-box;
+  right: 0;
+  top: 0;
+  color: #fff;
+  text-transform: inherit;
+  transform: translateX(0%);
+  -webkit-animation: scroll 8s linear 0.2s infinite normal forwards;
+  animation: scroll 8s linear 0.2s infinite normal forwards;
 }
 
 #nodeSelector>ul>li>h1.overflow::after {
-	display: block;
-	content: "";
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	background-image: linear-gradient(90deg, #45679E, transparent 8%, transparent 92%, #45679E);
+  display: block;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-image: linear-gradient(90deg, #45679E, transparent 8%, transparent 92%, #45679E);
 }
 
 #nodeSelector>ul>li>p,
 #detailNodeSelector p {
-	margin: 8px 0 0 0;
-	padding: 0;
-	overflow: hidden;
+  margin: 8px 0 0 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 #detailNodeSelector p.status {
-	margin: 0 0 8px;
-	padding: 4px;
+  margin: 0 0 8px;
+  padding: 4px;
 }
 
 #detailNodeSelector>div {
-	padding: 12px;
-	max-height: 200px;
-	overflow: auto;
+  padding: 12px;
+  max-height: 200px;
+  overflow: auto;
 }
 
 #detailNodeSelector ul {
-	list-style: none;
-	margin: 8px 0 0;
-	padding: 0;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
 }
 
 #detailNodeSelector ul li {
-	position: relative;
+  position: relative;
 }
 
 #detailNodeSelector ul li::before {
-	font-family: awesome;
-	content: '\f111';
-	position: relative;
-	font-size: 6px;
-	left: 0;
-	margin: 0 3px 0;
-	vertical-align: middle;
+  font-family: awesome;
+  content: '\f111';
+  position: relative;
+  font-size: 6px;
+  left: 0;
+  margin: 0 3px 0;
+  vertical-align: middle;
 }

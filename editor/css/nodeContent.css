@@ -2,152 +2,152 @@ input,
 button,
 select,
 textarea {
-	box-sizing: border-box;
-	border: 2px solid #3E3E3E;
-	display: block;
-	background-color: #3E3E3E;
-	border-radius: 6px;
-	color: #fff;
-	font-size: 20px;
-	width: 100%;
-	font-weight: normal;
-	font-family: robotothin;
-	padding: 1px;
-	margin: 0;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	position: relative;
+  box-sizing: border-box;
+  border: 2px solid #3E3E3E;
+  display: block;
+  background-color: #3E3E3E;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 20px;
+  width: 100%;
+  font-weight: normal;
+  font-family: robotothin;
+  padding: 1px;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  position: relative;
 }
 
 label {
-	display: block;
-	cursor: pointer;
-	font-size: 20px;
-	width: 100%;
-	position: relative;
-	color: #bbb;
-	clear: both;
-	min-height: 27px;
+  display: block;
+  cursor: pointer;
+  font-size: 20px;
+  width: 100%;
+  position: relative;
+  color: #bbb;
+  clear: both;
+  min-height: 27px;
 }
 
 
 /* describe */
 
 label p {
-	position: absolute;
-	right: -8px;
-	top: 0;
-	background-color: #000;
-	color: #ccc;
-	font-size: 7px;
-	height: 100%;
-	width: calc( 75% + 5px);
-	margin: 0;
-	box-sizing: border-box;
-	padding: 0 4px;
-	overflow: hidden;
-	transition: color 0.2s ease-out;
-	transform: translateX(100%);
+  position: absolute;
+  right: -8px;
+  top: 0;
+  background-color: #000;
+  color: #ccc;
+  font-size: 7px;
+  height: 100%;
+  width: calc( 75% + 5px);
+  margin: 0;
+  box-sizing: border-box;
+  padding: 0 4px;
+  overflow: hidden;
+  transition: color 0.2s ease-out;
+  transform: translateX(100%);
 }
 
 label p span {
-	font-style: normal;
+  font-style: normal;
 }
 
 label p.none {
-	font-style: italic;
+  font-style: italic;
 }
 
 label p::before, label:hover p.overflow::after {
-	display: block;
-	position: absolute;
-	content: "";
-	height: 0.5px;
-	width: 100%;
-	left: 0;
-	top: 0;
-	background-image: linear-gradient(to right, #333, #333 80%, transparent);
+  display: block;
+  position: absolute;
+  content: "";
+  height: 0.5px;
+  width: 100%;
+  left: 0;
+  top: 0;
+  background-image: linear-gradient(to right, #333, #333 80%, transparent);
 }
 
 label p.overflow::after {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	background-image: linear-gradient(to right, transparent, #000 40%, #000);
-	box-sizing: border-box;
-	height: 9px;
-	padding: 0 4px 0 6px;
-	display: block;
-	font-family: awesome;
-	content: "\f0d7";
-	line-height: 9px;
-	font-size: 11px;
-	color: #eee;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(to right, transparent, #000 40%, #000);
+  box-sizing: border-box;
+  height: 9px;
+  padding: 0 4px 0 6px;
+  display: block;
+  font-family: awesome;
+  content: "\f0d7";
+  line-height: 9px;
+  font-size: 11px;
+  color: #eee;
 }
 
 :host-context(.node:hover) label p {
-	color: #555;
+  color: #555;
 }
 
 :host-context(.node:hover) label:hover p {
-	overflow: visible;
-	color: #fff;
-	z-index: 2;
+  overflow: visible;
+  color: #fff;
+  z-index: 2;
 }
 
 :host-context(.node:hover) label p.overflow::after {
-	color: #333;
+  color: #333;
 }
 
 :host-context(.node:hover) label:hover p.overflow {
-	height: auto;
+  height: auto;
 }
 
 :host-context(.node:hover) label:hover p.overflow::after {
-	top: auto;
-	bottom: 0;
+  top: auto;
+  bottom: 0;
 }
 
 /*
 if only...
 :host>label:has(input:optional) {
-	display: none;
+  display: none;
 }
 */
 
 :host>label.optional {
-	display: none;
+  display: none;
 }
 
 :host-context(.node:hover)>label,
 :host-context(.node.selected)>label {
-	display: block;
+  display: block;
 }
 
 /* always show all labels and inputs when in describe/help mode */
 :host-context(.describe)>label {
-	display: block;
+  display: block;
 }
 
 input~span,
 selectcontainer~span,
 textarea~span {
-	display: none;
-	box-sizing: border-box;
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-image: linear-gradient(to left, rgba(221, 221, 221, 0), #ddd 4px, #ddd);
-	color: #333;
-	padding: 2px 5px;
-	border-radius: 6px 0 0 6px;
-	transform: translate(-100%, 0) translateX(1px);
-	font-size: 20px;
-	height: 100%;
-	white-space: nowrap;
-	box-shadow: -3px 0 8px -1px #000;
-	vertical-align: middle;
+  display: none;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-image: linear-gradient(to left, rgba(221, 221, 221, 0), #ddd 4px, #ddd);
+  color: #333;
+  padding: 2px 5px;
+  border-radius: 6px 0 0 6px;
+  transform: translate(-100%, 0) translateX(1px);
+  font-size: 20px;
+  height: 100%;
+  white-space: nowrap;
+  box-shadow: -3px 0 8px -1px #000;
+  vertical-align: middle;
 }
 
 
@@ -156,16 +156,16 @@ textarea~span {
 input~span::before,
 selectcontainer~span::before,
 textarea~span::before {
-	content: "";
-	display: inline-block;
-	height: 100%;
-	vertical-align: middle;
+  content: "";
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
 }
 
 input~span.unknown,
 selectcontainer~span.unknown,
 textarea~span.unknown {
-	color: #888;
+  color: #888;
 }
 
 input:hover,
@@ -174,7 +174,7 @@ selectcontainer:hover select,
 selectcontainer select:focus,
 textarea:hover,
 textarea:focus {
-	border-radius: 0 6px 6px 0;
+  border-radius: 0 6px 6px 0;
 }
 
 input:hover~span,
@@ -182,71 +182,71 @@ input:focus~span,
 selectcontainer:hover~span,
 textarea:hover~span,
 textarea:focus~span {
-	display: block;
+  display: block;
 }
 
 input[type="checkbox"] {
-	opacity: 0;
-	position: absolute;
-	top: 0;
-	left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 input[type="checkbox"]~span {
-	cursor: pointer;
-	box-sizing: border-box;
-	display: block;
-	background-color: #3E3E3E;
-	border: 2px solid #3E3E3E;
-	width: 40px;
-	height: 27px;
-	position: relative;
-	border-radius: 6px;
-	float: right;
-	opacity: 1;
-	background-image: none;
-	box-shadow: none;
-	transform: initial;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: block;
+  background-color: #3E3E3E;
+  border: 2px solid #3E3E3E;
+  width: 40px;
+  height: 27px;
+  position: relative;
+  border-radius: 6px;
+  float: right;
+  opacity: 1;
+  background-image: none;
+  box-shadow: none;
+  transform: initial;
 }
 
 input[type="checkbox"]~span::before {
-	position: absolute;
-	box-sizing: border-box;
-	display: block;
-	content: "";
-	left: 0;
-	top: 0;
-	right: auto;
-	width: 20px;
-	height: 100%;
-	background-color: #45679E;
-	border: 2px solid #111;
-	border-width: 0 0 1px 0;
-	border-radius: 6px;
+  position: absolute;
+  box-sizing: border-box;
+  display: block;
+  content: "";
+  left: 0;
+  top: 0;
+  right: auto;
+  width: 20px;
+  height: 100%;
+  background-color: #45679E;
+  border: 2px solid #111;
+  border-width: 0 0 1px 0;
+  border-radius: 6px;
 }
 
 input[type="checkbox"]:checked~span::before {
-	left: auto;
-	right: 0;
+  left: auto;
+  right: 0;
 }
 
 input[type="checkbox"]~span:hover::before {
-	background-color: #5b7cb3;
+  background-color: #5b7cb3;
 }
 
 input[type="checkbox"]:focus~span::before {
-	background-color: #5b7cb3;
+  background-color: #5b7cb3;
 }
 
 button,
 input[type="button"],
 input[type="submit"] {
-	padding: 3px;
-	border: 2px solid #000;
-	border-width: 0 0 2px 0;
-	background-color: #45679E;
-	cursor: pointer;
-	text-align: left;
+  padding: 3px;
+  border: 2px solid #000;
+  border-width: 0 0 2px 0;
+  background-color: #45679E;
+  cursor: pointer;
+  text-align: left;
 }
 
 button:hover,
@@ -255,111 +255,111 @@ input[type="submit"]:hover,
 button:focus,
 input[type="button"]:focus,
 input[type="submit"]:focus {
-	outline: none;
-	background-color: #5b7cb3;
+  outline: none;
+  background-color: #5b7cb3;
 }
 
 button:active,
 input[type="button"]:active,
 input[type="submit"]:active {
-	outline: none;
-	border-width: 2px 0 0 0;
-	border-color: rgb(30, 30, 30);
-	background-color: #31599b;
+  outline: none;
+  border-width: 2px 0 0 0;
+  border-color: rgb(30, 30, 30);
+  background-color: #31599b;
 }
 
 button:disabled,
 input[type="button"]:disabled,
 input[type="submit"]:disabled {
-	outline: none;
-	border-width: 2px 0 0 0;
-	border-color: rgb(30, 30, 30);
-	background-color: rgb(60, 60, 60);
-	color: rgb(130, 130, 130);
-	cursor: default;
+  outline: none;
+  border-width: 2px 0 0 0;
+  border-color: rgb(30, 30, 30);
+  background-color: rgb(60, 60, 60);
+  color: rgb(130, 130, 130);
+  cursor: default;
 }
 
 
 input[type=range] {
-	height: 30px;
-	border: none;
-	background-color: transparent;
+  height: 30px;
+  border: none;
+  background-color: transparent;
 }
 
 input[type=range]:focus {
-	border: none;
+  border: none;
 }
 
 input[type=range]:focus::-webkit-slider-thumb {
-	border: 1px solid #45679E;
+  border: 1px solid #45679E;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
-	background-color: #3E3E3E;
-	height: 2px;
-	border-radius: 2px;
+  background-color: #3E3E3E;
+  height: 2px;
+  border-radius: 2px;
 }
 
 input[type=range]::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	background-color: #fff;
-	display: block;
-	width: 6px;
-	height: 20px;
-	border: 1px solid #000;
-	border-radius: 2px;
-	box-sizing: border-box;
-	margin-top: -9px;
+  -webkit-appearance: none;
+  background-color: #fff;
+  display: block;
+  width: 6px;
+  height: 20px;
+  border: 1px solid #000;
+  border-radius: 2px;
+  box-sizing: border-box;
+  margin-top: -9px;
 }
 
 .xible .node.fail>.content input,
 .xible .node.fail>button,
 .node.fail>.content select {
-	border: 2px solid #f00;
-	background-color: rgba(255, 0, 0, 0.3);
+  border: 2px solid #f00;
+  background-color: rgba(255, 0, 0, 0.3);
 }
 
 selectcontainer {
-	display: block;
-	position: relative;
+  display: block;
+  position: relative;
 }
 
 selectcontainer::after {
-	color: #ccc;
-	display: block;
-	font-family: awesome;
-	font-size: 16px;
-	content: "\f078";
-	position: absolute;
-	right: 4px;
-	box-sizing: border-box;
-	top: 50%;
-	margin-top: -2px;
-	transform: translateY(-50%);
-	-webkit-filter: drop-shadow(0 0 2px #000);
-	filter: drop-shadow(0 0 2px #000);
-	pointer-events: none;
+  color: #ccc;
+  display: block;
+  font-family: awesome;
+  font-size: 16px;
+  content: "\f078";
+  position: absolute;
+  right: 4px;
+  box-sizing: border-box;
+  top: 50%;
+  margin-top: -2px;
+  transform: translateY(-50%);
+  -webkit-filter: drop-shadow(0 0 2px #000);
+  filter: drop-shadow(0 0 2px #000);
+  pointer-events: none;
 }
 
 input:focus,
 textarea:focus,
 .node>.content select:focus {
-	outline: none;
-	border: 2px solid #45679E;
-	-webkit-user-select: text;
-	-moz-user-select: text;
-	-ms-user-select: text;
-	user-select: text;
+  outline: none;
+  border: 2px solid #45679E;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 input:hover,
 textarea:hover {
-	-webkit-user-select: text;
-	-moz-user-select: text;
-	-ms-user-select: text;
-	user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 input[type="number"] {
-	font-size: 40px;
+  font-size: 40px;
 }

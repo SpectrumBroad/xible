@@ -1,47 +1,47 @@
 .inner {
-	box-shadow: 0 0 6px 0 rgba(0, 0, 0, 1);
-	position: relative;
-	flex: 1 1 100%;
-	overflow: hidden;
-	background-color: #292929;
-	background-size: 50px 50px;
-	flex: 1 1 auto;
-	width: 1px;
-	padding: 10px 16px;
-	overflow: auto;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 1);
+  position: relative;
+  flex: 1 1 100%;
+  overflow: hidden;
+  background-color: #292929;
+  background-size: 50px 50px;
+  flex: 1 1 auto;
+  width: 1px;
+  padding: 10px 16px;
+  overflow: auto;
 }
 
 .inner>:first-child, .inner>section>:first-child, .inner>.view>:first-child, .inner>.view>section>:first-child {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 .inner h1 {
-	font-family: robotothin;
-	font-weight: normal;
-	font-size: 1.5em;
+  font-family: robotothin;
+  font-weight: normal;
+  font-size: 1.5em;
 }
 
 .inner h2 {
-	font-family: robotothin;
-	font-weight: normal;
-	font-size: 1.2em;
-	margin: 20px 0 20px 0;
+  font-family: robotothin;
+  font-weight: normal;
+  font-size: 1.2em;
+  margin: 20px 0 20px 0;
 }
 
 section {
-	width: 100%;
-	padding: 0;
-	box-sizing: border-box;
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .inner section dl, .inner section p, .inner section ul, .inner section ol {
-	font-size: 0.7em;
+  font-size: 0.7em;
 }
 
 main {
-	box-sizing: border-box;
-	height: 100%;
-	flex: 1 1 auto;
-	background-color: #181818;
-	color: #ddd;
+  box-sizing: border-box;
+  height: 100%;
+  flex: 1 1 auto;
+  background-color: #181818;
+  color: #ddd;
 }

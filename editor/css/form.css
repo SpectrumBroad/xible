@@ -2,51 +2,51 @@ input,
 button,
 select,
 textarea {
-	box-sizing: border-box;
-	border: 1px solid #111;
-	display: block;
-	background-color: #3E3E3E;
-	border-radius: 6px;
-	color: #fff;
-	font-size: 1em;
-	width: 100%;
-	font-weight: normal;
-	font-family: robotothin;
-	padding: 3px;
-	margin: 0;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	position: relative;
+  box-sizing: border-box;
+  border: 1px solid #111;
+  display: block;
+  background-color: #3E3E3E;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1em;
+  width: 100%;
+  font-weight: normal;
+  font-family: robotothin;
+  padding: 3px;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  position: relative;
 }
 
 input, button {
-	-webkit-appearance: none;
-	-moz-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 input:focus, select:focus {
-	outline: none;
-	border: 2px solid #45679E;
-	padding: 2px;
+  outline: none;
+  border: 2px solid #45679E;
+  padding: 2px;
 }
 
 /*
 input:invalid {
-	border-color: #dd0000;
+  border-color: #dd0000;
 }
 */
 
 button,
 input[type="button"],
 input[type="submit"] {
-	padding: 3px;
-	border: 2px solid #000;
-	border-width: 0 0 2px 0;
-	background-color: #45679E;
-	cursor: pointer;
-	text-align: left;
-	margin-bottom: 3px;
+  padding: 3px;
+  border: 2px solid #000;
+  border-width: 0 0 2px 0;
+  background-color: #45679E;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 3px;
 }
 
 button:hover,
@@ -55,82 +55,82 @@ input[type="submit"]:hover,
 button:focus,
 input[type="button"]:focus,
 input[type="submit"]:focus {
-	outline: none;
-	background-color: #5b7cb3;
+  outline: none;
+  background-color: #5b7cb3;
 }
 
 button:active,
 input[type="button"]:active,
 input[type="submit"]:active {
-	outline: none;
-	border-width: 2px 0 0 0;
-	border-color: rgb(30, 30, 30);
-	background-color: #31599b;
+  outline: none;
+  border-width: 2px 0 0 0;
+  border-color: rgb(30, 30, 30);
+  background-color: #31599b;
 }
 
 button:disabled,
 input[type="button"]:disabled,
 input[type="submit"]:disabled {
-	outline: none;
-	border-width: 2px 0 0 0;
-	border-color: rgb(30, 30, 30);
-	background-color: rgb(60, 60, 60);
-	color: rgb(130, 130, 130);
-	cursor: default;
+  outline: none;
+  border-width: 2px 0 0 0;
+  border-color: rgb(30, 30, 30);
+  background-color: rgb(60, 60, 60);
+  color: rgb(130, 130, 130);
+  cursor: default;
 }
 
 input[type="checkbox"] {
-	opacity: 0;
-	position: absolute;
-	top: 0;
-	left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 input[type="checkbox"]~span {
-	cursor: pointer;
-	vertical-align: bottom;
-	box-sizing: border-box;
-	display: inline-block;
-	background-color: #3E3E3E;
-	border: 2px solid #3E3E3E;
-	width: 40px;
-	height: 27px;
-	position: relative;
-	border-radius: 6px;
-	float: right;
-	top: 0;
-	right: 0;
-	opacity: 1;
-	background-image: none;
-	box-shadow: none;
-	transform: initial;
+  cursor: pointer;
+  vertical-align: bottom;
+  box-sizing: border-box;
+  display: inline-block;
+  background-color: #3E3E3E;
+  border: 2px solid #3E3E3E;
+  width: 40px;
+  height: 27px;
+  position: relative;
+  border-radius: 6px;
+  float: right;
+  top: 0;
+  right: 0;
+  opacity: 1;
+  background-image: none;
+  box-shadow: none;
+  transform: initial;
 }
 
 input[type="checkbox"]~span::before {
-	position: absolute;
-	box-sizing: border-box;
-	display: block;
-	content: "";
-	left: 0;
-	top: 0;
-	right: auto;
-	width: 20px;
-	height: 100%;
-	background-color: #45679E;
-	border: 2px solid #111;
-	border-width: 0 0 1px 0;
-	border-radius: 6px;
+  position: absolute;
+  box-sizing: border-box;
+  display: block;
+  content: "";
+  left: 0;
+  top: 0;
+  right: auto;
+  width: 20px;
+  height: 100%;
+  background-color: #45679E;
+  border: 2px solid #111;
+  border-width: 0 0 1px 0;
+  border-radius: 6px;
 }
 
 input[type="checkbox"]:checked~span::before {
-	left: auto;
-	right: 0;
+  left: auto;
+  right: 0;
 }
 
 input[type="checkbox"]~span:hover::before {
-	background-color: #5b7cb3;
+  background-color: #5b7cb3;
 }
 
 input[type="checkbox"]:focus~span::before {
-	background-color: #5b7cb3;
+  background-color: #5b7cb3;
 }
