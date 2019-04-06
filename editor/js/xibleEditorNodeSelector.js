@@ -18,7 +18,7 @@ class XibleEditorNodeSelector {
     this.openXPosition = 0;
 
     // detail div for downloading new nodes
-    let detailDiv = document.body.appendChild(document.createElement('div'));
+    const detailDiv = document.body.appendChild(document.createElement('div'));
     this.detailDiv = detailDiv;
     detailDiv.setAttribute('id', 'detailNodeSelector');
     detailDiv.classList.add('hidden');
@@ -35,7 +35,7 @@ class XibleEditorNodeSelector {
     };
 
     // the div containing the node list
-    let div = document.body.appendChild(document.createElement('div'));
+    const div = document.body.appendChild(document.createElement('div'));
     this.div = div;
     div.setAttribute('id', 'nodeSelector');
 
@@ -365,17 +365,17 @@ class XibleEditorNodeSelector {
     this.detailDivSub.innerHTML = `
       <p id="nodePackInstallDisabled" class="status alert hidden">Installing nodepacks is disabled <a href="/settings/registry#nodepacks" target="_blank">in settings</a>.</p>
       <section>
-        <h1>${nodeName}</h1>
-        <p>This node is part of nodepack "${nodePack.name}". By installing, all contents of this nodepack will be installed.</p>
+        <h1>${escapeHtml(nodeName)}</h1>
+        <p>This node is part of nodepack "${escapeHtml(nodePack.name)}". By installing, all contents of this nodepack will be installed.</p>
       </section>
       <section>
         <h1>publish user</h1>
-        <p>This node pack is published by user "${nodePack.publishUserName}"</p>
+        <p>This node pack is published by user "${escapeHtml(nodePack.publishUserName)}"</p>
       </section>
       <section>
         <h1>nodes</h1>
         <ul>
-          ${nodePack.nodes.map(node => `<li>${node.name}</li>`).join('')}
+          ${nodePack.nodes.map(node => `<li>${escapeHtml(node.name)}</li>`).join('')}
         </ul>
       </section>
       <section>
@@ -397,10 +397,13 @@ class XibleEditorNodeSelector {
 
     // the heading element containing the node name
     const h1 = li.appendChild(document.createElement('h1'));
-    h1.appendChild(document.createTextNode(nodeName));
     h1.setAttribute('title', nodeName);
+    h1.innerHTML = escapeHtml(nodeName).replace(/[._-]/g, val => `${val}<wbr />`);
 
     // scroll text if it overflows
+    /*
+    h1.appendChild(document.createTextNode(nodeName));
+
     li.addEventListener('mouseenter', () => {
       if (h1.scrollWidth > h1.offsetWidth) {
         h1.classList.add('overflow');
@@ -410,6 +413,7 @@ class XibleEditorNodeSelector {
     li.addEventListener('mouseleave', () => {
       h1.classList.remove('overflow');
     });
+    */
 
     // description
     const description = node.description;

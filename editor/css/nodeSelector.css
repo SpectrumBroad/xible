@@ -1,11 +1,12 @@
-#nodeSelector, #detailNodeSelector {
+#nodeSelector,
+#detailNodeSelector {
 	position: absolute;
 	display: block;
 	margin: 0;
 	padding: 0;
 	background-color: #eee;
 	font-size: 13px;
-	width: 190px;
+	width: 200px;
 	text-align: left;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 1);
 	border: 1px solid #000;
@@ -198,6 +199,10 @@
 	white-space: nowrap;
 }
 
+#nodeSelector>ul>li>h1 {
+	direction: rtl;
+}
+
 #detailNodeSelector section {
 	margin: 8px 0 0;
 }
@@ -211,7 +216,7 @@
 		transform: translateX(0%);
 	}
 	100% {
-		transform: translateX(-50%);
+		transform: translateX(50%);
 	}
 }
 
@@ -225,7 +230,7 @@
 	content: "\00a0" attr(title) "\00a0" attr(title);
 	position: absolute;
 	box-sizing: border-box;
-	left: 0;
+	right: 0;
 	top: 0;
 	color: #fff;
 	text-transform: inherit;
