@@ -342,51 +342,49 @@ class XibleEditorNode extends xibleWrapper.Node {
     }
   }
 
-  addStatus(status) {
+  async addStatus(status) {
     if (!status || !status._id) {
       return;
     }
 
-    xibleWrapper.Config
-    .getValue('editor.nodes.statuses.max')
-    .then((configMaxStatuses) => {
-      let statusCount = 0;
-      let ul = this.statusEl;
-      if (!ul) {
-        ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
-        ul.classList.add('statuses');
-      } else {
-        statusCount = ul.querySelectorAll('li:not(.bar)').length;
+    const configMaxStatuses = await xibleWrapper.Config.getValue('editor.nodes.statuses.max')
+
+    let statusCount = 0;
+    let ul = this.statusEl;
+    if (!ul) {
+      ul = this.statusEl = this.element.appendChild(document.createElement('ul'));
+      ul.classList.add('statuses');
+    } else {
+      statusCount = ul.querySelectorAll('li:not(.bar)').length;
+    }
+
+    // remove all statuses above the max config setting
+    if (typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
+      while (statusCount >= configMaxStatuses && ul.firstChild) {
+        const removeChild = ul.firstChild;
+        this.removeStatusById(removeChild.getAttribute('data-statusid'));
+        statusCount -= 1;
       }
+    }
 
-      // remove all statuses above the max config setting
-      if (typeof configMaxStatuses === 'number' && statusCount >= configMaxStatuses && ul.firstChild) {
-        while (statusCount >= configMaxStatuses && ul.firstChild) {
-          const removeChild = ul.firstChild;
-          this.removeStatusById(removeChild.getAttribute('data-statusid'));
-          statusCount -= 1;
-        }
-      }
+    if (configMaxStatuses === 0) {
+      return;
+    }
 
-      if (configMaxStatuses === 0) {
-        return;
-      }
+    const li = ul.appendChild(document.createElement('li'));
+    li.setAttribute('data-statusid', status._id);
 
-      const li = ul.appendChild(document.createElement('li'));
-      li.setAttribute('data-statusid', status._id);
+    if (typeof status.color === 'string') {
+      li.classList.add(status.color);
+    }
 
-      if (typeof status.color === 'string') {
-        li.classList.add(status.color);
-      }
+    li.appendChild(document.createTextNode(status.message));
 
-      li.appendChild(document.createTextNode(status.message));
-
-      if (typeof status.timeout === 'number') {
-        this.statusTimeouts[status._id] = window.setTimeout(() => {
-          this.removeStatusById(status._id);
-        }, status.timeout);
-      }
-    });
+    if (typeof status.timeout === 'number') {
+      this.statusTimeouts[status._id] = window.setTimeout(() => {
+        this.removeStatusById(status._id);
+      }, status.timeout);
+    }
   }
 
   updateStatusById(statusId, status) {
