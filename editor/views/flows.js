@@ -289,9 +289,7 @@ View.routes['/flows'] = (EL) => {
 
     const startButton = actionTd.appendChild(document.createElement('button'));
     startButton.innerHTML = 'Start';
-    startButton.onclick = () => {
-      flow.createInstance({ start: true });
-    };
+    startButton.onclick = () => startFlow(flow);
 
     const stopButton = actionTd.appendChild(document.createElement('button'));
     stopButton.innerHTML = 'Stop all';
@@ -301,21 +299,7 @@ View.routes['/flows'] = (EL) => {
 
     const deleteButton = actionTd.appendChild(document.createElement('button'));
     deleteButton.innerHTML = 'Delete';
-    deleteButton.onclick = () => {
-      const deletePrompt = customPrompt(`
-        <h1>Stop instance</h1>
-        <p>
-          Are you sure you want to permanently delete flow &quot;<span style="font-weight: bold;"></span>&quot;?
-        </p>
-      `, 'Confirm');
-
-      deletePrompt.form.querySelector('span').appendChild(document.createTextNode(flow._id));
-
-      deletePrompt.form.addEventListener('submit', () => {
-        deletePrompt.remove();
-        flow.delete();
-      });
-    };
+    deleteButton.onclick = () => deleteFlow(flow);
 
     function flowOnDeleteInstance({ flowInstance }) {
       instanceLength -= 1;

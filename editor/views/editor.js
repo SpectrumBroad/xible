@@ -232,166 +232,12 @@ function editorView(EL) {
     logUl.innerHTML = '';
   };
 
-  function getParamNames(flow) {
-    const paramNames = [];
-    const paramNodes = flow.getNodesByName('xible.flow.instance.param');
-    for (let i = 0; i < paramNodes.length; i += 1) {
-      const inputEl = paramNodes[i].editorContentEl.querySelector('input');
-      if (inputEl && inputEl.value) {
-        paramNames.push(inputEl.value);
-      }
-    }
-    return paramNames;
-  }
-
-  function renderParamInputs(section, paramNames) {
-    const paramInputs = {};
-    if (paramNames.length) {
-      section.style.display = '';
-
-      const startFlowParamDl = section.querySelector('dl');
-      paramNames.forEach((paramName) => {
-        const dt = startFlowParamDl.appendChild(document.createElement('dt'));
-        dt.appendChild(document.createTextNode(paramName));
-
-        const dd = startFlowParamDl.appendChild(document.createElement('dd'));
-        const input = dd.appendChild(document.createElement('input'));
-        input.setAttribute('type', 'text');
-        paramInputs[paramName] = input;
-      });
-    }
-    return paramInputs;
-  }
-
-  function getParamObject(paramNames, paramInputs) {
-    const params = {};
-    if (paramNames.length) {
-      for (const paramName in paramInputs) {
-        if (paramInputs[paramName].value) {
-          params[paramName] = paramInputs[paramName].value;
-        }
-      }
-    }
-    return params;
-  }
-
   // hook buttons
   // deploy
-  document.getElementById('xibleFlowDeployButton').onclick = async () => {
-    // get parameter names
-    const paramNames = getParamNames(xibleEditor.loadedFlow);
-
-    // if there are no parameters and there are no instances running
-    // simply deploy immediately.
-    const hasInstancesRunning = await flowHasRunningInstances(xibleEditor.loadedFlow);
-    if (!paramNames.length && !hasInstancesRunning) {
-      const flow = await xibleEditor.loadedFlow.save();
-      await flow.createInstance({ start: true });
-      return;
-    }
-
-    const deployPrompt = customPrompt(`
-      <h1>Deploy flow</h1>
-      <p class="warning" id="startFlowAlreadyRunningWarning">
-        This flow has one or more running instances.
-        Deploying will stop these instances to ensure integrity across the defined flow. A single new instance is created with the new deployment.<br/>
-        You can start more after the save is complete.
-      </p>
-      <section id="startFlowParamSection" style="display: none;">
-        <h2>Parameters</h2>
-        <dl></dl>
-      </section>
-    `, paramNames.length ? 'Submit' : 'Confirm');
-
-    if (!hasInstancesRunning) {
-      document.getElementById('startFlowAlreadyRunningWarning').style.display = 'none';
-    }
-
-    const paramInputs = renderParamInputs(document.getElementById('startFlowParamSection'), paramNames);
-
-    deployPrompt.form.addEventListener('submit', async () => {
-      const params = getParamObject(paramNames, paramInputs);
-
-      deployPrompt.remove();
-
-      const flow = await xibleEditor.loadedFlow.save();
-      await flow.createInstance({ start: true, params });
-    });
-  };
-
-  async function flowHasRunningInstances(flow) {
-    if (!flow) {
-      throw new Error('The "flow" argument needs to be specified');
-    }
-
-    const instances = await flow.getInstances();
-    return instances.some(
-      instance =>
-        instance.state !== xibleWrapper.FlowInstance.STATE_STOPPED &&
-        instance.state !== xibleWrapper.FlowInstance.STATE_STOPPING &&
-        instance.state !== xibleWrapper.FlowInstance.STATE_INITIALIZED
-    );
-  }
+  document.getElementById('xibleFlowDeployButton').onclick = () => deployFlow(xibleEditor.loadedFlow);
 
   // start
-  document.getElementById('xibleFlowStartButton').onclick = async () => {
-    // get parameter names
-    const paramNames = getParamNames(xibleEditor.loadedFlow);
-
-    // if there are no parameters and there are no instances running
-    // simply start immediately.
-    const hasInstancesRunning = await flowHasRunningInstances(xibleEditor.loadedFlow);
-    if (!paramNames.length && !hasInstancesRunning) {
-      xibleEditor.loadedFlow.createInstance({ start: true });
-      return;
-    }
-
-    const startPrompt = customPrompt(`
-      <h1>Start flow</h1>
-      <section id="startFlowPreSection">
-        <h2>Prestart checklist</h2>
-        <dl>
-          <dd class="checkbox">
-            <label for="startFlowStopInstances">
-              <input type="checkbox" value="true" id="startFlowStopInstances" checked="checked" />
-              <span></span>
-            </label>
-          </dd>
-          <dt class="checkbox">
-            <label for="startFlowStopInstances">
-              Stop running instances
-              <div>There are currently one or more instances already running for this flow.
-              Check this checkbox to stop these before starting a new one.</div>
-            </label>
-          </dt>
-        </dl>
-      </section>
-      <section id="startFlowParamSection" style="display: none;">
-        <h2>Parameters</h2>
-        <dl id="startFlowParamDl"></dl>
-      </section>
-    `, 'Confirm');
-
-    if (!hasInstancesRunning) {
-      document.getElementById('startFlowPreSection').style.display = 'none';
-    }
-
-    const paramInputs = renderParamInputs(document.getElementById('startFlowParamSection'), paramNames);
-
-    startPrompt.form.addEventListener('submit', async () => {
-      const params = getParamObject(paramNames, paramInputs);
-
-      if (hasInstancesRunning) {
-        const stopAllInstances = document.getElementById('startFlowStopInstances').checked;
-        if (stopAllInstances) {
-          await xibleEditor.loadedFlow.stopAllInstances();
-        }
-      }
-
-      startPrompt.remove();
-      xibleEditor.loadedFlow.createInstance({ start: true, params });
-    });
-  };
+  document.getElementById('xibleFlowStartButton').onclick = () => startFlow(xibleEditor.loadedFlow);
 
   // stop
   document.getElementById('xibleFlowStopButton').onclick = () => {
@@ -421,30 +267,7 @@ function editorView(EL) {
   };
 
   // delete
-  document.getElementById('xibleFlowDeleteButton').onclick = () => {
-    if (!xibleEditor.loadedFlow) {
-      return;
-    }
-
-    const deletePrompt = customPrompt(`
-      <h1>Stop instance</h1>
-      <p>
-        Are you sure you want to permanently delete flow &quot;<span style="font-weight: bold;"></span>&quot;?
-      </p>
-    `, 'Confirm');
-
-    deletePrompt.form.querySelector('span').appendChild(document.createTextNode(xibleEditor.loadedFlow._id));
-
-    deletePrompt.form.addEventListener('submit', async () => {
-      deletePrompt.remove();
-      await xibleEditor.loadedFlow.delete();
-
-      const flowTab = document.querySelector(`.flowList>li[data-flowid="${xibleEditor.loadedFlow._id}"]`);
-      if (flowTab) {
-        flowTab.parentNode.removeChild(flowTab);
-      }
-    });
-  };
+  document.getElementById('xibleFlowDeleteButton').onclick = () => deleteFlow(xibleEditor.loadedFlow);
 
   const { cpuChart, memChart, delayChart } = createResourceCharts(document.getElementById('cpuChart'), document.getElementById('memChart'), document.getElementById('delayChart'));
 
@@ -743,10 +566,19 @@ function editorView(EL) {
     }
     flow.on('deleteInstance', flowOnDeleteInstance);
 
+    function flowOnDelete() {
+      const flowTab = document.querySelector(`.flowList>li[data-flowid="${flow._id}"]`);
+      if (flowTab) {
+        flowTab.parentNode.removeChild(flowTab);
+      }
+    }
+    flow.on('delete', flowOnDelete);
+
     mainViewHolder.once('purge', () => {
       flow.removeListener('initJson', flowOnInitJson);
       flow.removeListener('createInstance', flowOnCreateInstance);
       flow.removeListener('deleteInstance', flowOnDeleteInstance);
+      flow.removeListener('delete', flowOnDelete);
     });
 
     return li;
