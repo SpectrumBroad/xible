@@ -328,7 +328,7 @@ class Xible extends EventEmitter {
 
   /**
    * Stops XIBLE.
-   * To do; this stops the webserver, removes the pid and cliqueue files.
+   * This stops the webserver, removes the pid and cliqueue files.
    */
   close() {
     this.stopping = true;
@@ -343,7 +343,6 @@ class Xible extends EventEmitter {
     this.CliQueue.removeFile();
     this.removePidFile();
 
-    // TODO: should stop all flow instances
     xibleDebug('close');
   }
 
