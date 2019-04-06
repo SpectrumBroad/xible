@@ -105,7 +105,10 @@ View.routes['/settings/general'] = (EL) => {
           <dt>
             <label for="settingsGeneralVaultPath">
               Vault path
-              <div>Path to the directory containing the flows.</div>
+              <div>
+                Path to the file containing node data values which should not be exposed.<br/>
+                Values in this file are not published towards the registry when publishing flows.
+              </div>
             </label>
           </dt>
           <dd><input id="settingsGeneralVaultPath" type="text" data-configpath="vault.path" /></dd>
