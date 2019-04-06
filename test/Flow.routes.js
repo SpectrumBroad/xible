@@ -3,7 +3,6 @@
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
 
-const assert = require('assert');
 const supertest = require('supertest');
 const Xible = require('..');
 

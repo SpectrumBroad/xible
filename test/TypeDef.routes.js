@@ -36,9 +36,9 @@ describe('/api/typedefs', function () {
       return supertest(xible.expressApp)
       .get('/api/typedefs/string')
       .expect(200)
-      .expect(res => assert.equal(res.body.color, 'yellow'))
-      .expect(res => assert.equal(res.body.name, 'string'))
-      .expect(res => assert.equal(res.body.extends, 'object'));
+      .expect(res => assert.strictEqual(res.body.color, 'yellow'))
+      .expect(res => assert.strictEqual(res.body.name, 'string'))
+      .expect(res => assert.strictEqual(res.body.extends, 'object'));
     });
 
     it('non existing should return 404', function () {
