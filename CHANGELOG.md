@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Noting noteworthy right now.
 
+## [0.17.0][] - 2019-04-06
+### Changed
+-   Starting flows from the 'flows' page triggers the same checks as the start button on the 'editor' page does. Existing instances can therefor be stopped and instance parameters can be provided.
+
+-   Improved node selector in editor. Node names are now wrapped for better readability.
+
 ## [0.16.1][] - 2019-02-01
 ### Fixed
 -   Various `xible node` cli commands are functioning again.
@@ -317,7 +323,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.16.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/SpectrumBroad/xible/compare/v0.16.1...v0.17.0
 [0.16.1]: https://github.com/SpectrumBroad/xible/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/SpectrumBroad/xible/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/SpectrumBroad/xible/compare/v0.14.0...v0.15.0
