@@ -369,7 +369,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             try {
               const router = express.Router();
               EXPRESS_APP.use(`/api/node-routes/${xibleNode._id}/`, router);
-              require(nodeConstr.routesPath)(xibleNode, router);
+              require(nodeConstr.routesPath)(xibleNode, router, express.static);
             } catch (err) {
               console.error(err);
             }
