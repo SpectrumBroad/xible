@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   Chart labels are no longer overlapped by the chart itself. ([#3](https://github.com/SpectrumBroad/xible/issues/3))
 
+-   Removed browser feature check for HTML imports. ([#84](https://github.com/SpectrumBroad/xible/issues/84))
+
 ## [0.17.0][] - 2019-04-06
 ### Changed
 -   Starting flows from the 'flows' page triggers the same checks as the start button on the 'editor' page does. Existing instances can therefor be stopped and instance parameters can be provided.
