@@ -28,6 +28,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     res.sendFile(`${__dirname}/node_modules/xible-wrapper/dist/index.js`);
   });
 
+  // expose chart.js to editor
+  EXPRESS_APP.get('/js/Chart.min.js', (req, res) => {
+    res.sendFile(`${__dirname}/node_modules/chart.js/dist/Chart.min.js`);
+  });
+
   EXPRESS_APP.get('*', (req, res, next) => {
     // node editor content hosting
     // and node-routes

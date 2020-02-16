@@ -60,6 +60,7 @@
     "sanitize-filename": "*",
     "fs-extra": "*",
     "strip-ansi": "*",
+    "chart.js": "*",
     "xible-np-xible": "*",
     "xible-np-core": "*",
     "xible-np-compare": "*",

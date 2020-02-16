@@ -161,7 +161,7 @@
   background-color: darkorange;
 }
 
-.stats div {
+.stats>div {
   position: relative;
   height: 100px;
 }
