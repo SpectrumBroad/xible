@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Noting noteworthy right now.
+### Fixed
+-   Chart labels are no longer overlapped by the chart itself. ([#3](https://github.com/SpectrumBroad/xible/issues/3))
 
 ## [0.17.0][] - 2019-04-06
 ### Changed

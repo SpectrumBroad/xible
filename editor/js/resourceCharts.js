@@ -134,6 +134,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
               fontColor: '#666',
               mirror: true,
               maxTicksLimit: 4,
+              z: 1,
               callback: value => `${value} %`
             }
           }
@@ -206,6 +207,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
               fontColor: '#666',
               mirror: true,
               maxTicksLimit: 4,
+              z: 1,
               callback: value => `${value} MiB`
             }
           }
@@ -262,6 +264,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
               fontColor: '#666',
               mirror: true,
               maxTicksLimit: 4,
+              z: 1,
               callback: value => `${value} μs`
             }
           }
