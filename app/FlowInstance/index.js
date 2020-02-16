@@ -540,11 +540,13 @@ module.exports = (XIBLE) => {
             }
           });
 
-          this.worker.send({
-            method: 'stop'
-          });
+          if (this.worker.connected) {
+            this.worker.send({
+              method: 'stop'
+            });
 
-          this.worker.disconnect();
+            this.worker.disconnect();
+          }
 
           // forcibly kill after 5 seconds
           killTimeout = setTimeout(() => {
