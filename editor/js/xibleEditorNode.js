@@ -170,9 +170,9 @@ class XibleEditorNode extends xibleWrapper.Node {
         templateEl = document.body.appendChild(template.querySelector('template'));
         templateEl.setAttribute('id', `xible-node-${this.name}`);
 
-        // remove scripts that don't have a type set (to module)
+        // remove scripts
         // so we can evaulate them in a seperate function with a specific document argument.
-        templateEl.plainScripts = Array.from(templateEl.content.querySelectorAll('script:not([type])'))
+        templateEl.plainScripts = Array.from(templateEl.content.querySelectorAll('script'))
         .map((scriptEl) => {
           const scriptContent = scriptEl.textContent;
           scriptEl.parentNode.removeChild(scriptEl);
