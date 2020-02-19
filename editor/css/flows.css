@@ -156,7 +156,7 @@
   box-sizing: border-box;
   width: 33.3%;
   border-right: 1px solid #222;
-  padding: 6px;
+  padding: 6px 2px;
 }
 
 td.state>ul {

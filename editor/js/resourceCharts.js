@@ -17,18 +17,18 @@ function updateResourceCharts(flow, usage, cpuChart, memChart, delayChart, insta
         acc.cpu.user += currentValue.usage.cpu.user;
         acc.cpu.system += currentValue.usage.cpu.system;
         acc.cpu.percentage += currentValue.usage.cpu.percentage;
-  
+
         acc.memory.rss += currentValue.usage.memory.rss;
         acc.memory.heapTotal += currentValue.usage.memory.heapTotal;
         acc.memory.heapUsed += currentValue.usage.memory.heapUsed;
         acc.memory.external += currentValue.usage.memory.external;
-  
+
         if (!currentIndex) {
           acc.delay = currentValue.usage.delay;
         } else {
           acc.delay = ((acc.delay * currentIndex) + currentValue.usage.delay) / (currentIndex + 1);
         }
-  
+
         return acc;
       },
       {
@@ -130,7 +130,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
             },
             ticks: {
               beginAtZero: true,
-              padding: 2,
+              padding: 0,
               fontColor: '#666',
               mirror: true,
               maxTicksLimit: 4,
@@ -203,7 +203,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
             },
             ticks: {
               beginAtZero: true,
-              padding: 2,
+              padding: 0,
               fontColor: '#666',
               mirror: true,
               maxTicksLimit: 4,
@@ -260,7 +260,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
             },
             ticks: {
               beginAtZero: true,
-              padding: 2,
+              padding: 0,
               fontColor: '#666',
               mirror: true,
               maxTicksLimit: 4,
