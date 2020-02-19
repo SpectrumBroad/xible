@@ -196,7 +196,7 @@
   overflow-x: hidden;
   text-overflow: ellipsis;
   position: relative;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 #nodeSelector>ul>li>h1 {
