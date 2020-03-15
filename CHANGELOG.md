@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.17.2][] - 2020-03-15
+### Fixed
+-   Wrapping of node names in the editor now works cross browser, instead of only in Chrome.
+
+-   Installing XIBLE on non-MacOS operating systems failed because of an older nested dependency in the [filesystem nodepack](https://xible.io/nodes?search=filesystem).
+
 ## [0.17.1][] - 2020-02-19
 ### Fixed
 -   Chart labels are no longer overlapped by the chart itself. ([#3](https://github.com/SpectrumBroad/xible/issues/3))
@@ -329,7 +335,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.17.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.17.2...HEAD
+[0.17.2]: https://github.com/SpectrumBroad/xible/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/SpectrumBroad/xible/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/SpectrumBroad/xible/compare/v0.16.1...v0.17.0
 [0.16.1]: https://github.com/SpectrumBroad/xible/compare/v0.16.0...v0.16.1
