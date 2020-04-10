@@ -105,7 +105,7 @@
   height: 0.5px;
   width: 100%;
   top: 0;
-  bottom: 0;
+  left: 0;
   background-image: linear-gradient(to right, #333, #333 80%, transparent);
   z-index: -1;
 }
