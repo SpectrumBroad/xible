@@ -347,7 +347,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       return;
     }
 
-    const configMaxStatuses = await xibleWrapper.Config.getValue('editor.nodes.statuses.max')
+    const configMaxStatuses = await xibleWrapper.Config.getValue('editor.nodes.statuses.max');
 
     let statusCount = 0;
     let ul = this.statusEl;
