@@ -11,6 +11,10 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
 
     // double click for global
     this.element.addEventListener('dblclick', () => {
+      if (!this.node.flow) {
+        return;
+      }
+
       const globalValue = !this.global;
       if (
         this instanceof XibleEditorNodeInput &&
@@ -102,6 +106,10 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
 
       // if there's nothing to move, return
       if (event.shiftKey && this.connectors.length === 0) {
+        return;
+      }
+
+      if (!this.node.flow) {
         return;
       }
 
@@ -326,7 +334,7 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
     const el = this.element;
 
     el.addEventListener('mouseover', () => {
-      if (!this.global) {
+      if (!this.global || !this.node.flow) {
         return;
       }
 
@@ -336,9 +344,13 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
       }
     });
 
-    el.addEventListener('mouseout', () =>
+    el.addEventListener('mouseout', () => {
+      if (!this.global || !this.node.flow) {
+        return;
+      }
+
       this.node.flow.removeGlobalConnectors()
-    );
+    });
   }
 
   viewGlobalConnectors(highlightIo) {

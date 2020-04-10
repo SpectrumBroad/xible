@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Added
+-   New nodes view which lists all the installed nodepacks and their nodes.
+
+### Fixed
+-   Vault path description in settings was incorrect.
 
 ## [0.17.2][] - 2020-03-15
 ### Fixed

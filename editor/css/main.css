@@ -34,7 +34,10 @@ section {
   box-sizing: border-box;
 }
 
-.inner section dl, .inner section p, .inner section ul, .inner section ol {
+.inner section > dl,
+.inner section > p,
+.inner section > ul,
+.inner section > ol {
   font-size: 0.7em;
 }
 
