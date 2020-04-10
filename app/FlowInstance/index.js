@@ -424,8 +424,8 @@ module.exports = (XIBLE) => {
         throw new Error('instance must be associated with a flow');
       }
 
+      await this.flow.deleteInstance(this);
       this.emit('delete');
-      return this.flow.deleteInstance(this);
     }
 
     /**
