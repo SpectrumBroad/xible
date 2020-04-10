@@ -5,9 +5,6 @@ const debug = require('debug');
 const fs = require('fs');
 const path = require('path');
 
-// lazy requires
-let express;
-
 const nodeDebug = debug('xible:node');
 const typeSymbol = Symbol('typedef');
 
