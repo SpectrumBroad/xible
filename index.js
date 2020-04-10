@@ -145,12 +145,6 @@ class Xible extends EventEmitter {
 
     this.stopping = false;
 
-    // get all installed nodes
-    const nodesPath = this.Config.getValue('nodes.path');
-    if (!nodesPath) {
-      throw new Error('need a "nodes.path" in the configuration to load the installed nodes from');
-    }
-
     this.initStats();
 
     if (this.child) {
@@ -196,26 +190,11 @@ class Xible extends EventEmitter {
       require('./routes.js')(this, this.expressApp);
     }
 
-    const DEFAULT_NODEPACK_NODE_MODULES = [
-      'xible-np-xible',
-      'xible-np-core',
-      'xible-np-compare',
-      'xible-np-console',
-      'xible-np-input',
-      'xible-np-object',
-      'xible-np-string',
-      'xible-nodepack-math',
-      'xible-nodepack-stream',
-      'xible-nodepack-filesystem',
-      'xible-nodepack-process',
-      'xible-nodepack-timing'
-    ];
-    await Promise.all([
-      this.Node.initFromPath(`${__dirname}/nodes`),
-      ...DEFAULT_NODEPACK_NODE_MODULES.map(defaultNodePack =>
-        this.Node.initFromPath(`${__dirname}/node_modules/${defaultNodePack}`)),
-      this.Node.initFromPath(this.resolvePath(nodesPath))
-    ]);
+    // load nodepacks/nodes
+    const nodePacks = await this.NodePack.getAll();
+    for (const nodePackName in nodePacks) {
+      await nodePacks[nodePackName].initNodes()
+    }
 
     // get all installed flows
     if (!obj || !obj.nodeNames) {

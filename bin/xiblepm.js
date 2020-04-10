@@ -312,12 +312,7 @@ const cli = {
           }
 
           // remove preceeding 'xible-...' from the nodepack name.
-          nodePackName = nodePackName.toLowerCase();
-          if (nodePackName.substring(0, 15) === 'xible-nodepack-') {
-            nodePackName = nodePackName.substring(15);
-          } else if (nodePackName.substring(0, 9) === 'xible-np-') {
-            nodePackName = nodePackName.substring(9);
-          }
+          nodePackName = xible.NodePack.getBaseName(nodePackName);
 
           if (!nodePackName) {
             reject('The nodepack name in "package.json" is empty.');
