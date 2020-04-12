@@ -350,7 +350,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           method: 'xible.node.addProgressBar',
           status
         }
-
       });
 
       return status._id;
