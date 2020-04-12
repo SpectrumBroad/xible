@@ -58,15 +58,21 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const nodePacks = {};
       this.DEFAULT_NODEPACK_NAMES.forEach((defaultNodePackName) => {
         const baseName = this.getBaseName(defaultNodePackName);
-        nodePacks[baseName] = this.getOneByPath(`${__dirname}/../../node_modules/${defaultNodePackName}`, baseName);
-        nodePacks[baseName].installedByDefault = true;
+        const nodePack = this.getOneByPath(`${__dirname}/../../node_modules/${defaultNodePackName}`, baseName);
+        if (nodePack) {
+          nodePacks[baseName] = nodePack;
+          nodePacks[baseName].installedByDefault = true;
+        }
       });
 
       return nodePacks;
     }
 
     static getOneByPath(path, nodePackName) {
-      if (!fsExtra.statSync(path).isDirectory()) {
+      if (
+        !fsExtra.existsSync(path) ||
+        !fsExtra.statSync(path).isDirectory()
+      ) {
         return null;
       }
 
