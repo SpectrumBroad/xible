@@ -162,6 +162,11 @@ class XibleEditorNode extends xibleWrapper.Node {
       });
       shadow.xibleNode = this;
 
+      // hook base document stuff
+      shadow.createElement = (...args) => document.createElement(...args);
+      shadow.createElementNS = (...args) => document.createElementNS(...args);
+      shadow.createTextNode = (...args) => document.createTextNode(...args);
+
       let templateEl = document.getElementById(`xible-node-${this.name}`);
       if (!templateEl) {
         const textTemplate = `<template><style>@import url("css/nodeContent.css");</style>${content}</template>`;
