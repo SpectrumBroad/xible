@@ -158,7 +158,7 @@ class XibleEditor extends EventEmitter {
 
     // handle descriptions for input elements and labels
     node.on('editorContentLoad', () => {
-      if (!node.editorContentEl) {
+      if (!node.shadowRoot) {
         return;
       }
 

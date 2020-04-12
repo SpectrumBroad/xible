@@ -185,12 +185,12 @@ class XibleEditorNode extends xibleWrapper.Node {
 
       shadow.appendChild(templateContent.cloneNode(true));
 
+      // append the div & shadowroot to the node
+      this.shadowRoot = shadow;
+
       templateEl.plainScripts.forEach((script) => {
         new Function('document', script).call(this, shadow);
       });
-
-      // append the div & shadowroot to the node
-      this.editorContentEl = shadow;
 
       // trigger some convenience stuff
       this.convenienceLabel();
@@ -483,11 +483,11 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   getRootLabelElements() {
-    return Array.from(this.editorContentEl.querySelectorAll(':host>label'));
+    return Array.from(this.shadowRoot.querySelectorAll(':host>label'));
   }
 
   getRootInputElements() {
-    return Array.from(this.editorContentEl.querySelectorAll(':host>input, :host>selectcontainer, :host>textarea'));
+    return Array.from(this.shadowRoot.querySelectorAll(':host>input, :host>selectcontainer, :host>textarea'));
   }
 
   /**
@@ -497,7 +497,7 @@ class XibleEditorNode extends xibleWrapper.Node {
     this.getRootInputElements()
     .forEach((el) => {
       const label = document.createElement('label');
-      this.editorContentEl.replaceChild(label, el);
+      this.shadowRoot.replaceChild(label, el);
       label.appendChild(el);
 
       // set the required attribute
@@ -545,7 +545,7 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   convenienceTextAreaSetup() {
-    const els = Array.from(this.editorContentEl.querySelectorAll('textarea'));
+    const els = Array.from(this.shadowRoot.querySelectorAll('textarea'));
     els.forEach((el) => {
       el.addEventListener('keydown', (event) => {
         if (event.keyCode === 9) {
@@ -561,7 +561,7 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   convenienceOutputValue() {
-    const els = Array.from(this.editorContentEl.querySelectorAll('[data-output-value], [data-outputvalue]'));
+    const els = Array.from(this.shadowRoot.querySelectorAll('[data-output-value], [data-outputvalue]'));
     els.forEach((el) => {
       const attr = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
       const type = el.getAttribute('type');
@@ -634,7 +634,7 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   convenienceHideIfAttached() {
-    const els = Array.from(this.editorContentEl.querySelectorAll('[data-hide-if-attached], [data-hideifattached]'));
+    const els = Array.from(this.shadowRoot.querySelectorAll('[data-hide-if-attached], [data-hideifattached]'));
     els.forEach((el) => {
       const attr = el.getAttribute('data-hide-if-attached') || el.getAttribute('data-hideifattached');
       let matchArray;
