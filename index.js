@@ -168,7 +168,7 @@ class Xible extends EventEmitter {
       this.close();
     });
 
-    this.startWeb();
+    await this.startWeb();
 
     // throttle broadcast messages
     if (WEB_SOCKET_THROTTLE > 0) {
@@ -347,79 +347,83 @@ class Xible extends EventEmitter {
   /**
    * Starts the webserver.
    */
-  startWeb() {
-    xibleDebug('startWeb');
+  async startWeb() {
+    return new Promise((resolve) => {
+      xibleDebug('startWeb');
 
-    // setup client requests over https
-    const spdy = require('spdy');
-    const expressApp = this.expressApp;
+      // setup client requests over https
+      const spdy = require('spdy');
+      const expressApp = this.expressApp;
 
-    // editor
-    expressApp.use(this.express.static(`${__dirname}/editor`, {
-      index: false
-    }));
+      // editor
+      expressApp.use(this.express.static(`${__dirname}/editor`, {
+        index: false
+      }));
 
-    // init the webserver
-    const webPortNumber = this.Config.getValue('webserver.portnumber') || 9600;
-    this.webPortNumber = webPortNumber;
-    expressDebug(`starting on port: ${webPortNumber}`);
+      // init the webserver
+      const webPortNumber = this.Config.getValue('webserver.portnumber') || 9600;
+      this.webPortNumber = webPortNumber;
+      expressDebug(`starting on port: ${webPortNumber}`);
 
-    const onListen = (webServer) => {
-      const address = webServer.address();
-      const port = address.port;
+      const onListen = (webServer) => {
+        const address = webServer.address();
+        const port = address.port;
 
-      expressDebug(`listening on: ${address.address}:${port}`);
+        expressDebug(`listening on: ${address.address}:${port}`);
 
-      if (this.secure && port === webPortNumber) {
-        return;
+        if (this.secure && port === webPortNumber) {
+          return;
+        }
+
+        // websocket
+        const wsDebug = debug('xible:websocket');
+        const ws = require('ws'); // uws is buggy right now
+
+        wsDebug(`listening on port: ${webPortNumber}`);
+
+        const webSocketServer = new ws.Server({
+          server: webServer,
+          ssl: this.secure
+        });
+        this.webSocketServer = webSocketServer;
+
+        webSocketServer.on('connection', (client) => {
+          webSocketDebug('connection');
+
+          client.on('error', (err) => {
+            webSocketDebug(`error: ${err}`);
+          });
+
+          client.on('close', () => {
+            webSocketDebug('close');
+          });
+        });
+
+        resolve()
+      };
+
+      // spdy (https)
+      const webSslPortNumber = this.Config.getValue('webserver.ssl.portnumber') || 9601;
+      this.webSslPortNumber = webSslPortNumber;
+      const webSslKeyPath = this.Config.getValue('webserver.ssl.keypath');
+      const webSslKeyCert = this.Config.getValue('webserver.ssl.certpath');
+      if (webSslPortNumber && webSslKeyPath && webSslKeyCert) {
+        expressDebug('starting spdy (https)');
+        this.secure = true;
+
+        this.secureWebServer = spdy.createServer({
+          key: fs.readFileSync(webSslKeyPath),
+          cert: fs.readFileSync(webSslKeyCert)
+        }, expressApp).listen(webSslPortNumber, () => onListen(this.secureWebServer));
+
+        expressApp.settings.port = webSslPortNumber;
+      } else {
+        expressApp.settings.port = webPortNumber;
       }
 
-      // websocket
-      const wsDebug = debug('xible:websocket');
-      const ws = require('ws'); // uws is buggy right now
-
-      wsDebug(`listening on port: ${webPortNumber}`);
-
-      const webSocketServer = new ws.Server({
-        server: webServer,
-        ssl: this.secure
-      });
-      this.webSocketServer = webSocketServer;
-
-      webSocketServer.on('connection', (client) => {
-        webSocketDebug('connection');
-
-        client.on('error', (err) => {
-          webSocketDebug(`error: ${err}`);
-        });
-
-        client.on('close', () => {
-          webSocketDebug('close');
-        });
-      });
-    };
-
-    // spdy (https)
-    const webSslPortNumber = this.Config.getValue('webserver.ssl.portnumber') || 9601;
-    this.webSslPortNumber = webSslPortNumber;
-    const webSslKeyPath = this.Config.getValue('webserver.ssl.keypath');
-    const webSslKeyCert = this.Config.getValue('webserver.ssl.certpath');
-    if (webSslPortNumber && webSslKeyPath && webSslKeyCert) {
-      expressDebug('starting spdy (https)');
-      this.secure = true;
-
-      this.secureWebServer = spdy.createServer({
-        key: fs.readFileSync(webSslKeyPath),
-        cert: fs.readFileSync(webSslKeyCert)
-      }, expressApp).listen(webSslPortNumber, () => onListen(this.secureWebServer));
-
-      expressApp.settings.port = webSslPortNumber;
-    } else {
-      expressApp.settings.port = webPortNumber;
-    }
-
-    expressDebug('starting plain (http)');
-    this.plainWebServer = expressApp.listen(webPortNumber, () => onListen(this.plainWebServer));
+      expressDebug('starting plain (http)');
+      this.plainWebServer = expressApp.listen(webPortNumber, () => onListen(this.plainWebServer));
+    });
   }
 
   initWeb() {
