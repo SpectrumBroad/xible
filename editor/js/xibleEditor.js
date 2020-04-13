@@ -587,18 +587,18 @@ class XibleEditor extends EventEmitter {
 
     const selectionIndex = this.selection.indexOf(obj);
 
-    if (!event.ctrlKey && event.type === 'mousedown' && selectionIndex === -1) {
+    if (!event.ctrlKey && !event.metaKey && event.type === 'mousedown' && selectionIndex === -1) {
       this.deselect();
       this.selection.push(obj);
       obj.element.classList.add('selected');
-    } else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex === -1 && !this.nodeDragHasFired) {
+    } else if ((event.ctrlKey || event.metaKey) && event.type === 'mouseup' && selectionIndex === -1 && !this.nodeDragHasFired) {
       this.selection.push(obj);
       obj.element.classList.add('selected');
-    } else if (!event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
+    } else if (!event.ctrlKey && !event.metaKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
       this.deselect();
       this.selection.push(obj);
       obj.element.classList.add('selected');
-    } else if (event.ctrlKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
+    } else if ((event.ctrlKey || event.metaKey) && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
       this.deselect(obj);
     }
   }
@@ -741,7 +741,7 @@ class XibleEditor extends EventEmitter {
     }
 
     // deselect previous selection
-    if (!event.ctrlKey) {
+    if (!event.ctrlKey && !event.metaKey) {
       this.deselect();
     }
 
@@ -877,7 +877,7 @@ class XibleEditor extends EventEmitter {
 
       // area selector
       if (
-        (!this.selection.length || event.ctrlKey) &&
+        (!this.selection.length || event.ctrlKey || event.metaKey) &&
         (event.target === this.element || event.target === this.element.firstChild)
       ) {
         this.initAreaSelector(event);
@@ -898,7 +898,7 @@ class XibleEditor extends EventEmitter {
         // deselect
         if (
           (event.target === this.element.firstChild || event.target === this.element) &&
-          !event.ctrlKey && event.button === 0
+          !event.ctrlKey && !event.metaKey && event.button === 0
         ) {
           this.deselect();
         }
@@ -983,7 +983,7 @@ class XibleEditor extends EventEmitter {
 
           // select all
         case 'a':
-          if (event.ctrlKey) {
+          if (event.ctrlKey || event.metaKey) {
             this.loadedFlow.nodes
             .forEach(node => this.select(node));
             this.loadedFlow.connectors
@@ -996,7 +996,7 @@ class XibleEditor extends EventEmitter {
 
           // deselect all
         case 'd':
-          if (event.ctrlKey) {
+          if (event.ctrlKey || event.metaKey) {
             this.deselect();
             event.preventDefault();
           }
@@ -1012,7 +1012,7 @@ class XibleEditor extends EventEmitter {
 
           // duplicate layers
         case 'j':
-          if (event.ctrlKey) {
+          if (event.ctrlKey || event.metaKey) {
             this.duplicateToEditor(this.selection);
             event.preventDefault();
           }
@@ -1021,7 +1021,7 @@ class XibleEditor extends EventEmitter {
 
           // cut
         case 'x':
-          if (event.ctrlKey && this.selection.length) {
+          if ((event.ctrlKey || event.metaKey) && this.selection.length) {
             this.copySelection = this.duplicate(this.selection);
             while (this.selection.length) {
               this.selection[0].delete();
@@ -1034,7 +1034,7 @@ class XibleEditor extends EventEmitter {
 
           // copy
         case 'c':
-          if (event.ctrlKey && this.selection.length) {
+          if ((event.ctrlKey || event.metaKey) && this.selection.length) {
             this.copySelection = this.duplicate(this.selection);
             event.preventDefault();
           }
@@ -1043,7 +1043,7 @@ class XibleEditor extends EventEmitter {
 
           // paste
         case 'v':
-          if (event.ctrlKey && this.copySelection) {
+          if ((event.ctrlKey || event.metaKey) && this.copySelection) {
             // TODO: ensure paste is in view
             this.duplicateToEditor(this.copySelection);
 
@@ -1064,7 +1064,7 @@ class XibleEditor extends EventEmitter {
 
           // save
         case 's':
-          if (event.ctrlKey) {
+          if (event.ctrlKey || event.metaKey) {
             this.loadedFlow.save();
             event.preventDefault();
           }
