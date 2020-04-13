@@ -108,13 +108,16 @@ View.routes['/nodepacks'] = async (EL) => {
     const actionsDiv = li.appendChild(document.createElement('div'));
     actionsDiv.classList.add('actions');
 
+/*
+    // remove button
     if (!nodePack.installedByDefault) {
       const deleteButton = actionsDiv.appendChild(document.createElement('button'));
-      deleteButton.appendChild(document.createTextNode('Delete'));
+      deleteButton.appendChild(document.createTextNode('Remove'));
       deleteButton.addEventListener('click', () => {
 
       });
     }
+*/
 
     return li;
   }
