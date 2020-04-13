@@ -147,22 +147,25 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               const nodeDestDir = `${nodePath}/${this.name}`;
 
               // when success, resolve
-              const onSuccess = () => XIBLE.Node
-              .initFromPath(nodeDestDir)
-              .then(() => cleanUp(tmpRegDir))
-              .then(() => {
-                // see if we can/need to reinit flows that are not runnable
-                const flows = XIBLE.getFlows();
-                for (const flowId in flows) {
-                  if (!flows[flowId].runnable) {
-                    flows[flowId].initJson(flows[flowId].json);
+              const onSuccess = () => {
+                const nodePack = XIBLE.NodePack.getOneByPath(nodeDestDir, this.name);
+
+                return nodePack.initNodes()
+                .then(() => cleanUp(tmpRegDir))
+                .then(() => {
+                  // see if we can/need to reinit flows that are not runnable
+                  const flows = XIBLE.getFlows();
+                  for (const flowId in flows) {
+                    if (!flows[flowId].runnable) {
+                      flows[flowId].initJson(flows[flowId].json);
+                    }
                   }
-                }
-              })
-              .then(resolve)
-              .catch((onSuccessErr) => {
-                reject(onSuccessErr);
-              });
+                })
+                .then(resolve)
+                .catch((onSuccessErr) => {
+                  reject(onSuccessErr);
+                });
+              };
 
               // remove existing node directory
               fsExtra.emptyDir(nodeDestDir, (removeExistingNodeErr) => {
