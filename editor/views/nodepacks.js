@@ -1,6 +1,6 @@
 'use strict';
 
-View.routes['/nodes'] = async (EL) => {
+View.routes['/nodepacks'] = async (EL) => {
   EL.innerHTML = `
     <div id="sub">
       <header>XIBLE</header>
