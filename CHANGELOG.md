@@ -4,6 +4,9 @@ All notable changes to the [XIBLE project](https://xible.io) will be documented 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased][]
+Noting noteworthy right now.	Nothing notable at the moment.
+
 ## [0.18.0][] - 2020-04-13
 ### Added
 -   A nodepack view has been added which lists all the installed nodepacks and their nodes.
