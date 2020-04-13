@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing noteworthy right now.	Nothing notable at the moment.
 
+## [0.18.1][] - 2020-04-13
+### Fixed
+-   Installing nodepacks from the registry failed.
+
 ## [0.18.0][] - 2020-04-13
 ### Added
 -   A nodepack view has been added which lists all the installed nodepacks and their nodes.
@@ -344,7 +348,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/SpectrumBroad/xible/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/SpectrumBroad/xible/compare/v0.17.2...v0.18.0
 [0.17.2]: https://github.com/SpectrumBroad/xible/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/SpectrumBroad/xible/compare/v0.17.0...v0.17.1
