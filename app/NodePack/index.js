@@ -244,6 +244,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       fsExtra.removeSync(this.path);
       this.path = null;
+
+      delete constructed[this.name];
       return this;
     }
   }
