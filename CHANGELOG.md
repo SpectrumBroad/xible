@@ -4,9 +4,11 @@ All notable changes to the [XIBLE project](https://xible.io) will be documented 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][]
+## [0.18.0][] - 2020-04-13
 ### Added
--   New nodes view which lists all the installed nodepacks and their nodes.
+-   A nodepack view has been added which lists all the installed nodepacks and their nodes.
+
+-   Support for the command key in the editor on MacOS.
 
 ### Fixed
 -   Vault path description in settings was incorrect.
@@ -339,7 +341,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.17.2...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/SpectrumBroad/xible/compare/v0.17.2...v0.18.0
 [0.17.2]: https://github.com/SpectrumBroad/xible/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/SpectrumBroad/xible/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/SpectrumBroad/xible/compare/v0.16.1...v0.17.0
