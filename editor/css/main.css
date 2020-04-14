@@ -11,20 +11,23 @@
   overflow: auto;
 }
 
-.inner>:first-child, .inner>section>:first-child, .inner>.view>:first-child, .inner>.view>section>:first-child {
+.inner > :first-child,
+.inner > section > :first-child,
+.inner > .view > :first-child,
+.inner > .view > section > :first-child {
   margin-top: 0;
 }
 
 .inner h1 {
   font-family: robotothin;
   font-weight: normal;
-  font-size: 1.5em;
+  font-size: 1.8em;
 }
 
 .inner h2 {
   font-family: robotothin;
   font-weight: normal;
-  font-size: 1.2em;
+  font-size: 1.5em;
   margin: 20px 0 20px 0;
 }
 
@@ -32,13 +35,6 @@ section {
   width: 100%;
   padding: 0;
   box-sizing: border-box;
-}
-
-.inner section > dl,
-.inner section > p,
-.inner section > ul,
-.inner section > ol {
-  font-size: 0.7em;
 }
 
 main {

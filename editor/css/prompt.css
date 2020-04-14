@@ -10,6 +10,7 @@
   color: #eee;
   overflow-y: auto;
   overflow-x: hidden;
+  font-size: 1.2em;
 }
 
 .prompt form {

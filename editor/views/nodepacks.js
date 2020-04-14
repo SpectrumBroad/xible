@@ -83,7 +83,7 @@ View.routes['/nodepacks'] = async (EL) => {
       .appendChild(document.createTextNode('default'));
     }
 
-    li.appendChild(document.createElement('h1'))
+    li.appendChild(document.createElement('h2'))
     .appendChild(document.createTextNode(nodePack.name));
 
     if (nodePack.description) {

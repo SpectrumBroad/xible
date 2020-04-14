@@ -30,7 +30,7 @@ html, body {
   margin: 0;
   box-sizing: border-box;
   font-family: robotolight;
-  font-size: 22px;
+  font-size: 16px;
 }
 
 body {
@@ -125,7 +125,7 @@ nav>ul>li>a {
   box-sizing: border-box;
   color: inherit;
   transition: background-color ease-out .3s, color ease .2s;
-  font-size: 0.6em;
+  font-size: 0.8em;
   letter-spacing: 1px;
   display: flex;
   align-items: center;
@@ -187,6 +187,7 @@ header {
   padding: 0;
   margin: 10px 16px;
   text-shadow: 0 1px 0 #000;
+  font-size: 1.6em;
 }
 
 header span {
