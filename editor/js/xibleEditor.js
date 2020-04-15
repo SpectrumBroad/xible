@@ -649,6 +649,15 @@ class XibleEditor extends EventEmitter {
 
     if (typeof this.gridSize === 'number' && this.gridSize > 0) {
       document.body.addEventListener('mouseup', this.nodeDragUpListener = () => {
+        if (this.nodeDragUpListener) {
+          document.body.removeEventListener('mouseup', this.nodeDragUpListener);
+          this.nodeDragUpListener = null;
+        }
+
+        if (!this.nodeDragHasFired) {
+          return;
+        }
+
         for (const sel of this.selection) {
           if (typeof (sel.setPosition) === 'function') {
             sel.setPosition(
@@ -656,11 +665,6 @@ class XibleEditor extends EventEmitter {
               Math.round(sel.top / this.gridSize) * this.gridSize
             );
           }
-        }
-
-        if (this.nodeDragUpListener) {
-          document.body.removeEventListener('mouseup', this.nodeDragUpListener);
-          this.nodeDragUpListener = null;
         }
       });
     }
