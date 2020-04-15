@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing noteworthy right now.	Nothing notable at the moment.
+### Added
+-   You can now snap nodes in the editor to a grid. The setting is enabled by default. It can be toggled in the editor in the bottom left corner.
 
 ## [0.18.1][] - 2020-04-13
 ### Fixed
