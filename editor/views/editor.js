@@ -67,6 +67,13 @@ function editorView(EL) {
       </section>
     </div>
     <div id="flowEditorHolder">
+      <div id="snapConfiguration">
+        <label title="Snaps the nodes to a grid upon dragging them">
+          <input type="checkbox" checked id="snapConfigurationCheckbox" />
+          <span></span>
+          Snap
+        </label>
+      </div>
       <div class="zoomButtons">
         <button id="zoomOutButton" type="button" title="Zoom out">&#xe024;</button>
         <button id="zoomFitButton" type="button" title="Zoom to fit">&gt;</button>
@@ -305,6 +312,12 @@ function editorView(EL) {
 
   // holds the flowlist and editor
   const flowEditorHolder = document.getElementById('flowEditorHolder');
+
+  // snap
+  const snapConfigurationCheckbox = document.getElementById('snapConfigurationCheckbox');
+  snapConfigurationCheckbox.onchange = () => {
+    xibleEditor.gridSize = snapConfigurationCheckbox.checked ? 50 : 0;
+  };
 
   // zoom and reset
   function zoomOut() {

@@ -6,6 +6,34 @@
   position: relative;
 }
 
+#flowEditorHolder #snapConfiguration {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 1;
+  padding: 0 4px 0 0;
+  margin: 0;
+  opacity: 0.4;
+  background-color: #181818;
+  box-shadow: 0 0 6px 0 #000;
+  border: 1px solid #000;
+  transition: opacity ease .2s;
+}
+
+#flowEditorHolder #snapConfiguration:hover {
+  opacity: 0.9;
+}
+
+#flowEditorHolder #snapConfiguration label {
+  display: flex;
+  align-items: center;
+}
+
+#flowEditorHolder #snapConfiguration span {
+  float: left;
+  margin-right: 10px;
+}
+
 #flowEditorHolder .zoomButtons {
   position: absolute;
   right: 10px;
@@ -14,7 +42,7 @@
   padding: 0;
   margin: 0;
   font-size: 1.4em;
-  opacity: 0.5;
+  opacity: 0.4;
   background-color: #181818;
   box-shadow: 0 0 6px 0 #000;
   border: 1px solid #000;
