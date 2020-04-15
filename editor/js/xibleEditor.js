@@ -39,11 +39,14 @@ class XibleEditor extends EventEmitter {
       }
     }
 
+    this.gridSize = 50;
+
     this.selection = [];
     this.copySelection = null;
 
     this.nodeDragHasFired = false;
     this.nodeDragListener = null;
+    this.nodeDragUpListener = null;
     this.nodeDragSpliceConnector = false;
 
     this.areaMoveListener = null;
@@ -644,6 +647,24 @@ class XibleEditor extends EventEmitter {
       });
     }
 
+    if (typeof this.gridSize === 'number' && this.gridSize > 0) {
+      document.body.addEventListener('mouseup', this.nodeDragUpListener = () => {
+        for (const sel of this.selection) {
+          if (typeof (sel.setPosition) === 'function') {
+            sel.setPosition(
+              Math.round(sel.left / this.gridSize) * this.gridSize,
+              Math.round(sel.top / this.gridSize) * this.gridSize
+            );
+          }
+        }
+
+        if (this.nodeDragUpListener) {
+          document.body.removeEventListener('mouseup', this.nodeDragUpListener);
+          this.nodeDragUpListener = null;
+        }
+      });
+    }
+
     // catch the mousemove event
     document.body.addEventListener('mousemove', this.nodeDragListener = (mouseMoveEvent) => {
       // check if mouse actually moved
@@ -665,8 +686,7 @@ class XibleEditor extends EventEmitter {
       initPageY = mouseMoveEvent.pageY;
 
       // update position of each of the selection items that cares
-      for (let i = 0; i < this.selection.length; i += 1) {
-        const sel = this.selection[i];
+      for (const sel of this.selection) {
         if (typeof (sel.setPosition) === 'function') {
           sel.setPosition(sel.left + relativePageX, sel.top + relativePageY);
         }
