@@ -1,12 +1,9 @@
 'use strict';
 
 module.exports = (XIBLE, EXPRESS_APP) => {
-  EXPRESS_APP.get('/api/validateFlowPermissions', (req, res) => {
-    XIBLE.Flow
-    .validatePermissions()
-    .then((result) => {
-      res.json(result);
-    });
+  EXPRESS_APP.get('/api/validateFlowPermissions', async (req, res) => {
+    const permissionsResult = await XIBLE.Flow.validatePermissions();
+    res.json(permissionsResult);
   });
 
   EXPRESS_APP.get('/api/serverDate', (req, res) => {
