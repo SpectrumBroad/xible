@@ -267,18 +267,18 @@ class XibleEditorNodeSelector {
   * @returns {Boolean} Visible or not.
   */
   static setListVisibility(li, filterInputValue, searchWords) {
-    const textContent = li.textContent.toLowerCase();
+    const textContent = li.textContent.toLowerCase().replace(/-+/g, '');
 
     li.classList.remove('headerMatchExact', 'headerMatchPartial');
     if (
       !filterInputValue ||
-      searchWords.every(searchWord => textContent.indexOf(searchWord) > -1)
+      searchWords.every((searchWord) => textContent.indexOf(searchWord) > -1)
     ) {
       // specify more relevant search results
       const headerTextContent = li.firstChild.textContent.toLowerCase();
       if (headerTextContent === filterInputValue) {
         li.classList.add('headerMatchExact');
-      } else if (searchWords.every(searchWord => headerTextContent.indexOf(searchWord) > -1)) {
+      } else if (searchWords.every((searchWord) => headerTextContent.indexOf(searchWord) > -1)) {
         li.classList.add('headerMatchPartial');
       }
 
