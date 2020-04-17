@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   You can now snap nodes in the editor to a grid. The setting is enabled by default. It can be toggled in the editor in the bottom left corner.
 
+-   Searching for a node in the node selector which contains a dash, no longer needs that dash supplied in the search input. For example, the search string 'appendstring' will find the node `filesystem.file.append-string`.
+
 ## [0.18.1][] - 2020-04-13
 ### Fixed
 -   Installing nodepacks from the registry failed.
