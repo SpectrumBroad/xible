@@ -3,6 +3,7 @@
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
 
+const assert = require('assert');
 const supertest = require('supertest');
 const Xible = require('..');
 
@@ -39,7 +40,7 @@ describe('/api/flows', function () {
         connectors: []
       })
       .expect(200)
-      .expect(res => res.body._id === 'new_test_flow');
+      .expect(res => assert(res.body._id === 'new_test_flow'));
     });
 
     it('should fail on flow name', function () {
@@ -59,7 +60,7 @@ describe('/api/flows', function () {
       return supertest(xible.expressApp)
       .get('/api/flows/new_test_flow')
       .expect(200)
-      .expect(res => res.body._id === 'new_test_flow');
+      .expect(res => assert(res.body._id === 'new_test_flow'));
     });
   });
 
