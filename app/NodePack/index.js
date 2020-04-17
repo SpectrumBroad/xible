@@ -5,9 +5,9 @@ const fsExtra = require('fs-extra');
 // lazy requires
 let express;
 
-let constructed;
-
 module.exports = (XIBLE, EXPRESS_APP) => {
+  let constructed;
+
   class NodePack {
     constructor(obj = {}) {
       this.name = obj.name;
