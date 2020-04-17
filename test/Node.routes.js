@@ -3,6 +3,7 @@
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
 
+const assert = require('assert');
 const supertest = require('supertest');
 const Xible = require('..');
 
@@ -25,7 +26,9 @@ describe('/api/nodes', function () {
     it('should return list of nodes', function () {
       return supertest(xible.expressApp)
       .get('/api/nodes')
-      .expect(200);
+      .expect(200)
+      .expect((res) => assert(res.body['console.log'] !== undefined))
+      .expect((res) => assert(Object.keys(res.body).length > 1))
     });
   });
 
