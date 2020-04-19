@@ -96,12 +96,16 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       });
     }
 
-    static getByPath(nodesPath) {
+    static getByPath(nodesPath, extractBaseName) {
       const nodePacks = {};
       const nodePackDirs = fsExtra.readdirSync(nodesPath);
 
       for (let i = 0; i < nodePackDirs.length; i += 1) {
-        const nodePack = this.getOneByPath(`${nodesPath}/${nodePackDirs[i]}`, nodePackDirs[i]);
+        let baseName = nodePackDirs[i];
+        if (extractBaseName) {
+          baseName = NodePack.getBaseName(baseName);
+        }
+        const nodePack = this.getOneByPath(`${nodesPath}/${nodePackDirs[i]}`, baseName);
         if (!nodePack) {
           continue;
         }
@@ -136,7 +140,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       const nodePacks = this.getDefault();
-      Object.assign(nodePacks, this.getByPath(`${__dirname}/../../nodes`));
+      Object.assign(nodePacks, this.getByPath(`${__dirname}/../../nodes`, true));
       Object.assign(nodePacks, this.getByPath(nodesPath));
 
       constructed = nodePacks;
