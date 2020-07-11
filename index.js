@@ -81,7 +81,7 @@ class Xible extends EventEmitter {
     if (!this.configPath) {
       throw new Error('Cannot write PID file, configPath not set.');
     }
-    fs.writeFile(`${this.configPath}.pid`, process.pid, {
+    fs.writeFile(`${this.configPath}.pid`, process.pid.toString(), {
       mode: 0o600
     }, (err) => {
       if (err) {

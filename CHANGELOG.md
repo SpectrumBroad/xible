@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Searching for a node in the node selector which contains a dash, no longer needs that dash supplied in the search input. For example, the search string 'appendstring' will find the node `filesystem.file.append-string`.
 
+### Fixed
+-   Support for NodeJS v14. ([#85](https://github.com/SpectrumBroad/xible/issues/85))
+
 ## [0.18.1][] - 2020-04-13
 ### Fixed
 -   Installing nodepacks from the registry failed.
