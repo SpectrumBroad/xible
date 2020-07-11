@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing considerable to mention at the moment.
+
+## [0.19.0][] - 2020-07-11
 ### Added
 -   You can now snap nodes in the editor to a grid. The setting is enabled by default. It can be toggled in the editor in the bottom left corner.
 
@@ -354,7 +357,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.18.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.19.0...HEAD
+[0.18.2]: https://github.com/SpectrumBroad/xible/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/SpectrumBroad/xible/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/SpectrumBroad/xible/compare/v0.17.2...v0.18.0
 [0.17.2]: https://github.com/SpectrumBroad/xible/compare/v0.17.1...v0.17.2
