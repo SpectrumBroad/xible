@@ -37,8 +37,10 @@
     "inspect": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/xible.js server start",
     "inspect-brk": "export DEBUG=\"xible*\" && ./node_modules/.bin/nodemon --inspect-brk=0.0.0.0:9229 ./bin/xible.js server start",
     "prepublishOnly": "npm shrinkwrap --only=prod",
-    "test": "./node_modules/.bin/mocha",
-    "cov": "./node_modules/.bin/nyc ./node_modules/.bin/mocha"
+    "test": "npm run test:integration",
+    "test:integration": "./node_modules/.bin/mocha",
+    "test:integration:coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha",
+    "test:ui": "./node_modules/.bin/cypress run"
   },
   "bin": {
     "xible": "./bin/xible.js",
@@ -75,14 +77,16 @@
     "xible-nodepack-timing": "*"
   },
   "devDependencies": {
-    "eslint": "^4.3.0",
-    "eslint-config-airbnb": "^15.1.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jsx-a11y": "^5.1.1",
-    "eslint-plugin-react": "^7.1.0",
-    "nodemon": "*",
+    "cypress": "^4.4.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^2.5.0",
     "mocha": "*",
-    "supertest": "*",
-    "nyc": "*"
+    "nodemon": "*",
+    "nyc": "*",
+    "supertest": "*"
   }
 }

@@ -5,3 +5,4 @@ ssl
 docs
 package-lock.json
 .nyc_output
+cypress
