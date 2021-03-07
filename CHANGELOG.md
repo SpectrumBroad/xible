@@ -368,8 +368,8 @@ You can use this to deviate from the default registry stored in your config file
 -   Config module failed to create new config.json upon fresh installation.
 
 [Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.19.2...HEAD
-[0.19.2]: https://github.com/SpectrumBroad/xible/compare/v0.19.1...0.19.2
-[0.19.1]: https://github.com/SpectrumBroad/xible/compare/v0.19.0...0.19.1
+[0.19.2]: https://github.com/SpectrumBroad/xible/compare/v0.19.1...v0.19.2
+[0.19.1]: https://github.com/SpectrumBroad/xible/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/SpectrumBroad/xible/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/SpectrumBroad/xible/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/SpectrumBroad/xible/compare/v0.17.2...v0.18.0
