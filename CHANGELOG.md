@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing considerable to mention at the moment.
 
+## [0.19.1][] - 2021-03-08
+### Fixed
+-   Non-existing '/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
+
 ## [0.19.0][] - 2020-07-11
 ### Added
 -   You can now snap nodes in the editor to a grid. The setting is enabled by default. It can be toggled in the editor in the bottom left corner.
