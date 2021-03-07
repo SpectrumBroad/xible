@@ -9,7 +9,7 @@ Nothing considerable to mention at the moment.
 
 ## [0.19.1][] - 2021-03-07
 ### Fixed
--   Non-existing '/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
+-   Non-existing 'xible/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
 
 -   Browser dependencies imported from node_modules now use `require.resolve()` to ensure a proper path is used on all platforms.
 
