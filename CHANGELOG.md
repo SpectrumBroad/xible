@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing considerable to mention at the moment.
 
-## [0.19.1][] - 2021-03-08
+## [0.19.1][] - 2021-03-07
 ### Fixed
 -   Non-existing '/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
 
