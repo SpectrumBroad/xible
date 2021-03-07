@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing considerable to mention at the moment.
 
+## [0.19.2][] - 2021-03-07
+### Fixed
+-   Non-existing '~/.xible/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
+
 ## [0.19.1][] - 2021-03-07
 ### Fixed
 -   Non-existing 'xible/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
@@ -363,7 +367,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.19.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.19.2...HEAD
+[0.19.2]: https://github.com/SpectrumBroad/xible/compare/v0.19.1...0.19.2
 [0.19.1]: https://github.com/SpectrumBroad/xible/compare/v0.19.0...0.19.1
 [0.19.0]: https://github.com/SpectrumBroad/xible/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/SpectrumBroad/xible/compare/v0.18.0...v0.18.1
