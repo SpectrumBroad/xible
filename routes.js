@@ -22,20 +22,20 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
   // expose xibleWrapper to editor
   EXPRESS_APP.get('/js/xibleWrapper.js', (req, res) => {
-    res.sendFile(`${__dirname}/node_modules/xible-wrapper/dist/index.js`);
+    res.sendFile(require.resolve('xible-wrapper/dist/index.js'));
   });
 
   // expose chart.js to editor
   EXPRESS_APP.get('/js/Chart.min.js', (req, res) => {
-    res.sendFile(`${__dirname}/node_modules/chart.js/dist/Chart.min.js`);
+    res.sendFile(require.resolve('chart.js/dist/Chart.min.js'));
   });
 
   EXPRESS_APP.get('*', (req, res, next) => {
     // node editor content hosting
     // and node-routes
     if (
-      /^\/api\/nodes\/[^/]+\/editor\//.test(req.path) ||
-      /^\/api\/node-routes\/[^/]+\//.test(req.path)
+      /^\/api\/nodes\/[^/]+\/editor\//.test(req.path)
+      || /^\/api\/node-routes\/[^/]+\//.test(req.path)
     ) {
       next();
       return;

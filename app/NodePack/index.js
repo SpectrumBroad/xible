@@ -58,6 +58,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const nodePacks = {};
       this.DEFAULT_NODEPACK_NAMES.forEach((defaultNodePackName) => {
         const baseName = this.getBaseName(defaultNodePackName);
+
+        // this won't work until all nodepacks have an index.js
+        // const nodePack = this.getOneByPath(require.resolve(defaultNodePackName), baseName);
+
         const nodePack = this.getOneByPath(`${__dirname}/../../node_modules/${defaultNodePackName}`, baseName);
         if (nodePack) {
           nodePacks[baseName] = nodePack;
