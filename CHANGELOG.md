@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing considerable to mention at the moment.
 
+-   Minimum supported node version is now 12.0.0
+
 ## [0.19.2][] - 2021-03-07
 ### Fixed
 -   Non-existing '~/.xible/nodes' directory no longer prevents XIBLE from importing nodepacks and flows.
