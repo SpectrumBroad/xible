@@ -144,10 +144,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       const nodePacks = this.getDefault();
 
+      // include directory used for internal development purposes
       try {
         Object.assign(nodePacks, this.getByPath(`${__dirname}/../../nodes`, true));
       } catch (err) {
-        console.warn('Failed to include nodes directory', err);
+        // silently failing as this directory is not important
+        // console.warn('Failed to include nodes directory', err);
       }
 
       Object.assign(nodePacks, this.getByPath(nodesPath));

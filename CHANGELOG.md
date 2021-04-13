@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing considerable to mention at the moment.
 
+### Changed
+-   A missing `./nodes` directory within the XIBLE installation path no longer throws a warning, and instead silently fails. This directory is used for internal development purposes only and is harmless if it is missing.
+
 -   Minimum supported node version is now 12.0.0
 
 ## [0.19.2][] - 2021-03-07
