@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing considerable to mention at the moment.
+### Added
+-   Nodepack and node logging has been improved. ([#89](https://github.com/SpectrumBroad/xible/issues/89))
 
 ### Changed
 -   A missing `./nodes` directory within the XIBLE installation path no longer throws a warning, and instead silently fails. This directory is used for internal development purposes only and is harmless if it is missing.

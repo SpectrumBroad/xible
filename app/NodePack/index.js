@@ -1,6 +1,9 @@
 'use strict';
 
 const fsExtra = require('fs-extra');
+const debug = require('debug');
+
+const nodePackDebug = debug('xible:nodePack');
 
 // lazy requires
 let express;
@@ -55,6 +58,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * And specified in the package.json.
      */
     static getDefault() {
+      nodePackDebug('loading defaults from "./node_modules"');
+
       const nodePacks = {};
       this.DEFAULT_NODEPACK_NAMES.forEach((defaultNodePackName) => {
         const baseName = this.getBaseName(defaultNodePackName);
@@ -74,14 +79,15 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     static getOneByPath(path, nodePackName) {
       if (
-        !fsExtra.existsSync(path) ||
-        !fsExtra.statSync(path).isDirectory()
+        !fsExtra.existsSync(path)
+        || !fsExtra.statSync(path).isDirectory()
       ) {
         return null;
       }
 
       const packageJsonPath = `${path}/package.json`;
       if (!fsExtra.existsSync(packageJsonPath)) {
+        nodePackDebug(`ignoring "${nodePackName}", missing package.json.`);
         return null;
       }
 
@@ -89,7 +95,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       try {
         packageJson = require(packageJsonPath);
       } catch (err) {
-        console.error(err);
+        nodePackDebug(`could not require "${packageJsonPath}", ${err}`);
         return null;
       }
 
@@ -101,6 +107,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     static getByPath(nodesPath, extractBaseName) {
+      nodePackDebug(`loading from "${nodesPath}"`);
+
       const nodePacks = {};
       const nodePackDirs = fsExtra.readdirSync(nodesPath);
 
@@ -174,12 +182,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-     * Initializes all nodes and typedefs found within the path of this nodepack, recursively.
+     * Initializes all nodes and typedefs found within this.path of this nodepack, recursively.
      * Runs Node.getStructures() on that path, and hosting editor contents if applicable.
      * Throws when run from a worker.
-     * @param {String} nodePath Path to the directory containting the nodes.
-     * If the directory does not exist, it will be created.
-     * @returns {Promise.<Object>}
      * @private
      */
     async initNodes() {

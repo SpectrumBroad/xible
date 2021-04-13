@@ -1,6 +1,8 @@
+/* eslint-disable max-classes-per-file */
+
 'use strict';
 
-const EventEmitter = require('events').EventEmitter;
+const { EventEmitter } = require('events');
 const debug = require('debug');
 const fs = require('fs');
 const path = require('path');
@@ -113,61 +115,76 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       // first check if the given path is a structure itself
       try {
         const structure = await this.getStructure(structuresPath);
-        if (structure.typedefs) {
-          Object.assign(structures.typedefs, structure.typedefs);
-        }
-        if (structure.node) {
-          structures.nodes[structure.node.name] = structure.node;
-        }
-      } catch (getStructureErr) {
-        // if this path does not concern a structure itself, check subdirs
-        return new Promise((resolve) => {
-          const files = this.getFiles(structuresPath);
-          let loadedCounter = 0;
-
-          if (!files.length) {
-            resolve(structures);
+        if (structure) {
+          if (structure.typedefs) {
+            Object.assign(structures.typedefs, structure.typedefs);
           }
+          if (structure.node) {
+            structures.nodes[structure.node.name] = structure.node;
+          }
+        } else {
+          // if this path does not concern a structure itself, check subdirs
+          return new Promise((resolve) => {
+            const files = this.getFiles(structuresPath);
+            let loadedCounter = 0;
 
-          function checkAndResolve() {
-            if (++loadedCounter === files.length) { // eslint-disable-line
+            if (!files.length) {
               resolve(structures);
             }
-          }
 
-          for (let i = 0; i < files.length; i += 1) {
-            if (files[i] === 'node_modules' || files[i].substring(0, 1) === '.') {
-              checkAndResolve();
-              continue;
+            function checkAndResolve() {
+              if (++loadedCounter === files.length) { // eslint-disable-line
+                if (
+                  Object.keys(structures.nodes).length === 0
+                  && Object.keys(structures.typedefs).length === 0
+                ) {
+                  nodeDebug(`no "structure.json" found for "${structuresPath}"`);
+                }
+
+                resolve(structures);
+              }
             }
 
-            const normalizedPath = path.resolve(structuresPath, files[i]);
-            fs.stat(normalizedPath, async (err, stat) => {
-              if (err) {
-                nodeDebug(`Could not stat "${normalizedPath}": ${err}`);
+            for (let i = 0; i < files.length; i += 1) {
+              if (
+                files[i] === 'node_modules'
+                || files === 'package.json'
+                || files === 'structure.json'
+                || files[i].substring(0, 1) === '.'
+              ) {
                 checkAndResolve();
-                return;
+                continue;
               }
 
-              if (!stat.isDirectory()) {
-                checkAndResolve();
-                return;
-              }
+              const normalizedPath = path.resolve(structuresPath, files[i]);
+              fs.stat(normalizedPath, async (err, stat) => {
+                if (err) {
+                  nodeDebug(`Could not stat "${normalizedPath}": ${err}`);
+                  checkAndResolve();
+                  return;
+                }
 
-              // process subdirs
-              const nestedStructures = await this.getStructures(normalizedPath);
-              if (!Object.keys(nestedStructures).length) {
-                nodeDebug(getStructureErr);
-                checkAndResolve();
-                return;
-              }
+                if (!stat.isDirectory()) {
+                  checkAndResolve();
+                  return;
+                }
 
-              Object.assign(structures.nodes, nestedStructures.nodes);
-              Object.assign(structures.typedefs, nestedStructures.typedefs);
-              checkAndResolve();
-            });
-          }
-        });
+                // process subdirs
+                const nestedStructures = await this.getStructures(normalizedPath);
+                if (!Object.keys(nestedStructures).length) {
+                  checkAndResolve();
+                  return;
+                }
+
+                Object.assign(structures.nodes, nestedStructures.nodes);
+                Object.assign(structures.typedefs, nestedStructures.typedefs);
+                checkAndResolve();
+              });
+            }
+          });
+        }
+      } catch (getStructureErr) {
+        nodeDebug(getStructureErr);
       }
 
       return structures;
@@ -193,7 +210,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         // check for structure.json
         fs.access(structurePath, fs.constants.R_OK, (err) => {
           if (err) {
-            reject(`Could not access "${structurePath}": ${err}`);
+            if (err.code === 'ENOENT') {
+              resolve(null);
+            }
+
+            reject(new Error(`Could not access "${structurePath}": ${err}`));
             return;
           }
 
@@ -201,7 +222,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             structure = require(structurePath);
             structure.path = dirPath;
           } catch (requireStructureJsonErr) {
-            reject(`Could not require "${structurePath}": ${requireStructureJsonErr}`);
+            reject(new Error(`Could not require "${structurePath}": ${requireStructureJsonErr}`));
             return;
           }
 
@@ -211,7 +232,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               try {
                 Object.assign(typedefs, require(typedefPath));
               } catch (requireTypedefJsonError) {
-                reject(`Could not require "${typedefPath}": ${requireTypedefJsonError}`);
+                reject(new Error(`Could not require "${typedefPath}": ${requireTypedefJsonError}`));
               }
             }
 
@@ -616,7 +637,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @returns {Boolean} Returns a Boolean; true or false.
     */
     hasConnectedInputsOfType(type) {
-      return this.inputs.some(input => input.type === type && input.connectors.length);
+      return this.inputs.some((input) => input.type === type && input.connectors.length);
     }
 
     /**
@@ -666,8 +687,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
 
         if (
-          Array.isArray(obj.assignsOutputTypes) &&
-          obj.assignsOutputTypes.every(assignsOutputType => typeof assignsOutputType === 'string')
+          Array.isArray(obj.assignsOutputTypes)
+          && obj.assignsOutputTypes.every((assignsOutputType) => typeof assignsOutputType === 'string')
         ) {
           this.assignsOutputTypes = obj.assignsOutputTypes;
         }
@@ -677,8 +698,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
 
         if (
-          Array.isArray(obj.assignsInputTypes) &&
-          obj.assignsInputTypes.every(assignsInputType => typeof assignsInputType === 'string')
+          Array.isArray(obj.assignsInputTypes)
+          && obj.assignsInputTypes.every((assignsInputType) => typeof assignsInputType === 'string')
         ) {
           this.assignsInputTypes = obj.assignsInputTypes;
         }
@@ -788,7 +809,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         if (!conns.length && this.global) {
           conns = this.node.flow
           .getGlobalOutputsByType(this.type)
-          .map(output => ({
+          .map((output) => ({
             origin: output
           }));
         }
@@ -831,7 +852,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
              */
             if (cbValue !== undefined) {
               if (Array.isArray(cbValue)) {
-                values = values.concat(cbValue.filter(value => this.matchesTypeDef(value)));
+                values = values.concat(cbValue.filter((value) => this.matchesTypeDef(value)));
               } else if (this.matchesTypeDef(cbValue)) {
                 values.push(cbValue);
               }
