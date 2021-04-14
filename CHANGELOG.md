@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing noteworthy at the moment.
+
+## [0.20.0][] - 2021-04-14
 ### Added
--   Nodepack and node logging has been improved. ([#89](https://github.com/SpectrumBroad/xible/issues/89))
+-   Nodepack- and node- logging have been improved. ([#89](https://github.com/SpectrumBroad/xible/issues/89))
 
 ### Changed
 -   A missing `./nodes` directory within the XIBLE installation path no longer throws a warning, and instead silently fails. This directory is used for internal development purposes only and is harmless if it is missing.
@@ -373,7 +376,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.19.2...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.20.0...HEAD
+[0.20.0]: https://github.com/SpectrumBroad/xible/compare/v0.19.2...v0.20.0
 [0.19.2]: https://github.com/SpectrumBroad/xible/compare/v0.19.1...v0.19.2
 [0.19.1]: https://github.com/SpectrumBroad/xible/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/SpectrumBroad/xible/compare/v0.18.1...v0.19.0
