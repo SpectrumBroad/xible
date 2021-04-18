@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing noteworthy at the moment.
 
+## [0.20.2][] - 2021-04-18
+### Fixed
+-   An invalid repository reference ended up in the shrinkwrap.json, causing installations to fail.
+
 ## [0.20.0][] - 2021-04-14
 ### Added
 -   Nodepack- and node- logging have been improved. ([#89](https://github.com/SpectrumBroad/xible/issues/89))
@@ -376,7 +380,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.20.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.20.2...HEAD
+[0.20.2]: https://github.com/SpectrumBroad/xible/compare/v0.20.0...v0.20.2
 [0.20.0]: https://github.com/SpectrumBroad/xible/compare/v0.19.2...v0.20.0
 [0.19.2]: https://github.com/SpectrumBroad/xible/compare/v0.19.1...v0.19.2
 [0.19.1]: https://github.com/SpectrumBroad/xible/compare/v0.19.0...v0.19.1
