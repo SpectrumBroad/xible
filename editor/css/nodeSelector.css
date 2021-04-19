@@ -13,6 +13,11 @@
   box-sizing: border-box;
   z-index: 1;
   contain: content;
+
+  /* chromium is bleeding the background-color
+   * into the border
+   */
+  background-clip: content-box;
 }
 
 #nodeSelector.loading::after {
