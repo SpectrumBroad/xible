@@ -358,16 +358,16 @@ function editorView(EL) {
       const nodeOffsetWidth = node.element.offsetWidth;
       const nodeOffsetHeight = node.element.offsetHeight;
 
-      if (!minLeft || node.left < minLeft) {
+      if (minLeft === undefined || node.left < minLeft) {
         minLeft = node.left;
       }
-      if (!maxLeft || node.left + nodeOffsetWidth > maxLeft) {
+      if (maxLeft === undefined || node.left + nodeOffsetWidth > maxLeft) {
         maxLeft = node.left + nodeOffsetWidth;
       }
-      if (!minTop || node.top < minTop) {
+      if (minTop === undefined || node.top < minTop) {
         minTop = node.top;
       }
-      if (!maxTop || node.top + nodeOffsetHeight > maxTop) {
+      if (maxTop === undefined || node.top + nodeOffsetHeight > maxTop) {
         maxTop = node.top + nodeOffsetHeight;
       }
     }

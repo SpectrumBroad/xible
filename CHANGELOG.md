@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Charts work again after version pinning the chart.js dependency.
 
+-   Prevent issues with the zoom-to-fit button showing erratic behaviour if any of the nodes in a flow had an x or y position of exactly 0.
+
 ## [0.20.2][] - 2021-04-18
 ### Fixed
 -   An invalid repository reference ended up in the shrinkwrap.json, causing installations to fail.
