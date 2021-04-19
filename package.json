@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "body-parser": "*",
-    "chart.js": "*",
+    "chart.js": "^2.0.0",
     "debug": "*",
     "express": "*",
     "fs-extra": "*",

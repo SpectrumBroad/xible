@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -   `npm run debug` and other commands now work on Windows by using [cross-env](https://github.com/kentcdodds/cross-env) to set environment variables, instead of `EXPORT`.
 
+-   Charts work again after version pinning the chart.js dependency.
+
 ## [0.20.2][] - 2021-04-18
 ### Fixed
 -   An invalid repository reference ended up in the shrinkwrap.json, causing installations to fail.
