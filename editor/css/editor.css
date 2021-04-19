@@ -386,10 +386,14 @@
 }
 
 .xible .editor>.connector>path {
-  stroke: #fff;
+  stroke: #aaa;
   stroke-width: 3px;
   fill: none;
   pointer-events: all;
+}
+
+.xible .editor>.connector>path.trigger {
+  stroke: #fff;
 }
 
 .xible .editor>.connector.global>path {
