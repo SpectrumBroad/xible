@@ -125,10 +125,13 @@ class XibleEditor extends EventEmitter {
     // append the node type information
     /*
     let typeEl = node.element.querySelector('h1').appendChild(document.createElement('p'));
-    typeEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(node.type));
+    typeEl.appendChild(document.createElement('span'))
+      .appendChild(document.createTextNode(node.type));
 
     if(node.type === 'action') {
-      typeEl.appendChild(document.createTextNode('Double-click this header in the flow overview to start it in directed mode.'));
+      typeEl.appendChild(document.createTextNode(
+        'Double-click this header in the flow overview to start it in directed mode.'
+      ));
     }
     */
 
@@ -232,10 +235,10 @@ class XibleEditor extends EventEmitter {
       this.typeDefStyleEl.setAttribute('type', 'text/css');
       let styleText = '';
       for (const type in typeDefs) {
-        if (typeDefs[type].color &&
-          (
-            /^\w+$/.test(typeDefs[type].color) ||
-            /^#[a-f0-9]{6}$/i.test(typeDefs[type].color)
+        if (typeDefs[type].color
+          && (
+            /^\w+$/.test(typeDefs[type].color)
+            || /^#[a-f0-9]{6}$/i.test(typeDefs[type].color)
           )
         ) {
           styleText += `.xible .node>.io>ul>.${type.replace(/\./g, '\\.')} {border-color: ${typeDefs[type].color};}\n`;
@@ -363,7 +366,7 @@ class XibleEditor extends EventEmitter {
   * @return {XibleEditorFlow|Void} The found Flow
   */
   getFlowById(id) {
-    return this.flows.find(flow => flow._id === id);
+    return this.flows.find((flow) => flow._id === id);
   }
 
   /**
@@ -379,15 +382,15 @@ class XibleEditor extends EventEmitter {
 
     // global inputs
     // FIXME: move this to the XibleFlow def and track all global outputs there
-    let globalTypes = [].concat(...this.loadedFlow.nodes.map(node => node.getGlobalOutputs()
-    .map(output => output.type)));
+    let globalTypes = [].concat(...this.loadedFlow.nodes.map((node) => node.getGlobalOutputs()
+    .map((output) => output.type)));
 
     node.getInputs()
     .forEach((input) => {
       let globalValue = input.global;
       if (
-        globalTypes.indexOf(input.type) > -1 &&
-        !input.connectors.length && input.global !== false
+        globalTypes.indexOf(input.type) > -1
+        && !input.connectors.length && input.global !== false
       ) {
         globalValue = true;
       }
@@ -714,23 +717,23 @@ class XibleEditor extends EventEmitter {
 
           if (
             (
-              selNode.getInputsByType(connector.origin.type).length ||
-              (connector.origin.type !== 'trigger' && selNode.getInputsByType(null).length)
-            ) &&
-            (
-              selNode.getOutputsByType(connector.origin.type).length ||
-              (connector.destination.type !== 'trigger' && selNode.getOutputsByType(null).length) ||
-              (
-                selNode.outputs.length &&
-                !connector.destination.type &&
-                selNode.outputs.length > selNode.getOutputsByType('trigger').length
+              selNode.getInputsByType(connector.origin.type).length
+              || (connector.origin.type !== 'trigger' && selNode.getInputsByType(null).length)
+            )
+            && (
+              selNode.getOutputsByType(connector.origin.type).length
+              || (connector.destination.type !== 'trigger' && selNode.getOutputsByType(null).length)
+              || (
+                selNode.outputs.length
+                && !connector.destination.type
+                && selNode.outputs.length > selNode.getOutputsByType('trigger').length
               )
             )
           ) {
             const connBounding = connector.element.getBoundingClientRect();
             if (
-              Math.abs((connector.left + (connBounding.width / this.zoom) / 2) - selLeftAvg) < 20 &&
-              Math.abs((connector.top + (connBounding.height / this.zoom) / 2) - selTopAvg) < 20
+              Math.abs((connector.left + (connBounding.width / this.zoom) / 2) - selLeftAvg) < 20
+              && Math.abs((connector.top + (connBounding.height / this.zoom) / 2) - selTopAvg) < 20
             ) {
               this.nodeDragSpliceConnector = connector;
               connector.element.classList.add('splice');
@@ -747,8 +750,8 @@ class XibleEditor extends EventEmitter {
         }
 
         if (
-          previousSpliceConnector &&
-          (!hasSpliceConnector || previousSpliceConnector !== this.nodeDragSpliceConnector)
+          previousSpliceConnector
+          && (!hasSpliceConnector || previousSpliceConnector !== this.nodeDragSpliceConnector)
         ) {
           previousSpliceConnector.element.classList.remove('splice');
         }
@@ -802,7 +805,7 @@ class XibleEditor extends EventEmitter {
 
       if (Math.abs(relativePageY) < 3 && Math.abs(relativePageX) < 3) {
         return;
-      } else if (!areaEl) {
+      } if (!areaEl) {
         areaEl = document.createElement('div');
         areaEl.classList.add('area');
         areaEl.style.transform = `translate(${areaElLeft}px, ${areaElTop}px)`;
@@ -858,12 +861,12 @@ class XibleEditor extends EventEmitter {
       for (let i = 0; i < this.loadedFlow.nodes.length; i += 1) {
         const node = this.loadedFlow.nodes[i];
         const nodeBounding = boundings.get(node);
-        const nodeLeftAvg = nodeBounding.nodeLeftAvg;
-        const nodeTopAvg = nodeBounding.nodeTopAvg;
+        const { nodeLeftAvg } = nodeBounding;
+        const { nodeTopAvg } = nodeBounding;
 
         if (
-          nodeLeftAvg > areaElPageLeft && nodeLeftAvg < areaElPageLeft + relativePageX &&
-          nodeTopAvg > areaElPageTop && nodeTopAvg < areaElPageTop + relativePageY
+          nodeLeftAvg > areaElPageLeft && nodeLeftAvg < areaElPageLeft + relativePageX
+          && nodeTopAvg > areaElPageTop && nodeTopAvg < areaElPageTop + relativePageY
         ) {
           if (alreadySelectedNodes.has(node)) {
             selectedNodes.delete(node);
@@ -903,8 +906,8 @@ class XibleEditor extends EventEmitter {
 
       // area selector
       if (
-        (!this.selection.length || event.ctrlKey || event.metaKey) &&
-        (event.target === this.element || event.target === this.element.firstChild)
+        (!this.selection.length || event.ctrlKey || event.metaKey)
+        && (event.target === this.element || event.target === this.element.firstChild)
       ) {
         this.initAreaSelector(event);
       } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
@@ -923,8 +926,8 @@ class XibleEditor extends EventEmitter {
       if ((!this.nodeDragListener || !this.nodeDragHasFired) && !this.element.classList.contains('panning')) {
         // deselect
         if (
-          (event.target === this.element.firstChild || event.target === this.element) &&
-          !event.ctrlKey && !event.metaKey && event.button === 0
+          (event.target === this.element.firstChild || event.target === this.element)
+          && !event.ctrlKey && !event.metaKey && event.button === 0
         ) {
           this.deselect();
         }
@@ -975,7 +978,7 @@ class XibleEditor extends EventEmitter {
           if (selOutputs.length) {
             selOutput = selOutputs[0];
           } else {
-            selOutput = selNode.outputs.find(output => output.type !== 'trigger');
+            selOutput = selNode.outputs.find((output) => output.type !== 'trigger');
           }
         } else {
           selOutput = selOutputs[0];
@@ -1011,9 +1014,9 @@ class XibleEditor extends EventEmitter {
         case 'a':
           if (event.ctrlKey || event.metaKey) {
             this.loadedFlow.nodes
-            .forEach(node => this.select(node));
+            .forEach((node) => this.select(node));
             this.loadedFlow.connectors
-            .forEach(connector => this.select(connector));
+            .forEach((connector) => this.select(connector));
 
             event.preventDefault();
           }
@@ -1129,8 +1132,8 @@ class XibleEditor extends EventEmitter {
       }
 
       if (
-        !this.loadedFlow.nodes.includes(dup.origin.node) ||
-        !this.loadedFlow.nodes.includes(dup.destination.node)
+        !this.loadedFlow.nodes.includes(dup.origin.node)
+        || !this.loadedFlow.nodes.includes(dup.destination.node)
       ) {
         return;
       }
@@ -1141,7 +1144,7 @@ class XibleEditor extends EventEmitter {
 
     // select the duplicates
     this.deselect();
-    duplicates.forEach(dup => this.select(dup));
+    duplicates.forEach((dup) => this.select(dup));
   }
 
   /**
@@ -1249,8 +1252,10 @@ class XibleEditor extends EventEmitter {
       }
 
       // update left/top based on cursor position
-      this.left = relativeMouseLeft - (this.zoom * relativeMouseLeft) + mouseLeft - relativeMouseLeft;
-      this.top = relativeMouseTop - (this.zoom * relativeMouseTop) + mouseTop - relativeMouseTop;
+      this.left = relativeMouseLeft - (this.zoom * relativeMouseLeft)
+        + mouseLeft - relativeMouseLeft;
+      this.top = relativeMouseTop - (this.zoom * relativeMouseTop)
+        + mouseTop - relativeMouseTop;
 
       // apply the zoom transformation
       this.transform();
@@ -1274,9 +1279,9 @@ class XibleEditor extends EventEmitter {
     let mousePanFunction;
     this.element.addEventListener('mousedown', this._panMouseDownListener = (event) => {
       if (
-        mousePanFunction ||
-        (event.button === 0 && !event.shiftKey) ||
-        event.button > 1
+        mousePanFunction
+        || (event.button === 0 && !event.shiftKey)
+        || event.button > 1
       ) {
         return;
       }
@@ -1311,7 +1316,6 @@ class XibleEditor extends EventEmitter {
       event.preventDefault();
     });
 
-
     // unhook eventhandler created on mousedown
     document.body.addEventListener('mouseup', this._panMouseUpListener = () => {
       if (!mousePanFunction) {
@@ -1339,7 +1343,7 @@ class XibleEditor extends EventEmitter {
 
       // destroy the temporary connector & dummyXibleNode
       this.dummyXibleNode.delete();
-      this.dummyXibleConnectors.forEach(conn => conn.delete());
+      this.dummyXibleConnectors.forEach((conn) => conn.delete());
       this.dummyXibleConnectors = null;
       this.dummyXibleNode = null;
       this.dummyIo = null;
