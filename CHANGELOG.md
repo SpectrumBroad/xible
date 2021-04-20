@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   Connectors that are not of the type 'trigger', have a slightly different colour to make it easier to follow the flow.
 
+-   Node routes (as described in the [documentation](https://xible.io/docs/guides/nodes/routes)) follow a different structure that supports both global routes, and routes for an initialized node within a flow.
+   -   `/node/routes/flow.js` replicates the behaviour of the previously existing `/node/routes.js`; hosting routes for an initialized node within a flow. The endpoint has changed to `/api/nodes/node-name/routes/flow/node-id`.
+   -   `/node/routes/global.js` hosts routes directly on `/api/nodes/node-name/routes/global`. The node does not need to be part of a flow for these to work.
+
 ### Fixed
 -   `npm run debug` and other commands now work on Windows by using [cross-env](https://github.com/kentcdodds/cross-env) to set environment variables, instead of `EXPORT`.
 

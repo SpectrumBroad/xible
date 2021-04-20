@@ -365,11 +365,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           }
 
           // host routes
-          if (!XIBLE.child && nodeConstr.routesPath) {
+          if (!XIBLE.child && nodeConstr.routePaths.flow) {
             try {
               const router = express.Router();
-              EXPRESS_APP.use(`/api/node-routes/${xibleNode._id}/`, router);
-              require(nodeConstr.routesPath)(xibleNode, router, express.static);
+              EXPRESS_APP.use(`/api/nodes/${xibleNode.name}/routes/flow/${xibleNode._id}/`, router);
+              require(nodeConstr.routePaths.flow)(xibleNode, router, express.static);
             } catch (err) {
               console.error(err);
             }

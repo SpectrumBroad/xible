@@ -205,7 +205,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         const structurePath = `${dirPath}/structure.json`;
         const typedefPath = `${dirPath}/typedef.json`;
         const editorPath = `${dirPath}/editor`;
-        const routesPath = `${dirPath}/routes.js`;
+
+        // paths to route files
+        const routesFiles = ['global', 'flow'];
 
         // check for structure.json
         fs.access(structurePath, fs.constants.R_OK, (err) => {
@@ -221,12 +223,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           try {
             structure = require(structurePath);
             structure.path = dirPath;
+            structure.routePaths = {};
           } catch (requireStructureJsonErr) {
             reject(new Error(`Could not require "${structurePath}": ${requireStructureJsonErr}`));
             return;
           }
 
-          // check for typedef.json
+          // Check for typedef.json.
           fs.access(typedefPath, fs.constants.R_OK, (typeDefAccessErr) => {
             if (!typeDefAccessErr) {
               try {
@@ -236,7 +239,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
               }
             }
 
-            // check for editor contents
+            // Check for editor contents.
             fs.stat(editorPath, (statEditorErr, stat) => {
               if (!statEditorErr) {
                 if (stat.isDirectory()) {
@@ -244,16 +247,30 @@ module.exports = (XIBLE, EXPRESS_APP) => {
                 }
               }
 
-              fs.access(routesPath, fs.constants.R_OK, (routesAccessErr) => {
-                if (!routesAccessErr) {
-                  structure.routesPath = routesPath;
+              let routesFilesFinished = 0;
+              const resolveRoutesFiles = () => {
+                routesFilesFinished += 1;
+                if (routesFilesFinished !== routesFiles.length) {
+                  return;
                 }
 
                 resolve({
                   node: structure,
                   typedefs
                 });
-              });
+              };
+
+              for (let i = 0; i < routesFiles.length; i += 1) {
+                const routesPath = `${dirPath}/routes/${routesFiles[i]}.js`;
+                // eslint-disable-next-line no-loop-func
+                fs.access(routesPath, fs.constants.R_OK, (routesAccessErr) => {
+                  if (!routesAccessErr) {
+                    structure.routePaths[routesFiles[i]] = routesPath;
+                  }
+
+                  resolveRoutesFiles();
+                });
+              }
             });
           });
         });

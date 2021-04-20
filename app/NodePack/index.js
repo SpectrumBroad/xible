@@ -238,13 +238,27 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           }
         }
 
-        // Host editor contents if applicable
+        // Host routes if applicable.
+        if (structure.routePaths.global) {
+          try {
+            const router = express.Router();
+            EXPRESS_APP.use(`/api/nodes/${nodeName}/routes/global`, router);
+            require(structure.routePaths.global)(router, express.static);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        // Host editor contents if applicable.
         if (structure.editorContentPath) {
           structure.hostsEditorContent = true;
 
-          EXPRESS_APP.use(`/api/nodes/${nodeName}/editor`, express.static(structure.editorContentPath, {
-            index: false
-          }));
+          EXPRESS_APP.use(
+            `/api/nodes/${nodeName}/editor`,
+            express.static(structure.editorContentPath, {
+              index: false
+            })
+          );
         }
 
         this.nodes.push(structure);
