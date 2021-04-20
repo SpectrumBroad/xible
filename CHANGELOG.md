@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Fixed
+-   The 'http' and 'function' nodepacks are now loaded by default. They were included in the package.json, but not in the default nodepack loader. In previous version it is still possible to simply install these nodepacks directly from the registry.
 
 ## [0.21.0][] - 2021-04-20
 ### Added

@@ -48,7 +48,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         'xible-nodepack-stream',
         'xible-nodepack-filesystem',
         'xible-nodepack-process',
-        'xible-nodepack-timing'
+        'xible-nodepack-timing',
+        'xible-nodepack-function',
+        'xible-nodepack-http'
       ];
     }
 
