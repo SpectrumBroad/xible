@@ -552,6 +552,9 @@ module.exports = (NODE) => {
       const user = new xible.Registry.User();
 
       const userName = await getUserInput('Enter your username: ');
+      if (!userName) {
+        throw 'You need to enter a username.';
+      }
       user.name = userName;
 
       const password = await getUserInput('Enter your password: ', true);
