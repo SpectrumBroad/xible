@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.21.0][] - 2021-04-20
 ### Added
 -   Within the editor, the dock can now be docked to the left or the bottom. Previously there was no option available, it was always stuck to the left. The default location remains the left. The location will be stored in the browsers' `localStorage` to bring it back in the same place when reopening a session.
 
