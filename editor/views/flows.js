@@ -495,6 +495,7 @@ View.routes['/flows'] = (EL) => {
     const resourceUl = li.appendChild(document.createElement('ul'));
     resourceUl.classList.add('stats');
     const cpuResourceLi = resourceUl.appendChild(document.createElement('li'));
+    cpuResourceLi.classList.add('chart');
     cpuResourceLi.innerHTML = `
       <div>
         <canvas></canvas>
@@ -503,6 +504,7 @@ View.routes['/flows'] = (EL) => {
     `;
 
     const memResourceLi = resourceUl.appendChild(document.createElement('li'));
+    memResourceLi.classList.add('chart');
     memResourceLi.innerHTML = `
       <div>
         <canvas></canvas>
@@ -513,6 +515,7 @@ View.routes['/flows'] = (EL) => {
     `;
 
     const delayResourceLi = resourceUl.appendChild(document.createElement('li'));
+    delayResourceLi.classList.add('chart');
     delayResourceLi.innerHTML = `
       <div>
         <canvas></canvas>

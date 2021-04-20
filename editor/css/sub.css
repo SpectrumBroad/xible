@@ -6,7 +6,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
-  padding: 10px 16px;
+  padding: 0 16px 10px;
   height: 100%;
   flex-shrink: 0;
   display: flex;
@@ -94,6 +94,8 @@
 #sub section.buttons {
   display: flex;
   flex-wrap: wrap;
+  column-gap: 12px;
+  row-gap: 12px;
 }
 
 #sub form {
@@ -127,8 +129,7 @@
   cursor: pointer;
   display: block;
   border-radius: 4px;
-  margin: 10px;
-  min-width: 30%;
+  min-width: 40%;
   flex: 1 1 0;
   text-align: center;
 }
@@ -157,7 +158,6 @@
 
   .buttons button {
     padding: 8px 0;
-    margin: 6px 10px;
   }
 }
 

@@ -1,86 +1,123 @@
 'use strict';
 
 function editorView(EL) {
+  EL.classList.add('editor');
+
   EL.innerHTML = `
-    <div id="sub">
+    <div class="top">
       <header>XIBLE<!--<span>ENTERPRISE</span>--></header>
-      <p id="connectionLost" class="status loading alert hidden">
-        Connection lost
-      </p>
-      <p id="validateWritePermissions" class="status loading">
-        Validating write permissions
-      </p>
-      <p id="browserSupportAttachShadow" class="status alert hidden">
-        Your browser does not support the necessary features to enable all editor functionality.
-        <a href="#">Details</a>
-      </p>
-      <p id="flowNotRunnable" class="status alert hidden">
-        This flow cannot be started because it contains nodes that don't exist in the given configuration.
-      </p>
-      <section class="buttons editor">
-        <button type="button" id="xibleFlowDeployButton" disabled="disabled">Deploy</button>
-        <button type="button" id="xibleFlowStartButton" disabled="disabled">Start</button>
-        <button type="button" id="xibleFlowStopButton" disabled="disabled">Stop</button>
-        <button type="button" id="xibleFlowSaveButton" disabled="disabled">Save</button>
-        <button type="button" id="xibleFlowDeleteButton" disabled="disabled">Delete</button>
-      </section>
-      <ul class="tablist">
-        <li class="open">
-          <a id="logOpenA" href="#logs" data-section-class="log">log</a>
-        </li>
-        <li>
-          <a id="statsOpenA" href="#resources" data-section-class="stats">resources</a>
-        </li>
-        <li style="display: none;">
-          <a id="instancesOpenA" href="#instances" data-section-class="instances">instances</a>
-        </li>
-      </ul>
-      <section id="log" class="tabcontents log">
-        <form class="buttons">
-          <button id="logClearButton" type="button">clear</button>
-          <!-- <label class="required"><input type="checkbox" value="true" />wrap<span></span></label> -->
-        </form>
-        <ul></ul>
-      </section>
-      <section class="tabcontents stats" style="display: none;">
-        <div>
-          <canvas id="cpuChart"></canvas>
-        </div>
-        <label id="cpu">cpu</label>
-      </section>
-      <section class="tabcontents stats" style="display: none;">
-        <div>
-          <canvas id="memChart"></canvas>
-        </div>
-        <label id="rss">rss</label>
-        <label id="heapTotal">heap total</label>
-        <label id="heapUsed">heap used</label>
-      </section>
-      <section class="tabcontents stats" style="display: none;">
-        <div>
-          <canvas id="delayChart"></canvas>
-        </div>
-        <label id="delay">event loop delay</label>
-      </section>
-      <section id="instances" class="tabcontents instances" style="display: none;">
-        <ul></ul>
-      </section>
-    </div>
-    <div id="flowEditorHolder">
-      <div id="snapConfiguration">
-        <label title="Snaps the nodes to a grid upon dragging them">
-          <input type="checkbox" checked id="snapConfigurationCheckbox" />
-          <span></span>
-          Snap
-        </label>
-      </div>
-      <div class="zoomButtons">
-        <button id="zoomOutButton" type="button" title="Zoom out">&#xe024;</button>
-        <button id="zoomFitButton" type="button" title="Zoom to fit">&gt;</button>
-        <button id="zoomResetButton" type="button" title="Reset zoom">&#xe01c;</button>
-        <button id="zoomInButton" type="button" title="Zoom in">&#xe035;</button>
-      </div>
       <ul id="flowList" class="flowList loading"></ul>
+    </div>
+    <div id="bottomDiv" class="bottom">
+      <div id="sub">
+        <div class="interactions">
+          <div class="dockSide">
+            Dock side
+            <ul>
+              <li>
+                <button id="dockSideLeftButton">
+                  <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 4H22V20H2V4ZM8 6H20V18H8V6Z"/>
+                  </svg>
+                </button>
+              </li>
+              <li>
+                <button id="dockSideBottomButton">
+                  <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 20V4H22V20H2ZM4 6H20V14H4V6Z"/>
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <p id="connectionLost" class="status loading alert hidden">
+            Connection lost
+          </p>
+          <p id="validateWritePermissions" class="status loading">
+            Validating write permissions
+          </p>
+          <p id="browserSupportAttachShadow" class="status alert hidden">
+            Your browser does not support the necessary features to enable all editor functionality.
+            <a href="#">Details</a>
+          </p>
+          <p id="flowNotRunnable" class="status alert hidden">
+            This flow cannot be started because it contains nodes that don't exist in the given configuration.
+          </p>
+          <section class="buttons editor">
+            <button type="button" id="xibleFlowDeployButton" disabled="disabled">Deploy</button>
+            <button type="button" id="xibleFlowStartButton" disabled="disabled">Start</button>
+            <button type="button" id="xibleFlowStopButton" disabled="disabled">Stop</button>
+            <button type="button" id="xibleFlowSaveButton" disabled="disabled">Save</button>
+            <button type="button" id="xibleFlowDeleteButton" disabled="disabled">Delete</button>
+          </section>
+        </div>
+        <div class="results">
+          <ul class="tablist">
+            <li class="open">
+              <a id="logOpenA" href="#logs" data-section-class="log">log</a>
+            </li>
+            <li>
+              <a id="statsOpenA" href="#resources" data-section-class="stats">resources</a>
+            </li>
+            <li style="display: none;">
+              <a id="instancesOpenA" href="#instances" data-section-class="instances">instances</a>
+            </li>
+          </ul>
+          <section id="log" class="tabcontents log">
+            <form class="buttons">
+              <button id="logClearButton" type="button">clear</button>
+              <!-- <label class="required"><input type="checkbox" value="true" />wrap<span></span></label> -->
+            </form>
+            <ul></ul>
+          </section>
+          <section class="tabcontents stats" style="display: none;">
+            <div class="chart">
+              <div class="chartHolder">
+                <canvas id="cpuChart"></canvas>
+              </div>
+              <div class="labels">
+                <label id="cpu">cpu</label>
+              </div>
+            </div>
+            <div class="chart">
+              <div class="chartHolder">
+                <canvas id="memChart"></canvas>
+              </div>
+              <div class="labels">
+                <label id="rss">rss</label>
+                <label id="heapTotal">heap total</label>
+                <label id="heapUsed">heap used</label>
+              </div>
+            </div>
+            <div class="chart">
+              <div class="chartHolder">
+                <canvas id="delayChart"></canvas>
+              </div>
+              <div class="labels">
+                <label id="delay">event loop delay</label>
+              </div>
+            </div>
+          </section>
+          <section id="instances" class="tabcontents instances" style="display: none;">
+            <ul></ul>
+          </section>
+        </div>
+      </div>
+      <div id="flowEditorHolder">
+        <div id="snapConfiguration">
+          <label title="Snaps the nodes to a grid upon dragging them">
+            <input type="checkbox" checked id="snapConfigurationCheckbox" />
+            <span></span>
+            Snap
+          </label>
+        </div>
+        <div class="zoomButtons">
+          <button id="zoomOutButton" type="button" title="Zoom out">&#xe024;</button>
+          <button id="zoomFitButton" type="button" title="Zoom to fit">&gt;</button>
+          <button id="zoomResetButton" type="button" title="Reset zoom">&#xe01c;</button>
+          <button id="zoomInButton" type="button" title="Zoom in">&#xe035;</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -196,6 +233,23 @@ function editorView(EL) {
     // disable buttons that require input from content in the browser
     document.getElementById('xibleFlowDeployButton').disabled = true;
     document.getElementById('xibleFlowSaveButton').disabled = true;
+  }
+
+  // Dock-side
+  const bottomDiv = document.getElementById('bottomDiv');
+  const dockSideLeftButton = document.getElementById('dockSideLeftButton');
+  dockSideLeftButton.onclick = () => {
+    localStorage.setItem('dockSide', 'left');
+    bottomDiv.classList.remove('column');
+  };
+  const dockSideBottomButton = document.getElementById('dockSideBottomButton');
+  dockSideBottomButton.onclick = () => {
+    localStorage.setItem('dockSide', 'bottom');
+    bottomDiv.classList.add('column');
+  };
+
+  if (localStorage.getItem('dockSide') === 'bottom') {
+    bottomDiv.classList.add('column');
   }
 
   // flip between logs and stats

@@ -181,13 +181,16 @@ nav>ul>li.editor>a>span {
 }
 
 header {
+  display: flex;
+  align-items: center;
   font-family: robotothin;
   font-weight: normal;
   color: gold;
   padding: 0;
-  margin: 10px 16px;
+  margin: 0 16px;
   text-shadow: 0 1px 0 #000;
   font-size: 1.6em;
+  height: 39px;
 }
 
 header span {
