@@ -31,11 +31,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   });
 
   EXPRESS_APP.get('*', (req, res, next) => {
-    // node editor content hosting
-    // and node-routes
+    // API hosting.
     if (
-      /^\/api\/nodes\/[^/]+\/editor\//.test(req.path)
-      || /^\/api\/node-routes\/[^/]+\//.test(req.path)
+      /^\/api\//.test(req.path)
     ) {
       next();
       return;
