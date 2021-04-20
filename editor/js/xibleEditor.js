@@ -282,6 +282,7 @@ class XibleEditor extends EventEmitter {
         break;
 
       // TODO: this needs to be handled by the view, not XibleEditor.
+      // TODO: Should take time from the log record (which does not exist right now).
       case 'xible.flow.instance.error':
         if (json.flowId === this.loadedFlow._id) {
           const logUl = document.querySelector('#log ul');
@@ -291,7 +292,7 @@ class XibleEditor extends EventEmitter {
 
           const dateSpan = logLi.appendChild(document.createElement('span'));
           dateSpan.classList.add('date');
-          dateSpan.innerHTML = new Date().toISOString();
+          dateSpan.innerHTML = new Date().toLocaleString();
 
           if (json.error.stack) {
             logLi.appendChild(document.createTextNode(json.error.stack));
@@ -306,6 +307,7 @@ class XibleEditor extends EventEmitter {
       case 'xible.node.addStatus': {
         node.addStatus(json.status);
 
+        // TODO: Should take time from the log record (which does not exist right now).
         // TODO: this needs to be handled by the view, not XibleEditor.
         const logUl = document.querySelector('#log ul');
         const logLi = document.createElement('li');
@@ -317,7 +319,7 @@ class XibleEditor extends EventEmitter {
 
         const dateSpan = logLi.appendChild(document.createElement('span'));
         dateSpan.classList.add('date');
-        dateSpan.innerHTML = new Date().toISOString();
+        dateSpan.innerHTML = new Date().toLocaleString();
 
         logLi.appendChild(document.createTextNode(json.status.message));
 
