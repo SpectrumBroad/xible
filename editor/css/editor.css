@@ -150,6 +150,7 @@
 }
 
 #sub #log li {
+  border-bottom: 1px solid #555;
   color: #eee;
   font-weight: 400;
   white-space: pre;
