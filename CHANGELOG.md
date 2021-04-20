@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
    -   `/node/routes/flow.js` replicates the behaviour of the previously existing `/node/routes.js`; hosting routes for an initialized node within a flow. The endpoint has changed to `/api/nodes/node-name/routes/flow/node-id`.
    -   `/node/routes/global.js` hosts routes directly on `/api/nodes/node-name/routes/global`. The node does not need to be part of a flow for these to work.
 
+-   The purple state colour for initialized flows in the tabs within the editor are no longer suppressed.
+
 ### Fixed
 -   `npm run debug` and other commands now work on Windows by using [cross-env](https://github.com/kentcdodds/cross-env) to set environment variables, instead of `EXPORT`.
 

@@ -116,11 +116,11 @@
 .flowList ul.states li.state-4 {
   background-color: darkorange;
 }
-/*
+
 .flowList ul.states li.state-3 {
   background-color: purple;
 }
-*/
+
 .flowList li.open {
   background-color: #45679E;
   z-index: 1;
