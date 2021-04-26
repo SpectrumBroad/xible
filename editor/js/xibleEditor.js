@@ -595,18 +595,29 @@ class XibleEditor extends EventEmitter {
 
     const selectionIndex = this.selection.indexOf(obj);
 
-    if (!event.ctrlKey && !event.metaKey && event.type === 'mousedown' && selectionIndex === -1) {
+    // mousedown
+    if (event.type === 'mousedown') {
+      if (!event.ctrlKey && !event.metaKey && selectionIndex === -1) {
+        this.deselect();
+        this.selection.push(obj);
+        obj.element.classList.add('selected');
+        return;
+      }
+    }
+
+    if (event.type !== 'mouseup') {
+      return;
+    }
+
+    // mouseup
+    if ((event.ctrlKey || event.metaKey) && selectionIndex === -1 && !this.nodeDragHasFired) {
+      this.selection.push(obj);
+      obj.element.classList.add('selected');
+    } else if (!event.ctrlKey && !event.metaKey && selectionIndex > -1 && !this.nodeDragHasFired) {
       this.deselect();
       this.selection.push(obj);
       obj.element.classList.add('selected');
-    } else if ((event.ctrlKey || event.metaKey) && event.type === 'mouseup' && selectionIndex === -1 && !this.nodeDragHasFired) {
-      this.selection.push(obj);
-      obj.element.classList.add('selected');
-    } else if (!event.ctrlKey && !event.metaKey && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
-      this.deselect();
-      this.selection.push(obj);
-      obj.element.classList.add('selected');
-    } else if ((event.ctrlKey || event.metaKey) && event.type === 'mouseup' && selectionIndex > -1 && !this.nodeDragHasFired) {
+    } else if ((event.ctrlKey || event.metaKey) && selectionIndex > -1 && !this.nodeDragHasFired) {
       this.deselect(obj);
     }
   }
@@ -912,8 +923,6 @@ class XibleEditor extends EventEmitter {
         this.initAreaSelector(event);
       } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
         this.initDrag(event);
-      } else {
-        this.deselect();
       }
     });
 

@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Changed
+-   A focused input field now focuses the surrounding node, preventing the loss of visibility on fields that are not required. These fields hide by default of the focus is not on the node, which could make it cumbersome to edit these fields.
+
 ### Fixed
 -   The 'http' and 'function' nodepacks are now loaded by default. They were included in the package.json, but not in the default nodepack loader. In previous version it is still possible to simply install these nodepacks directly from the registry.
 
