@@ -571,6 +571,10 @@ class XibleEditorNode extends xibleWrapper.Node {
     });
   }
 
+  /**
+   * Ensures that the value of fields with the "data-output-value" attribute
+   * are mapped to the node's "data" map.
+   */
   convenienceOutputValue() {
     const els = Array.from(this.shadowRoot.querySelectorAll('[data-output-value], [data-outputvalue]'));
     els.forEach((el) => {
@@ -644,6 +648,10 @@ class XibleEditorNode extends xibleWrapper.Node {
     });
   }
 
+  /**
+   * Handles data-hide-if-attached property on elements.
+   * See https://xible.io/docs/guides/nodes/editor#special-attributes
+   */
   convenienceHideIfAttached() {
     const els = Array.from(this.shadowRoot.querySelectorAll('[data-hide-if-attached], [data-hideifattached]'));
     els.forEach((el) => {
@@ -666,7 +674,7 @@ class XibleEditorNode extends xibleWrapper.Node {
           });
 
           io.on('detach', () => {
-            if (ioArray.every(io => !io.connectors.length)) {
+            if (ioArray.every((ioArrayEntry) => !ioArrayEntry.connectors.length)) {
               el.style.display = '';
             }
           });
