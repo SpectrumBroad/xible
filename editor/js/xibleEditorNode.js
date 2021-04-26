@@ -549,6 +549,12 @@ class XibleEditorNode extends xibleWrapper.Node {
     });
   }
 
+  /**
+   * Setup UX handling for textarea.
+   * Currently only handles tabs,
+   * by inserting a tab instead of switching to another field
+   * in the editor when the tab key is pressed.
+   */
   convenienceTextAreaSetup() {
     const els = Array.from(this.shadowRoot.querySelectorAll('textarea'));
     els.forEach((el) => {
