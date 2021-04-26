@@ -553,7 +553,7 @@ class XibleEditorNode extends xibleWrapper.Node {
     const els = Array.from(this.shadowRoot.querySelectorAll('textarea'));
     els.forEach((el) => {
       el.addEventListener('keydown', (event) => {
-        if (event.keyCode === 9) {
+        if (event.key === 'Tab') {
           event.preventDefault();
 
           const selectionStart = el.selectionStart;
