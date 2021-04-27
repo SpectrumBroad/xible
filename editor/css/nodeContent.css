@@ -130,9 +130,9 @@ if only...
   display: block;
 }
 
-input~span,
-selectcontainer~span,
-textarea~span {
+input ~ span,
+selectcontainer ~ span,
+textarea ~ span {
   display: none;
   box-sizing: border-box;
   position: absolute;
@@ -152,19 +152,18 @@ textarea~span {
 
 
 /* vertical align for contents of the above */
-
-input~span::before,
-selectcontainer~span::before,
-textarea~span::before {
+input ~ span::before,
+selectcontainer ~ span::before,
+textarea ~ span::before {
   content: "";
   display: inline-block;
   height: 100%;
   vertical-align: middle;
 }
 
-input~span.unknown,
-selectcontainer~span.unknown,
-textarea~span.unknown {
+input ~ span.unknown,
+selectcontainer ~ span.unknown,
+textarea ~ span.unknown {
   color: #888;
 }
 
@@ -177,11 +176,11 @@ textarea:focus {
   border-radius: 0 6px 6px 0;
 }
 
-input:hover~span,
-input:focus~span,
-selectcontainer:hover~span,
-textarea:hover~span,
-textarea:focus~span {
+input:hover ~ span,
+input:focus ~ span,
+selectcontainer:hover ~ span,
+textarea:hover ~ span,
+textarea:focus ~ span {
   display: block;
 }
 
@@ -362,4 +361,31 @@ textarea:hover {
 
 input[type="number"] {
   font-size: 40px;
+}
+
+/* password visibility handling */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 26px;
+}
+
+.password-toggle {
+  font-family: awesome;
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  transform: translatey(-50%);
+  font-size: 0.9rem;
+}
+
+.password-toggle::before {
+  display: inline;
+  content: "\f06e";
+}
+
+.password-wrapper input[type="text"] ~ .password-toggle::before {
+  content: "\f070";
 }

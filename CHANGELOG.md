@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Added
+-   Input fields within nodes that have type=password, now include a toggle to make the password visible from the editor.
+
 ### Changed
 -   A focused input field now focuses the surrounding node, preventing the loss of visibility on fields that are not required. These fields hide by default of the focus is not on the node, which could make it cumbersome to edit these fields.
 

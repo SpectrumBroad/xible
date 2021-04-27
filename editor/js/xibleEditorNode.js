@@ -202,6 +202,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       this.convenienceHideIfAttached();
       this.convenienceOutputValue();
       this.convenienceTextAreaSetup();
+      this.conveniencePasswordVisibility();
 
       this.emit('editorContentLoad');
     };
@@ -503,7 +504,32 @@ class XibleEditorNode extends xibleWrapper.Node {
     .forEach((el) => {
       const label = document.createElement('label');
       this.shadowRoot.replaceChild(label, el);
-      label.appendChild(el);
+
+      const span = document.createElement('span');
+
+      // password visibility
+      if (el.getAttribute('type') === 'password') {
+        const passwordWrapper = document.createElement('div');
+        passwordWrapper.classList.add('password-wrapper');
+        passwordWrapper.appendChild(el);
+        passwordWrapper.appendChild(span);
+
+        const toggle = passwordWrapper.appendChild(document.createElement('div'));
+        toggle.classList.add('password-toggle');
+        toggle.onclick = () => {
+          const currentType = el.getAttribute('type');
+          if (currentType === 'password') {
+            el.setAttribute('type', 'text');
+          } else {
+            el.setAttribute('type', 'password');
+          }
+        };
+
+        label.appendChild(passwordWrapper);
+      } else {
+        label.appendChild(el);
+        label.appendChild(span);
+      }
 
       // set the required attribute
       // because the :has() pseudo selector is not available (yet)
@@ -524,7 +550,6 @@ class XibleEditorNode extends xibleWrapper.Node {
 
       // add the label
       let placeholder = el.getAttribute('placeholder') || el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
-      const span = document.createElement('span');
 
       // try to fetch a placeholder for a select input
       if (!placeholder && el.nodeName === 'SELECTCONTAINER') {
@@ -539,7 +564,6 @@ class XibleEditorNode extends xibleWrapper.Node {
       }
 
       span.appendChild(document.createTextNode(placeholder || 'unknown'));
-      label.appendChild(span);
 
       // ensure hideif attached is hooked properly
       const hideIfAttached = el.getAttribute('data-hide-if-attached') || el.getAttribute('data-hideifattached');
