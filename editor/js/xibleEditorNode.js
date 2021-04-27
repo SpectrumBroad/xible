@@ -202,7 +202,6 @@ class XibleEditorNode extends xibleWrapper.Node {
       this.convenienceHideIfAttached();
       this.convenienceOutputValue();
       this.convenienceTextAreaSetup();
-      this.conveniencePasswordVisibility();
 
       this.emit('editorContentLoad');
     };
