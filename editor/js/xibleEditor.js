@@ -605,19 +605,19 @@ class XibleEditor extends EventEmitter {
       }
     }
 
-    if (event.type !== 'mouseup') {
+    if (event.type !== 'mouseup' || this.nodeDragHasFired) {
       return;
     }
 
     // mouseup
-    if ((event.ctrlKey || event.metaKey) && selectionIndex === -1 && !this.nodeDragHasFired) {
+    if ((event.ctrlKey || event.metaKey) && selectionIndex === -1) {
       this.selection.push(obj);
       obj.element.classList.add('selected');
-    } else if (!event.ctrlKey && !event.metaKey && selectionIndex > -1 && !this.nodeDragHasFired) {
+    } else if (!event.ctrlKey && !event.metaKey && selectionIndex > -1) {
       this.deselect();
       this.selection.push(obj);
       obj.element.classList.add('selected');
-    } else if ((event.ctrlKey || event.metaKey) && selectionIndex > -1 && !this.nodeDragHasFired) {
+    } else if ((event.ctrlKey || event.metaKey) && selectionIndex > -1) {
       this.deselect(obj);
     }
   }
@@ -917,12 +917,14 @@ class XibleEditor extends EventEmitter {
 
       // area selector
       if (
-        (!this.selection.length || event.ctrlKey || event.metaKey)
-        && (event.target === this.element || event.target === this.element.firstChild)
+        event.target === this.element
+        || event.target === this.element.firstChild
       ) {
         this.initAreaSelector(event);
       } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
         this.initDrag(event);
+      } else {
+        this.nodeDragHasFired = false;
       }
     });
 
