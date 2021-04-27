@@ -74,7 +74,7 @@
     "xible-np-input": "^0.2.0",
     "xible-np-object": "*",
     "xible-np-string": "*",
-    "xible-np-xible": "*",
+    "xible-np-xible": "^0.2.0",
     "xible-registry-wrapper": "*",
     "xible-wrapper": "^0.12.1"
   },
