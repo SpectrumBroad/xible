@@ -497,8 +497,9 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   /**
-  * Creates a label for every input/selectcontainer element that doesn't have one.
-  */
+   * Creates a label for every input/selectcontainer element that doesn't have one.
+   * Enables password visibility toggle on input[type=password].
+   */
   convenienceLabel() {
     this.getRootInputElements()
     .forEach((el) => {
