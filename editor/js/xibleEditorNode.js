@@ -506,6 +506,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       this.shadowRoot.replaceChild(label, el);
 
       const span = document.createElement('span');
+      span.classList.add('label');
 
       // password visibility
       if (el.getAttribute('type') === 'password') {
@@ -531,6 +532,11 @@ class XibleEditorNode extends xibleWrapper.Node {
         label.appendChild(span);
       }
 
+      const dataOutputValue = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
+      if (this.vault && dataOutputValue && this.vault.includes(dataOutputValue)) {
+        label.classList.add('vault');
+      }
+
       // set the required attribute
       // because the :has() pseudo selector is not available (yet)
       if (
@@ -549,7 +555,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       }
 
       // add the label
-      let placeholder = el.getAttribute('placeholder') || el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
+      let placeholder = el.getAttribute('placeholder') || dataOutputValue;
 
       // try to fetch a placeholder for a select input
       if (!placeholder && el.nodeName === 'SELECTCONTAINER') {

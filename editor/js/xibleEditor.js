@@ -112,7 +112,7 @@ class XibleEditor extends EventEmitter {
 
     // append the node descriptionEl
     const descriptionEl = describeEl.appendChild(document.createElement('p'));
-    descriptionEl.appendChild(document.createTextNode(node.description || 'not described'));
+    descriptionEl.appendChild(document.createTextNode(node.description || 'No description.'));
 
     if (!node.description) {
       descriptionEl.classList.add('none');
@@ -151,7 +151,7 @@ class XibleEditor extends EventEmitter {
       // add description
       const ioDescriptionEl = io.element.appendChild(document.createElement('p'));
       ioDescriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.structureType || 'any'));
-      ioDescriptionEl.appendChild(document.createTextNode(io.description || 'not described'));
+      ioDescriptionEl.appendChild(document.createTextNode(io.description || 'No description.'));
 
       if (!io.description) {
         ioDescriptionEl.classList.add('none');
@@ -176,7 +176,11 @@ class XibleEditor extends EventEmitter {
         // this is actually not allowed
         // a label may not contain a block element
         const labelDescriptionEl = label.appendChild(document.createElement('p'));
-        labelDescriptionEl.appendChild(document.createTextNode(description || 'not described'));
+        labelDescriptionEl.appendChild(document.createTextNode(description || 'No description.'));
+
+        if (label.classList.contains('vault')) {
+          labelDescriptionEl.appendChild(document.createTextNode('This value is stored in the vault.'));
+        }
 
         if (!description) {
           labelDescriptionEl.classList.add('none');

@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Input fields within nodes that have type=password, now include a toggle to make the password visible from the editor.
 
+-   Data fields that are stored in the [vault](https://xible.io/docs/guides/nodes/structure#structure.json), now have a shield icon in available in the editor to signify this. ([#90](https://github.com/SpectrumBroad/xible/issues/90))
+
 ### Changed
 -   A focused input field now focuses the surrounding node, preventing the loss of visibility on fields that are not required. These fields hide by default of the focus is not on the node, which could make it cumbersome to edit these fields.
 

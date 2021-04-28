@@ -29,6 +29,7 @@ label {
   color: #bbb;
   clear: both;
   min-height: 27px;
+  box-sizing: border-box;
 }
 
 
@@ -130,9 +131,7 @@ if only...
   display: block;
 }
 
-input ~ span,
-selectcontainer ~ span,
-textarea ~ span {
+label .label {
   display: none;
   box-sizing: border-box;
   position: absolute;
@@ -147,23 +146,10 @@ textarea ~ span {
   height: 100%;
   white-space: nowrap;
   box-shadow: -3px 0 8px -1px #000;
-  vertical-align: middle;
+  align-items: center;
 }
 
-
-/* vertical align for contents of the above */
-input ~ span::before,
-selectcontainer ~ span::before,
-textarea ~ span::before {
-  content: "";
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-}
-
-input ~ span.unknown,
-selectcontainer ~ span.unknown,
-textarea ~ span.unknown {
+label .label.unknown {
   color: #888;
 }
 
@@ -176,14 +162,15 @@ textarea:focus {
   border-radius: 0 6px 6px 0;
 }
 
-input:hover ~ span,
-input:focus ~ span,
-selectcontainer:hover ~ span,
-textarea:hover ~ span,
-textarea:focus ~ span {
-  display: block;
+input:hover ~ .label,
+input:focus ~ .label,
+selectcontainer:hover ~ .label,
+textarea:hover ~ .label,
+textarea:focus ~ .label {
+  display: flex;
 }
 
+/* checkboxes */
 input[type="checkbox"] {
   opacity: 0;
   position: absolute;
@@ -191,7 +178,7 @@ input[type="checkbox"] {
   left: 0;
 }
 
-input[type="checkbox"]~span {
+input[type="checkbox"] ~ span {
   cursor: pointer;
   box-sizing: border-box;
   display: block;
@@ -208,7 +195,7 @@ input[type="checkbox"]~span {
   transform: initial;
 }
 
-input[type="checkbox"]~span::before {
+input[type="checkbox"] ~ span::before {
   position: absolute;
   box-sizing: border-box;
   display: block;
@@ -224,19 +211,20 @@ input[type="checkbox"]~span::before {
   border-radius: 6px;
 }
 
-input[type="checkbox"]:checked~span::before {
+input[type="checkbox"]:checked ~ span::before {
   left: auto;
   right: 0;
 }
 
-input[type="checkbox"]~span:hover::before {
+input[type="checkbox"] ~ span:hover::before {
   background-color: #5b7cb3;
 }
 
-input[type="checkbox"]:focus~span::before {
+input[type="checkbox"]:focus ~ span::before {
   background-color: #5b7cb3;
 }
 
+/* buttons */
 button,
 input[type="button"],
 input[type="submit"] {
@@ -382,10 +370,17 @@ input[type="number"] {
 }
 
 .password-toggle::before {
-  display: inline;
+  display: block;
   content: "\f06e";
 }
 
 .password-wrapper input[type="text"] ~ .password-toggle::before {
   content: "\f070";
+}
+
+label.vault .label::after {
+  content: "\f132";
+  font-family: awesome;
+  font-size: 0.9rem;
+  margin-left: 4px;
 }
