@@ -40,6 +40,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.routesPath = obj.routesPath;
       this.top = obj.top || 0;
       this.left = obj.left || 0;
+      this.vaultDataNames = obj.vault;
 
       /**
        * An object map which contains all data coming from the editor,
@@ -83,7 +84,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     toJSON() {
-      const ignore = ['domain', '_events', '_eventsCount', '_maxListeners', 'flow', '_states', 'vault'];
+      const ignore = ['domain', '_events', '_eventsCount', '_maxListeners', 'flow', '_states', 'vault', 'vaultDataNames'];
       const jsonObj = {};
       const objectKeys = Object.keys(this);
       for (let i = 0; i < objectKeys.length; i += 1) {
@@ -93,6 +94,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
         jsonObj[key] = this[key];
       }
+
+      jsonObj.vault = this.vaultDataNames;
+
       return jsonObj;
     }
 
