@@ -1088,8 +1088,7 @@ class XibleEditor extends EventEmitter {
           // paste
         case 'v':
           if ((event.ctrlKey || event.metaKey) && this.copySelection) {
-            // TODO: ensure paste is in view
-            this.duplicateToEditor(this.copySelection);
+            this.duplicateToEditor(this.copySelection, true);
 
             event.preventDefault();
           }
@@ -1119,11 +1118,12 @@ class XibleEditor extends EventEmitter {
   }
 
   /**
-  * Duplicates the given selection in the editor.
-  * Repositions the duplicated selection by x+20px, y+20px.
-  * @param {(XibleEditorNode|XibleEditorConnector)[]} [selection=] the selection to duplicate.
-  */
-  duplicateToEditor(selection = this.selection) {
+   * Duplicates the given selection in the editor.
+   * Repositions the duplicated selection by x+20px, y+20px.
+   * @param {(XibleEditorNode|XibleEditorConnector)[]} [selection=] - The selection to duplicate.
+   * @param {boolean} [centerInView=false] - Center the duplication in the current view.
+   */
+  duplicateToEditor(selection = this.selection, centerInView = false) {
     const duplicates = this.duplicate(selection);
 
     // add the nodes
@@ -1160,6 +1160,62 @@ class XibleEditor extends EventEmitter {
     // select the duplicates
     this.deselect();
     duplicates.forEach((dup) => this.select(dup));
+
+    // centerInView handling
+    if (!centerInView) {
+      return;
+    }
+
+    // find min and max of selection
+    let minLeft;
+    let minTop;
+    let maxLeft;
+    let maxTop;
+
+    duplicates.forEach((dup) => {
+      if (!(dup instanceof XibleEditorNode)) {
+        return;
+      }
+
+      const node = dup;
+      const nodeOffsetWidth = node.element.offsetWidth;
+      const nodeOffsetHeight = node.element.offsetHeight;
+
+      if (minLeft === undefined || node.left < minLeft) {
+        minLeft = node.left;
+      }
+      if (maxLeft === undefined || node.left + nodeOffsetWidth > maxLeft) {
+        maxLeft = node.left + nodeOffsetWidth;
+      }
+      if (minTop === undefined || node.top < minTop) {
+        minTop = node.top;
+      }
+      if (maxTop === undefined || node.top + nodeOffsetHeight > maxTop) {
+        maxTop = node.top + nodeOffsetHeight;
+      }
+    });
+
+    if (minLeft === undefined) {
+      return;
+    }
+
+    // get editor size
+    const xibleEditorBounding = this.element.getBoundingClientRect();
+    const xibleEditorWidth = xibleEditorBounding.width;
+    const xibleEditorHeight = xibleEditorBounding.height;
+
+    const xDiff = minLeft + (this.left / this.zoom)
+      - (((xibleEditorWidth / this.zoom) / 2) - ((maxLeft - minLeft) / 2));
+    const yDiff = minTop + (this.top / this.zoom)
+      - (((xibleEditorHeight / this.zoom) / 2) - ((maxTop - minTop) / 2));
+
+    duplicates.forEach((dup) => {
+      if (!(dup instanceof XibleEditorNode)) {
+        return;
+      }
+
+      dup.setPosition(dup.left - xDiff, dup.top - yDiff);
+    });
   }
 
   /**

@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The `xible.flow.onstart` node as been renamed to follow naming conventions. It is now `xible.flow.on-start`. Existing flows which are using this node will have to replace it with the newly named `on-start` node.
 
+-   Within the editor, pasting a selection of nodes will center the copy in the viewport. ([#19](https://github.com/SpectrumBroad/xible/issues/19))
+
 ### Fixed
 -   The 'http' and 'function' nodepacks are now loaded by default. They were included in the package.json, but not in the default nodepack loader. In previous version it is still possible to simply install these nodepacks directly from the registry.
 
