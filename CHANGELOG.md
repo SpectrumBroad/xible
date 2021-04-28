@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 -   A focused input field now focuses the surrounding node, preventing the loss of visibility on fields that are not required. These fields hide by default of the focus is not on the node, which could make it cumbersome to edit these fields.
 
--   The `xible.flow.onstart` node as been renamed to follow naming conventions. It is now `xible.flow.on-start`. Existing flows which are using this node will have to replace it with the newly named `on-start` node.
+-   The `xible.flow.onstart` and `waitfor` nodes have been renamed to follow naming conventions. They are now called `xible.flow.on-start` and `wait-for`. Existing flows which are using these nodes will have to replace it with the newly named nodes.
 
 -   Within the editor, pasting a selection of nodes will center the copy in the viewport. ([#19](https://github.com/SpectrumBroad/xible/issues/19))
 
