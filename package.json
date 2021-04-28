@@ -70,7 +70,7 @@
     "xible-nodepack-timing": "*",
     "xible-np-compare": "*",
     "xible-np-console": "*",
-    "xible-np-core": "^0.1.0",
+    "xible-np-core": "^0.2.0",
     "xible-np-input": "^0.2.0",
     "xible-np-object": "*",
     "xible-np-string": "*",
