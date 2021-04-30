@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Data fields that are stored in the [vault](https://xible.io/docs/guides/nodes/structure#structure.json), now have a shield icon in available in the editor to signify this. ([#90](https://github.com/SpectrumBroad/xible/issues/90))
 
+-   The ['object' nodepack](https://xible.io/nodes?search=object) now contains a `object.path` node to parse [jsonpath expressions](https://goessner.net/articles/JsonPath/). ([#62](https://github.com/SpectrumBroad/xible/issues/62))
+
 ### Changed
 -   A focused input field now focuses the surrounding node, preventing the loss of visibility on fields that are not required. These fields hide by default of the focus is not on the node, which could make it cumbersome to edit these fields.
 
