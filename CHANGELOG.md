@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Within the editor, pasting a selection of nodes will center the copy in the viewport. ([#19](https://github.com/SpectrumBroad/xible/issues/19))
 
+-   For new installations, the default amount of statuses visible on any node in the editor is set to 5. This can be changed through the settings. The value is stored in the configuration file as `editor.nodes.statuses.max`.
+
 ### Fixed
 -   The 'http' and 'function' nodepacks are now loaded by default. They were included in the package.json, but not in the default nodepack loader. In previous version it is still possible to simply install these nodepacks directly from the registry.
 

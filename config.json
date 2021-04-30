@@ -26,7 +26,7 @@
     },
     "nodes": {
       "statuses": {
-        "max": null
+        "max": 5
       }
     },
     "flows": {
