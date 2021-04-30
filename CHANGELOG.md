@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   Input fields within nodes that have type=password, now include a toggle to make the password visible from the editor.
 
--   Data fields that are stored in the [vault](https://xible.io/docs/guides/nodes/structure#structure.json), now have a shield icon in available in the editor to signify this. ([#90](https://github.com/SpectrumBroad/xible/issues/90))
+-   Data fields that are stored in the [vault](https://xible.io/docs/guides/nodes/structure#structure.json) now have a shield icon available in the editor to signify this. ([#90](https://github.com/SpectrumBroad/xible/issues/90))
 
 -   The ['object' nodepack](https://xible.io/nodes?search=object) now contains a `object.path` node to parse [jsonpath expressions](https://goessner.net/articles/JsonPath/). ([#62](https://github.com/SpectrumBroad/xible/issues/62))
 
