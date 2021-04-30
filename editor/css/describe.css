@@ -59,6 +59,8 @@
 .xible>.describe .node>h1 {
   position: relative;
   overflow: visible;
+  white-space: break-spaces;
+  overflow-wrap: break-word;
 }
 
 .xible>.describe .node>h1>p {
