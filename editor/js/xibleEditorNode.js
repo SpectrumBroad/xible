@@ -32,7 +32,7 @@ class XibleEditorNode extends xibleWrapper.Node {
      */
     this.setMaxListeners(1000);
 
-    headerEl.appendChild(document.createTextNode(this.name));
+    headerEl.innerHTML = escapeHtml(this.name).replace(/[._-]/g, (val) => `${val}<wbr />`);
 
     // add additional content
     if (this.hostsEditorContent) { // load editor static hosted content for this node

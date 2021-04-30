@@ -56,14 +56,18 @@
   transform-origin: center 0;
 }
 
-.xible>.describe .node>h1 {
+.xible>.describe .node > h1 {
   position: relative;
   overflow: visible;
   white-space: break-spaces;
   overflow-wrap: break-word;
 }
 
-.xible>.describe .node>h1>p {
+.xible>.describe .node > h1 wbr {
+  display: inline;
+}
+
+.xible>.describe .node > h1 > p {
   position: absolute;
   margin: 0;
   left: 0;

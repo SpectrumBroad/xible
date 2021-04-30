@@ -591,6 +591,10 @@
   border-top-right-radius: 4px;
 }
 
+.xible .node>h1 wbr {
+  display: none;
+}
+
 .xible .node.fail>h1 {
   background-color: rgba(255, 0, 0, 0.3);
 }
