@@ -1,13 +1,12 @@
 {
   "parserOptions": {
-    "ecmaVersion": 8,
     "sourceType": "script"
   },
   "extends": "airbnb",
   "env": {
     "browser": false,
     "node": true,
-    "es6": true
+    "es2020": true
   },
   "rules": {
     "global-require": "off",
