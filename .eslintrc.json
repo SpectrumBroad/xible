@@ -2,7 +2,7 @@
   "parserOptions": {
     "sourceType": "script"
   },
-  "extends": "airbnb",
+  "extends": "airbnb-base",
   "env": {
     "browser": false,
     "node": true,
@@ -23,8 +23,5 @@
     "no-restricted-syntax": ["off"],
     "no-param-reassign": "off",
     "no-use-before-define": ["error", {"functions": false, "classes": false}]
-  },
-  "plugins": [
-    "import"
-  ]
+  }
 }

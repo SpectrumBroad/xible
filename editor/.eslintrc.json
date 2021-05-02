@@ -1,13 +1,8 @@
 {
-  "parserOptions": {
-    "ecmaVersion": 8,
-    "sourceType": "script"
-  },
-  "extends": "airbnb",
+  "extends": "../.eslintrc.json",
   "env": {
     "browser": true,
-    "node": false,
-    "es6": true
+    "node": false
   },
   "globals": {
     "xibleWrapper": false,
@@ -24,25 +19,5 @@
     "EventEmitter": false,
     "customPrompt": false,
     "createResourceCharts": false
-  },
-  "rules": {
-    "global-require": "off",
-    "import/no-dynamic-require": "off",
-    "comma-dangle": ["error", "never"],
-    "no-underscore-dangle": "off",
-    "no-mixed-operators": "off",
-    "no-multi-assign": "warn",
-    "default-case": "off",
-    "strict": ["error", "global"],
-    "no-console": "off",
-    "no-continue": "off",
-    "guard-for-in": "off",
-    "no-restricted-syntax": ["off"],
-    "no-param-reassign": "off",
-    "no-use-before-define": ["error", {"functions": false, "classes": false}],
-    "indent": ["error", 2, {"MemberExpression": 0, "SwitchCase": 1}]
-  },
-  "plugins": [
-    "import"
-  ]
+  }
 }
