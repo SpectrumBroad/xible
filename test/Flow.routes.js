@@ -3,6 +3,7 @@
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
 
+const fs = require('fs');
 const assert = require('assert');
 const supertest = require('supertest');
 const Xible = require('..');
@@ -45,13 +46,99 @@ describe('/api/flows', function () {
 
     it('should fail on flow name', function () {
       return supertest(xible.expressApp)
-      .post('/api/flows')
-      .send({
-        _id: 'new_test_flow ',
-        nodes: [],
-        connectors: []
+        .post('/api/flows')
+        .send({
+          _id: 'new_test_flow ',
+          nodes: [],
+          connectors: []
+        })
+        .expect(400);
+    });
+
+    describe('vault', function () {
+      const consumerKey = Xible.generateObjectId();
+      const stringValue = Xible.generateObjectId();
+
+      before(function () {
+        // create a flow with a node that has a vaulted value
+        return supertest(xible.expressApp)
+          .post('/api/flows')
+          .send({
+            _id: 'vault_test_flow',
+            nodes: [
+              {
+                _id: '1',
+                inputs: {},
+                outputs: {
+                  twitter: {
+                    _id: '2',
+                    name: 'twitter',
+                    type: 'twitter'
+                  }
+                },
+                left: 0,
+                top: 0,
+                data: {
+                  consumerKey,
+                  consumerSecret: '',
+                  accessToken: '',
+                  accessTokenSecret: ''
+                },
+                type: 'object',
+                name: 'twitter'
+              },
+              {
+                _id: '3',
+                inputs: {
+                  concat: {
+                    _id: '4',
+                    name: 'concat',
+                    type: 'string'
+                  }
+                },
+                outputs: {
+                  result: {
+                    _id: '5',
+                    name: 'result',
+                    type: 'string'
+                  }
+                },
+                left: 50,
+                top: 50,
+                data: {
+                  value: stringValue
+                },
+                type: 'object',
+                name: 'string'
+              }
+            ],
+            connectors: []
+          })
+          .expect(200);
       })
-      .expect(400);
+
+      it('vaulted values _should not_ be stored in flow', function () {
+        // check the contents of the flow, it should not contain the consumerKey
+        const flowsPath = xible.resolvePath(xible.Config.getValue('flows.path'));
+        const flowJson = fs.readFileSync(`${flowsPath}/vault_test_flow.json`);
+        assert(!flowJson.includes(consumerKey));
+        assert(flowJson.includes(stringValue));
+      })
+
+      it('vaulted values _should_ be stored in vault', function () {
+        // check the contents of the vault, it should contain the consumerKey
+        const vaultPath = xible.resolvePath(xible.Config.getValue('vault.path'));
+        const vaultJson = fs.readFileSync(vaultPath);
+        assert(vaultJson.includes(consumerKey));
+        assert(!vaultJson.includes(stringValue));
+      });
+
+      after(function () {
+        // delete the test flow
+        return supertest(xible.expressApp)
+          .delete('/api/flows/vault_test_flow')
+          .expect(200);
+      });
     });
   });
 
