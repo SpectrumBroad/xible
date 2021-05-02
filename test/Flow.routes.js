@@ -25,22 +25,22 @@ describe('/api/flows', function () {
   describe('GET /', function () {
     it('should return list of flows', function () {
       return supertest(xible.expressApp)
-      .get('/api/flows')
-      .expect(200);
+        .get('/api/flows')
+        .expect(200);
     });
   });
 
   describe('POST /:flowId', function () {
     it('should create new flow', function () {
       return supertest(xible.expressApp)
-      .post('/api/flows')
-      .send({
-        _id: 'new_test_flow',
-        nodes: [],
-        connectors: []
-      })
-      .expect(200)
-      .expect(res => assert(res.body._id === 'new_test_flow'));
+        .post('/api/flows')
+        .send({
+          _id: 'new_test_flow',
+          nodes: [],
+          connectors: []
+        })
+        .expect(200)
+        .expect((res) => assert(res.body._id === 'new_test_flow'));
     });
 
     it('should fail on flow name', function () {
@@ -58,17 +58,17 @@ describe('/api/flows', function () {
   describe('GET /:flowId', function () {
     it('existing should return flow', function () {
       return supertest(xible.expressApp)
-      .get('/api/flows/new_test_flow')
-      .expect(200)
-      .expect(res => assert(res.body._id === 'new_test_flow'));
+        .get('/api/flows/new_test_flow')
+        .expect(200)
+        .expect((res) => assert(res.body._id === 'new_test_flow'));
     });
   });
 
   describe('POST /:flowId/instances', function () {
     it('should create new instance', function () {
       return supertest(xible.expressApp)
-      .post('/api/flows/new_test_flow/instances')
-      .expect(200);
+        .post('/api/flows/new_test_flow/instances')
+        .expect(200);
     });
   });
 
@@ -76,23 +76,23 @@ describe('/api/flows', function () {
     this.timeout(20000);
     it('should create and start new instance', function () {
       return supertest(xible.expressApp)
-      .post('/api/flows/new_test_flow/instances')
-      .send({ start: true })
-      .expect(200);
+        .post('/api/flows/new_test_flow/instances')
+        .send({ start: true })
+        .expect(200);
     });
   });
 
   describe('DELETE /:flowId', function () {
     it('should delete flow', function () {
       return supertest(xible.expressApp)
-      .delete('/api/flows/new_test_flow')
-      .expect(200);
+        .delete('/api/flows/new_test_flow')
+        .expect(200);
     });
 
     it('should return 404', function () {
       return supertest(xible.expressApp)
-      .get('/api/flows/new_test_flow')
-      .expect(404);
+        .get('/api/flows/new_test_flow')
+        .expect(404);
     });
   });
 });
