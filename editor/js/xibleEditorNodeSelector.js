@@ -78,48 +78,48 @@ class XibleEditorNodeSelector {
 
       // query the registry
       this.xibleEditor.xibleWrapper.Registry
-      .searchNodePacks(filterInputValue)
-      .then((nodePacks) => {
+        .searchNodePacks(filterInputValue)
+        .then((nodePacks) => {
         // print the li's belonging to the found nodePacks
-        for (const nodePackName in nodePacks) {
-          const nodePack = nodePacks[nodePackName];
-          for (let i = 0; i < nodePack.nodes.length; i += 1) {
+          for (const nodePackName in nodePacks) {
+            const nodePack = nodePacks[nodePackName];
+            for (let i = 0; i < nodePack.nodes.length; i += 1) {
             // check if this nodeName doesn't already exist in the list
-            const nodeName = nodePack.nodes[i].name;
-            if (nodesUl.querySelector(`li h1[title="${nodeName}"]`)) {
-              continue;
-            }
+              const nodeName = nodePack.nodes[i].name;
+              if (nodesUl.querySelector(`li h1[title="${nodeName}"]`)) {
+                continue;
+              }
 
-            // construct the new node and append to the list
-            const li = XibleEditorNodeSelector.buildNode(nodeName, nodePack.nodes[i]);
-            li.classList.add('online');
-            li.onclick = () => {
+              // construct the new node and append to the list
+              const li = XibleEditorNodeSelector.buildNode(nodeName, nodePack.nodes[i]);
+              li.classList.add('online');
+              li.onclick = () => {
               // open the detailed confirmation view
-              this.detailedNodeView(li, nodePack, nodeName);
-            };
-            nodesUl.appendChild(li);
+                this.detailedNodeView(li, nodePack, nodeName);
+              };
+              nodesUl.appendChild(li);
+            }
           }
-        }
 
-        this.setListsVisibility('online');
+          this.setListsVisibility('online');
 
-        this.position();
+          this.position();
 
-        searchOnlineButton.addEventListener('animationiteration', () => {
-          searchOnlineButton.classList.remove('loading');
-        }, {
-          once: true
+          searchOnlineButton.addEventListener('animationiteration', () => {
+            searchOnlineButton.classList.remove('loading');
+          }, {
+            once: true
+          });
+        })
+        .catch(() => {
+          div.classList.add('noresults');
+
+          searchOnlineButton.addEventListener('animationiteration', () => {
+            searchOnlineButton.classList.remove('loading');
+          }, {
+            once: true
+          });
         });
-      })
-      .catch(() => {
-        div.classList.add('noresults');
-
-        searchOnlineButton.addEventListener('animationiteration', () => {
-          searchOnlineButton.classList.remove('loading');
-        }, {
-          once: true
-        });
-      });
     });
 
     // open the node menu on double click
@@ -128,9 +128,9 @@ class XibleEditorNodeSelector {
       event.stopPropagation();
 
       if (
-        !event.ctrlKey && !event.shiftKey &&
-        XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport &&
-        (event.target === XIBLE_EDITOR.element || event.target === XIBLE_EDITOR.element.firstChild)
+        !event.ctrlKey && !event.shiftKey
+        && XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport
+        && (event.target === XIBLE_EDITOR.element || event.target === XIBLE_EDITOR.element.firstChild)
       ) {
         this.open(event);
       }
@@ -180,8 +180,8 @@ class XibleEditorNodeSelector {
   */
   getSearchWords() {
     return this.filterInput.value.toLowerCase()
-    .replace(/[\W_]+/g, ' ')
-    .split(' ');
+      .replace(/[\W_]+/g, ' ')
+      .split(' ');
   }
 
   /**
@@ -271,8 +271,8 @@ class XibleEditorNodeSelector {
 
     li.classList.remove('headerMatchExact', 'headerMatchPartial');
     if (
-      !filterInputValue ||
-      searchWords.every((searchWord) => textContent.indexOf(searchWord) > -1)
+      !filterInputValue
+      || searchWords.every((searchWord) => textContent.indexOf(searchWord) > -1)
     ) {
       // specify more relevant search results
       const headerTextContent = li.firstChild.textContent.toLowerCase();
@@ -302,14 +302,14 @@ class XibleEditorNodeSelector {
 
     // check if config allows installing new nodepacks
     this.xibleEditor.xibleWrapper.Config
-    .getValue('registry.nodepacks.allowinstall')
-    .then((allowInstall) => {
-      this.detailConfirmButton.disabled = !allowInstall;
+      .getValue('registry.nodepacks.allowinstall')
+      .then((allowInstall) => {
+        this.detailConfirmButton.disabled = !allowInstall;
 
-      if (!allowInstall) {
-        document.getElementById('nodePackInstallDisabled').classList.remove('hidden');
-      }
-    });
+        if (!allowInstall) {
+          document.getElementById('nodePackInstallDisabled').classList.remove('hidden');
+        }
+      });
 
     // set confirm button action
     this.detailConfirmButton.onclick = () => {
@@ -318,29 +318,29 @@ class XibleEditorNodeSelector {
       li.classList.add('loading');
 
       this.xibleEditor.xibleWrapper.Registry
-      .installNodePackByName(nodePack.name)
-      .then(() => {
-        this.detailConfirmButton.disabled = false;
-        this.detailConfirmButton.classList.remove('loading');
-
-        this.detailDiv.classList.add('hidden');
-
-        // refill
-        return this.fill();
-      })
-      .catch((err) => {
-        this.detailConfirmButton.disabled = true;
-
-        this.detailDivSub.innerHTML = '<p class="alert">An error occured.</p>';
-        this.detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode(err));
-
-        this.detailConfirmButton.addEventListener('animationiteration', () => {
+        .installNodePackByName(nodePack.name)
+        .then(() => {
+          this.detailConfirmButton.disabled = false;
           this.detailConfirmButton.classList.remove('loading');
-          li.classList.remove('loading');
-        }, {
-          once: true
+
+          this.detailDiv.classList.add('hidden');
+
+          // refill
+          return this.fill();
+        })
+        .catch((err) => {
+          this.detailConfirmButton.disabled = true;
+
+          this.detailDivSub.innerHTML = '<p class="alert">An error occured.</p>';
+          this.detailDivSub.appendChild(document.createElement('p')).appendChild(document.createTextNode(err));
+
+          this.detailConfirmButton.addEventListener('animationiteration', () => {
+            this.detailConfirmButton.classList.remove('loading');
+            li.classList.remove('loading');
+          }, {
+            once: true
+          });
         });
-      });
     };
 
     this.detailDiv.classList.remove('hidden');
@@ -375,7 +375,7 @@ class XibleEditorNodeSelector {
       <section>
         <h1>nodes</h1>
         <ul>
-          ${nodePack.nodes.map(node => `<li>${escapeHtml(node.name)}</li>`).join('')}
+          ${nodePack.nodes.map((node) => `<li>${escapeHtml(node.name)}</li>`).join('')}
         </ul>
       </section>
       <section>
@@ -398,7 +398,7 @@ class XibleEditorNodeSelector {
     // the heading element containing the node name
     const h1 = li.appendChild(document.createElement('h1'));
     h1.setAttribute('title', nodeName);
-    h1.innerHTML = escapeHtml(nodeName).replace(/[._-]/g, val => `${val}<wbr />`);
+    h1.innerHTML = escapeHtml(nodeName).replace(/[._-]/g, (val) => `${val}<wbr />`);
 
     // scroll text if it overflows
     /*
@@ -416,7 +416,7 @@ class XibleEditorNodeSelector {
     */
 
     // description
-    const description = node.description;
+    const { description } = node;
     if (description) {
       li.appendChild(document.createElement('p')).appendChild(document.createTextNode(description));
     }
@@ -438,10 +438,10 @@ class XibleEditorNodeSelector {
       const editorNode = this.xibleEditor.addNode(new XibleEditorNode(node));
       this.xibleEditor.loadedFlow.addNode(editorNode);
       editorNode.setPosition(
-        ((event.pageX - actionsOffset.left - this.xibleEditor.left) / this.xibleEditor.zoom) -
-        (editorNode.element.firstChild.offsetWidth / 2),
-        ((event.pageY - actionsOffset.top - this.xibleEditor.top) / this.xibleEditor.zoom) -
-        (editorNode.element.firstChild.offsetHeight / 2)
+        ((event.pageX - actionsOffset.left - this.xibleEditor.left) / this.xibleEditor.zoom)
+        - (editorNode.element.firstChild.offsetWidth / 2),
+        ((event.pageY - actionsOffset.top - this.xibleEditor.top) / this.xibleEditor.zoom)
+        - (editorNode.element.firstChild.offsetHeight / 2)
       );
 
       this.xibleEditor.deselect();
@@ -471,8 +471,8 @@ class XibleEditorNodeSelector {
     let visibleNodeNames;
     if (Array.from(this.nodesUl.querySelectorAll('li.hidden')).length) {
       visibleNodeNames = Array.from(this.nodesUl
-      .querySelectorAll('li:not(.hidden) h1'))
-      .map(header => header.getAttribute('title'));
+        .querySelectorAll('li:not(.hidden) h1'))
+        .map((header) => header.getAttribute('title'));
     }
     const hasMax = !!this.nodesUl.querySelector('.max');
 
@@ -480,45 +480,45 @@ class XibleEditorNodeSelector {
 
     // get the installed nodes
     return this.xibleEditor.xibleWrapper.http.request('GET', '/api/nodes')
-    .toJson()
-    .then((nodes) => {
+      .toJson()
+      .then((nodes) => {
       // hide loader
-      if (this.div.classList.contains('hidden')) {
-        this.div.classList.remove('loading');
-      } else {
-        this.div.addEventListener('animationiteration', () => {
+        if (this.div.classList.contains('hidden')) {
           this.div.classList.remove('loading');
-        }, {
-          once: true
-        });
-      }
-
-      Object.keys(nodes)
-      .forEach((nodeName) => {
-        const li = XibleEditorNodeSelector.buildNode(nodeName, nodes[nodeName]);
-        this.hookNode(li, nodes[nodeName]);
-
-        if (visibleNodeNames) {
-          li.classList.add('hidden');
+        } else {
+          this.div.addEventListener('animationiteration', () => {
+            this.div.classList.remove('loading');
+          }, {
+            once: true
+          });
         }
 
-        this.nodesUl.appendChild(li);
-      });
+        Object.keys(nodes)
+          .forEach((nodeName) => {
+            const li = XibleEditorNodeSelector.buildNode(nodeName, nodes[nodeName]);
+            this.hookNode(li, nodes[nodeName]);
 
-      // make items visible that were so before
-      if (visibleNodeNames) {
-        for (let i = 0; i < visibleNodeNames.length; i += 1) {
-          const h1 = this.nodesUl.querySelector(`li h1[title="${visibleNodeNames[i]}"]`);
-          if (h1) {
-            h1.parentNode.classList.remove('hidden');
+            if (visibleNodeNames) {
+              li.classList.add('hidden');
+            }
+
+            this.nodesUl.appendChild(li);
+          });
+
+        // make items visible that were so before
+        if (visibleNodeNames) {
+          for (let i = 0; i < visibleNodeNames.length; i += 1) {
+            const h1 = this.nodesUl.querySelector(`li h1[title="${visibleNodeNames[i]}"]`);
+            if (h1) {
+              h1.parentNode.classList.remove('hidden');
+            }
           }
         }
-      }
 
-      if (hasMax) {
-        this.addMaxMessage();
-      }
-    });
+        if (hasMax) {
+          this.addMaxMessage();
+        }
+      });
   }
 
   /**

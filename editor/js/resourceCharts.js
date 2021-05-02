@@ -47,7 +47,7 @@ function updateResourceCharts(flow, usage, cpuChart, memChart, delayChart, insta
       }
     );
   } else {
-    const instangeUsage = flow.find(usageInstance => usageInstance.flowInstanceId === instance._id);
+    const instangeUsage = flow.find((usageInstance) => usageInstance.flowInstanceId === instance._id);
     if (!instangeUsage) {
       return;
     }
@@ -135,7 +135,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
               mirror: true,
               maxTicksLimit: 4,
               z: 1,
-              callback: value => `${value} %`
+              callback: (value) => `${value} %`
             }
           }
         ]
@@ -208,7 +208,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
               mirror: true,
               maxTicksLimit: 4,
               z: 1,
-              callback: value => `${value} MiB`
+              callback: (value) => `${value} MiB`
             }
           }
         ]
@@ -265,7 +265,7 @@ function createResourceCharts(cpuCanvas, memCanvas, delayCanvas) {
               mirror: true,
               maxTicksLimit: 4,
               z: 1,
-              callback: value => `${value} μs`
+              callback: (value) => `${value} μs`
             }
           }
         ]

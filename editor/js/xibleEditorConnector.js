@@ -7,15 +7,15 @@ class XibleEditorConnector extends xibleWrapper.Connector {
     el.classList.add('connector');
     const path = el.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
 
-    super(Object.assign({}, obj, { element: el }));
+    super({ ...obj, element: el });
 
     if (this.global) {
       el.classList.add('global');
     }
 
     // selection handlers
-    path.addEventListener('mousedown', event => this.editor.toggleSelectionOnMouseEvent(event, this));
-    path.addEventListener('mouseup', event => this.editor.toggleSelectionOnMouseEvent(event, this));
+    path.addEventListener('mousedown', (event) => this.editor.toggleSelectionOnMouseEvent(event, this));
+    path.addEventListener('mouseup', (event) => this.editor.toggleSelectionOnMouseEvent(event, this));
   }
 
   setType(type) {
@@ -29,8 +29,8 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 
   filterDuplicateConnectors(type, end) {
     if (
-      !this.editor || !this.editor.dummyXibleConnectors ||
-      this.editor.dummyXibleConnectors.indexOf(this) === -1
+      !this.editor || !this.editor.dummyXibleConnectors
+      || this.editor.dummyXibleConnectors.indexOf(this) === -1
     ) {
       super.filterDuplicateConnectors(type, end);
     }
@@ -101,16 +101,16 @@ class XibleEditorConnector extends xibleWrapper.Connector {
 
     // get the position of the output
     const originNodeStyle = getComputedStyle(origin.node.element);
-    const originLeft = origin.node.left + origin.element.offsetLeft + origin.element.offsetWidth +
-      parseInt(originNodeStyle.borderLeftWidth, 10) +
-      parseInt(originNodeStyle.paddingLeft, 10);
+    const originLeft = origin.node.left + origin.element.offsetLeft + origin.element.offsetWidth
+      + parseInt(originNodeStyle.borderLeftWidth, 10)
+      + parseInt(originNodeStyle.paddingLeft, 10);
     const originTop = origin.node.top + origin.element.offsetTop;
 
     // get the position of the input
     const destinationNodeStyle = getComputedStyle(destination.node.element);
-    const destinationLeft = destination.node.left + destination.element.offsetLeft +
-      parseInt(destinationNodeStyle.borderLeftWidth, 10) +
-      parseInt(destinationNodeStyle.paddingLeft, 10);
+    const destinationLeft = destination.node.left + destination.element.offsetLeft
+      + parseInt(destinationNodeStyle.borderLeftWidth, 10)
+      + parseInt(destinationNodeStyle.paddingLeft, 10);
     const destinationTop = destination.node.top + destination.element.offsetTop;
 
     // get the distances between input and output

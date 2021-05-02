@@ -73,7 +73,7 @@ class ViewHolder extends EventEmitter {
   }
 
   static splitPath(path) {
-    let paths = path.split('/');
+    const paths = path.split('/');
     if (paths[paths.length - 1] === '') {
       paths.pop();
     }
@@ -111,22 +111,22 @@ class ViewHolder extends EventEmitter {
     this.render(view);
 
     return view.init()
-    .then((view) => {
+      .then((view) => {
       // scroll to element with id === hash
-      if (pathHash) {
-        const el = document.getElementById(pathHash.substring(1));
-        if (el) {
-          el.scrollIntoView(true);
+        if (pathHash) {
+          const el = document.getElementById(pathHash.substring(1));
+          if (el) {
+            el.scrollIntoView(true);
+          }
         }
-      }
 
-      this.emit('load', view);
-      return view;
-    })
-    .catch((err) => {
-      this.emit('error', err);
-      return view;
-    });
+        this.emit('load', view);
+        return view;
+      })
+      .catch((err) => {
+        this.emit('error', err);
+        return view;
+      });
   }
 
   loadNav() {
@@ -154,11 +154,11 @@ class ViewHolder extends EventEmitter {
       queryParams = window.location.search.substring(1);
     }
 
-    let viewParams = {};
+    const viewParams = {};
     queryParams.forEach((val) => {
-      let valSplit = val.split('=');
-      let param = valSplit[0],
-        value = '';
+      const valSplit = val.split('=');
+      const param = valSplit[0];
+      let value = '';
 
       if (valSplit.length > 1) {
         value = valSplit.slice(1, valSplit.length).join('=');

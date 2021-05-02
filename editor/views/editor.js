@@ -126,26 +126,26 @@ function editorView(EL) {
 
   // validate if the flows can be altered
   xibleWrapper.Flow
-  .validatePermissions()
-  .then((result) => {
-    permissionsValidate.addEventListener('animationiteration', () => {
-      permissionsValidate.classList.remove('loading');
-    }, {
-      once: true
+    .validatePermissions()
+    .then((result) => {
+      permissionsValidate.addEventListener('animationiteration', () => {
+        permissionsValidate.classList.remove('loading');
+      }, {
+        once: true
+      });
+
+      if (result) {
+        permissionsValidate.innerHTML = 'Write permissions check success.';
+        permissionsValidate.classList.add('success');
+
+        window.setTimeout(() => {
+          permissionsValidate.parentNode.removeChild(permissionsValidate);
+        }, 6000);
+      } else {
+        permissionsValidate.innerHTML = 'Writing to the flow path failed. Please check permissions.';
+        permissionsValidate.classList.add('alert');
+      }
     });
-
-    if (result) {
-      permissionsValidate.innerHTML = 'Write permissions check success.';
-      permissionsValidate.classList.add('success');
-
-      window.setTimeout(() => {
-        permissionsValidate.parentNode.removeChild(permissionsValidate);
-      }, 6000);
-    } else {
-      permissionsValidate.innerHTML = 'Writing to the flow path failed. Please check permissions.';
-      permissionsValidate.classList.add('alert');
-    }
-  });
 
   // check if this browser supports attachShadow
   const browserSupportAttachShadowEl = document.getElementById('browserSupportAttachShadow');
@@ -263,22 +263,22 @@ function editorView(EL) {
     event.preventDefault();
 
     Array.from(this.parentNode.parentNode.querySelectorAll('.open'))
-    .forEach((el) => {
-      el.classList.remove('open');
-    });
+      .forEach((el) => {
+        el.classList.remove('open');
+      });
 
     Array.from(this.parentNode.parentNode.parentNode.querySelectorAll('section.tabcontents'))
-    .forEach((section) => {
-      section.style.display = 'none';
-    });
+      .forEach((section) => {
+        section.style.display = 'none';
+      });
 
     this.parentNode.classList.add('open');
 
     const sectionClass = this.getAttribute('data-section-class');
     Array.from(this.parentNode.parentNode.parentNode.querySelectorAll(`section.tabcontents.${sectionClass}`))
-    .forEach((section) => {
-      section.style.display = '';
-    });
+      .forEach((section) => {
+        section.style.display = '';
+      });
 
     return false;
   }
@@ -449,12 +449,12 @@ function editorView(EL) {
       xibleEditor.left = xibleEditor.zoom * -minLeft;
 
       // center y
-      xibleEditor.top = (xibleEditor.zoom * -minTop) + (xibleEditorHeight / 2) -
-        (xibleEditor.zoom * ((maxTop - minTop) / 2));
+      xibleEditor.top = (xibleEditor.zoom * -minTop) + (xibleEditorHeight / 2)
+        - (xibleEditor.zoom * ((maxTop - minTop) / 2));
     } else {
       // center x
-      xibleEditor.left = (xibleEditor.zoom * -minLeft) + (xibleEditorWidth / 2) -
-        (xibleEditor.zoom * ((maxLeft - minLeft) / 2));
+      xibleEditor.left = (xibleEditor.zoom * -minLeft) + (xibleEditorWidth / 2)
+        - (xibleEditor.zoom * ((maxLeft - minLeft) / 2));
 
       // set y
       xibleEditor.top = xibleEditor.zoom * -minTop;
@@ -498,7 +498,7 @@ function editorView(EL) {
   async function fillInstances(flow) {
     instancesUl.innerHTML = '';
     const instances = await flow.getInstances();
-    instances.forEach(instance => createInstance(instance));
+    instances.forEach((instance) => createInstance(instance));
   }
 
   function createInstance(instance) {
@@ -556,9 +556,9 @@ function editorView(EL) {
       logUl.innerHTML = '';
 
       Array.from(flowListUl.querySelectorAll('li.open'))
-      .forEach((openLi) => {
-        openLi.classList.remove('open');
-      });
+        .forEach((openLi) => {
+          openLi.classList.remove('open');
+        });
       li.classList.add('open');
 
       if (!xibleEditor.viewFlow(flow)) {
@@ -571,31 +571,31 @@ function editorView(EL) {
 
       // get all persistent websocket messages
       xibleWrapper.getPersistentWebSocketMessages()
-      .then((messages) => {
-        let flowInstanceId;
-        let nodeId;
-        let statusId;
-        for (flowInstanceId in messages) {
-          for (nodeId in messages[flowInstanceId]) {
-            for (statusId in messages[flowInstanceId][nodeId]) {
-              xibleEditor.messageHandler(messages[flowInstanceId][nodeId][statusId]);
+        .then((messages) => {
+          let flowInstanceId;
+          let nodeId;
+          let statusId;
+          for (flowInstanceId in messages) {
+            for (nodeId in messages[flowInstanceId]) {
+              for (statusId in messages[flowInstanceId][nodeId]) {
+                xibleEditor.messageHandler(messages[flowInstanceId][nodeId][statusId]);
+              }
             }
           }
-        }
-      });
+        });
 
       // set desired zoomstate
       xibleWrapper.Config.getValue('editor.viewstate.zoomstateonopen')
-      .then((value) => {
-        switch (value) {
-          case 'reset':
-            zoomReset();
-            break;
-          case 'fit':
-            zoomFit();
-            break;
-        }
-      });
+        .then((value) => {
+          switch (value) {
+            case 'reset':
+              zoomReset();
+              break;
+            case 'fit':
+              zoomFit();
+              break;
+          }
+        });
     };
 
     // if in path, load it immediately
@@ -613,12 +613,12 @@ function editorView(EL) {
       setFlowTabState(flow, li);
 
       flow.getInstances()
-      .then((instances) => {
-        instances.forEach(instance => handleInstanceState(instance, flow, li));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((instances) => {
+          instances.forEach((instance) => handleInstanceState(instance, flow, li));
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
 
     function flowOnCreateInstance({ flowInstance }) {
@@ -705,9 +705,9 @@ function editorView(EL) {
       resetCharts();
 
       Array.from(document.querySelectorAll('.flowList>li.open'))
-      .forEach((openLi) => {
-        openLi.classList.remove('open');
-      });
+        .forEach((openLi) => {
+          openLi.classList.remove('open');
+        });
 
       const flow = new XibleEditorFlow({
         _id: flowName
@@ -749,22 +749,22 @@ function editorView(EL) {
 
     // ensure all flow tabs are gone
     Array.from(flowListUl.parentNode.querySelectorAll('#flowList > li:not(.add)'))
-    .forEach((flowListLi) => {
-      flowListUl.removeChild(flowListLi);
-    });
+      .forEach((flowListLi) => {
+        flowListUl.removeChild(flowListLi);
+      });
 
     xibleEditor.getFlows()
-    .then((flows) => {
-      Object.keys(flows).forEach((id) => {
-        createFlowTab(flows[id]);
-      });
+      .then((flows) => {
+        Object.keys(flows).forEach((id) => {
+          createFlowTab(flows[id]);
+        });
 
-      flowListUl.addEventListener('animationiteration', () => {
-        flowListUl.classList.remove('loading');
-      }, {
-        once: true
+        flowListUl.addEventListener('animationiteration', () => {
+          flowListUl.classList.remove('loading');
+        }, {
+          once: true
+        });
       });
-    });
   }
 
   // add the xibleEditor to the view
@@ -789,15 +789,15 @@ function editorView(EL) {
   function xibleWrapperOnClose() {
     // remove state li's
     Array.from(flowListUl.querySelectorAll('ul.states li'))
-    .forEach((li) => {
-      li.parentNode.removeChild(li);
-    });
+      .forEach((li) => {
+        li.parentNode.removeChild(li);
+      });
 
     // reset instance counts
     Array.from(flowListUl.querySelectorAll('.instance-count'))
-    .forEach((instanceCountEl) => {
-      instanceCountEl.innerHTML = '0';
-    });
+      .forEach((instanceCountEl) => {
+        instanceCountEl.innerHTML = '0';
+      });
 
     // reset directed styling
     if (xibleEditor.loadedFlow && xibleEditor.loadedFlow.directedInstance) {

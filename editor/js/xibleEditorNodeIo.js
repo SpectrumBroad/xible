@@ -1,13 +1,11 @@
 'use strict';
 
-const XibleEditorNodeIo = toExtend => class extends toExtend {
+const XibleEditorNodeIo = (toExtend) => class extends toExtend {
   constructor(name, obj) {
     const el = document.createElement('li');
     el.appendChild(document.createElement('div'));
 
-    super(name, Object.assign({}, obj, {
-      element: el
-    }));
+    super(name, { ...obj, element: el });
 
     // double click for global
     this.element.addEventListener('dblclick', () => {
@@ -17,9 +15,9 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
 
       const globalValue = !this.global;
       if (
-        this instanceof XibleEditorNodeInput &&
-        !this.node.flow.getGlobalOutputs()
-        .find(gOutput => gOutput.type === this.type)
+        this instanceof XibleEditorNodeInput
+        && !this.node.flow.getGlobalOutputs()
+          .find((gOutput) => gOutput.type === this.type)
       ) {
         return;
       }
@@ -123,8 +121,8 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
       let mouseMoveListener;
       document.addEventListener('mousemove', mouseMoveListener = (event) => {
         // confirm that we moved
-        const pageX = event.pageX;
-        const pageY = event.pageY;
+        const { pageX } = event;
+        const { pageY } = event;
         if (Math.abs(pageX - initPageX) > 2 || Math.abs(pageY - initPageY) > 2) {
           document.removeEventListener('mousemove', mouseMoveListener);
           mouseMoveListener = null;
@@ -161,10 +159,10 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
           const actionsOffset = this.node.editor.getOffsetPosition();
 
           // set the initial position at the mouse position
-          const left = ((event.pageX - actionsOffset.left - this.node.editor.left) / this.node.editor.zoom) -
-            this.node.editor.dummyIo.element.offsetLeft - (outGoing ? 0 : this.node.editor.dummyIo.element.offsetWidth + 2);
-          const top = ((event.pageY - actionsOffset.top - this.node.editor.top) / this.node.editor.zoom) -
-            this.node.editor.dummyIo.element.offsetTop - (this.node.editor.dummyIo.element.offsetHeight / 2);
+          const left = ((event.pageX - actionsOffset.left - this.node.editor.left) / this.node.editor.zoom)
+            - this.node.editor.dummyIo.element.offsetLeft - (outGoing ? 0 : this.node.editor.dummyIo.element.offsetWidth + 2);
+          const top = ((event.pageY - actionsOffset.top - this.node.editor.top) / this.node.editor.zoom)
+            - this.node.editor.dummyIo.element.offsetTop - (this.node.editor.dummyIo.element.offsetHeight / 2);
 
           this.node.editor.dummyXibleNode.setPosition(left, top);
 
@@ -172,16 +170,16 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
           if (event.shiftKey) {
             // find selected connectors
             const selectedConnectors = this.node.editor.selection
-            .filter(sel => sel instanceof XibleEditorConnector && (sel.origin === this || sel.destination === this));
-            this.node.editor.dummyXibleConnectors = selectedConnectors.length ?
-              selectedConnectors : this.connectors.slice(0);
+              .filter((sel) => sel instanceof XibleEditorConnector && (sel.origin === this || sel.destination === this));
+            this.node.editor.dummyXibleConnectors = selectedConnectors.length
+              ? selectedConnectors : this.connectors.slice(0);
 
             if (outGoing) {
               this.node.editor.dummyXibleConnectors
-              .forEach(conn => conn.setDestination(this.node.editor.dummyIo));
+                .forEach((conn) => conn.setDestination(this.node.editor.dummyIo));
             } else {
               this.node.editor.dummyXibleConnectors
-              .forEach(conn => conn.setOrigin(this.node.editor.dummyIo));
+                .forEach((conn) => conn.setOrigin(this.node.editor.dummyIo));
             }
           } else {
             this.node.editor.dummyXibleConnectors = [
@@ -199,10 +197,8 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
           this.node.editor.initDrag(event);
 
           // keep track of these for snap ins
-          this.node.editor.dummyXibleConnectors.originalOrigin =
-            this.node.editor.dummyXibleConnectors[0].origin;
-          this.node.editor.dummyXibleConnectors.originalDestination =
-            this.node.editor.dummyXibleConnectors[0].destination;
+          this.node.editor.dummyXibleConnectors.originalOrigin = this.node.editor.dummyXibleConnectors[0].origin;
+          this.node.editor.dummyXibleConnectors.originalDestination = this.node.editor.dummyXibleConnectors[0].destination;
         }
       });
 
@@ -234,42 +230,42 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
       const outGoing = this instanceof XibleEditorNodeOutput;
       const end = connectors[0][(outGoing ? 'origin' : 'destination')];
       if (
-        end !== this.node.editor.dummyIo &&
-        end !== this
+        end !== this.node.editor.dummyIo
+        && end !== this
       ) {
         return;
       }
 
       this.matchesConnectors(connectors)
-      .then((matchesConnectors) => {
-        if (!matchesConnectors) {
-          return;
-        }
-
-        // create the new connectors
-        connectors.forEach((conn) => {
-          const newConn = new XibleEditorConnector({
-            origin: outGoing ? this : conn.origin,
-            destination: outGoing ? conn.destination : this
-          });
-
-          if (newConn.destination.global) {
-            newConn.destination.setGlobal(undefined);
+        .then((matchesConnectors) => {
+          if (!matchesConnectors) {
+            return;
           }
 
-          this.node.editor.loadedFlow.connectors.push(newConn);
-          this.node.editor.addConnector(newConn);
+          // create the new connectors
+          connectors.forEach((conn) => {
+            const newConn = new XibleEditorConnector({
+              origin: outGoing ? this : conn.origin,
+              destination: outGoing ? conn.destination : this
+            });
+
+            if (newConn.destination.global) {
+              newConn.destination.setGlobal(undefined);
+            }
+
+            this.node.editor.loadedFlow.connectors.push(newConn);
+            this.node.editor.addConnector(newConn);
+          });
+
+          // ensure we deselect
+          this.node.editor.deselect();
+
+          // destroy the temporary connector & dummyXibleNode
+          this.node.editor.dummyXibleConnectors = null;
+          this.node.editor.dummyIo = null;
+          this.node.editor.dummyXibleNode.delete();
+          this.node.editor.dummyXibleNode = null;
         });
-
-        // ensure we deselect
-        this.node.editor.deselect();
-
-        // destroy the temporary connector & dummyXibleNode
-        this.node.editor.dummyXibleConnectors = null;
-        this.node.editor.dummyIo = null;
-        this.node.editor.dummyXibleNode.delete();
-        this.node.editor.dummyXibleNode = null;
-      });
     });
   }
 
@@ -291,41 +287,41 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
       const outGoing = this instanceof XibleEditorNodeOutput;
       const end = connectors[0][(outGoing ? 'origin' : 'destination')];
       if (
-        end !== this.node.editor.dummyIo &&
-        end !== this
+        end !== this.node.editor.dummyIo
+        && end !== this
       ) {
         return;
       }
 
       this.matchesConnectors(connectors)
-      .then((matchesConnectors) => {
-        if (!matchesConnectors) {
-          return;
-        }
+        .then((matchesConnectors) => {
+          if (!matchesConnectors) {
+            return;
+          }
 
-        if (this instanceof XibleEditorNodeInput) {
-          connectors.forEach(conn => conn.setDestination(this));
-        } else {
-          connectors.forEach(conn => conn.setOrigin(this));
-        }
-      });
+          if (this instanceof XibleEditorNodeInput) {
+            connectors.forEach((conn) => conn.setDestination(this));
+          } else {
+            connectors.forEach((conn) => conn.setOrigin(this));
+          }
+        });
     });
 
     // handle snap-out
     el.addEventListener('mouseout', () => {
       const connectors = this.node.editor.dummyXibleConnectors;
       if (
-        this instanceof XibleEditorNodeInput && connectors &&
-        connectors[0].destination === this &&
-        connectors[0].destination !== connectors.originalDestination
+        this instanceof XibleEditorNodeInput && connectors
+        && connectors[0].destination === this
+        && connectors[0].destination !== connectors.originalDestination
       ) {
-        connectors.forEach(conn => conn.setDestination(this.node.editor.dummyIo));
+        connectors.forEach((conn) => conn.setDestination(this.node.editor.dummyIo));
       } else if (
-        this instanceof XibleEditorNodeOutput && connectors &&
-        connectors[0].origin === this &&
-        connectors[0].origin !== connectors.originalOrigin
+        this instanceof XibleEditorNodeOutput && connectors
+        && connectors[0].origin === this
+        && connectors[0].origin !== connectors.originalOrigin
       ) {
-        connectors.forEach(conn => conn.setOrigin(this.node.editor.dummyIo));
+        connectors.forEach((conn) => conn.setOrigin(this.node.editor.dummyIo));
       }
     });
   }
@@ -349,7 +345,7 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
         return;
       }
 
-      this.node.flow.removeGlobalConnectors()
+      this.node.flow.removeGlobalConnectors();
     });
   }
 
@@ -369,7 +365,7 @@ const XibleEditorNodeIo = toExtend => class extends toExtend {
     const nodeInputs = this.node.flow.getGlobalInputsByType(this.type);
     for (let i = 0; i < nodeInputs.length; i += 1) {
       const nodeInput = nodeInputs[i];
-      if (nodeInput.connectors.filter(conn => !conn.global).length) {
+      if (nodeInput.connectors.filter((conn) => !conn.global).length) {
         return;
       }
 

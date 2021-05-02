@@ -26,8 +26,8 @@ const XibleEditorFlow = (() => {
     removeGlobalConnectors() {
       this.nodes.forEach((node) => {
         node.getOutputs().forEach((output) => {
-          output.connectors.filter(conn => conn.global)
-          .forEach(globalConn => globalConn.delete());
+          output.connectors.filter((conn) => conn.global)
+            .forEach((globalConn) => globalConn.delete());
         });
       });
     }
@@ -35,10 +35,10 @@ const XibleEditorFlow = (() => {
     setGlobalFromOutput(output) {
       // if we have another global of this type, ignore
       let globalOutputsByType = this.getGlobalOutputs()
-      .filter(gOutput => gOutput.type === output.type);
+        .filter((gOutput) => gOutput.type === output.type);
       if (
-        (!output.global && globalOutputsByType.length) ||
-        (output.global && globalOutputsByType.length > 1)
+        (!output.global && globalOutputsByType.length)
+        || (output.global && globalOutputsByType.length > 1)
       ) {
         return;
       }
@@ -47,8 +47,8 @@ const XibleEditorFlow = (() => {
       for (let i = 0; i < this.nodes.length; i += 1) {
         this.nodes[i].getInputs().forEach((input) => {
           if (
-            input.type === output.type && !input.connectors.filter(conn => !conn.global).length &&
-            input.global !== false
+            input.type === output.type && !input.connectors.filter((conn) => !conn.global).length
+            && input.global !== false
           ) {
             input.setGlobal(output.global ? true : undefined);
           }
@@ -64,7 +64,7 @@ const XibleEditorFlow = (() => {
 
     initNodes(nodes) {
       this.nodes = [];
-      nodes.forEach(node => this.addNode(new XibleEditorNode(node)));
+      nodes.forEach((node) => this.addNode(new XibleEditorNode(node)));
     }
 
     initConnectors(connectors) {

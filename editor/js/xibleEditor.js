@@ -64,7 +64,7 @@ class XibleEditor extends EventEmitter {
     // in ms
     this.serverClientDateDifference = 0;
     xibleWrapper.getServerClientDateDifference()
-    .then((ms) => { this.serverClientDateDifference = ms; });
+      .then((ms) => { this.serverClientDateDifference = ms; });
 
     this.enableNodeSelector();
     this.enableZoom();
@@ -141,26 +141,26 @@ class XibleEditor extends EventEmitter {
 
     // add the description for each io
     node.getInputs()
-    .concat(node.getOutputs())
-    .forEach((io) => {
+      .concat(node.getOutputs())
+      .forEach((io) => {
       // get rid of event listeners
-      const clonedNode = io.element.cloneNode(true);
-      io.element.parentNode.replaceChild(clonedNode, io.element);
-      io.element = clonedNode;
+        const clonedNode = io.element.cloneNode(true);
+        io.element.parentNode.replaceChild(clonedNode, io.element);
+        io.element = clonedNode;
 
-      // add description
-      const ioDescriptionEl = io.element.appendChild(document.createElement('p'));
-      ioDescriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.structureType || 'any'));
-      ioDescriptionEl.appendChild(document.createTextNode(io.description || 'No description.'));
+        // add description
+        const ioDescriptionEl = io.element.appendChild(document.createElement('p'));
+        ioDescriptionEl.appendChild(document.createElement('span')).appendChild(document.createTextNode(io.structureType || 'any'));
+        ioDescriptionEl.appendChild(document.createTextNode(io.description || 'No description.'));
 
-      if (!io.description) {
-        ioDescriptionEl.classList.add('none');
-      }
+        if (!io.description) {
+          ioDescriptionEl.classList.add('none');
+        }
 
-      if (ioDescriptionEl.scrollHeight > ioDescriptionEl.offsetHeight) {
-        ioDescriptionEl.classList.add('overflow');
-      }
-    });
+        if (ioDescriptionEl.scrollHeight > ioDescriptionEl.offsetHeight) {
+          ioDescriptionEl.classList.add('overflow');
+        }
+      });
 
     // handle descriptions for input elements and labels
     node.on('editorContentLoad', () => {
@@ -170,26 +170,26 @@ class XibleEditor extends EventEmitter {
 
       // add the description for each input element
       node.getRootLabelElements()
-      .forEach((label) => {
-        const description = label.getAttribute('data-description');
+        .forEach((label) => {
+          const description = label.getAttribute('data-description');
 
-        // this is actually not allowed
-        // a label may not contain a block element
-        const labelDescriptionEl = label.appendChild(document.createElement('p'));
-        labelDescriptionEl.appendChild(document.createTextNode(description || 'No description.'));
+          // this is actually not allowed
+          // a label may not contain a block element
+          const labelDescriptionEl = label.appendChild(document.createElement('p'));
+          labelDescriptionEl.appendChild(document.createTextNode(description || 'No description.'));
 
-        if (label.classList.contains('vault')) {
-          labelDescriptionEl.appendChild(document.createTextNode('This value is stored in the vault.'));
-        }
+          if (label.classList.contains('vault')) {
+            labelDescriptionEl.appendChild(document.createTextNode('This value is stored in the vault.'));
+          }
 
-        if (!description) {
-          labelDescriptionEl.classList.add('none');
-        }
+          if (!description) {
+            labelDescriptionEl.classList.add('none');
+          }
 
-        if (labelDescriptionEl.scrollHeight > labelDescriptionEl.offsetHeight) {
-          labelDescriptionEl.classList.add('overflow');
-        }
-      });
+          if (labelDescriptionEl.scrollHeight > labelDescriptionEl.offsetHeight) {
+            labelDescriptionEl.classList.add('overflow');
+          }
+        });
     });
 
     node.editor = this;
@@ -212,15 +212,15 @@ class XibleEditor extends EventEmitter {
   getFlows() {
     const req = this.xibleWrapper.http.request('GET', '/api/flows');
     return req.toObject(Object)
-    .then((flows) => {
-      this.flows = {};
-      for (const flowId in flows) {
-        const flow = new XibleEditorFlow(flows[flowId]);
-        this.flows[flowId] = flow;
-      }
+      .then((flows) => {
+        this.flows = {};
+        for (const flowId in flows) {
+          const flow = new XibleEditorFlow(flows[flowId]);
+          this.flows[flowId] = flow;
+        }
 
-      return this.flows;
-    });
+        return this.flows;
+      });
   }
 
   /**
@@ -228,35 +228,35 @@ class XibleEditor extends EventEmitter {
   */
   loadTypeDefStyles() {
     xibleWrapper.TypeDef.getAll()
-    .then((typeDefs) => {
+      .then((typeDefs) => {
       // remove existing style el
-      if (this.typeDefStyleEl && this.typeDefStyleEl.parentNode) {
-        this.typeDefStyleEl.parentNode.removeChild(this.typeDefStyleEl);
-      }
+        if (this.typeDefStyleEl && this.typeDefStyleEl.parentNode) {
+          this.typeDefStyleEl.parentNode.removeChild(this.typeDefStyleEl);
+        }
 
-      // create new style el
-      this.typeDefStyleEl = document.createElement('style');
-      this.typeDefStyleEl.setAttribute('type', 'text/css');
-      let styleText = '';
-      for (const type in typeDefs) {
-        if (typeDefs[type].color
+        // create new style el
+        this.typeDefStyleEl = document.createElement('style');
+        this.typeDefStyleEl.setAttribute('type', 'text/css');
+        let styleText = '';
+        for (const type in typeDefs) {
+          if (typeDefs[type].color
           && (
             /^\w+$/.test(typeDefs[type].color)
             || /^#[a-f0-9]{6}$/i.test(typeDefs[type].color)
           )
-        ) {
-          styleText += `.xible .node>.io>ul>.${type.replace(/\./g, '\\.')} {border-color: ${typeDefs[type].color};}\n`;
+          ) {
+            styleText += `.xible .node>.io>ul>.${type.replace(/\./g, '\\.')} {border-color: ${typeDefs[type].color};}\n`;
+          }
         }
-      }
-      if (!styleText) {
-        return;
-      }
+        if (!styleText) {
+          return;
+        }
 
-      // add to head
-      this.typeDefStyleEl.appendChild(document.createTextNode(styleText));
-      const head = document.head || document.getElementsByTagName('head')[0];
-      head.appendChild(this.typeDefStyleEl);
-    });
+        // add to head
+        this.typeDefStyleEl.appendChild(document.createTextNode(styleText));
+        const head = document.head || document.getElementsByTagName('head')[0];
+        head.appendChild(this.typeDefStyleEl);
+      });
   }
 
   /**
@@ -387,25 +387,25 @@ class XibleEditor extends EventEmitter {
     // global inputs
     // FIXME: move this to the XibleFlow def and track all global outputs there
     let globalTypes = [].concat(...this.loadedFlow.nodes.map((node) => node.getGlobalOutputs()
-    .map((output) => output.type)));
+      .map((output) => output.type)));
 
     node.getInputs()
-    .forEach((input) => {
-      let globalValue = input.global;
-      if (
-        globalTypes.indexOf(input.type) > -1
+      .forEach((input) => {
+        let globalValue = input.global;
+        if (
+          globalTypes.indexOf(input.type) > -1
         && !input.connectors.length && input.global !== false
-      ) {
-        globalValue = true;
-      }
-      input.setGlobal(globalValue);
-    });
+        ) {
+          globalValue = true;
+        }
+        input.setGlobal(globalValue);
+      });
 
     // global outputs
     node.getGlobalOutputs()
-    .forEach((output) => {
-      this.loadedFlow.setGlobalFromOutput(output);
-    });
+      .forEach((output) => {
+        this.loadedFlow.setGlobalFromOutput(output);
+      });
 
     globalTypes = null;
 
@@ -1029,9 +1029,9 @@ class XibleEditor extends EventEmitter {
         case 'a':
           if (event.ctrlKey || event.metaKey) {
             this.loadedFlow.nodes
-            .forEach((node) => this.select(node));
+              .forEach((node) => this.select(node));
             this.loadedFlow.connectors
-            .forEach((connector) => this.select(connector));
+              .forEach((connector) => this.select(connector));
 
             event.preventDefault();
           }
@@ -1245,24 +1245,24 @@ class XibleEditor extends EventEmitter {
       }
 
       sel.getOutputs()
-      .forEach((output) => {
-        if (processedOutputs[output._id]) {
-          return;
-        }
-        processedOutputs[output._id] = true;
-
-        output.connectors.forEach((conn) => {
-          if (dupMap[conn.destination.node._id]) {
-            processedConnectors.push(`${conn.origin._id},${conn.destination._id}`);
-
-            const dupConn = new XibleEditorConnector({
-              origin: dupMap[sel._id].getOutputByName(output.name),
-              destination: dupMap[conn.destination.node._id].getInputByName(conn.destination.name)
-            });
-            newSelection.push(dupConn);
+        .forEach((output) => {
+          if (processedOutputs[output._id]) {
+            return;
           }
+          processedOutputs[output._id] = true;
+
+          output.connectors.forEach((conn) => {
+            if (dupMap[conn.destination.node._id]) {
+              processedConnectors.push(`${conn.origin._id},${conn.destination._id}`);
+
+              const dupConn = new XibleEditorConnector({
+                origin: dupMap[sel._id].getOutputByName(output.name),
+                destination: dupMap[conn.destination.node._id].getInputByName(conn.destination.name)
+              });
+              newSelection.push(dupConn);
+            }
+          });
         });
-      });
     });
     processedOutputs = null;
 

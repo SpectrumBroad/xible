@@ -5,20 +5,20 @@ const htmlMap = {
   '<': '&lt;',
   '>': '&gt;',
   '"': '&quot;'
-}
+};
 
 function escapeHtml(str) {
   if (!str) {
     return '';
   }
 
-  return str.replace(/[&<>"]/g, tag => htmlMap[tag] || tag)
+  return str.replace(/[&<>"]/g, (tag) => htmlMap[tag] || tag);
 }
 
 function getParamNames(flow) {
   const paramNodes = flow.getNodesByName('xible.flow.instance.param');
-  return paramNodes.map(paramNode => paramNode.data.paramName)
-  .filter(paramName => !!paramName);
+  return paramNodes.map((paramNode) => paramNode.data.paramName)
+    .filter((paramName) => !!paramName);
 }
 
 function renderParamInputs(section, paramNames) {
@@ -59,10 +59,9 @@ async function flowHasRunningInstances(flow) {
 
   const instances = await flow.getInstances();
   return instances.some(
-    instance =>
-      instance.state !== xibleWrapper.FlowInstance.STATE_STOPPED &&
-      instance.state !== xibleWrapper.FlowInstance.STATE_STOPPING &&
-      instance.state !== xibleWrapper.FlowInstance.STATE_INITIALIZED
+    (instance) => instance.state !== xibleWrapper.FlowInstance.STATE_STOPPED
+      && instance.state !== xibleWrapper.FlowInstance.STATE_STOPPING
+      && instance.state !== xibleWrapper.FlowInstance.STATE_INITIALIZED
   );
 }
 

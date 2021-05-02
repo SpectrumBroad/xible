@@ -19,11 +19,12 @@ class XibleEditorNode extends xibleWrapper.Node {
     const outputList = ios.appendChild(document.createElement('ul'));
     outputList.classList.add('output');
 
-    super(Object.assign({}, obj, {
+    super({
+      ...obj,
       element: el,
       inputList,
       outputList
-    }), ignoreData);
+    }, ignoreData);
 
     /*
      * Increase max listeners limit.
@@ -64,39 +65,39 @@ class XibleEditorNode extends xibleWrapper.Node {
 
       // check if direct mode is alowed before continuing
       xibleWrapper.Config
-      .getValue('editor.flows.allowdirect')
-      .then((allowDirect) => {
-        if (!allowDirect) {
-          return;
-        }
+        .getValue('editor.flows.allowdirect')
+        .then((allowDirect) => {
+          if (!allowDirect) {
+            return;
+          }
 
-        this.flow.undirect();
+          this.flow.undirect();
 
-        // fetch all related connectors and nodes for the double clicked node
-        const related = XibleEditorNode.getAllInputObjectNodes(this);
+          // fetch all related connectors and nodes for the double clicked node
+          const related = XibleEditorNode.getAllInputObjectNodes(this);
 
-        // don't forget about globals
-        related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
+          // don't forget about globals
+          related.nodes = related.nodes.concat(this.flow.getGlobalNodes());
 
-        related.nodes.forEach((node) => {
-          node._directSetDataListener = () => this.editor.loadedFlow.direct(related.nodes);
-          node.on('setdata', node._directSetDataListener);
+          related.nodes.forEach((node) => {
+            node._directSetDataListener = () => this.editor.loadedFlow.direct(related.nodes);
+            node.on('setdata', node._directSetDataListener);
+          });
+
+          this.editor.loadedFlow.nodes
+            .filter((node) => related.nodes.indexOf(node) === -1)
+            .forEach((node) => {
+              node.element.classList.add('nodirect');
+            });
+
+          this.editor.loadedFlow.connectors
+            .filter((connector) => related.connectors.indexOf(connector) === -1)
+            .forEach((connector) => {
+              connector.element.classList.add('nodirect');
+            });
+
+          this.editor.loadedFlow.direct(related.nodes);
         });
-
-        this.editor.loadedFlow.nodes
-        .filter(node => related.nodes.indexOf(node) === -1)
-        .forEach((node) => {
-          node.element.classList.add('nodirect');
-        });
-
-        this.editor.loadedFlow.connectors
-        .filter(connector => related.connectors.indexOf(connector) === -1)
-        .forEach((connector) => {
-          connector.element.classList.add('nodirect');
-        });
-
-        this.editor.loadedFlow.direct(related.nodes);
-      });
     });
 
     if (!obj.nodeExists) {
@@ -130,9 +131,9 @@ class XibleEditorNode extends xibleWrapper.Node {
   getAndProcessEditorContent() {
     const proc = () => {
       this.getEditorContent()
-      .then((data) => {
-        this.processEditorContent(data);
-      });
+        .then((data) => {
+          this.processEditorContent(data);
+        });
     };
 
     if (this.editor) {
@@ -178,12 +179,12 @@ class XibleEditorNode extends xibleWrapper.Node {
         // remove scripts
         // so we can evaulate them in a seperate function with a specific document argument.
         templateEl.plainScripts = Array.from(templateEl.content.querySelectorAll('script'))
-        .map((scriptEl) => {
-          const scriptContent = scriptEl.textContent;
-          scriptEl.parentNode.removeChild(scriptEl);
+          .map((scriptEl) => {
+            const scriptContent = scriptEl.textContent;
+            scriptEl.parentNode.removeChild(scriptEl);
 
-          return scriptContent;
-        });
+            return scriptContent;
+          });
       }
 
       const templateContent = templateEl.content;
@@ -501,82 +502,82 @@ class XibleEditorNode extends xibleWrapper.Node {
    */
   convenienceLabel() {
     this.getRootInputElements()
-    .forEach((el) => {
-      const label = document.createElement('label');
-      this.shadowRoot.replaceChild(label, el);
+      .forEach((el) => {
+        const label = document.createElement('label');
+        this.shadowRoot.replaceChild(label, el);
 
-      const span = document.createElement('span');
-      span.classList.add('label');
+        const span = document.createElement('span');
+        span.classList.add('label');
 
-      // password visibility
-      if (el.getAttribute('type') === 'password') {
-        const passwordWrapper = document.createElement('div');
-        passwordWrapper.classList.add('password-wrapper');
-        passwordWrapper.appendChild(el);
-        passwordWrapper.appendChild(span);
+        // password visibility
+        if (el.getAttribute('type') === 'password') {
+          const passwordWrapper = document.createElement('div');
+          passwordWrapper.classList.add('password-wrapper');
+          passwordWrapper.appendChild(el);
+          passwordWrapper.appendChild(span);
 
-        const toggle = passwordWrapper.appendChild(document.createElement('div'));
-        toggle.classList.add('password-toggle');
-        toggle.onclick = () => {
-          const currentType = el.getAttribute('type');
-          if (currentType === 'password') {
-            el.setAttribute('type', 'text');
-          } else {
-            el.setAttribute('type', 'password');
-          }
-        };
+          const toggle = passwordWrapper.appendChild(document.createElement('div'));
+          toggle.classList.add('password-toggle');
+          toggle.onclick = () => {
+            const currentType = el.getAttribute('type');
+            if (currentType === 'password') {
+              el.setAttribute('type', 'text');
+            } else {
+              el.setAttribute('type', 'password');
+            }
+          };
 
-        label.appendChild(passwordWrapper);
-      } else {
-        label.appendChild(el);
-        label.appendChild(span);
-      }
-
-      const dataOutputValue = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
-      if (this.vault && dataOutputValue && this.vault.includes(dataOutputValue)) {
-        label.classList.add('vault');
-      }
-
-      // set the required attribute
-      // because the :has() pseudo selector is not available (yet)
-      if (
-        el.required ||
-        (el.nodeName === 'SELECTCONTAINER' && el.querySelector('select') && el.querySelector('select').required)
-      ) {
-        label.classList.add('required');
-      } else {
-        label.classList.add('optional');
-      }
-
-      // copy the description to the label
-      const description = el.getAttribute('data-description');
-      if (description) {
-        label.setAttribute('data-description', description);
-      }
-
-      // add the label
-      let placeholder = el.getAttribute('placeholder') || dataOutputValue;
-
-      // try to fetch a placeholder for a select input
-      if (!placeholder && el.nodeName === 'SELECTCONTAINER') {
-        const selectEl = el.querySelector('select');
-        if (selectEl) {
-          placeholder = selectEl.getAttribute('placeholder') || selectEl.getAttribute('data-output-value') || selectEl.getAttribute('data-outputvalue');
+          label.appendChild(passwordWrapper);
+        } else {
+          label.appendChild(el);
+          label.appendChild(span);
         }
-      }
 
-      if (!placeholder) {
-        span.classList.add('unknown');
-      }
+        const dataOutputValue = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
+        if (this.vault && dataOutputValue && this.vault.includes(dataOutputValue)) {
+          label.classList.add('vault');
+        }
 
-      span.appendChild(document.createTextNode(placeholder || 'unknown'));
+        // set the required attribute
+        // because the :has() pseudo selector is not available (yet)
+        if (
+          el.required
+        || (el.nodeName === 'SELECTCONTAINER' && el.querySelector('select') && el.querySelector('select').required)
+        ) {
+          label.classList.add('required');
+        } else {
+          label.classList.add('optional');
+        }
 
-      // ensure hideif attached is hooked properly
-      const hideIfAttached = el.getAttribute('data-hide-if-attached') || el.getAttribute('data-hideifattached');
-      if (hideIfAttached) {
-        label.setAttribute('data-hide-if-attached', hideIfAttached);
-      }
-    });
+        // copy the description to the label
+        const description = el.getAttribute('data-description');
+        if (description) {
+          label.setAttribute('data-description', description);
+        }
+
+        // add the label
+        let placeholder = el.getAttribute('placeholder') || dataOutputValue;
+
+        // try to fetch a placeholder for a select input
+        if (!placeholder && el.nodeName === 'SELECTCONTAINER') {
+          const selectEl = el.querySelector('select');
+          if (selectEl) {
+            placeholder = selectEl.getAttribute('placeholder') || selectEl.getAttribute('data-output-value') || selectEl.getAttribute('data-outputvalue');
+          }
+        }
+
+        if (!placeholder) {
+          span.classList.add('unknown');
+        }
+
+        span.appendChild(document.createTextNode(placeholder || 'unknown'));
+
+        // ensure hideif attached is hooked properly
+        const hideIfAttached = el.getAttribute('data-hide-if-attached') || el.getAttribute('data-hideifattached');
+        if (hideIfAttached) {
+          label.setAttribute('data-hide-if-attached', hideIfAttached);
+        }
+      });
   }
 
   /**
@@ -592,7 +593,7 @@ class XibleEditorNode extends xibleWrapper.Node {
         if (event.key === 'Tab') {
           event.preventDefault();
 
-          const selectionStart = el.selectionStart;
+          const { selectionStart } = el;
           el.value = `${el.value.substring(0, selectionStart)}\t${el.value.substring(el.selectionEnd)}`;
           el.selectionStart = selectionStart + 1;
           el.selectionEnd = selectionStart + 1;

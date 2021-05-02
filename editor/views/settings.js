@@ -54,7 +54,7 @@ View.routes['/settings'] = (EL) => {
   settingsViewHolder.on('load', (view) => {
     // unselect all buttons from #sub
     Array.from(document.querySelectorAll('#sub ul a'))
-    .forEach(a => a.classList.remove('view'));
+      .forEach((a) => a.classList.remove('view'));
 
     // select the button from lhs
     const a = document.querySelector(`#sub ul a[href*="${window.location.hash}"][href*="${view.name}"]`);
@@ -64,85 +64,85 @@ View.routes['/settings'] = (EL) => {
 
     // hook event handler on change to save config data immediately
     Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
-    .forEach((input) => {
-      input.addEventListener('change', () => {
-        let value = input.value;
-        switch (input.getAttribute('type')) {
-          case 'number':
+      .forEach((input) => {
+        input.addEventListener('change', () => {
+          let { value } = input;
+          switch (input.getAttribute('type')) {
+            case 'number':
 
-            if (typeof value === 'string' && value.length > 0) {
-              value = +value;
-              if (isNaN(value)) {
-                return;
+              if (typeof value === 'string' && value.length > 0) {
+                value = +value;
+                if (isNaN(value)) {
+                  return;
+                }
               }
-            }
 
-            break;
+              break;
 
-          case 'checkbox':
-            value = input.checked;
-            break;
-        }
+            case 'checkbox':
+              value = input.checked;
+              break;
+          }
 
-        if (typeof value === 'string' && value.length === 0) {
-          xibleWrapper.Config.deleteValue(input.getAttribute('data-configpath'));
-          return;
-        }
+          if (typeof value === 'string' && value.length === 0) {
+            xibleWrapper.Config.deleteValue(input.getAttribute('data-configpath'));
+            return;
+          }
 
-        xibleWrapper.Config.setValue(input.getAttribute('data-configpath'), value);
+          xibleWrapper.Config.setValue(input.getAttribute('data-configpath'), value);
+        });
       });
-    });
 
     // disable if necessary
     xibleWrapper.Config.getValue('editor.settings.allowchange')
-    .then((allowChange) => {
-      Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
-      .forEach((input) => {
-        input.disabled = !allowChange;
+      .then((allowChange) => {
+        Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
+          .forEach((input) => {
+            input.disabled = !allowChange;
+          });
       });
-    });
 
     // set the right data in the data-configpath fields
     xibleWrapper.Config.getAll()
-    .then((config) => {
-      Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
-      .forEach((input) => {
-        if (input.getAttribute('type') === 'checkbox') {
-          input.checked = !!xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
-        } else {
-          input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
-        }
+      .then((config) => {
+        Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
+          .forEach((input) => {
+            if (input.getAttribute('type') === 'checkbox') {
+              input.checked = !!xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+            } else {
+              input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+            }
+          });
       });
-    });
   });
   settingsViewHolder.hookNavHandler();
   settingsViewHolder.loadNav()
-  .catch(() => {
-    mainViewHolder.navigate('/settings/general');
-  });
+    .catch(() => {
+      mainViewHolder.navigate('/settings/general');
+    });
 
   // validate if the config can be altered
   const permissionsValidate = document.getElementById('validateWritePermissions');
   xibleWrapper.Config.validatePermissions()
-  .then((result) => {
-    permissionsValidate.addEventListener('animationiteration', () => {
-      permissionsValidate.classList.remove('loading');
-    }, {
-      once: true
+    .then((result) => {
+      permissionsValidate.addEventListener('animationiteration', () => {
+        permissionsValidate.classList.remove('loading');
+      }, {
+        once: true
+      });
+
+      if (result) {
+        permissionsValidate.innerHTML = 'Write permissions check success.';
+        permissionsValidate.classList.remove('checking');
+        permissionsValidate.classList.add('success');
+
+        window.setTimeout(() => {
+          permissionsValidate.parentNode.removeChild(permissionsValidate);
+        }, 6000);
+      } else {
+        permissionsValidate.innerHTML = 'Writing to the configuration file failed. Please check permissions.';
+        permissionsValidate.classList.remove('checking', 'loading');
+        permissionsValidate.classList.add('alert');
+      }
     });
-
-    if (result) {
-      permissionsValidate.innerHTML = 'Write permissions check success.';
-      permissionsValidate.classList.remove('checking');
-      permissionsValidate.classList.add('success');
-
-      window.setTimeout(() => {
-        permissionsValidate.parentNode.removeChild(permissionsValidate);
-      }, 6000);
-    } else {
-      permissionsValidate.innerHTML = 'Writing to the configuration file failed. Please check permissions.';
-      permissionsValidate.classList.remove('checking', 'loading');
-      permissionsValidate.classList.add('alert');
-    }
-  });
 };

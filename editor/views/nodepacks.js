@@ -55,8 +55,8 @@ View.routes['/nodepacks'] = async (EL) => {
 
   function loadNextNodePack() {
     if (
-      loadedNodePackNameIndex >= nodePackNames.length - 1 ||
-      innerEl.offsetHeight < (innerEl.scrollHeight - innerEl.scrollTop) - 300
+      loadedNodePackNameIndex >= nodePackNames.length - 1
+      || innerEl.offsetHeight < (innerEl.scrollHeight - innerEl.scrollTop) - 300
     ) {
       return;
     }
@@ -76,19 +76,19 @@ View.routes['/nodepacks'] = async (EL) => {
     detailsUl.classList.add('details');
 
     detailsUl.appendChild(document.createElement('li'))
-    .appendChild(document.createTextNode(`version ${nodePack.version}`));
+      .appendChild(document.createTextNode(`version ${nodePack.version}`));
 
     if (nodePack.installedByDefault) {
       detailsUl.appendChild(document.createElement('li'))
-      .appendChild(document.createTextNode('default'));
+        .appendChild(document.createTextNode('default'));
     }
 
     li.appendChild(document.createElement('h2'))
-    .appendChild(document.createTextNode(nodePack.name));
+      .appendChild(document.createTextNode(nodePack.name));
 
     if (nodePack.description) {
       li.appendChild(document.createElement('p'))
-      .appendChild(document.createTextNode(nodePack.description));
+        .appendChild(document.createTextNode(nodePack.description));
     }
 
     const nodesUl = li.appendChild(document.createElement('ul'));
@@ -98,7 +98,7 @@ View.routes['/nodepacks'] = async (EL) => {
       const editorNode = new XibleEditorNode(node);
 
       nodesUl.appendChild(document.createElement('li'))
-      .appendChild(editorNode.element);
+        .appendChild(editorNode.element);
 
       editorNode.editor = dummyEditor;
       editorNode.emit('beforeAppend');
@@ -108,7 +108,7 @@ View.routes['/nodepacks'] = async (EL) => {
     const actionsDiv = li.appendChild(document.createElement('div'));
     actionsDiv.classList.add('actions');
 
-/*
+    /*
     // remove button
     if (!nodePack.installedByDefault) {
       const deleteButton = actionsDiv.appendChild(document.createElement('button'));

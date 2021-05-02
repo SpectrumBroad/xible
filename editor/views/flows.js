@@ -203,11 +203,11 @@ View.routes['/flows'] = (EL) => {
     for (let i = 0; i < rows.length; i += 1) {
       if (
         !filterValue || (
-          !rows[i].classList.contains('instances') &&
-          rows[i].cells[0].innerText.toLowerCase().includes(filterValue)
+          !rows[i].classList.contains('instances')
+          && rows[i].cells[0].innerText.toLowerCase().includes(filterValue)
         ) || (
-          rows[i].classList.contains('instances') &&
-          rows[i].previousSibling.style.display !== 'none'
+          rows[i].classList.contains('instances')
+          && rows[i].previousSibling.style.display !== 'none'
         )
       ) {
         rows[i].style.display = '';
@@ -578,23 +578,23 @@ View.routes['/flows'] = (EL) => {
     startDateLi.innerHTML = instance.timing.startDate ? new Date(instance.timing.startDate).toLocaleString() : '&nbsp;';
 
     const createTime = Math.round(
-      ((instance.timing.createEnd[0] - instance.timing.createStart[0]) * 1000) +
-      ((instance.timing.createEnd[1] - instance.timing.createStart[1]) / 1e6)
+      ((instance.timing.createEnd[0] - instance.timing.createStart[0]) * 1000)
+      + ((instance.timing.createEnd[1] - instance.timing.createStart[1]) / 1e6)
     );
 
     let initTime = 0;
     if (instance.timing.initEnd) {
       initTime = Math.round(
-        ((instance.timing.initEnd[0] - instance.timing.initStart[0]) * 1000) +
-        ((instance.timing.initEnd[1] - instance.timing.initStart[1]) / 1e6)
+        ((instance.timing.initEnd[0] - instance.timing.initStart[0]) * 1000)
+        + ((instance.timing.initEnd[1] - instance.timing.initStart[1]) / 1e6)
       );
     }
 
     let startTime = 0;
     if (instance.timing.startEnd) {
       startTime = Math.round(
-        ((instance.timing.startEnd[0] - instance.timing.startStart[0]) * 1000) +
-        ((instance.timing.startEnd[1] - instance.timing.startStart[1]) / 1e6)
+        ((instance.timing.startEnd[0] - instance.timing.startStart[0]) * 1000)
+        + ((instance.timing.startEnd[1] - instance.timing.startStart[1]) / 1e6)
       );
     }
     startupDurationLi.innerHTML = `${createTime + initTime + startTime}ms`;
@@ -647,14 +647,14 @@ View.routes['/flows'] = (EL) => {
 
     if (tr.nextSibling && tr.nextSibling.classList.contains('instances')) {
       Array.from(tr.nextSibling.querySelectorAll('ul.instances>li'))
-      .forEach((li) => {
-        flow.removeListener('delete', li._flowInstanceDeleteListener);
-        li._instance.removeListener('delete', li._flowInstanceDeleteListener);
-        li._instance.removeListener('starting', li._flowInstanceParamsUpdateListener);
-        delete li._instance;
-        delete li._flowInstanceDeleteListener;
-        delete li._flowInstanceParamsUpdateListener;
-      });
+        .forEach((li) => {
+          flow.removeListener('delete', li._flowInstanceDeleteListener);
+          li._instance.removeListener('delete', li._flowInstanceDeleteListener);
+          li._instance.removeListener('starting', li._flowInstanceParamsUpdateListener);
+          delete li._instance;
+          delete li._flowInstanceDeleteListener;
+          delete li._flowInstanceParamsUpdateListener;
+        });
       tr.parentNode.removeChild(tr.nextSibling);
     }
   }
