@@ -6,13 +6,13 @@
 'use strict';
 
 // windows: running "xible x" in this folder will invoke WSH, not node.
-/* global WScript*/
+/* global WScript */
 if (typeof WScript !== 'undefined') {
   WScript.echo(
-    'xiblepm does not work when run\n' +
-    'with the Windows Scripting Host\n\n' +
-    "'cd' to a different directory,\n" +
-    "or type 'node xiblepm <args>'."
+    'xiblepm does not work when run\n'
+    + 'with the Windows Scripting Host\n\n'
+    + "'cd' to a different directory,\n"
+    + "or type 'node xiblepm <args>'."
   );
   WScript.quit(1);
   return;
@@ -27,7 +27,7 @@ const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
 const Xible = require('../index.js');
-const Writable = require('stream').Writable;
+const {Writable} = require('stream');
 
 // option parsing
 const knownOpts = {
@@ -41,7 +41,7 @@ const shortHands = {
   f: '--force'
 };
 const opts = nopt(knownOpts, shortHands);
-const remain = opts.argv.remain;
+const {remain} = opts.argv;
 const context = remain.shift() || 'help';
 const command = remain.shift();
 
@@ -186,7 +186,7 @@ const cli = {
         if (!xible.Flow.validateId(altFlowId)) {
           throw 'flow _id/name cannot contain reserved/unsave characters';
         }
-        flowJson = Object.assign({}, flowJson);
+        flowJson = { ...flowJson};
         flowJson._id = altFlowId;
         flowJson.name = altFlowId;
       }
@@ -199,31 +199,31 @@ const cli = {
 
       // verify that we're logged in
       return xible.Registry.User
-      .getByToken(token)
-      .catch(getUserErr => Promise.reject(`Failed to get user from token: ${getUserErr}`))
-      .then((user) => {
-        if (!user) {
-          return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
-        }
-
-        // verify if this node had been published before
-        return xible.Registry.Flow
-        .getByName(flow._id)
-        .catch(getFlowErr => Promise.reject(`Failed to get flow from registry: ${getFlowErr}`))
-        .then((registryFlow) => {
-          // verify that whoami equals the remote user
-          if (registryFlow && registryFlow.publishUserName !== user.name) {
-            return Promise.reject(`Flow "${registryFlow._id}" was previously published by "${registryFlow.publishUserName}". You are currently logged in as "${user.name}".`);
+        .getByToken(token)
+        .catch((getUserErr) => Promise.reject(`Failed to get user from token: ${getUserErr}`))
+        .then((user) => {
+          if (!user) {
+            return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
           }
 
-          // publish
+          // verify if this node had been published before
           return xible.Registry.Flow
-          .publish(flowJson)
-          .then((publishedFlow) => {
-            log(`Published flow "${publishedFlow._id}".`);
-          });
+            .getByName(flow._id)
+            .catch((getFlowErr) => Promise.reject(`Failed to get flow from registry: ${getFlowErr}`))
+            .then((registryFlow) => {
+              // verify that whoami equals the remote user
+              if (registryFlow && registryFlow.publishUserName !== user.name) {
+                return Promise.reject(`Flow "${registryFlow._id}" was previously published by "${registryFlow.publishUserName}". You are currently logged in as "${user.name}".`);
+              }
+
+              // publish
+              return xible.Registry.Flow
+                .publish(flowJson)
+                .then((publishedFlow) => {
+                  log(`Published flow "${publishedFlow._id}".`);
+                });
+            });
         });
-      });
     },
     async install(flowName) {
       if (!flowName) {
@@ -271,12 +271,12 @@ const cli = {
       }
 
       return xible.Registry.Flow
-      .search(str)
-      .then((flows) => {
-        Object.keys(flows).forEach((flowName) => {
-          log(`${flowName}`);
+        .search(str)
+        .then((flows) => {
+          Object.keys(flows).forEach((flowName) => {
+            log(`${flowName}`);
+          });
         });
-      });
     }
   },
 
@@ -329,48 +329,48 @@ const cli = {
           // verify that we're logged in
           resolve(
             xible.Registry.User
-            .getByToken(token)
-            .catch(getUserErr => Promise.reject(`Failed to get user from token: ${getUserErr}`))
-            .then((user) => {
-              if (!user) {
-                return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
-              }
-
-              // verify if this node had been published before
-              return xible.Registry.NodePack
-              .getByName(nodePackName)
-              .catch(getNodePackErr => Promise.reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
-              .then((nodePack) => {
-                // verify that whoami equals the remote user
-                if (nodePack && nodePack.publishUserName !== user.name) {
-                  return Promise.reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
+              .getByToken(token)
+              .catch((getUserErr) => Promise.reject(`Failed to get user from token: ${getUserErr}`))
+              .then((user) => {
+                if (!user) {
+                  return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
                 }
 
-                // publish
+                // verify if this node had been published before
                 return xible.Registry.NodePack
-                .publish({
-                  name: nodePackName,
-                  registry: {
-                    url: `https://registry.npmjs.com/${packageJson.name}`
-                  }
-                })
-                .then((publishedNodePack) => {
-                  log(`Published nodepack "${publishedNodePack.name}"@${publishedNodePack.version}`);
-                })
-                .catch((publishErr) => {
-                  if (publishErr.statusCode === 400 && publishErr.data) {
-                    try {
-                      publishErr = JSON.parse(publishErr.data).message;
-                    } catch (jsonParseErr) {
-                      // unable to get publish error
+                  .getByName(nodePackName)
+                  .catch((getNodePackErr) => Promise.reject(`Failed to get nodepack from registry: ${getNodePackErr}`))
+                  .then((nodePack) => {
+                    // verify that whoami equals the remote user
+                    if (nodePack && nodePack.publishUserName !== user.name) {
+                      return Promise.reject(`Nodepack "${nodePack.name}" was previously published by "${nodePack.publishUserName}". You are currently logged in as "${user.name}".`);
                     }
-                  }
 
-                  logError(publishErr);
-                  return Promise.reject(`Failed to publish nodepack "${nodePackName}": ${publishErr}`);
-                });
-              });
-            })
+                    // publish
+                    return xible.Registry.NodePack
+                      .publish({
+                        name: nodePackName,
+                        registry: {
+                          url: `https://registry.npmjs.com/${packageJson.name}`
+                        }
+                      })
+                      .then((publishedNodePack) => {
+                        log(`Published nodepack "${publishedNodePack.name}"@${publishedNodePack.version}`);
+                      })
+                      .catch((publishErr) => {
+                        if (publishErr.statusCode === 400 && publishErr.data) {
+                          try {
+                            publishErr = JSON.parse(publishErr.data).message;
+                          } catch (jsonParseErr) {
+                            // unable to get publish error
+                          }
+                        }
+
+                        logError(publishErr);
+                        return Promise.reject(`Failed to publish nodepack "${nodePackName}": ${publishErr}`);
+                      });
+                  });
+              })
           );
         });
       });
@@ -385,13 +385,13 @@ const cli = {
       }
 
       return xible.Registry.NodePack
-      .getByName(nodePackName)
-      .then((nodePack) => {
-        if (!nodePack) {
-          return Promise.reject(`Nodepack "${nodePackName}" does not exist in the registry`);
-        }
-        return nodePack.install();
-      });
+        .getByName(nodePackName)
+        .then((nodePack) => {
+          if (!nodePack) {
+            return Promise.reject(`Nodepack "${nodePackName}" does not exist in the registry`);
+          }
+          return nodePack.install();
+        });
     },
     async remove(nodePackName) {
       if (!nodePackName) {
@@ -437,17 +437,17 @@ const cli = {
       }
 
       return xible.Registry.NodePack
-      .search(str)
-      .then((nodePacks) => {
-        Object.keys(nodePacks)
-        .forEach((nodePackName) => {
-          nodePacks[nodePackName]
-          .getRegistryData()
-          .then((data) => {
-            log(`${nodePackName}: ${data.description}: ${data['dist-tags'].latest}`);
-          });
+        .search(str)
+        .then((nodePacks) => {
+          Object.keys(nodePacks)
+            .forEach((nodePackName) => {
+              nodePacks[nodePackName]
+                .getRegistryData()
+                .then((data) => {
+                  log(`${nodePackName}: ${data.description}: ${data['dist-tags'].latest}`);
+                });
+            });
         });
-      });
     },
     async init(nodeName) {
       if (!nodeName) {
@@ -637,8 +637,8 @@ module.exports = (NODE) => {
         } else if (password.toLowerCase() === emailAddress.toLowerCase()) {
           console.error('The password cannot equal the email address.');
         } else if (
-          userName.toLowerCase().includes(password.toLowerCase()) ||
-          password.toLowerCase().includes(userName.toLowerCase())
+          userName.toLowerCase().includes(password.toLowerCase())
+          || password.toLowerCase().includes(userName.toLowerCase())
         ) {
           console.error('The password cannot be a significant part of the username, or the other way around.');
         } else {
@@ -688,10 +688,10 @@ function printUsage(path) {
 if (cli[context]) {
   if (!command && typeof cli[context] === 'function') {
     cli[context](...remain)
-    .catch(err => logError(err));
+      .catch((err) => logError(err));
   } else if (command && typeof cli[context][command] === 'function') {
     cli[context][command](...remain)
-    .catch(err => logError(err));
+      .catch((err) => logError(err));
   } else {
     printUsage(cli[context]);
   }

@@ -5,13 +5,13 @@
 'use strict';
 
 // windows: running "xible x" in this folder will invoke WSH, not node.
-/* global WScript*/
+/* global WScript */
 if (typeof WScript !== 'undefined') {
   WScript.echo(
-    'xible does not work when run\n' +
-    'with the Windows Scripting Host\n\n' +
-    "'cd' to a different directory,\n" +
-    "or type 'node xible <args>'."
+    'xible does not work when run\n'
+    + 'with the Windows Scripting Host\n\n'
+    + "'cd' to a different directory,\n"
+    + "or type 'node xible <args>'."
   );
   WScript.quit(1);
   return;
@@ -42,7 +42,7 @@ const shortHands = {
   f: '--force'
 };
 const opts = nopt(knownOpts, shortHands);
-const remain = opts.argv.remain;
+const { remain } = opts.argv;
 const context = remain.shift() || 'help';
 const command = remain.shift();
 
@@ -354,7 +354,7 @@ const cli = {
     },
     start() {
       return new Promise((resolve, reject) => {
-        const exec = require('child_process').exec;
+        const { exec } = require('child_process');
         exec('systemctl start xible.service', (err) => {
           if (err) {
             reject(`Failed to start service: ${err}`);
@@ -367,7 +367,7 @@ const cli = {
     },
     stop() {
       return new Promise((resolve, reject) => {
-        const exec = require('child_process').exec;
+        const { exec } = require('child_process');
         exec('systemctl stop xible.service', (err) => {
           if (err) {
             reject(`Failed to stop service: ${err}`);
@@ -380,7 +380,7 @@ const cli = {
     },
     restart() {
       return new Promise((resolve, reject) => {
-        const exec = require('child_process').exec;
+        const { exec } = require('child_process');
         exec('systemctl restart xible.service', (err) => {
           if (err) {
             reject(`Failed to restart service: ${err}`);
@@ -393,7 +393,7 @@ const cli = {
     },
     status() {
       return new Promise((resolve) => {
-        const exec = require('child_process').exec;
+        const { exec } = require('child_process');
         exec('systemctl show xible.service -p ActiveState', (err, stdout) => {
           if (err) {
             log(`Failed to get service status: ${err}`);
@@ -413,22 +413,22 @@ const cli = {
     },
     enable() {
       return this.install()
-      .catch(err => Promise.reject(`Failed to enable service: ${err}`))
-      .then(() => new Promise((resolve, reject) => {
-        const exec = require('child_process').exec;
-        exec('systemctl enable xible.service', (err) => {
-          if (err) {
-            reject(`Failed to enable service: ${err}`);
-            return;
-          }
-          log('Service enabled. XIBLE will now automatically start at boot.');
-          resolve();
-        });
-      }));
+        .catch((err) => Promise.reject(`Failed to enable service: ${err}`))
+        .then(() => new Promise((resolve, reject) => {
+          const { exec } = require('child_process');
+          exec('systemctl enable xible.service', (err) => {
+            if (err) {
+              reject(`Failed to enable service: ${err}`);
+              return;
+            }
+            log('Service enabled. XIBLE will now automatically start at boot.');
+            resolve();
+          });
+        }));
     },
     disable() {
       return new Promise((resolve, reject) => {
-        const exec = require('child_process').exec;
+        const { exec } = require('child_process');
         exec('systemctl disable xible.service', (err) => {
           if (err) {
             reject(`Failed to disable service: ${err}`);
@@ -484,10 +484,10 @@ function printUsage(path) {
 if (cli[context]) {
   if (!command && typeof cli[context] === 'function') {
     cli[context](...remain)
-    .catch(err => logError(err));
+      .catch((err) => logError(err));
   } else if (command && typeof cli[context][command] === 'function') {
     cli[context][command](...remain)
-    .catch(err => logError(err));
+      .catch((err) => logError(err));
   } else {
     printUsage(cli[context]);
   }

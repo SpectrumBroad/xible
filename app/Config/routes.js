@@ -11,8 +11,8 @@ module.exports = (Config, XIBLE, EXPRESS_APP) => {
       return;
     }
 
-    const path = req.body.path;
-    const value = req.body.value;
+    const { path } = req.body;
+    const { value } = req.body;
     if (typeof path !== 'string' || typeof value === 'undefined') {
       res.status(400).end();
       return;
@@ -28,7 +28,7 @@ module.exports = (Config, XIBLE, EXPRESS_APP) => {
       return;
     }
 
-    const path = req.body.path;
+    const { path } = req.body;
     if (typeof path !== 'string') {
       res.status(400).end();
       return;

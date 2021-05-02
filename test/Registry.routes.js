@@ -24,16 +24,16 @@ describe('/api/registry', function () {
   describe('GET /nodepacks?search=test', function () {
     it('should return list of nodepacks', function () {
       return supertest(xible.expressApp)
-      .get('/api/registry/nodepacks?search=test')
-      .expect(200);
+        .get('/api/registry/nodepacks?search=test')
+        .expect(200);
     });
   });
 
   describe('PATCH /nodepacks/not_exist_nodepack/install', function () {
     it('should return 404', function () {
       return supertest(xible.expressApp)
-      .patch('/api/registry/nodepacks/not_exist_nodepack/install')
-      .expect(404);
+        .patch('/api/registry/nodepacks/not_exist_nodepack/install')
+        .expect(404);
     });
   });
 
@@ -41,12 +41,12 @@ describe('/api/registry', function () {
     this.timeout(120000);
     it('should install nodepack', async function () {
       const res = await supertest(xible.expressApp)
-      .patch('/api/registry/nodepacks/stream/install')
-      .expect(200);
+        .patch('/api/registry/nodepacks/stream/install')
+        .expect(200);
 
       // cleanup
       await supertest(xible.expressApp)
-      .delete('/api/nodepacks/stream');
+        .delete('/api/nodepacks/stream');
 
       return res;
     });

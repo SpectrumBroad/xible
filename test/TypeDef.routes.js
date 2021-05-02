@@ -25,26 +25,26 @@ describe('/api/typedefs', function () {
   describe('GET /', function () {
     it('should return list of typedefs', function () {
       return supertest(xible.expressApp)
-      .get('/api/typedefs')
-      .expect(200)
-      .expect(res => assert.equal(res.body.string.name, 'string'));
+        .get('/api/typedefs')
+        .expect(200)
+        .expect((res) => assert.equal(res.body.string.name, 'string'));
     });
   });
 
   describe('GET /:typedef', function () {
     it('string should return single typedef', function () {
       return supertest(xible.expressApp)
-      .get('/api/typedefs/string')
-      .expect(200)
-      .expect(res => assert.strictEqual(res.body.color, 'yellow'))
-      .expect(res => assert.strictEqual(res.body.name, 'string'))
-      .expect(res => assert.strictEqual(res.body.extends, 'object'));
+        .get('/api/typedefs/string')
+        .expect(200)
+        .expect((res) => assert.strictEqual(res.body.color, 'yellow'))
+        .expect((res) => assert.strictEqual(res.body.name, 'string'))
+        .expect((res) => assert.strictEqual(res.body.extends, 'object'));
     });
 
     it('non existing should return 404', function () {
       return supertest(xible.expressApp)
-      .get('/api/typedefs/does_hopefully_not_exist_for_real')
-      .expect(404);
+        .get('/api/typedefs/does_hopefully_not_exist_for_real')
+        .expect(404);
     });
   });
 });

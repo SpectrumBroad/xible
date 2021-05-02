@@ -1,6 +1,6 @@
 'use strict';
 
-const EventEmitter = require('events').EventEmitter;
+const {EventEmitter} = require('events');
 const debug = require('debug');
 const fs = require('fs');
 
@@ -77,7 +77,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
   function objectAssignDeep(target, ...objs) {
     for (let i = 0; i < objs.length; i += 1) {
       const keys = Object.keys(target);
-      const objDelete = Object.assign({}, objs[i]);
+      const objDelete = { ...objs[i]};
       for (const key of keys) {
         if (typeof target[key] === 'object' && target[key] !== null && objs[i][key]) {
           delete objDelete[key];

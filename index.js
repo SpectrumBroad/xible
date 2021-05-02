@@ -1,6 +1,6 @@
 'use strict';
 
-const EventEmitter = require('events').EventEmitter;
+const {EventEmitter} = require('events');
 const os = require('os');
 const fs = require('fs');
 const debug = require('debug');
@@ -193,7 +193,7 @@ class Xible extends EventEmitter {
     // load nodepacks/nodes
     const nodePacks = await this.NodePack.getAll();
     for (const nodePackName in nodePacks) {
-      await nodePacks[nodePackName].initNodes()
+      await nodePacks[nodePackName].initNodes();
     }
 
     // get all installed flows
@@ -215,8 +215,8 @@ class Xible extends EventEmitter {
           for (let i = 0; i < flows[flowId].instances.length; i += 1) {
             const instance = flows[flowId].instances[i];
             if (
-              instance.state === instance.STATE_STOPPED ||
-              !instance.usage
+              instance.state === instance.STATE_STOPPED
+              || !instance.usage
             ) {
               continue;
             }
@@ -268,8 +268,8 @@ class Xible extends EventEmitter {
               user: cpuUsage.user,
               system: cpuUsage.system,
               percentage: Math.round(
-                100 * ((cpuUsage.user + cpuUsage.system) / 1000) /
-                (cpuTime[0] * 1000 + cpuTime[1] / 1e6)
+                100 * ((cpuUsage.user + cpuUsage.system) / 1000)
+                / (cpuTime[0] * 1000 + cpuTime[1] / 1e6)
               )
             },
             memory: process.memoryUsage(),
@@ -289,14 +289,14 @@ class Xible extends EventEmitter {
   }
 
   static getNativeModules() {
-    return Object.keys(process.binding('natives')).filter(el => !/^_|^internal|\//.test(el));
+    return Object.keys(process.binding('natives')).filter((el) => !/^_|^internal|\//.test(el));
   }
 
   static generateObjectId() {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
+        .toString(16)
+        .substring(1);
     }
     return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
   }
@@ -353,7 +353,7 @@ class Xible extends EventEmitter {
 
       // setup client requests over https
       const spdy = require('spdy');
-      const expressApp = this.expressApp;
+      const {expressApp} = this;
 
       // editor
       expressApp.use(this.express.static(`${__dirname}/editor`, {
@@ -367,7 +367,7 @@ class Xible extends EventEmitter {
 
       const onListen = (webServer) => {
         const address = webServer.address();
-        const port = address.port;
+        const {port} = address;
 
         expressDebug(`listening on: ${address.address}:${port}`);
 
@@ -399,7 +399,7 @@ class Xible extends EventEmitter {
           });
         });
 
-        resolve()
+        resolve();
       };
 
       // spdy (https)
@@ -509,14 +509,14 @@ class Xible extends EventEmitter {
           break;
 
         case 'xible.node.updateProgressBarById':
-          copyMessage = Object.assign({}, message);
+          copyMessage = { ...message};
           copyMessage.method = 'xible.node.addProgressBar';
           this.setPersistentWebSocketMessage(copyMessage);
 
           break;
 
         case 'xible.node.updateStatusById':
-          copyMessage = Object.assign({}, message);
+          copyMessage = { ...message};
           copyMessage.method = 'xible.node.addStatus';
           this.setPersistentWebSocketMessage(copyMessage);
 
@@ -528,8 +528,8 @@ class Xible extends EventEmitter {
 
         case 'xible.node.removeAllStatuses':
           if (
-            this.persistentWebSocketMessages[message.flowInstanceId] &&
-            this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId]
+            this.persistentWebSocketMessages[message.flowInstanceId]
+            && this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId]
           ) {
             delete this.persistentWebSocketMessages[message.flowInstanceId][message.nodeId];
           }
@@ -559,7 +559,7 @@ class Xible extends EventEmitter {
     if (!obj || !obj.name) {
       throw new Error('Argument needs to be an object with a name parameter');
     }
-    const name = obj.name;
+    const {name} = obj;
 
     // check if a similar node with the same name doesn't already exist
     if (this.nodes[name]) {

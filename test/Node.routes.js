@@ -25,24 +25,24 @@ describe('/api/nodes', function () {
   describe('GET /', function () {
     it('should return list of nodes', function () {
       return supertest(xible.expressApp)
-      .get('/api/nodes')
-      .expect(200)
-      .expect((res) => assert(res.body['console.log'] !== undefined))
-      .expect((res) => assert(Object.keys(res.body).length > 1))
+        .get('/api/nodes')
+        .expect(200)
+        .expect((res) => assert(res.body['console.log'] !== undefined))
+        .expect((res) => assert(Object.keys(res.body).length > 1));
     });
   });
 
   describe('GET /:nodeName', function () {
     it('non existing should return 404', function () {
       return supertest(xible.expressApp)
-      .get('/api/nodes/non_existing_nodeName')
-      .expect(404);
+        .get('/api/nodes/non_existing_nodeName')
+        .expect(404);
     });
 
     it('console.log should return node definition', function () {
       return supertest(xible.expressApp)
-      .get('/api/nodes/console.log')
-      .expect(200);
+        .get('/api/nodes/console.log')
+        .expect(200);
     });
   });
 });

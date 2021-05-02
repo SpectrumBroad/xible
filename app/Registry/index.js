@@ -94,139 +94,137 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     // get the registrydata
     return this.getRegistryData()
-    .then((registryData) => {
-      if (!registryData.name) {
-        return Promise.reject(`No "name" field found in the registry data for node "${this.name}"`);
-      }
-
-      return this.getTarballUrl()
-      .then(tarballUrl => new Promise((resolve, reject) => {
-        // check if the tarbalUrl is safe
-        if (encodeURI(tarballUrl) !== tarballUrl) {
-          reject(new Error('Package URL contains potentially unsafe characters'));
-          return;
+      .then((registryData) => {
+        if (!registryData.name) {
+          return Promise.reject(`No "name" field found in the registry data for node "${this.name}"`);
         }
 
-        // create the tmp dir
-        fsExtra.mkdtemp(TMP_REGISTRY_DIR, (err, mTmpRegDir) => {
-          tmpRegDir = mTmpRegDir;
-          if (err) {
-            reject(err);
-            return;
-          }
-
-          // create a package.json so npm knows where the root lies
-          // remove the dependencies from the package so npm doesn't get confused
-          const packageJson = require(`${__dirname}/../../package.json`);
-          delete packageJson.dependencies;
-          delete packageJson.devDependencies;
-
-          // write off package.json
-          fsExtra.writeFile(`${tmpRegDir}/package.json`, JSON.stringify(packageJson), (createPackageJsonErr) => {
-            if (createPackageJsonErr) {
-              reject(createPackageJsonErr);
+        return this.getTarballUrl()
+          .then((tarballUrl) => new Promise((resolve, reject) => {
+            // check if the tarbalUrl is safe
+            if (encodeURI(tarballUrl) !== tarballUrl) {
+              reject(new Error('Package URL contains potentially unsafe characters'));
               return;
             }
 
-            // fork npm to install the registry url
-            const fork = require('child_process').spawn;
-            const npm = fork('npm', ['install', '--no-save', '--global', 'false', tarballUrl], {
-              cwd: tmpRegDir,
-              shell: true
-            });
-
-            npm.on('error', npmErr => reject(npmErr));
-
-            npm.on('exit', (exitCode) => {
-              if (exitCode) {
-                reject(`exited with code: ${exitCode}`);
+            // create the tmp dir
+            fsExtra.mkdtemp(TMP_REGISTRY_DIR, (err, mTmpRegDir) => {
+              tmpRegDir = mTmpRegDir;
+              if (err) {
+                reject(err);
                 return;
               }
 
-              // specify the dir where this node will be installed
-              const nodeDestDir = `${nodePath}/${this.name}`;
+              // create a package.json so npm knows where the root lies
+              // remove the dependencies from the package so npm doesn't get confused
+              const packageJson = require(`${__dirname}/../../package.json`);
+              delete packageJson.dependencies;
+              delete packageJson.devDependencies;
 
-              // when success, resolve
-              const onSuccess = () => {
-                const nodePack = XIBLE.NodePack.getOneByPath(nodeDestDir, this.name);
-
-                return nodePack.initNodes()
-                .then(() => cleanUp(tmpRegDir))
-                .then(() => {
-                  // see if we can/need to reinit flows that are not runnable
-                  const flows = XIBLE.getFlows();
-                  for (const flowId in flows) {
-                    if (!flows[flowId].runnable) {
-                      flows[flowId].initJson(flows[flowId].json);
-                    }
-                  }
-                })
-                .then(resolve)
-                .catch((onSuccessErr) => {
-                  reject(onSuccessErr);
-                });
-              };
-
-              // remove existing node directory
-              fsExtra.emptyDir(nodeDestDir, (removeExistingNodeErr) => {
-                if (removeExistingNodeErr) {
-                  reject(removeExistingNodeErr);
+              // write off package.json
+              fsExtra.writeFile(`${tmpRegDir}/package.json`, JSON.stringify(packageJson), (createPackageJsonErr) => {
+                if (createPackageJsonErr) {
+                  reject(createPackageJsonErr);
                   return;
                 }
 
-                // first move the node itself
-                fsExtra.move(`${tmpRegDir}/node_modules/${registryData.name}`, nodeDestDir, {
-                  overwrite: true
-                }, (moveNodeErr) => {
-                  if (moveNodeErr) {
-                    reject(moveNodeErr);
+                // fork npm to install the registry url
+                const fork = require('child_process').spawn;
+                const npm = fork('npm', ['install', '--no-save', '--global', 'false', tarballUrl], {
+                  cwd: tmpRegDir,
+                  shell: true
+                });
+
+                npm.on('error', (npmErr) => reject(npmErr));
+
+                npm.on('exit', (exitCode) => {
+                  if (exitCode) {
+                    reject(`exited with code: ${exitCode}`);
                     return;
                   }
 
-                  // check if there's anything left in node_modules
-                  fsExtra.readdir(`${tmpRegDir}/node_modules`, (remainingNodeModulesErr, files) => {
-                    if (remainingNodeModulesErr) {
-                      reject(remainingNodeModulesErr);
+                  // specify the dir where this node will be installed
+                  const nodeDestDir = `${nodePath}/${this.name}`;
+
+                  // when success, resolve
+                  const onSuccess = () => {
+                    const nodePack = XIBLE.NodePack.getOneByPath(nodeDestDir, this.name);
+
+                    return nodePack.initNodes()
+                      .then(() => cleanUp(tmpRegDir))
+                      .then(() => {
+                        // see if we can/need to reinit flows that are not runnable
+                        const flows = XIBLE.getFlows();
+                        for (const flowId in flows) {
+                          if (!flows[flowId].runnable) {
+                            flows[flowId].initJson(flows[flowId].json);
+                          }
+                        }
+                      })
+                      .then(resolve)
+                      .catch((onSuccessErr) => {
+                        reject(onSuccessErr);
+                      });
+                  };
+
+                  // remove existing node directory
+                  fsExtra.emptyDir(nodeDestDir, (removeExistingNodeErr) => {
+                    if (removeExistingNodeErr) {
+                      reject(removeExistingNodeErr);
                       return;
                     }
 
-                    if (!files.length) {
-                      onSuccess();
-                      return;
-                    }
-
-                    // move the rest of the node_modules
-                    fsExtra.move(`${tmpRegDir}/node_modules`, `${nodeDestDir}/node_modules`, {
+                    // first move the node itself
+                    fsExtra.move(`${tmpRegDir}/node_modules/${registryData.name}`, nodeDestDir, {
                       overwrite: true
-                    }, (moveNodeModulesErr) => {
-                      if (moveNodeModulesErr) {
-                        reject(moveNodeModulesErr);
+                    }, (moveNodeErr) => {
+                      if (moveNodeErr) {
+                        reject(moveNodeErr);
                         return;
                       }
 
-                      onSuccess();
+                      // check if there's anything left in node_modules
+                      fsExtra.readdir(`${tmpRegDir}/node_modules`, (remainingNodeModulesErr, files) => {
+                        if (remainingNodeModulesErr) {
+                          reject(remainingNodeModulesErr);
+                          return;
+                        }
+
+                        if (!files.length) {
+                          onSuccess();
+                          return;
+                        }
+
+                        // move the rest of the node_modules
+                        fsExtra.move(`${tmpRegDir}/node_modules`, `${nodeDestDir}/node_modules`, {
+                          overwrite: true
+                        }, (moveNodeModulesErr) => {
+                          if (moveNodeModulesErr) {
+                            reject(moveNodeModulesErr);
+                            return;
+                          }
+
+                          onSuccess();
+                        });
+                      });
                     });
                   });
                 });
+
+                npm.stdout.on('data', (data) => {
+                  // console.log(data.toString());
+                });
+
+                npm.stderr.on('data', (data) => {
+                  console.log(data.toString());
+                });
               });
             });
-
-            npm.stdout.on('data', (data) => {
-              // console.log(data.toString());
-            });
-
-            npm.stderr.on('data', (data) => {
-              console.log(data.toString());
-            });
-          });
-        });
-      }));
-    })
-    .catch(err =>
-      cleanUp(tmpRegDir)
-      .then(() => Promise.reject(err))
-      .catch(() => Promise.reject(err))
-    );
+          }));
+      })
+      .catch((err) => cleanUp(tmpRegDir)
+        .then(() => Promise.reject(err))
+        .catch(() => Promise.reject(err)));
   };
 
   if (EXPRESS_APP) {

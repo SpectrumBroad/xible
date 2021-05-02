@@ -1,6 +1,6 @@
 'use strict';
 
-const EventEmitter = require('events').EventEmitter;
+const {EventEmitter} = require('events');
 const debug = require('debug');
 const fs = require('fs');
 const path = require('path');
@@ -19,8 +19,8 @@ const flowDebug = debug('xible:flow');
  */
 function baseHtmlEncode(str) {
   return str.replace(/"/g, '&quot;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;');
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 module.exports = (XIBLE, EXPRESS_APP) => {
@@ -177,8 +177,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       for (const flowId in statuses) {
         // if a flow doesn't exist anymore, remove it from the statuses
         if (
-          !flows[flowId] ||
-          !Array.isArray(statuses[flowId])
+          !flows[flowId]
+          || !Array.isArray(statuses[flowId])
         ) {
           delete statuses[flowId];
           continue;
@@ -331,12 +331,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           this.runnable = false;
         } else {
           // init a working node
-          xibleNode = new XIBLE.Node(Object.assign({}, nodeConstr, {
-            _id: node._id,
+          xibleNode = new XIBLE.Node({ ...nodeConstr, _id: node._id,
             data: Object.assign({}, node.data),
             left: node.left,
-            top: node.top
-          }));
+            top: node.top});
 
           if (!xibleNode) {
             throw new Error(`Could not construct node '${node.name}'`);
@@ -543,7 +541,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @return {Node|undefined} The found node.
     */
     getNodeById(id) {
-      return this.nodes.find(node => node._id === id);
+      return this.nodes.find((node) => node._id === id);
     }
 
     /**
@@ -587,7 +585,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     */
     getGlobalOutputsByType(type) {
       if (globalOutputs) {
-        return globalOutputs.filter(globalOutput => globalOutput.type === type);
+        return globalOutputs.filter((globalOutput) => globalOutput.type === type);
       }
 
       const outputs = [];
@@ -619,10 +617,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       const statuses = Flow.getStatuses();
       const startedInstances = this.instances
-      .filter(
-        instance =>
-          instance.state === XIBLE.FlowInstance.STATE_STARTED && !instance.directed
-      );
+        .filter(
+          instance => instance.state === XIBLE.FlowInstance.STATE_STARTED && !instance.directed
+        );
 
       if (!startedInstances.length) {
         delete statuses[this._id];
@@ -686,7 +683,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       if (this.initLevel === Flow.INITLEVEL_FLOW && this.emptyInitInstance) {
-        const emptyInitInstance = this.emptyInitInstance;
+        const {emptyInitInstance} = this;
         emptyInitInstance.params = params;
         emptyInitInstance.directNodes = directNodes;
         this.emptyInitInstance.removeEmptyInitInstanceListeners();
@@ -738,7 +735,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * @returns {FlowInstance|null}
      */
     getInstanceById(id) {
-      return this.instances.find(instance => instance._id === id);
+      return this.instances.find((instance) => instance._id === id);
     }
 
     /**
@@ -762,7 +759,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * @returns {Promise.<Flow>} Returns the current flow for daisy chaining.
      */
     async deleteAllInstances() {
-      await Promise.all(this.instances.slice().map(instance => instance.delete()));
+      await Promise.all(this.instances.slice().map((instance) => instance.delete()));
       return this;
     }
 

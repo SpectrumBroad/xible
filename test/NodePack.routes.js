@@ -26,21 +26,21 @@ describe('/api/nodepacks', function () {
   describe('GET /', function () {
     it('should return list of nodepacks', function () {
       return supertest(xible.expressApp)
-      .get('/api/nodepacks')
-      .expect(200);
+        .get('/api/nodepacks')
+        .expect(200);
     });
 
     it('should contain all default nodepacks', async function () {
       const defaultNodePackNames = Object.keys(packageJson.dependencies)
-      .filter((packageName) => packageName.startsWith('xible-np-') || packageName.startsWith('xible-nodepack-'))
-      .map((packageName) => (
-        packageName.startsWith('xible-np-')
-          ? packageName.substring(9)
-          : packageName.substring(15)
-      ));
+        .filter((packageName) => packageName.startsWith('xible-np-') || packageName.startsWith('xible-nodepack-'))
+        .map((packageName) => (
+          packageName.startsWith('xible-np-')
+            ? packageName.substring(9)
+            : packageName.substring(15)
+        ));
 
       const res = await supertest(xible.expressApp)
-      .get('/api/nodepacks');
+        .get('/api/nodepacks');
 
       const hostedNodePackNames = Object.keys(res.body);
       assert(defaultNodePackNames.every(
@@ -54,28 +54,28 @@ describe('/api/nodepacks', function () {
       this.timeout(120000);
 
       return supertest(xible.expressApp)
-      .patch('/api/registry/nodepacks/stream/install')
-      .expect(200);
+        .patch('/api/registry/nodepacks/stream/install')
+        .expect(200);
     });
 
     it('existing should return 200', function () {
       return supertest(xible.expressApp)
-      .get('/api/nodepacks/stream')
-      .expect(200);
+        .get('/api/nodepacks/stream')
+        .expect(200);
     });
   });
 
   describe('DELETE /:nodePackName', function () {
     it('should delete nodepack', function () {
       return supertest(xible.expressApp)
-      .delete('/api/nodepacks/stream')
-      .expect(200);
+        .delete('/api/nodepacks/stream')
+        .expect(200);
     });
 
     it('should return 404', function () {
       return supertest(xible.expressApp)
-      .get('/api/nodepacks/stream')
-      .expect(404);
+        .get('/api/nodepacks/stream')
+        .expect(404);
     });
   });
 });

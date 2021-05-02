@@ -115,7 +115,7 @@ describe('/api/flows', function () {
             connectors: []
           })
           .expect(200);
-      })
+      });
 
       it('vaulted values _should not_ be stored in flow', function () {
         // check the contents of the flow, it should not contain the consumerKey
@@ -123,7 +123,7 @@ describe('/api/flows', function () {
         const flowJson = fs.readFileSync(`${flowsPath}/vault_test_flow.json`);
         assert(!flowJson.includes(consumerKey));
         assert(flowJson.includes(stringValue));
-      })
+      });
 
       it('vaulted values _should_ be stored in vault', function () {
         // check the contents of the vault, it should contain the consumerKey

@@ -9,11 +9,11 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
   // create a new flow
   EXPRESS_APP.post('/api/flows', async (req, res) => {
     if (
-      !req.body ||
-      !req.body._id ||
-      !Array.isArray(req.body.nodes) ||
-      !Array.isArray(req.body.connectors) ||
-      !FLOW.validateId(req.body._id)
+      !req.body
+      || !req.body._id
+      || !Array.isArray(req.body.nodes)
+      || !Array.isArray(req.body.connectors)
+      || !FLOW.validateId(req.body._id)
     ) {
       res.status(400).end();
       return;
@@ -47,7 +47,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
   // get an existing flow
   EXPRESS_APP.get('/api/flows/:flowId', (req, res) => {
-    const flow = req.locals.flow;
+    const { flow } = req.locals;
 
     const returnFlow = {
       _id: flow._id,
@@ -73,7 +73,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     req.body._id = req.locals.flow._id;
     req.body.name = req.locals.flow.name;
 
-    const flow = req.locals.flow;
+    const { flow } = req.locals;
     await flow.stopAllInstances();
 
     // init the newly provided json over the existing flow

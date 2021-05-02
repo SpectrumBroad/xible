@@ -25,7 +25,7 @@ function configList(obj, pre) {
   return returnArr;
 }
 
-module.exports = XIBLE => (
+module.exports = (XIBLE) => (
   {
     set(arg, value) {
       // assignment using equals sign

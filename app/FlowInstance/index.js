@@ -1,6 +1,6 @@
 'use strict';
 
-const EventEmitter = require('events').EventEmitter;
+const { EventEmitter } = require('events');
 const debug = require('debug');
 
 // lazy requires
@@ -12,9 +12,9 @@ module.exports = (XIBLE) => {
   // check inspect arguments so we can fork properly
   let inspectPortNumberIncrement = 0;
   let inspectLevel = 0;
-  if (process.execArgv.some(arg => arg.includes('--inspect='))) {
+  if (process.execArgv.some((arg) => arg.includes('--inspect='))) {
     inspectLevel = 1;
-  } else if (process.execArgv.some(arg => arg.includes('--inspect-brk='))) {
+  } else if (process.execArgv.some((arg) => arg.includes('--inspect-brk='))) {
     inspectLevel = 2;
   }
 
@@ -50,7 +50,6 @@ module.exports = (XIBLE) => {
       delete this.timing.startDate;
       delete this.timing.startStart;
       delete this.timing.startEnd;
-
 
       this.timing.initDate = Date.now();
       this.timing.initStart = process.hrtime();
@@ -142,15 +141,15 @@ module.exports = (XIBLE) => {
               flow = XIBLE.getFlowById(message.flowId);
               if (flow) {
                 flow.createInstance({ params: message.params }).forceStart()
-                .then((flowInstance) => {
-                  if (this.worker && this.worker.connected) {
-                    this.worker.send({
-                      method: 'flowStarted',
-                      flowId: message.flowId,
-                      flowInstanceId: flowInstance._id
-                    });
-                  }
-                });
+                  .then((flowInstance) => {
+                    if (this.worker && this.worker.connected) {
+                      this.worker.send({
+                        method: 'flowStarted',
+                        flowId: message.flowId,
+                        flowInstanceId: flowInstance._id
+                      });
+                    }
+                  });
               } else if (this.worker && this.worker.connected) {
                 this.worker.send({
                   method: 'flowNotExist',
@@ -406,10 +405,10 @@ module.exports = (XIBLE) => {
         // trigger the action nodes
         for (let i = 0; i < actionNodes.length; i += 1) {
           actionNodes[i].getInputs()
-          .filter(input => input.type === 'trigger')
-          .forEach((input) => {
-            input.emit('trigger', null, flowState);
-          });
+            .filter((input) => input.type === 'trigger')
+            .forEach((input) => {
+              input.emit('trigger', null, flowState);
+            });
         }
       });
 
@@ -443,8 +442,8 @@ module.exports = (XIBLE) => {
           return new Promise((resolve) => {
             this.once('initialized', () => {
               if (
-                this.state === FlowInstance.STATE_INITIALIZING ||
-                this.state === FlowInstance.STATE_INITIALIZED
+                this.state === FlowInstance.STATE_INITIALIZING
+                || this.state === FlowInstance.STATE_INITIALIZED
               ) {
                 resolve(startFlow());
                 return;
@@ -458,14 +457,14 @@ module.exports = (XIBLE) => {
 
         case FlowInstance.STATE_STOPPED:
           return this.init()
-          .then(startFlow);
+            .then(startFlow);
 
         case FlowInstance.STATE_STOPPING:
           return new Promise((resolve) => {
             this.once('stopped', () => {
               if (
-                this.state === FlowInstance.STATE_STARTING ||
-                this.state === FlowInstance.STATE_STARTED
+                this.state === FlowInstance.STATE_STARTING
+                || this.state === FlowInstance.STATE_STARTED
               ) {
                 resolve(this);
               }
@@ -475,7 +474,7 @@ module.exports = (XIBLE) => {
 
         case FlowInstance.STATE_STARTED:
           return this.stop()
-          .then(() => this.forceStart());
+            .then(() => this.forceStart());
 
         case FlowInstance.STATE_STARTING:
           return new Promise((resolve) => {
@@ -499,8 +498,8 @@ module.exports = (XIBLE) => {
       }
 
       if (
-        this.state !== FlowInstance.STATE_STARTED &&
-        this.state !== FlowInstance.STATE_INITIALIZED
+        this.state !== FlowInstance.STATE_STARTED
+        && this.state !== FlowInstance.STATE_INITIALIZED
       ) {
         return Promise.reject(new Error('cannot stop; flowInstance is not started or initialized'));
       }
@@ -580,7 +579,7 @@ module.exports = (XIBLE) => {
       flowInstanceDebug('stopping flowInstance from worker');
 
       // close any node that wants to
-      this.flow.nodes.forEach(node => node.emit('close'));
+      this.flow.nodes.forEach((node) => node.emit('close'));
 
       flowInstanceDebug('stopped flowInstance from worker');
       process.exit(exitCode || 0);

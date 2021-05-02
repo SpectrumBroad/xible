@@ -52,7 +52,7 @@ module.exports = (XIBLE) => {
     * @returns {FlowState} The new flowState.
     */
     this.split = function FlowStateSplit() {
-      return new FlowState(Object.assign({}, states));
+      return new FlowState({ ...states});
     };
 
     Object.freeze(this);

@@ -25,27 +25,27 @@ describe('/api', function () {
   describe('GET /api/validateFlowPermissions', function () {
     it('should return boolean', function () {
       return supertest(xible.expressApp)
-      .get('/api/validateFlowPermissions')
-      .expect(200)
-      .expect((res) => assert(typeof res.body === 'boolean'))
+        .get('/api/validateFlowPermissions')
+        .expect(200)
+        .expect((res) => assert(typeof res.body === 'boolean'));
     });
   });
 
   describe('GET /api/serverDate', function () {
     it('should return date since epoch', function () {
       return supertest(xible.expressApp)
-      .get('/api/serverDate')
-      .expect(200)
-      .expect((res) => assert(typeof res.body === 'number'))
+        .get('/api/serverDate')
+        .expect(200)
+        .expect((res) => assert(typeof res.body === 'number'));
     });
   });
 
   describe('GET /api/persistentWebSocketMessages', function () {
     it('should return object map', function () {
       return supertest(xible.expressApp)
-      .get('/api/persistentWebSocketMessages')
-      .expect(200)
-      .expect((res) => assert.deepStrictEqual(res.body, {}))
+        .get('/api/persistentWebSocketMessages')
+        .expect(200)
+        .expect((res) => assert.deepStrictEqual(res.body, {}));
     });
   });
 });

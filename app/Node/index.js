@@ -829,10 +829,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         // add global outputs as a dummy connector to the connector list
         if (!conns.length && this.global) {
           conns = this.node.flow
-          .getGlobalOutputsByType(this.type)
-          .map((output) => ({
-            origin: output
-          }));
+            .getGlobalOutputsByType(this.type)
+            .map((output) => ({
+              origin: output
+            }));
         }
 
         const connLength = conns.length;
