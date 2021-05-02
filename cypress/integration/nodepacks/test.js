@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
@@ -26,13 +26,13 @@ describe('Nodepacks', function () {
       cy.get('#nodepacks').children().then((children) => {
         const oldChildrenLength = children.length;
         cy.get('.inner').scrollTo('bottom');
-        cy.wait(500)
+        cy.wait(500);
 
         cy.get('#nodepacks').children().then((newChildren) => {
           expect(newChildren.length).to.be.greaterThan(oldChildrenLength);
           cy.contains('h2', 'compare');
-        })
-      })
-    })
+        });
+      });
+    });
   });
-})
+});
