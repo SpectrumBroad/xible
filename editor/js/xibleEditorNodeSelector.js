@@ -437,11 +437,13 @@ class XibleEditorNodeSelector {
       const actionsOffset = this.xibleEditor.getOffsetPosition();
       const editorNode = this.xibleEditor.addNode(new XibleEditorNode(node));
       this.xibleEditor.loadedFlow.addNode(editorNode);
+      const headerEl = editorNode.element.querySelector('h1');
+
       editorNode.setPosition(
         ((event.pageX - actionsOffset.left - this.xibleEditor.left) / this.xibleEditor.zoom)
-        - (editorNode.element.firstChild.offsetWidth / 2),
+        - (headerEl.offsetWidth / 2),
         ((event.pageY - actionsOffset.top - this.xibleEditor.top) / this.xibleEditor.zoom)
-        - (editorNode.element.firstChild.offsetHeight / 2)
+        - (headerEl.offsetHeight / 2)
       );
 
       this.xibleEditor.deselect();
