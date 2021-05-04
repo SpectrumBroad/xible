@@ -13,6 +13,10 @@
   display: block;
 }
 
+.xible > .edit h1 {
+  flex-shrink: 0;
+}
+
 .xible > .edit .node {
   position: static;
   transform: none !important;

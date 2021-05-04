@@ -420,6 +420,14 @@ label.vault .label::after {
   height: 100px;
 }
 
+:host-context(.node.edit) style ~ label:only-of-type {
+  height: 100%;
+}
+
+:host-context(.node.edit) style ~ label:only-of-type textarea {
+  height: 100%;
+}
+
 :host-context(.node.edit) input:hover,
 :host-context(.node.edit) input:focus,
 :host-context(.node.edit) select:hover,
