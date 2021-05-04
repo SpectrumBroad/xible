@@ -154,8 +154,8 @@ label .label.unknown {
 
 input:hover,
 input:focus,
-selectcontainer:hover select,
-selectcontainer select:focus,
+select:hover,
+select:focus,
 textarea:hover,
 textarea:focus {
   border-radius: 0 6px 6px 0;
@@ -302,31 +302,20 @@ input[type=range]::-webkit-slider-thumb {
   background-color: rgba(255, 0, 0, 0.3);
 }
 
-selectcontainer {
-  display: block;
-  position: relative;
+select {
+   background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23CCCCCC%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+   background-repeat: no-repeat, repeat;
+   background-position: right .4em top 50%, 0 0;
+   background-size: .65em auto;
 }
 
-selectcontainer::after {
-  color: #ccc;
-  display: block;
-  font-family: awesome;
-  font-size: 16px;
-  content: "\f078";
-  position: absolute;
-  right: 4px;
-  box-sizing: border-box;
-  top: 50%;
-  margin-top: -2px;
-  transform: translateY(-50%);
-  -webkit-filter: drop-shadow(0 0 2px #000);
-  filter: drop-shadow(0 0 2px #000);
-  pointer-events: none;
+select::-ms-expand {
+  display: none;
 }
 
 input:focus,
 textarea:focus,
-.node>.content select:focus {
+select:focus {
   outline: none;
   border: 2px solid #45679E;
   -webkit-user-select: text;
@@ -433,8 +422,8 @@ label.vault .label::after {
 
 :host-context(.node.edit) input:hover,
 :host-context(.node.edit) input:focus,
-:host-context(.node.edit) selectcontainer:hover select,
-:host-context(.node.edit) selectcontainer select:focus,
+:host-context(.node.edit) select:hover,
+:host-context(.node.edit) select:focus,
 :host-context(.node.edit) textarea:hover,
 :host-context(.node.edit) textarea:focus {
   border-radius: 6px;

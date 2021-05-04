@@ -539,11 +539,11 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   getRootInputElements() {
-    return Array.from(this.shadowRoot.querySelectorAll(':host>input, :host>selectcontainer, :host>textarea'));
+    return Array.from(this.shadowRoot.querySelectorAll(':host>input, :host>select, :host>textarea'));
   }
 
   /**
-   * Creates a label for every input/selectcontainer element that doesn't have one.
+   * Creates a label for every input/select element that doesn't have one.
    * Enables password visibility toggle on input[type=password].
    */
   convenienceLabel() {
@@ -586,10 +586,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 
         // set the required attribute
         // because the :has() pseudo selector is not available (yet)
-        if (
-          el.required
-        || (el.nodeName === 'SELECTCONTAINER' && el.querySelector('select') && el.querySelector('select').required)
-        ) {
+        if (el.required) {
           label.classList.add('required');
         } else {
           label.classList.add('optional');
@@ -603,14 +600,6 @@ class XibleEditorNode extends xibleWrapper.Node {
 
         // add the label
         let placeholder = el.getAttribute('placeholder') || dataOutputValue;
-
-        // try to fetch a placeholder for a select input
-        if (!placeholder && el.nodeName === 'SELECTCONTAINER') {
-          const selectEl = el.querySelector('select');
-          if (selectEl) {
-            placeholder = selectEl.getAttribute('placeholder') || selectEl.getAttribute('data-output-value') || selectEl.getAttribute('data-outputvalue');
-          }
-        }
 
         if (!placeholder) {
           span.classList.add('unknown');
