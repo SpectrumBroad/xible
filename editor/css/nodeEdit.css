@@ -27,4 +27,20 @@
 
 .xible > .edit .node .content {
   height: 100%;
+  overflow-y: auto;
+}
+
+.xible > .edit .node .content::-webkit-scrollbar {
+  width: 4px;
+  background-color: #000;
+}
+
+.xible > .edit .node .content::-webkit-scrollbar-thumb {
+  width: 4px;
+  background-color: #282828;
+}
+
+.xible > .edit .node .content::-webkit-scrollbar-thumb:hover {
+  width: 4px;
+  background-color: #383838;
 }

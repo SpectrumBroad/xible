@@ -385,9 +385,14 @@ label.vault .label::after {
 :host-context(.node.edit) label {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   font-size: 16px;
   color: #ddd;
-  margin: 18px 0;
+  margin: 0 0 18px;
+}
+
+:host-context(.node.edit) label:last-child {
+  margin-bottom: 0;
 }
 
 :host-context(.node.edit) label .label {
@@ -404,7 +409,7 @@ label.vault .label::after {
   padding: 0;
 }
 
-:host-context(.node.edit) input:not([type="password"]),
+:host-context(.node.edit) input,
 :host-context(.node.edit) .password-wrapper,
 :host-context(.node.edit) button,
 :host-context(.node.edit) select,
@@ -413,8 +418,9 @@ label.vault .label::after {
   margin-top: 6px;
 }
 
-:host-context(.node.edit) input[type="password"] {
+:host-context(.node.edit) .password-wrapper input {
   font-size: 16px;
+  margin-top: 0;
 }
 
 :host-context(.node.edit) input[type="number"] {
@@ -443,6 +449,7 @@ label.vault .label::after {
   padding: 0;
   transform: none;
   font-size: 0.9em;
+  height: auto;
 }
 
 :host-context(.node.edit) label p::before {
