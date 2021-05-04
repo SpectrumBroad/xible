@@ -180,7 +180,8 @@ nav>ul>li.editor>a>span {
   height: 100%;
 }
 
-header {
+#sub header,
+.top header {
   display: flex;
   align-items: center;
   font-family: robotothin;

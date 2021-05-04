@@ -76,7 +76,7 @@
     "xible-np-string": "*",
     "xible-np-xible": "^0.2.0",
     "xible-registry-wrapper": "*",
-    "xible-wrapper": "^0.12.1"
+    "xible-wrapper": "^0.13.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

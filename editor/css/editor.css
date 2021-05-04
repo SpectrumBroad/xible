@@ -7,7 +7,7 @@
   flex-direction: row;
 }
 
-.view.editor header {
+.view.editor .top header {
   width: 240px;
 }
 
@@ -533,6 +533,8 @@
 }
 
 .xible .node {
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
   position: absolute;
   background-color: rgb(30, 30, 30);
@@ -576,7 +578,48 @@
   opacity: 0.2;
 }
 
-.xible .node>h1 {
+.xible .node .details {
+  list-style: none;
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border-radius: 4px;
+  transform: translate(50%, -100%);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  background-color: rgb(30, 30, 30);
+  margin: 0;
+  padding: 0;
+  border: 1px solid #000;
+  font-family: awesome;
+  font-size: 0.9em;
+}
+
+.xible .node .details button {
+  font-family: inherit;
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  background-color: transparent;
+  padding: 4px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.xible .node .details button:hover {
+  background-color: rgb(50, 50, 50);
+}
+
+.xible .node .details button.edit {
+  font-size: 0.9em;
+}
+
+.xible .editor .node:hover .details,
+.xible .editor .node.selected .details {
+  display: flex;
+}
+
+.xible .node > h1 {
   font-family: 'robotolight';
   font-size: 1em;
   font-weight: bold;
@@ -591,11 +634,11 @@
   border-top-right-radius: 4px;
 }
 
-.xible .node>h1 wbr {
+.xible .node > h1 wbr {
   display: none;
 }
 
-.xible .node.fail>h1 {
+.xible .node.fail > h1 {
   background-color: rgba(255, 0, 0, 0.3);
 }
 
@@ -605,7 +648,7 @@
   border-bottom-right-radius: 4px;
 }
 
-.xible .node>.io>ul {
+.xible .node > .io > ul {
   width: 50%;
   margin: 0;
   padding: 0;
@@ -616,16 +659,16 @@
   display: block;
 }
 
-.xible .node>.io>ul.input {
+.xible .node>.io > ul.input {
   text-align: left;
 }
 
-.xible .node>.io>ul.output {
+.xible .node>.io > ul.output {
   top: 0;
   text-align: right;
 }
 
-.xible .node>.io>ul>li {
+.xible .node>.io > ul > li {
   display: block;
   padding: 0 2px;
   border-width: 0;
@@ -634,7 +677,7 @@
   position: relative;
 }
 
-.xible .node>.io>ul>li>div {
+.xible .node>.io > ul > li > div {
   overflow: hidden;
   text-overflow: ellipsis;
 }

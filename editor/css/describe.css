@@ -13,7 +13,8 @@
 
 /* close button */
 
-.xible>.describe>button {
+.xible > .edit > button,
+.xible > .describe > button {
   position: absolute;
   display: block;
   right: 0;
@@ -32,7 +33,14 @@
   width: auto;
 }
 
-.xible>.describe>button:hover {
+.xible > .edit > button {
+  font-size: 16px;
+  line-height: 11px;
+  padding: 10px;
+}
+
+.xible > .edit > button:hover,
+.xible > .describe > button:hover {
   background-color: rgba(255, 255, 255, 1);
 }
 
@@ -50,24 +58,28 @@
   font-style: italic;
 }
 
-.xible>.describe .node {
+.xible > .describe .node {
   left: 50%;
   transform: translateX(-50%) scale(2);
   transform-origin: center 0;
 }
 
-.xible>.describe .node > h1 {
+.xible > .describe .node .details {
+  display: none;
+}
+
+.xible > .describe .node > h1 {
   position: relative;
   overflow: visible;
   white-space: break-spaces;
   overflow-wrap: break-word;
 }
 
-.xible>.describe .node > h1 wbr {
+.xible > .describe .node > h1 wbr {
   display: inline;
 }
 
-.xible>.describe .node > h1 > p {
+.xible > .describe .node > h1 > p {
   position: absolute;
   margin: 0;
   left: 0;

@@ -5,7 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Added
+-   A feature has been added to edit the node data/input values in a separate dock, which hosts more space. The amount of space won here is especially useful for nodes which potentially contain large amount of data, such as the [function](https://xible.io/nodes?search=function) node.
+
+-   When hovering the mouse cursor over a node, a box with options appears that could previously only be triggered by hitting the [right key combination](https://xible.io/docs/editor#nodes). These include;
+    - Open the help/details page of a node.
+    - Delete a node from a flow.
+    - Edit the contents of a node in a seperate side panel.
 
 ## [0.22.0][] - 2021-05-01
 ### Added

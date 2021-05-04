@@ -25,6 +25,10 @@ class XibleEditor extends EventEmitter {
     this.element.firstChild.classList.add('editor');
     this.element.firstChild.style.transformOrigin = '0 0';
 
+    // node edit element
+    this.editElement = this.element.appendChild(document.createElement('div'));
+    this.editElement.classList.add('edit');
+
     // check for browser support
     this.browserSupportItems = {
       attachShadow: typeof this.element.attachShadow === 'function',
@@ -71,6 +75,87 @@ class XibleEditor extends EventEmitter {
     this.enableHook();
     this.enableSelection();
     this.enablePan();
+  }
+
+  closeEditNode() {
+    this.editElement.innerHTML = '';
+    this.editElement.classList.remove('open');
+  }
+
+  editNode(node) {
+    if (!(node instanceof XibleEditorNode)) {
+      throw new Error('1st argument must be a XibleEditorNode');
+    }
+
+    const dup = node.duplicate();
+
+    dup.element.classList.add('edit');
+    dup.editor = this;
+    dup.on('setdata', (attr, value, src) => {
+      if (src !== dup) {
+        return;
+      }
+
+      node.setData(attr, value, dup);
+      node.setOutputValues();
+    });
+
+    node.on('setdata', (attr, value, src) => {
+      if (src !== node) {
+        return;
+      }
+
+      dup.setData(attr, value, node);
+      dup.setOutputValues();
+    });
+
+    // handle descriptions for input elements and labels
+    dup.on('editorContentLoad', () => {
+      if (!dup.shadowRoot) {
+        return;
+      }
+
+      // add the description for each input element
+      dup.getRootLabelElements()
+        .forEach((label) => {
+          const description = label.getAttribute('data-description');
+          if (!description) {
+            return;
+          }
+
+          // this is actually not allowed
+          // a label may not contain a block element
+          const labelDescriptionEl = label.appendChild(document.createElement('p'));
+          labelDescriptionEl.appendChild(document.createTextNode(description || 'No description.'));
+
+          if (label.classList.contains('vault')) {
+            labelDescriptionEl.appendChild(document.createTextNode('This value is stored in the vault.'));
+          }
+
+          if (!description) {
+            labelDescriptionEl.classList.add('none');
+          }
+
+          if (labelDescriptionEl.scrollHeight > labelDescriptionEl.offsetHeight) {
+            labelDescriptionEl.classList.add('overflow');
+          }
+        });
+    });
+
+    this.editElement.innerHTML = '';
+
+    // close button
+    const closeButton = this.editElement.appendChild(document.createElement('button'));
+    closeButton.setAttribute('type', 'button');
+    closeButton.appendChild(document.createTextNode('X'));
+    closeButton.onclick = () => {
+      this.closeEditNode();
+    };
+
+    this.editElement.appendChild(dup.element);
+    this.editElement.classList.add('open');
+
+    dup.emit('append');
   }
 
   describeNode(node) {
@@ -508,6 +593,7 @@ class XibleEditor extends EventEmitter {
     }
 
     // clean
+    this.closeEditNode();
     this.element.firstChild.innerHTML = '';
 
     flow.editor = this;

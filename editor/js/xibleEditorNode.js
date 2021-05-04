@@ -5,6 +5,28 @@ class XibleEditorNode extends xibleWrapper.Node {
     const el = document.createElement('div');
     el.classList.add('node');
 
+    // details popout
+    const detailEl = el.appendChild(document.createElement('ul'));
+    detailEl.classList.add('details');
+
+/*
+    const holdButton = detailEl.appendChild(document.createElement('li'))
+      .appendChild(document.createElement('button'));
+    holdButton.appendChild(document.createTextNode('\uf04c'));
+*/
+
+    const infoButton = detailEl.appendChild(document.createElement('li'))
+      .appendChild(document.createElement('button'));
+    infoButton.setAttribute('title', 'Show all details on this node.');
+    infoButton.appendChild(document.createTextNode('\uf128'));
+    infoButton.onclick = () => {
+      if (!this.editor) {
+        return;
+      }
+
+      this.editor.describeNode(this);
+    };
+
     const headerEl = el.appendChild(document.createElement('h1'));
 
     // add ios
@@ -34,6 +56,29 @@ class XibleEditorNode extends xibleWrapper.Node {
     this.setMaxListeners(1000);
 
     headerEl.innerHTML = escapeHtml(this.name).replace(/[._-]/g, (val) => `${val}<wbr />`);
+
+    if (this.hostsEditorContent) {
+      const editButton = detailEl.appendChild(document.createElement('li'))
+        .appendChild(document.createElement('button'));
+      editButton.classList.add('edit');
+      editButton.setAttribute('title', 'Edit the contents of this node in separate dock.');
+      editButton.appendChild(document.createTextNode('\uf040'));
+      editButton.onclick = () => {
+        if (!this.editor) {
+          return;
+        }
+
+        this.editor.editNode(this);
+      };
+    }
+
+    const removeButton = detailEl.appendChild(document.createElement('li'))
+      .appendChild(document.createElement('button'));
+    removeButton.setAttribute('title', 'Remove this node from this flow.');
+    removeButton.appendChild(document.createTextNode('\uf00d'));
+    removeButton.onclick = () => {
+      this.delete();
+    };
 
     // add additional content
     if (this.hostsEditorContent) { // load editor static hosted content for this node
@@ -201,6 +246,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       // trigger some convenience stuff
       this.convenienceLabel();
       this.convenienceHideIfAttached();
+      this.setOutputValues();
       this.convenienceOutputValue();
       this.convenienceTextAreaSetup();
 
@@ -514,7 +560,6 @@ class XibleEditorNode extends xibleWrapper.Node {
           const passwordWrapper = document.createElement('div');
           passwordWrapper.classList.add('password-wrapper');
           passwordWrapper.appendChild(el);
-          passwordWrapper.appendChild(span);
 
           const toggle = passwordWrapper.appendChild(document.createElement('div'));
           toggle.classList.add('password-toggle');
@@ -530,8 +575,9 @@ class XibleEditorNode extends xibleWrapper.Node {
           label.appendChild(passwordWrapper);
         } else {
           label.appendChild(el);
-          label.appendChild(span);
         }
+
+        label.appendChild(span);
 
         const dataOutputValue = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
         if (this.vault && dataOutputValue && this.vault.includes(dataOutputValue)) {
@@ -603,10 +649,9 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   /**
-   * Ensures that the value of fields with the "data-output-value" attribute
-   * are mapped to the node's "data" map.
+   * Sets all the value properties for input elements according to this.data[].
    */
-  convenienceOutputValue() {
+  setOutputValues() {
     const els = Array.from(this.shadowRoot.querySelectorAll('[data-output-value], [data-outputvalue]'));
     els.forEach((el) => {
       const attr = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
@@ -628,8 +673,10 @@ class XibleEditorNode extends xibleWrapper.Node {
         } else if (el.nodeName === 'TEXTAREA') {
           el.innerHTML = '';
           el.appendChild(document.createTextNode(value));
+          el.value = value;
         } else {
           el.setAttribute('value', value);
+          el.value = value;
         }
       } else if (value === undefined) {
         if (type === 'checkbox') {
@@ -638,6 +685,18 @@ class XibleEditorNode extends xibleWrapper.Node {
           this.data[attr] = el.value;
         }
       }
+    });
+  }
+
+  /**
+   * Ensures that the value of fields with the "data-output-value" attribute
+   * are mapped to the node's "data" map.
+   */
+  convenienceOutputValue() {
+    const els = Array.from(this.shadowRoot.querySelectorAll('[data-output-value], [data-outputvalue]'));
+    els.forEach((el) => {
+      const attr = el.getAttribute('data-output-value') || el.getAttribute('data-outputvalue');
+      const type = el.getAttribute('type');
 
       switch (type) {
         // hidden inputs don't trigger 'onchange' or 'oninput'

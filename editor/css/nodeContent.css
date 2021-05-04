@@ -142,7 +142,6 @@ label .label {
   padding: 2px 5px;
   border-radius: 6px 0 0 6px;
   transform: translate(-100%, 0) translateX(1px);
-  font-size: 20px;
   height: 100%;
   white-space: nowrap;
   box-shadow: -3px 0 8px -1px #000;
@@ -162,11 +161,8 @@ textarea:focus {
   border-radius: 0 6px 6px 0;
 }
 
-input:hover ~ .label,
-input:focus ~ .label,
-selectcontainer:hover ~ .label,
-textarea:hover ~ .label,
-textarea:focus ~ .label {
+label:focus-within .label,
+label:hover .label {
   display: flex;
 }
 
@@ -383,4 +379,76 @@ label.vault .label::after {
   font-family: awesome;
   font-size: 0.9rem;
   margin-left: 4px;
+}
+
+/* edit mode */
+:host-context(.node.edit) label {
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  color: #ddd;
+  margin: 18px 0;
+}
+
+:host-context(.node.edit) label .label {
+  display: block;
+  position: static;
+  transform: none;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: none;
+  height: auto;
+  box-shadow: none;
+  color: inherit;
+  order: -2;
+  padding: 0;
+}
+
+:host-context(.node.edit) input:not([type="password"]),
+:host-context(.node.edit) .password-wrapper,
+:host-context(.node.edit) button,
+:host-context(.node.edit) select,
+:host-context(.node.edit) textarea {
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+:host-context(.node.edit) input[type="password"] {
+  font-size: 16px;
+}
+
+:host-context(.node.edit) input[type="number"] {
+  font-size: 40px;
+}
+
+:host-context(.node.edit) textarea {
+  height: 100px;
+}
+
+:host-context(.node.edit) input:hover,
+:host-context(.node.edit) input:focus,
+:host-context(.node.edit) selectcontainer:hover select,
+:host-context(.node.edit) selectcontainer select:focus,
+:host-context(.node.edit) textarea:hover,
+:host-context(.node.edit) textarea:focus {
+  border-radius: 6px;
+}
+
+:host-context(.node.edit) label p {
+  position: static;
+  order: -1;
+  background-color: transparent;
+  color: #bbb;
+  width: auto;
+  padding: 0;
+  transform: none;
+  font-size: 0.9em;
+}
+
+:host-context(.node.edit) label p::before {
+  display: none;
+}
+
+:host-context(.node.edit:hover) label p {
+  color: #bbb;
 }
