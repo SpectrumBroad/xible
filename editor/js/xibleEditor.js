@@ -21,9 +21,9 @@ class XibleEditor extends EventEmitter {
     // stage element
     this.element = document.createElement('div');
     this.element.classList.add('xible');
-    this.element.appendChild(document.createElement('div'));
-    this.element.firstChild.classList.add('editor');
-    this.element.firstChild.style.transformOrigin = '0 0';
+    this.editorElement = this.element.appendChild(document.createElement('div'));
+    this.editorElement.classList.add('editor');
+    this.editorElement.style.transformOrigin = '0 0';
 
     // node edit element
     this.editElement = this.element.appendChild(document.createElement('div'));
@@ -179,10 +179,6 @@ class XibleEditor extends EventEmitter {
     };
 
     // ignore default xible container event handlers
-    describeEl.addEventListener('wheel', (event) => {
-      event.stopPropagation();
-    });
-
     describeEl.addEventListener('mousedown', (event) => {
       event.stopPropagation();
     });
@@ -1387,7 +1383,7 @@ class XibleEditor extends EventEmitter {
     this.zoom = 1;
 
     // trigger zoom from scrollwheel
-    this.element.addEventListener('wheel', this._zoomWheelListener = (event) => {
+    this.editorElement.addEventListener('wheel', this._zoomWheelListener = (event) => {
       // prevent default browser action; scroll
       event.preventDefault();
 
