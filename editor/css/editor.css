@@ -230,10 +230,6 @@
   outline: 0;
 }
 
-#sub ul.tablist {
-  margin-bottom: -10px;
-}
-
 #log {
   display: flex;
   flex-direction: column;

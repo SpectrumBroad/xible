@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Delete a node from a flow.
     - Edit the contents of a node in a seperate side panel.
 
+### Fixed
+-   Within the dock of the flow editor, the 'clear' button was not completely clickable because of overlap by the tab list.
+
 ## [0.22.0][] - 2021-05-01
 ### Added
 -   Input fields within nodes that have type=password, now include a toggle to make the password visible from the editor.
