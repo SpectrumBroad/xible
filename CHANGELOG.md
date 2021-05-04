@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.23.0][] - 2021-05-04
 ### Added
--   A feature has been added to edit the node data/input values in a separate dock, which hosts more space. The amount of space won here is especially useful for nodes which potentially contain large amount of data, such as the [function](https://xible.io/nodes?search=function) node.
+-   A feature has been added to edit the node data/input values in a separate dock, which hosts more space. The amount of space available here is especially useful for nodes which potentially contain large amount of data, such as the [function](https://xible.io/nodes?search=function) node.
 
 -   When hovering the mouse cursor over a node, a box with options appears that could previously only be triggered by hitting the [right key combination](https://xible.io/docs/editor#nodes). These include;
     - Open the help/details page of a node.
@@ -14,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - Edit the contents of a node in a seperate side panel.
 
 ### Fixed
--   Within the dock of the flow editor, the 'clear' button was not completely clickable because of overlap by the tab list.
+-   Within the dock of the flow editor, the 'clear'-logs button was not completely clickable because of overlap by the tab list.
 
 ## [0.22.0][] - 2021-05-01
 ### Added
@@ -429,7 +432,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.22.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/SpectrumBroad/xible/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/SpectrumBroad/xible/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/SpectrumBroad/xible/compare/v0.20.2...v0.21.0
 [0.20.2]: https://github.com/SpectrumBroad/xible/compare/v0.20.0...v0.20.2
