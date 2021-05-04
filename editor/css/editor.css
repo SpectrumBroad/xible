@@ -579,6 +579,7 @@
 }
 
 .xible .node .details {
+  z-index: 1;
   list-style: none;
   display: none;
   position: absolute;
