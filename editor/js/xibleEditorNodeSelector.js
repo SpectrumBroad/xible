@@ -130,7 +130,11 @@ class XibleEditorNodeSelector {
       if (
         !event.ctrlKey && !event.shiftKey
         && XIBLE_EDITOR.loadedFlow && XIBLE_EDITOR.browserSupport
-        && (event.target === XIBLE_EDITOR.element || event.target === XIBLE_EDITOR.element.firstChild)
+        && (
+          event.target === XIBLE_EDITOR.element
+          || event.target === XIBLE_EDITOR.editorElement
+          || event.target === XIBLE_EDITOR.editorWrapperElement
+        )
       ) {
         this.open(event);
       }

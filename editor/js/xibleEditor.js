@@ -21,7 +21,11 @@ class XibleEditor extends EventEmitter {
     // stage element
     this.element = document.createElement('div');
     this.element.classList.add('xible');
-    this.editorElement = this.element.appendChild(document.createElement('div'));
+
+    this.editorWrapperElement = this.element.appendChild(document.createElement('div'));
+    this.editorWrapperElement.classList.add('wrapper');
+
+    this.editorElement = this.editorWrapperElement.appendChild(document.createElement('div'));
     this.editorElement.classList.add('editor');
     this.editorElement.style.transformOrigin = '0 0';
 
@@ -462,7 +466,7 @@ class XibleEditor extends EventEmitter {
   addNode(node) {
     node.emit('beforeAppend');
 
-    this.element.firstChild.appendChild(node.element);
+    this.editorElement.appendChild(node.element);
     node.editor = this;
 
     // global inputs
@@ -502,7 +506,7 @@ class XibleEditor extends EventEmitter {
   */
   addConnector(connector) {
     connector.editor = this;
-    this.element.firstChild.appendChild(connector.element);
+    this.editorElement.appendChild(connector.element);
     connector.draw();
 
     return connector;
@@ -542,7 +546,7 @@ class XibleEditor extends EventEmitter {
 
     // remove from dom
     if (node.element.parentNode) {
-      this.element.firstChild.removeChild(node.element);
+      this.editorElement.removeChild(node.element);
     }
   }
 
@@ -562,7 +566,7 @@ class XibleEditor extends EventEmitter {
 
     // remove from dom
     if (connector.element.parentNode) {
-      this.element.firstChild.removeChild(connector.element);
+      this.editorElement.removeChild(connector.element);
     }
   }
 
@@ -590,7 +594,7 @@ class XibleEditor extends EventEmitter {
 
     // clean
     this.closeEditNode();
-    this.element.firstChild.innerHTML = '';
+    this.editorElement.innerHTML = '';
 
     flow.editor = this;
     this.loadedFlow = flow;
@@ -622,7 +626,7 @@ class XibleEditor extends EventEmitter {
   * Returns the non-transformed offset position.
   */
   getOffsetPosition() {
-    let el = this.element.firstChild;
+    let el = this.editorElement;
     let actionsOffsetTop = 0;
     let actionsOffsetLeft = 0;
 
@@ -641,7 +645,7 @@ class XibleEditor extends EventEmitter {
   * Transforms the element according to the object properties.
   */
   transform() {
-    this.element.firstChild.style.transform = `translate(${this.left}px, ${this.top}px) scale(${this.zoom})`;
+    this.editorElement.style.transform = `translate(${this.left}px, ${this.top}px) scale(${this.zoom})`;
     this.element.style.backgroundPosition = `${this.backgroundLeft}px ${this.backgroundTop}px`;
   }
 
@@ -1004,7 +1008,8 @@ class XibleEditor extends EventEmitter {
       // area selector
       if (
         event.target === this.element
-        || event.target === this.element.firstChild
+        || event.target === this.editorElement
+        || event.target === this.editorWrapperElement
       ) {
         this.initAreaSelector(event);
       } else if (!XibleEditor.isInputElement(event.target)) { // drag handler
@@ -1023,7 +1028,11 @@ class XibleEditor extends EventEmitter {
       if ((!this.nodeDragListener || !this.nodeDragHasFired) && !this.element.classList.contains('panning')) {
         // deselect
         if (
-          (event.target === this.element.firstChild || event.target === this.element)
+          (
+            event.target === this.editorElement
+            || event.target === this.element
+            || event.target === this.editorWrapperElement
+          )
           && !event.ctrlKey && !event.metaKey && event.button === 0
         ) {
           this.deselect();
@@ -1373,7 +1382,7 @@ class XibleEditor extends EventEmitter {
   }
 
   disableZoom() {
-    this.element.removeEventListener('wheel', this._zoomWheelListener);
+    this.editorWrapperElement.removeEventListener('wheel', this._zoomWheelListener);
   }
 
   /**
@@ -1383,7 +1392,7 @@ class XibleEditor extends EventEmitter {
     this.zoom = 1;
 
     // trigger zoom from scrollwheel
-    this.editorElement.addEventListener('wheel', this._zoomWheelListener = (event) => {
+    this.editorWrapperElement.addEventListener('wheel', this._zoomWheelListener = (event) => {
       // prevent default browser action; scroll
       event.preventDefault();
 

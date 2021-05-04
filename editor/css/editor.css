@@ -438,6 +438,11 @@
   z-index: 10;
 }
 
+.xible .wrapper {
+  width: 100%;
+  height: 100%;
+}
+
 .xible .editor {
   transform-origin: 0 0;
   position: absolute;

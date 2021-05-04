@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.23.1][] - 2021-05-04
+### Fixed
+-   Some mouse actions (scroll for zoom, doubleclick to add a node) were not registered in the flow editor in certain scenarios.
+
 ## [0.23.0][] - 2021-05-04
 ### Added
 -   A feature has been added to edit the node data/input values in a separate dock, which hosts more space. The amount of space available here is especially useful for nodes which potentially contain large amount of data, such as the [function](https://xible.io/nodes?search=function) node.
