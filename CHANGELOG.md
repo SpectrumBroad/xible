@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+## [0.23.2][] - 2021-05-05
+### Fixed
+-   Describe/help for a node, in the flow editor, was no longer visible. When a node was in focus, and the 'h' key was pressed, the help page would not show up. Similarly when clicking on the help button for that node.
 
 ## [0.23.1][] - 2021-05-04
 ### Fixed
@@ -436,7 +438,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.23.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.23.2...HEAD
+[0.23.2]: https://github.com/SpectrumBroad/xible/compare/v0.23.1...v0.23.2
 [0.23.1]: https://github.com/SpectrumBroad/xible/compare/v0.23.0...v0.23.1
 [0.23.0]: https://github.com/SpectrumBroad/xible/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/SpectrumBroad/xible/compare/v0.21.0...v0.22.0
