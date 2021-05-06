@@ -760,7 +760,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @returns {Boolean} True if connected, false if not.
     */
     isConnected() {
-      return this.getConnectors().length;
+      return this.getConnectors().length > 0;
     }
 
     /**

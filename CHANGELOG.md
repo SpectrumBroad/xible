@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Changed
+-   [nodeIo.isConnected()](https://xible.io/docs/api/nodeio#nodeIo.isConnected) actually returns a boolean now, instead of the amount of connectors.
+
 ## [0.23.2][] - 2021-05-05
 ### Fixed
 -   Describe/help for a node, in the flow editor, was no longer visible. When a node was in focus, and the 'h' key was pressed, the help page would not show up. Similarly when clicking on the help button for that node.
