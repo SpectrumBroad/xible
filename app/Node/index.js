@@ -5,6 +5,7 @@
 const { EventEmitter } = require('events');
 const debug = require('debug');
 const fs = require('fs');
+const { stat, access } = require('fs/promises');
 const path = require('path');
 
 const nodeDebug = debug('xible:node');
@@ -202,83 +203,75 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * or cannot be found.
     * @private
     */
-    static getStructure(dirPath) {
-      return new Promise((resolve, reject) => {
-        let structure = null;
-        const typedefs = {};
-        const structurePath = `${dirPath}/structure.json`;
-        const typedefPath = `${dirPath}/typedef.json`;
-        const editorPath = `${dirPath}/editor`;
+    static async getStructure(dirPath) {
+      let structure = null;
+      const typedefs = {};
+      const structurePath = `${dirPath}/structure.json`;
+      const typeDefPath = `${dirPath}/typedef.json`;
+      const editorPath = `${dirPath}/editor`;
+      const editorIndexPath = `${dirPath}/editor/index.htm`;
 
-        // paths to route files
-        const routesFiles = ['global', 'flow'];
+      // paths to route files
+      const routesFiles = ['global', 'flow'];
 
-        // check for structure.json
-        fs.access(structurePath, fs.constants.R_OK, (err) => {
-          if (err) {
-            if (err.code === 'ENOENT') {
-              resolve(null);
-            }
+      // existence of structure.json
+      try {
+        await access(structurePath, fs.constants.R_OK);
+      } catch (err) {
+        if (err.code === 'ENOENT') {
+          return null;
+        }
 
-            reject(new Error(`Could not access "${structurePath}": ${err}`));
-            return;
-          }
+        throw new Error(`Could not access "${structurePath}": ${err}`);
+      }
 
-          try {
-            structure = require(structurePath);
-            structure.path = dirPath;
-            structure.routePaths = {};
-          } catch (requireStructureJsonErr) {
-            reject(new Error(`Could not require "${structurePath}": ${requireStructureJsonErr}`));
-            return;
-          }
+      // try to parse structure.json
+      try {
+        structure = require(structurePath);
+        structure.path = dirPath;
+        structure.routePaths = {};
+      } catch (requireStructureJsonErr) {
+        throw new Error(`Could not require "${structurePath}": ${requireStructureJsonErr}`);
+      }
 
-          // Check for typedef.json.
-          fs.access(typedefPath, fs.constants.R_OK, (typeDefAccessErr) => {
-            if (!typeDefAccessErr) {
-              try {
-                Object.assign(typedefs, require(typedefPath));
-              } catch (requireTypedefJsonError) {
-                reject(new Error(`Could not require "${typedefPath}": ${requireTypedefJsonError}`));
-              }
-            }
+      // existence of typedef.json
+      let typeDefExists = false;
+      try {
+        await access(typeDefPath, fs.constants.R_OK);
+        typeDefExists = true;
+      } catch (typeDefAccessErr) {}
 
-            // Check for editor contents.
-            fs.stat(editorPath, (statEditorErr, stat) => {
-              if (!statEditorErr) {
-                if (stat.isDirectory()) {
-                  structure.editorContentPath = editorPath;
-                }
-              }
+      if (typeDefExists) {
+        try {
+          Object.assign(typedefs, require(typeDefPath));
+        } catch (requireTypedefJsonError) {
+          throw new Error(`Could not require "${typeDefPath}": ${requireTypedefJsonError}`);
+        }
+      }
 
-              let routesFilesFinished = 0;
-              const resolveRoutesFiles = () => {
-                routesFilesFinished += 1;
-                if (routesFilesFinished !== routesFiles.length) {
-                  return;
-                }
+      // check for editor contents
+      try {
+        const editorStat = await stat(editorPath);
+        if (editorStat.isDirectory()) {
+          structure.editorContentPath = editorPath;
+        }
+      } catch (statEditorErr) {}
 
-                resolve({
-                  node: structure,
-                  typedefs
-                });
-              };
+      // check for editor index
 
-              for (let i = 0; i < routesFiles.length; i += 1) {
-                const routesPath = `${dirPath}/routes/${routesFiles[i]}.js`;
-                // eslint-disable-next-line no-loop-func
-                fs.access(routesPath, fs.constants.R_OK, (routesAccessErr) => {
-                  if (!routesAccessErr) {
-                    structure.routePaths[routesFiles[i]] = routesPath;
-                  }
+      // check for routes
+      await Promise.all(routesFiles.map(async (routesFile) => {
+        const routesPath = `${dirPath}/routes/${routesFile}.js`;
+        try {
+          await access(routesPath, fs.constants.R_OK);
+          structure.routePaths[routesFile] = routesPath;
+        } catch (routesAccessErr) {}
+      }));
 
-                  resolveRoutesFiles();
-                });
-              }
-            });
-          });
-        });
-      });
+      return {
+        node: structure,
+        typedefs
+      };
     }
 
     /**
