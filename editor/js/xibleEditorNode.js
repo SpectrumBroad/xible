@@ -57,7 +57,7 @@ class XibleEditorNode extends xibleWrapper.Node {
 
     headerEl.innerHTML = escapeHtml(this.name).replace(/[._-]/g, (val) => `${val}<wbr />`);
 
-    if (this.hostsEditorContent) {
+    if (this.hostsEditorContent || this.dataStructure) {
       const editButton = detailEl.appendChild(document.createElement('li'))
         .appendChild(document.createElement('button'));
       editButton.classList.add('edit');
@@ -81,10 +81,12 @@ class XibleEditorNode extends xibleWrapper.Node {
     };
 
     // add additional content
-    if (this.hostsEditorContent) { // load editor static hosted content for this node
+    if (this.hostsEditorContentIndex) {
       this.getAndProcessEditorContent();
     } else if (!this.nodeExists && obj.editorContent) {
       this.processEditorContent(obj.editorContent);
+    } else if (this.dataStructure) {
+      this.generateEditorContent();
     }
 
     this.statusTimeouts = {};
@@ -173,12 +175,92 @@ class XibleEditorNode extends xibleWrapper.Node {
     }
   }
 
+  /**
+   * Fetch editor contents from an editor/index.htm.
+   * Calls this.processEditorContent() to render the contents.
+   */
   getAndProcessEditorContent() {
+    const proc = async () => {
+      const data = await this.getEditorContent();
+      this.processEditorContent(data);
+    };
+
+    if (this.editor) {
+      proc();
+    } else {
+      this.once('beforeAppend', proc);
+    }
+  }
+
+  /**
+   * Generate editor contents based of the dataStructure object.
+   * Calls this.processEditorContent() to render the contents.
+   */
+  generateEditorContent() {
     const proc = () => {
-      this.getEditorContent()
-        .then((data) => {
-          this.processEditorContent(data);
-        });
+      if (!this.dataStructure) {
+        return;
+      }
+
+      const content = document.createDocumentFragment();
+
+      for (const [key, structure] of Object.entries(this.dataStructure)) {
+        let el;
+        switch (structure.type) {
+          case 'select': {
+            el = content.appendChild(document.createElement('select'));
+            structure.options.forEach((option) => {
+              el.appendChild(document.createElement('option'))
+                .appendChild(document.createTextNode(option));
+            });
+            break;
+          }
+
+          case 'textarea': case 'string': {
+            el = content.appendChild(document.createElement('textarea'));
+            break;
+          }
+
+          default: {
+            el = content.appendChild(document.createElement('input'));
+            el.setAttribute(
+              'type',
+              ['password', 'checkbox', 'number'].includes(structure.type)
+                ? structure.type
+                : 'text'
+            );
+
+            if (structure.pattern != null) {
+              el.setAttribute('pattern', structure.pattern);
+            }
+
+            if (structure.min != null) {
+              el.setAttribute('min', structure.min);
+            }
+
+            if (structure.max != null) {
+              el.setAttribute('max', structure.max);
+            }
+
+            if (structure.minlength != null) {
+              el.setAttribute('minlength', structure.minlength);
+            }
+
+            if (structure.maxlength != null) {
+              el.setAttribute('maxlength', structure.maxlength);
+            }
+          }
+        }
+
+        el.setAttribute('placeholder', structure.label || structure.placeholder || key);
+        if (structure.description != null) {
+          el.setAttribute('data-description', structure.description);
+        }
+        el.setAttribute('data-output-value', key);
+        el.required = structure.required;
+      }
+
+      this.processEditorContent(content);
     };
 
     if (this.editor) {
@@ -191,73 +273,71 @@ class XibleEditorNode extends xibleWrapper.Node {
   processEditorContent(content) {
     this.editorContent = content;
 
-    const proc = () => {
-      const div = document.createElement('div');
-      div.classList.add('content');
+    const div = document.createElement('div');
+    div.classList.add('content');
 
-      // if attachShadow shadow DOM v1) is not supported, simply don't show contents
-      if (typeof div.attachShadow !== 'function') {
-        return;
-      }
-
-      this.element.appendChild(div);
-
-      // create the shadow and set the contents including the nodeContent.css
-      const shadow = div.attachShadow({
-        mode: 'open'
-      });
-      shadow.xibleNode = this;
-
-      // hook base document stuff
-      shadow.createElement = (...args) => document.createElement(...args);
-      shadow.createElementNS = (...args) => document.createElementNS(...args);
-      shadow.createTextNode = (...args) => document.createTextNode(...args);
-
-      let templateEl = document.getElementById(`xible-node-${this.name}`);
-      if (!templateEl) {
-        const textTemplate = `<template><style>@import url("css/nodeContent.css");</style>${content}</template>`;
-        const template = new DOMParser().parseFromString(textTemplate, 'text/html');
-        templateEl = template.querySelector('template');
-        templateEl = document.body.appendChild(template.querySelector('template'));
-        templateEl.setAttribute('id', `xible-node-${this.name}`);
-
-        // remove scripts
-        // so we can evaulate them in a seperate function with a specific document argument.
-        templateEl.plainScripts = Array.from(templateEl.content.querySelectorAll('script'))
-          .map((scriptEl) => {
-            const scriptContent = scriptEl.textContent;
-            scriptEl.parentNode.removeChild(scriptEl);
-
-            return scriptContent;
-          });
-      }
-
-      const templateContent = templateEl.content;
-
-      shadow.appendChild(templateContent.cloneNode(true));
-
-      // append the div & shadowroot to the node
-      this.shadowRoot = shadow;
-
-      templateEl.plainScripts.forEach((script) => {
-        new Function('document', script).call(this, shadow);
-      });
-
-      // trigger some convenience stuff
-      this.convenienceLabel();
-      this.convenienceHideIfAttached();
-      this.setOutputValues();
-      this.convenienceOutputValue();
-      this.convenienceTextAreaSetup();
-
-      this.emit('editorContentLoad');
-    };
-
-    if (this.editor) {
-      proc();
-    } else {
-      this.once('beforeAppend', proc);
+    // if attachShadow shadow DOM v1) is not supported, simply don't show contents
+    if (typeof div.attachShadow !== 'function') {
+      return;
     }
+
+    this.element.appendChild(div);
+
+    // create the shadow and set the contents including the nodeContent.css
+    const shadow = div.attachShadow({
+      mode: 'open'
+    });
+    shadow.xibleNode = this;
+
+    // hook base document stuff
+    shadow.createElement = (...args) => document.createElement(...args);
+    shadow.createElementNS = (...args) => document.createElementNS(...args);
+    shadow.createTextNode = (...args) => document.createTextNode(...args);
+
+    let templateEl = document.getElementById(`xible-node-${this.name}`);
+    if (!templateEl) {
+      const template = new DOMParser().parseFromString(
+        `<template><style>@import url("css/nodeContent.css");</style>${typeof content === 'string' ? content : ''}</template>`,
+        'text/html'
+      );
+
+      if (typeof content !== 'string') {
+        template.querySelector('template').content.appendChild(content);
+      }
+
+      templateEl = document.body.appendChild(template.querySelector('template'));
+      templateEl.setAttribute('id', `xible-node-${this.name}`);
+
+      // remove scripts
+      // so we can evaulate them in a seperate function with a specific document argument.
+      templateEl.plainScripts = Array.from(templateEl.content.querySelectorAll('script'))
+        .map((scriptEl) => {
+          const scriptContent = scriptEl.textContent;
+          scriptEl.parentNode.removeChild(scriptEl);
+
+          return scriptContent;
+        });
+    }
+
+    const templateContent = templateEl.content;
+
+    shadow.appendChild(templateContent.cloneNode(true));
+
+    // append the div & shadowroot to the node
+    this.shadowRoot = shadow;
+
+    templateEl.plainScripts.forEach((script) => {
+      new Function('document', script).call(this, shadow);
+    });
+
+    // trigger some convenience stuff
+    this.convenienceLabel();
+    this.convenienceHideIfAttached();
+    this.setOutputValues();
+    this.convenienceOutputValue();
+    this.convenienceTextAreaSetup();
+
+    this.emit('editorContentLoad');
   }
 
   setPosition(left = 0, top = 0) {
@@ -266,12 +346,13 @@ class XibleEditorNode extends xibleWrapper.Node {
   }
 
   duplicate(ignoreData) {
-    const duplicateXibleNode = new XibleEditorNode(this, ignoreData);
-    duplicateXibleNode.flow = null;
-    duplicateXibleNode.editor = null;
-
-    // create a unique id for the node
-    duplicateXibleNode._id = xibleWrapper.generateObjectId();
+    const duplicateXibleNode = new XibleEditorNode({
+      ...this,
+      _id: xibleWrapper.generateObjectId(),
+      flow: null,
+      editor: null,
+      editorContent: null
+    }, ignoreData);
 
     // create a unique id for the inputs
     // and reset the type
@@ -599,12 +680,10 @@ class XibleEditorNode extends xibleWrapper.Node {
         }
 
         // add the label
-        let placeholder = el.getAttribute('placeholder') || dataOutputValue;
-
+        const placeholder = el.getAttribute('placeholder') || dataOutputValue;
         if (!placeholder) {
           span.classList.add('unknown');
         }
-
         span.appendChild(document.createTextNode(placeholder || 'unknown'));
 
         // ensure hideif attached is hooked properly

@@ -38,6 +38,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       this.description = obj.description;
       this.nodeExists = true;
       this.hostsEditorContent = obj.hostsEditorContent;
+      this.hostsEditorContentIndex = obj.hostsEditorContentIndex;
+      this.dataStructure = obj.dataStructure;
       this.routesPath = obj.routesPath;
       this.top = obj.top || 0;
       this.left = obj.left || 0;
@@ -254,6 +256,11 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         const editorStat = await stat(editorPath);
         if (editorStat.isDirectory()) {
           structure.editorContentPath = editorPath;
+
+          try {
+            await stat(editorIndexPath);
+            structure.editorContentIndexPath = editorIndexPath;
+          } catch (statEditorIndexErr) {}
         }
       } catch (statEditorErr) {}
 

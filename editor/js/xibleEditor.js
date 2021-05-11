@@ -92,6 +92,7 @@ class XibleEditor extends EventEmitter {
     }
 
     const dup = node.duplicate();
+    dup.emit('beforeAppend');
 
     dup.element.classList.add('edit');
     dup.editor = this;
@@ -114,7 +115,7 @@ class XibleEditor extends EventEmitter {
     });
 
     // handle descriptions for input elements and labels
-    dup.on('editorContentLoad', () => {
+    const render = () => {
       if (!dup.shadowRoot) {
         return;
       }
@@ -144,7 +145,13 @@ class XibleEditor extends EventEmitter {
             labelDescriptionEl.classList.add('overflow');
           }
         });
-    });
+    };
+
+    if (dup.editorContent) {
+      render();
+    } else {
+      dup.on('editorContentLoad', render);
+    }
 
     this.editElement.innerHTML = '';
 
@@ -159,16 +166,16 @@ class XibleEditor extends EventEmitter {
     this.editElement.appendChild(dup.element);
     this.editElement.classList.add('open');
 
+    dup.editor = this;
     dup.emit('append');
   }
 
-  describeNode(node) {
-    if (!(node instanceof XibleEditorNode)) {
+  describeNode(origNode) {
+    if (!(origNode instanceof XibleEditorNode)) {
       throw new Error('1st argument must be a XibleEditorNode');
     }
 
-    node = node.duplicate(true);
-
+    const node = origNode.duplicate(true);
     node.emit('beforeAppend');
 
     const describeEl = this.element.appendChild(document.createElement('div'));
@@ -248,7 +255,7 @@ class XibleEditor extends EventEmitter {
       });
 
     // handle descriptions for input elements and labels
-    node.on('editorContentLoad', () => {
+    const renderDescriptions = () => {
       if (!node.shadowRoot) {
         return;
       }
@@ -275,7 +282,13 @@ class XibleEditor extends EventEmitter {
             labelDescriptionEl.classList.add('overflow');
           }
         });
-    });
+    }
+
+    if (node.editorContent) {
+      renderDescriptions();
+    } else {
+      node.on('editorContentLoad', renderDescriptions);
+    }
 
     node.editor = this;
     node.emit('append');

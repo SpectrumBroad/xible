@@ -254,6 +254,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         // Host editor contents if applicable.
         if (structure.editorContentPath) {
           structure.hostsEditorContent = true;
+          structure.hostsEditorContentIndex = structure.editorContentIndexPath != null;
 
           EXPRESS_APP.use(
             `/api/nodes/${nodeName}/editor`,
