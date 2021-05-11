@@ -14,7 +14,8 @@
 
 .xible > .edit > button,
 .xible > .describe > button {
-  position: absolute;
+  position: sticky;
+  float: right;
   display: block;
   right: 0;
   top: 0;
@@ -33,9 +34,11 @@
 }
 
 .xible > .edit > button {
-  font-size: 16px;
+  position: absolute;
+  font-size: 14px;
   line-height: 11px;
-  padding: 10px;
+  padding: 6px;
+  top: 2px;
 }
 
 .xible > .edit > button:hover,
