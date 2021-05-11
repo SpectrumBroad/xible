@@ -236,6 +236,29 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         throw new Error(`Could not require "${structurePath}": ${requireStructureJsonErr}`);
       }
 
+      // Fetch vault fields from dataStructure
+      if (structure.dataStructure != null) {
+        for (const [key, fieldStructure] of Object.entries(structure.dataStructure)) {
+          if (fieldStructure.vault === true) {
+            if (structure.vault == null) {
+              structure.vault = [key];
+            } else if (!structure.vault.includes(key)) {
+              structure.vault.push(key);
+            }
+          }
+        }
+
+        // ensure dataStructure also knows about all vault fields
+        if (structure.vault != null) {
+          for (let i = 0; i < structure.vault.length; i += 1) {
+            const fieldStructure = structure.dataStructure[structure.vault[i]];
+            if (fieldStructure != null) {
+              fieldStructure.vault = true;
+            }
+          }
+        }
+      }
+
       // existence of typedef.json
       let typeDefExists = false;
       try {

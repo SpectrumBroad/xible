@@ -92,5 +92,27 @@ describe('Node', function () {
       assert.notEqual(structure.node.routePaths.global, null);
       assert.notEqual(structure.node.routePaths.flow, null);
     });
+
+    it('vault[] should translate to dataStructure[].vault and vice versa', async function () {
+      await fs.writeFile(`${dirPath}/structure.json`, '{ "name": "test-node", "dataStructure": { "some": {}, "else": { "vault": true } }, "vault": ["some"] }');
+      delete require.cache[require.resolve(`${dirPath}/structure.json`)];
+      const structure = await xible.Node.getStructure(dirPath);
+      assert.equal(structure.node.dataStructure.some.vault, true);
+      assert.equal(structure.node.vault.includes('else'), true);
+    });
+
+    it('dataStructure[].vault should translate to non-existing vault[]', async function () {
+      await fs.writeFile(`${dirPath}/structure.json`, '{ "name": "test-node", "dataStructure": { "some": {}, "else": { "vault": true } } }');
+      delete require.cache[require.resolve(`${dirPath}/structure.json`)];
+      const structure = await xible.Node.getStructure(dirPath);
+      assert.equal(structure.node.vault.includes('else'), true);
+    });
+
+    it('vault[] should ignore non-existing dataStructure[]', async function () {
+      await fs.writeFile(`${dirPath}/structure.json`, '{ "name": "test-node", "vault": ["some"] }');
+      delete require.cache[require.resolve(`${dirPath}/structure.json`)];
+      const structure = await xible.Node.getStructure(dirPath);
+      assert.equal(structure.node.dataStructure, null);
+    });
   });
 });
