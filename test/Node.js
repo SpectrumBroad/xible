@@ -68,22 +68,29 @@ describe('Node', function () {
     it('editor should return', async function () {
       await fs.mkdir(`${dirPath}/editor`);
       const structure = await xible.Node.getStructure(dirPath);
-      assert(structure.node.editorContentPath != null);
+      assert.notEqual(structure.node.editorContentPath, null);
+      assert.equal(structure.node.editorContentIndexPath, null);
+    });
+
+    it('editor index should return', async function () {
+      await fs.writeFile(`${dirPath}/editor/index.htm`, '<input />');
+      const structure = await xible.Node.getStructure(dirPath);
+      assert.notEqual(structure.node.editorContentIndexPath, null);
     });
 
     it('routes/global.js should return', async function () {
       await fs.mkdir(`${dirPath}/routes`);
       await fs.writeFile(`${dirPath}/routes/global.js`, 'process.exit(0);');
       const structure = await xible.Node.getStructure(dirPath);
-      assert(structure.node.routePaths.global != null);
+      assert.notEqual(structure.node.routePaths.global, null);
       assert.equal(structure.node.routePaths.flow, null);
     });
 
     it('routes/flow.js should return', async function () {
       await fs.writeFile(`${dirPath}/routes/flow.js`, 'process.exit(0);');
       const structure = await xible.Node.getStructure(dirPath);
-      assert(structure.node.routePaths.global != null);
-      assert(structure.node.routePaths.flow != null);
+      assert.notEqual(structure.node.routePaths.global, null);
+      assert.notEqual(structure.node.routePaths.flow, null);
     });
   });
 });
