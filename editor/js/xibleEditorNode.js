@@ -294,7 +294,8 @@ class XibleEditorNode extends xibleWrapper.Node {
     shadow.createElementNS = (...args) => document.createElementNS(...args);
     shadow.createTextNode = (...args) => document.createTextNode(...args);
 
-    let templateEl = document.getElementById(`xible-node-${this.name}`);
+    const templateId = `xible-node-${this.name}${this.nodeExists ? '' : '-fail'}`;
+    let templateEl = document.getElementById(templateId);
     if (!templateEl) {
       const template = new DOMParser().parseFromString(
         `<template><style>@import url("css/nodeContent.css");</style>${typeof content === 'string' ? content : ''}</template>`,
@@ -306,7 +307,7 @@ class XibleEditorNode extends xibleWrapper.Node {
       }
 
       templateEl = document.body.appendChild(template.querySelector('template'));
-      templateEl.setAttribute('id', `xible-node-${this.name}`);
+      templateEl.setAttribute('id', templateId);
 
       // remove scripts
       // so we can evaulate them in a seperate function with a specific document argument.
