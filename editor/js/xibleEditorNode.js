@@ -249,6 +249,10 @@ class XibleEditorNode extends xibleWrapper.Node {
             if (structure.maxlength != null) {
               el.setAttribute('maxlength', structure.maxlength);
             }
+
+            if (structure.defaultValue != null) {
+              el.setAttribute('value', structure.defaultValue);
+            }
           }
         }
 
