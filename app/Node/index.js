@@ -48,6 +48,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       /**
        * An object map which contains all data coming from the editor,
        * combined with the data from the vault.
+       * Preferred way of addressing this data is making use of the node.getData() method.
        * @type {Object}
        */
       this.data = obj.data || {};
