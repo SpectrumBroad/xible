@@ -1,6 +1,6 @@
 {
   "name": "xible",
-  "version": "0.23.2",
+  "version": "0.24.0",
   "description": "xible",
   "license": "MIT",
   "homepage": "https://xible.io",
@@ -69,7 +69,7 @@
     "xible-nodepack-stream": "*",
     "xible-nodepack-timing": "*",
     "xible-np-compare": "*",
-    "xible-np-console": "*",
+    "xible-np-console": "^0.2.0",
     "xible-np-core": "^0.3.0",
     "xible-np-input": "^0.2.0",
     "xible-np-object": "^0.2.0",
