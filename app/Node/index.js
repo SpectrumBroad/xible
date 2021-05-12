@@ -343,9 +343,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Returns all inputs attached to this node.
-    * @returns {NodeInput[]} List of inputs.
-    */
+     * Returns all inputs attached to this node.
+     * @returns {NodeInput[]} List of inputs.
+     */
     getInputs() {
       const inputs = [];
       for (const name in this.inputs) {
@@ -355,9 +355,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Returns all outputs attached to this node.
-    * @returns {NodeOutput[]} List of outputs.
-    */
+     * Returns all outputs attached to this node.
+     * @returns {NodeOutput[]} List of outputs.
+     */
     getOutputs() {
       const outputs = [];
       for (const name in this.outputs) {
@@ -367,37 +367,86 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Returns an input by the given name, or null if it does not exist.
-    * @param {String} name Name of the input.
-    * @returns {NodeInput|null} An input, or null if not found.
-    */
+     * Returns an input by the given name, or null if it does not exist.
+     * @param {String} name Name of the input.
+     * @returns {NodeInput|null} An input, or null if not found.
+     */
     getInputByName(name) {
       return this.inputs[name];
     }
 
     /**
-    * Returns an output by the given name, or null if it does not exist.
-    * @param {String} name Name of the output.
-    * @returns {NodeOutput|null} An output, or null if not found.
-    */
+     * Returns an output by the given name, or null if it does not exist.
+     * @param {String} name Name of the output.
+     * @returns {NodeOutput|null} An output, or null if not found.
+     */
     getOutputByName(name) {
       return this.outputs[name];
     }
 
     /**
-    * Adds a progress bar to the node, visible in the editor.
-    * @param {Object} status
-    * @param {String} [status.message] A text message representing the context of the progress bar.
-    * @param {Number} [status.percentage=0] The starting point of the progress bar as a percentage.
-    * Value can range from 0 to (including) 100.
-    * @param {Number} [status.updateOverTime] Specifies the time in milliseconds
-    * to automatically update the progress bar to 100% from the given percentage value.
-    * @param {Number} [status.timeout] Timeout in milliseconds
-    * after which the progress bar disappears.
-    * @returns {Number} Returns an identifier,
-    * which can be used to update the status of the progress bar through node.updateProgressBarById,
-    * or remove the progress bar through removeProgressBarById.
-    */
+     * Fetches all input values for this input.
+     * @param {String} dataName - The data name to fetch the values for.
+     * @param {FlowState} state - The flowstate at the time of calling.
+     * @returns {Promise.<Array>} An array of all values related to this data field.
+     * This includes the form field (first value), and data fetched from a related input.
+     * If a related input is configured, the input data is added to the returned array,
+     * unless 'replaces' is configured to true on the input configuration.
+     * If 'replaces' is set to true, the form field is ignored.
+     * For related inputs,
+     * data is returned by the outputs on the other ends of connected connectors or globals.
+     * If any of the outputs returns an array,
+     * it will be concatened to the return array, instead of pushed.
+     */
+    async getData(dataName, state) {
+      Node.flowStateCheck(state);
+
+      let data = [];
+
+      // push form data
+      if (this.data[dataName]) {
+        data.push(this.data[dataName]);
+      }
+
+      // get values from related inputs
+      if (
+        this.dataStructure[dataName]
+        && this.dataStructure[dataName].input
+        && this.dataStructure[dataName].input.name
+      ) {
+        const inputConfig = this.dataStructure[dataName].input;
+        const input = this.getInputByName(inputConfig.name);
+        if (!input) {
+          throw new Error(`Input "${inputConfig.name}" does not exist.`);
+        }
+
+        if (input.isConnected()) {
+          const inputValues = await input.getValues(state);
+          if (inputConfig.replaces === true) {
+            data = inputValues;
+          } else {
+            data = [...data, ...inputValues];
+          }
+        }
+      }
+
+      return data;
+    }
+
+    /**
+     * Adds a progress bar to the node, visible in the editor.
+     * @param {Object} status
+     * @param {String} [status.message] A text message representing the context of the progress bar.
+     * @param {Number} [status.percentage=0] The starting point of the progress bar as a percentage.
+     * Value can range from 0 to (including) 100.
+     * @param {Number} [status.updateOverTime] Specifies the time in milliseconds
+     * to automatically update the progress bar to 100% from the given percentage value.
+     * @param {Number} [status.timeout] Timeout in milliseconds
+     * after which the progress bar disappears.
+     * @returns {Number} Returns an identifier,
+     * which can be used to update the status of the progress bar through node.updateProgressBarById,
+     * or remove the progress bar through removeProgressBarById.
+     */
     addProgressBar(status) {
       if (!status) {
         throw new Error('the "status" argument is required');
@@ -831,14 +880,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-    * Fetches all input values for this input.
-    * @param {FlowState} state The flowstate at the time of calling.
-    * @fires NodeOutput#trigger
-    * @returns {Promise.<Array>} An array of all values
-    * as returned by the outputs on the other ends of connected connectors or globals.
-    * If any of the outputs returns an array,
-    * it will be concatened to the return array, instead of pushed.
-    */
+     * Fetches all input values for this input.
+     * @param {FlowState} state - The flowstate at the time of calling.
+     * @fires NodeOutput#trigger
+     * @returns {Promise.<Array>} - An array of all values
+     * as returned by the outputs on the other ends of connected connectors or globals.
+     * If any of the outputs returns an array,
+     * it will be concatened to the return array, instead of pushed.
+     */
     getValues(state) {
       Node.flowStateCheck(state);
 

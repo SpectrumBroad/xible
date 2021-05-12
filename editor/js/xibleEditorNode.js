@@ -256,6 +256,14 @@ class XibleEditorNode extends xibleWrapper.Node {
           }
         }
 
+        if (
+          structure.input
+          && structure.input.name != null
+          && structure.input.replaces === true
+        ) {
+          el.setAttribute('data-hide-if-attached', `input[name="${structure.input.name}"]`);
+        }
+
         el.setAttribute('placeholder', structure.label || structure.placeholder || key);
         if (structure.description != null) {
           el.setAttribute('data-description', structure.description);
