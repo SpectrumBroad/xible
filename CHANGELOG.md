@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Added
+-   Within the structure.json of a node, developers can now configure the input data fields using the [dataStructure object](https://xible.io/docs/guides/nodes/structure), instead of creating a separate [`editor/index.htm`](https://xible.io/docs/guides/nodes/editor). This improves development time for new nodes by a fair bit. If an `editor/index.htm` is present, it will overrule any configured dataStructure within the structure.json. ([#95](https://github.com/SpectrumBroad/xible/issues/95))
+
+-   A new convenience method [node.getData(dataName, state)](https://xible.io/docs/api/node#node.getData) to fetch all data for a data field, including related inputs if so configured. This behaves similarly as a combination of fetching data through `NODE.data.x` and `NODE.getInputByName(x).getValues()`. `node.getData()` is the new preferred method of fetching data. ([#95](https://github.com/SpectrumBroad/xible/issues/95))
+
 ### Changed
 -   [nodeIo.isConnected()](https://xible.io/docs/api/nodeio#nodeIo.isConnected) actually returns a boolean now, instead of the amount of connectors.
 
@@ -23,7 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   When hovering the mouse cursor over a node, a box with options appears that could previously only be triggered by hitting the [right key combination](https://xible.io/docs/editor#nodes). These include;
     - Open the help/details page of a node.
     - Delete a node from a flow.
-    - Edit the contents of a node in a seperate side panel.
+    - Edit the contents of a node in a separate side panel.
 
 ### Fixed
 -   Within the dock of the flow editor, the 'clear'-logs button was not completely clickable because of overlap by the tab list.
