@@ -3,9 +3,8 @@
 /* eslint-disable func-names */
 /* eslint-disable prefer-arrow-callback */
 
-const fs = require('fs/promises')
+const fs = require('fs/promises');
 const assert = require('assert');
-const supertest = require('supertest');
 const Xible = require('..');
 
 const CONFIG_PATH = '~/.xible/config.json';
