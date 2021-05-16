@@ -206,22 +206,11 @@ const cli = {
             return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
           }
 
-          // verify if this node had been published before
+          // publish
           return xible.Registry.Flow
-            .getByName(flow._id)
-            .catch((getFlowErr) => Promise.reject(`Failed to get flow from registry: ${getFlowErr}`))
-            .then((registryFlow) => {
-              // verify that whoami equals the remote user
-              if (registryFlow && registryFlow.publishUserName !== user.name) {
-                return Promise.reject(`Flow "${registryFlow._id}" was previously published by "${registryFlow.publishUserName}". You are currently logged in as "${user.name}".`);
-              }
-
-              // publish
-              return xible.Registry.Flow
-                .publish(flowJson)
-                .then((publishedFlow) => {
-                  log(`Published flow "${publishedFlow._id}".`);
-                });
+            .publish(flowJson)
+            .then((publishedFlow) => {
+              log(`Published flow "${publishedFlow.name}".`);
             });
         });
     },
@@ -234,7 +223,15 @@ const cli = {
         throw 'Your config does not allow to install flows from the registry';
       }
 
-      const altFlowName = opts.altname;
+      const publishUserName = opts.publishusername
+        || opts['publish-user-name']
+        || opts.publishuser
+        || opts['publish-user'];
+      if (!publishUserName) {
+        throw 'A --publish-user-name must be provided';
+      }
+
+      const altFlowName = opts.altname || opts['alt-name'];
       if (altFlowName && !xible.Flow.validateId(altFlowName)) {
         throw 'flow _id/name cannot contain reserved/unsave characters';
       }
@@ -247,18 +244,22 @@ const cli = {
       await xible.Flow.initFromPath(flowPath);
       const flow = xible.getFlowById(altFlowName || flowName);
 
-      // check if the flow already exists
-      if (flow && !opts.force) {
-        throw 'A flow already exists by this name. Provide --force to overwrite.';
-      }
-
-      const registryFlow = await xible.Registry.Flow.getByName(flowName);
+      const registryFlow = await xible.Registry.Flow.getByPublisherAndName(
+        publishUserName,
+        flowName
+      );
       if (!registryFlow) {
         throw `Flow "${flowName}" does not exist`;
       }
 
+      // check if the flow already exists
+      if (flow && !opts.force) {
+        throw 'A flow already exists by this name. Provide --force to overwrite or --alt-name to specify new name for the flow.';
+      }
+
       xible.CliQueue.add({
         method: 'registry.flow.install',
+        registryPublishUserName: publishUserName,
         registryFlowName: flowName,
         altFlowName
       });
@@ -273,8 +274,8 @@ const cli = {
       return xible.Registry.Flow
         .search(str)
         .then((flows) => {
-          Object.keys(flows).forEach((flowName) => {
-            log(`${flowName}`);
+          flows.forEach((flow) => {
+            log(`${flow.name}: by ${flow.publishUserName}`);
           });
         });
     }

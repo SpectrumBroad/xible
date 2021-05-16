@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.25.0][] - 2021-05-16
+### Changed
+-   Flows are now stored per user. This means that the registry can hold multiple flows by the same name, but published by different users. All functionality has been updated to reflect this change. This includes the UI and the cli commands such as [`xiblepm flow install`](https://xible.io/docs/commandlinetools/xiblepm#flow.install).
+
 ## [0.24.0][] - 2021-05-12
 ### Added
 -   Within the [structure.json](https://xible.io/docs/guides/nodes/structure) of a node, developers can now configure the input data fields using the [dataStructure object](https://xible.io/docs/guides/nodes/data#structure), instead of creating a separate [`editor/index.htm`](https://xible.io/docs/guides/nodes/editor). This improves development time for new nodes by a fair bit. If an `editor/index.htm` is present, it will overrule any configured dataStructure within the structure.json. ([#95](https://github.com/SpectrumBroad/xible/issues/95))
@@ -449,7 +453,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.24.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/SpectrumBroad/xible/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/SpectrumBroad/xible/compare/v0.23.2...v0.24.0
 [0.23.2]: https://github.com/SpectrumBroad/xible/compare/v0.23.1...v0.23.2
 [0.23.1]: https://github.com/SpectrumBroad/xible/compare/v0.23.0...v0.23.1

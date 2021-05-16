@@ -87,7 +87,10 @@ module.exports = (XIBLE) => {
                       break;
                     case 'registry.flow.install': {
                       if (obj.registryFlowName) {
-                        const registryFlow = await XIBLE.Registry.Flow.getByName(obj.registryFlowName);
+                        const registryFlow = await XIBLE.Registry.Flow.getByPublisherAndName(
+                          obj.registryPublishUserName,
+                          obj.registryFlowName
+                        );
                         if (!registryFlow) {
                           continue;
                         }

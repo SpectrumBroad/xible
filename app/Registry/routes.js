@@ -79,10 +79,16 @@ module.exports = (XIBLE_REGISTRY, XIBLE, EXPRESS_APP) => {
     res.json(flows);
   });
 
+  // get a user by a given name
+  EXPRESS_APP.param('regUserName', async (req, res, next, userName) => {
+    req.locals.userName = userName;
+    next();
+  });
+
   // get a flow by a given name
   EXPRESS_APP.param('regFlowName', async (req, res, next, flowName) => {
     req.locals.flowName = flowName;
-    const flow = await XIBLE_REGISTRY.Flow.getByName(flowName);
+    const flow = await XIBLE_REGISTRY.Flow.getByPublisherAndName(req.locals.userName, flowName);
     if (!flow) {
       res.status(404).end();
       return;
@@ -92,12 +98,12 @@ module.exports = (XIBLE_REGISTRY, XIBLE, EXPRESS_APP) => {
     next();
   });
 
-  EXPRESS_APP.get('/api/registry/flows/:regFlowName', (req, res) => {
+  EXPRESS_APP.get('/api/registry/users/:regUserName/flows/:regFlowName', (req, res) => {
     res.json(req.locals.flow);
   });
 
   // install a flow
-  EXPRESS_APP.patch('/api/registry/flows/:regFlowName/install', async (req, res) => {
+  EXPRESS_APP.patch('/api/registry/users/:regUserName/flows/:regFlowName/install', async (req, res) => {
     await req.locals.flow.install();
     res.end();
   });

@@ -49,6 +49,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
     flowPath = XIBLE.resolvePath(flowPath);
 
+    this._id = this.name;
     if (altName) {
       if (!XIBLE.Flow.validateId(altName)) {
         return Promise.reject('flow _id/name cannot contain reserved/unsave characters');
@@ -63,14 +64,14 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     return new Promise((resolve, reject) => {
       // write
-      const flowDestPath = `${flowPath}/${this._id}.json`;
+      const flowDestPath = `${flowPath}/${this.name}.json`;
       fsExtra.writeFile(flowDestPath, JSON.stringify(this, null, '\t'), (err) => {
         if (err) {
           reject(err);
           return;
         }
 
-        resolve(XIBLE.Flow.initOneFromPath(flowPath, `${this._id}.json`, true));
+        resolve(XIBLE.Flow.initOneFromPath(flowPath, `${this.name}.json`, true));
       });
     });
   };

@@ -61,12 +61,14 @@ View.routes['/flows'] = (EL) => {
             </p>
             <table id="registryFlowsTable" style="display: none;">
               <colgroup>
-                <col style="width: 60%;" />
-                <col style="width: 40%;" />
+                <col style="width: 50%;" />
+                <col style="width: 30%;" />
+                <col style="width: 20%;" />
               </colgroup>
               <thead>
                 <tr>
                   <th>name</th>
+                  <th>publisher</th>
                   <th class="actions">actions</th>
                 </tr>
               </thead>
@@ -110,8 +112,8 @@ View.routes['/flows'] = (EL) => {
   const subRegistryFlowSearchForm = document.getElementById('subRegistryFlowSearchForm');
   const registryFlowSearchForm = document.getElementById('registryFlowSearchForm');
 
-  async function installFlowByName(flowName) {
-    await xibleWrapper.Registry.installFlowByName(flowName);
+  async function installFlowByPublisherAndName(publishUserName, flowName) {
+    await xibleWrapper.Registry.installFlowByPublisherAndName(publishUserName, flowName);
     await populateFlows();
 
     mainViewHolder.navigate(`/flows/${encodeURIComponent(flowName)}`);
@@ -138,24 +140,25 @@ View.routes['/flows'] = (EL) => {
     }, { once: true });
     registryFlowsTable.style.display = '';
 
-    const flowIds = Object.keys(foundFlows);
-    if (!flowIds.length) {
+    if (!foundFlows.length) {
       registryFlowsNoResultsWarning.style.display = '';
       return;
     }
 
-    for (const flowId of flowIds) {
+    for (const flow of foundFlows) {
+      const flowName = flow.name;
       const tr = registryFlowsTbody.appendChild(document.createElement('tr'));
-      tr.appendChild(document.createElement('td')).appendChild(document.createTextNode(flowId));
+      tr.appendChild(document.createElement('td')).appendChild(document.createTextNode(flowName));
+      tr.appendChild(document.createElement('td')).appendChild(document.createTextNode(flow.publishUserName));
 
       const actionTd = tr.appendChild(document.createElement('td'));
       actionTd.classList.add('actions');
       const installButton = actionTd.appendChild(document.createElement('button'));
       installButton.innerHTML = 'Install';
       installButton.onclick = async () => {
-        const existingFlow = await xibleWrapper.Flow.getById(flowId);
+        const existingFlow = await xibleWrapper.Flow.getById(flowName);
         if (!existingFlow) {
-          installFlowByName(flowId);
+          installFlowByPublisherAndName(flow.publishUserName, flowName);
         } else {
           const overwritePrompt = customPrompt(`
             <h1>Flow already exists</h1>
@@ -165,11 +168,11 @@ View.routes['/flows'] = (EL) => {
             </p>
           `, 'Confirm');
 
-          overwritePrompt.form.querySelector('span').appendChild(document.createTextNode(flowId));
+          overwritePrompt.form.querySelector('span').appendChild(document.createTextNode(flowName));
 
           overwritePrompt.form.addEventListener('submit', () => {
             overwritePrompt.remove();
-            installFlowByName(flowId);
+            installFlowByPublisherAndName(flow.publishUserName, flowName);
           });
         }
       };
