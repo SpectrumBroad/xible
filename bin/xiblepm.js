@@ -26,8 +26,8 @@ const fs = require('fs');
 const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
+const { Writable } = require('stream');
 const Xible = require('../index.js');
-const {Writable} = require('stream');
 
 // option parsing
 const knownOpts = {
@@ -41,7 +41,7 @@ const shortHands = {
   f: '--force'
 };
 const opts = nopt(knownOpts, shortHands);
-const {remain} = opts.argv;
+const { remain } = opts.argv;
 const context = remain.shift() || 'help';
 const command = remain.shift();
 
@@ -186,7 +186,7 @@ const cli = {
         if (!xible.Flow.validateId(altFlowId)) {
           throw 'flow _id/name cannot contain reserved/unsave characters';
         }
-        flowJson = { ...flowJson};
+        flowJson = { ...flowJson };
         flowJson._id = altFlowId;
         flowJson.name = altFlowId;
       }
