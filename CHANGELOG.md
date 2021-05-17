@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+### Added
+-   It is now possible to `xiblepm flow install <user>/<flow>` instead of `xiblepm flow install <flow> --publish-user-name=<user>`. `xiblepm flow search` returns a list in the same format.
+
 ### Fixed
 -   Calling [node.getData()](https://xible.io/docs/api/node#node.getData) on a node that has no [dataStructure](https://xible.io/docs/guides/nodes/data#structure), would throw.
 

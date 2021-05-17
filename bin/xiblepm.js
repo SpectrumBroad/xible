@@ -223,10 +223,17 @@ const cli = {
         throw 'Your config does not allow to install flows from the registry';
       }
 
-      const publishUserName = opts.publishusername
-        || opts['publish-user-name']
-        || opts.publishuser
-        || opts['publish-user'];
+      // split the publishUserName from the flowName
+      let publishUserName;
+      if (flowName.includes('/')) {
+        publishUserName = flowName.substring(0, flowName.indexOf('/'));
+        flowName = flowName.substring(flowName.indexOf('/') + 1);
+      } else {
+        publishUserName = opts.publishusername
+          || opts['publish-user-name']
+          || opts.publishuser
+          || opts['publish-user'];
+      }
       if (!publishUserName) {
         throw 'A --publish-user-name must be provided';
       }
@@ -275,7 +282,7 @@ const cli = {
         .search(str)
         .then((flows) => {
           flows.forEach((flow) => {
-            log(`${flow.name}: by ${flow.publishUserName}`);
+            log(`${flow.publishUserName}/${flow.name}`);
           });
         });
     }
