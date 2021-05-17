@@ -1,6 +1,6 @@
 'use strict';
 
-const {EventEmitter} = require('events');
+const { EventEmitter } = require('events');
 const os = require('os');
 const fs = require('fs');
 const debug = require('debug');
@@ -353,7 +353,7 @@ class Xible extends EventEmitter {
 
       // setup client requests over https
       const spdy = require('spdy');
-      const {expressApp} = this;
+      const { expressApp } = this;
 
       // editor
       expressApp.use(this.express.static(`${__dirname}/editor`, {
@@ -367,7 +367,7 @@ class Xible extends EventEmitter {
 
       const onListen = (webServer) => {
         const address = webServer.address();
-        const {port} = address;
+        const { port } = address;
 
         expressDebug(`listening on: ${address.address}:${port}`);
 
@@ -509,14 +509,14 @@ class Xible extends EventEmitter {
           break;
 
         case 'xible.node.updateProgressBarById':
-          copyMessage = { ...message};
+          copyMessage = { ...message };
           copyMessage.method = 'xible.node.addProgressBar';
           this.setPersistentWebSocketMessage(copyMessage);
 
           break;
 
         case 'xible.node.updateStatusById':
-          copyMessage = { ...message};
+          copyMessage = { ...message };
           copyMessage.method = 'xible.node.addStatus';
           this.setPersistentWebSocketMessage(copyMessage);
 
@@ -559,7 +559,7 @@ class Xible extends EventEmitter {
     if (!obj || !obj.name) {
       throw new Error('Argument needs to be an object with a name parameter');
     }
-    const {name} = obj;
+    const { name } = obj;
 
     // check if a similar node with the same name doesn't already exist
     if (this.nodes[name]) {
