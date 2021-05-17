@@ -1,6 +1,6 @@
 'use strict';
 
-const {EventEmitter} = require('events');
+const { EventEmitter } = require('events');
 const debug = require('debug');
 const fs = require('fs');
 const path = require('path');
@@ -331,10 +331,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           this.runnable = false;
         } else {
           // init a working node
-          xibleNode = new XIBLE.Node({ ...nodeConstr, _id: node._id,
-            data: Object.assign({}, node.data),
+          xibleNode = new XIBLE.Node({
+            ...nodeConstr,
+            _id: node._id,
+            data: { ...node.data },
             left: node.left,
-            top: node.top});
+            top: node.top
+          });
 
           if (!xibleNode) {
             throw new Error(`Could not construct node '${node.name}'`);
@@ -618,7 +621,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       const statuses = Flow.getStatuses();
       const startedInstances = this.instances
         .filter(
-          instance => instance.state === XIBLE.FlowInstance.STATE_STARTED && !instance.directed
+          (instance) => instance.state === XIBLE.FlowInstance.STATE_STARTED && !instance.directed
         );
 
       if (!startedInstances.length) {
@@ -683,7 +686,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       if (this.initLevel === Flow.INITLEVEL_FLOW && this.emptyInitInstance) {
-        const {emptyInitInstance} = this;
+        const { emptyInitInstance } = this;
         emptyInitInstance.params = params;
         emptyInitInstance.directNodes = directNodes;
         this.emptyInitInstance.removeEmptyInitInstanceListeners();
