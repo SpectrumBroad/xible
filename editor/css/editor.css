@@ -8,7 +8,7 @@
 }
 
 .view.editor .top header {
-  width: 240px;
+  flex: 0 0 208px;
 }
 
 .view.editor > .bottom {
@@ -36,6 +36,10 @@
 }
 
 @media (max-width: 1023px) and (min-width: 1px) {
+  .view.editor .top header {
+    flex: 0 0 148px;
+  }
+
   .view.editor > .bottom.column #sub .interactions {
     width: 180px;
   }

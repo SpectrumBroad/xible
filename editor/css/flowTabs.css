@@ -1,4 +1,6 @@
 .flowList {
+  min-width: 1px;
+  flex-shrink: 1;
   width: 100%;
   margin: 0;
   padding: 0;
