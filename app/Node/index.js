@@ -411,7 +411,8 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
       // get values from related inputs
       if (
-        this.dataStructure[dataName]
+        this.dataStructure
+        && this.dataStructure[dataName]
         && this.dataStructure[dataName].input
         && this.dataStructure[dataName].input.name
       ) {

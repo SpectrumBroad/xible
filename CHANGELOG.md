@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Fixed
+-   Calling [node.getData()](https://xible.io/docs/api/node#node.getData) on a node that has no [dataStructure](https://xible.io/docs/guides/nodes/data#structure), would throw.
 
 ## [0.25.0][] - 2021-05-16
 ### Changed
