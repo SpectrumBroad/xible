@@ -14,6 +14,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
       || !Array.isArray(req.body.nodes)
       || !Array.isArray(req.body.connectors)
       || !FLOW.validateId(req.body._id)
+      || XIBLE.getFlows()[req.body._id]
     ) {
       res.status(400).end();
       return;
