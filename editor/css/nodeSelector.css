@@ -179,7 +179,8 @@
   padding: 12px;
 }
 
-#nodeSelector>ul>li:hover {
+#nodeSelector > ul > li:hover,
+#nodeSelector > ul > li.selected {
   background-color: #45679E;
   color: #fff;
 }

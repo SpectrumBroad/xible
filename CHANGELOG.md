@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The UI has an option to publish flows from the 'Flows' page. This acts similarly as the command line [`xiblepm flow publish <flowname>`](https://xible.io/docs/commandlinetools/xiblepm#flow.publish).
 
+-   It is now possible to navigate the node selector within the editor using the up and down keys to select different nodes, and the space key to insert a node.
+
 ### Changed
 -   The `.xiblerc.json` file location is now configurable in the config.json and as a result through the [`xible config` command](https://xible.io/docs/commandlinetools/xible#xible).
 
