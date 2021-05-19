@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   The CLI command `xiblepm flow delete <flowname>` has been added to delete a flow which is published to the registry. The [documentation](https://xible.io/docs/commandlinetools/xiblepm#flow.delete) has been updated.
 
+### Changed
+-   The `.xiblerc.json` file location is now configurable in the config.json and as a result through the [`xible config` command](https://xible.io/docs/commandlinetools/xible#xible).
+
 ### Fixed
 -   Calling [node.getData()](https://xible.io/docs/api/node#node.getData) on a node that has no [dataStructure](https://xible.io/docs/guides/nodes/data#structure), would throw.
 
