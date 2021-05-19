@@ -514,6 +514,8 @@ class XibleEditorNodeSelector {
 
       this.addNodeOnEvent(node, event);
 
+      this.xibleEditor.initDrag(event);
+
       event.stopPropagation();
 
       this.close();
@@ -538,7 +540,6 @@ class XibleEditorNodeSelector {
 
     this.xibleEditor.deselect();
     this.xibleEditor.select(editorNode);
-    this.xibleEditor.initDrag(event);
   }
 
   /**
