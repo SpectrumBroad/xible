@@ -241,7 +241,11 @@ View.routes['/flows'] = (EL) => {
     tr.appendChild(document.createElement('td')).appendChild(document.createTextNode(flow._id));
 
     function trOnClick(event) {
-      if (event && event.target && XibleEditor.inputElementNameList.includes(event.target.nodeName)) {
+      if (
+        event
+        && event.target
+        && XibleEditor.inputElementNameList.includes(event.target.nodeName)
+      ) {
         return;
       }
 
