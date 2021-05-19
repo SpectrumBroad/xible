@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 -   It is now possible to `xiblepm flow install <user>/<flow>` instead of `xiblepm flow install <flow> --publish-user-name=<user>`. `xiblepm flow search` returns a list in the same format.
 
+-   Whenever a nodepack is under development and the package.json name attribute does not start with 'xible-np-' or 'xible-nodepack-', a warning is thrown, indicating that the nodepack cannot be published to the registry.
+
 ### Fixed
 -   Calling [node.getData()](https://xible.io/docs/api/node#node.getData) on a node that has no [dataStructure](https://xible.io/docs/guides/nodes/data#structure), would throw.
 

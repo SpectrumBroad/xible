@@ -101,6 +101,13 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         return null;
       }
 
+      if (
+        packageJson.name.substring(0, 15) !== 'xible-nodepack-'
+        && packageJson.name.substring(0, 9) !== 'xible-np-'
+      ) {
+        nodePackDebug(`Package "${packageJson.name}" cannot be published. The package.json "name" attribute should start with "xible-np-" or "xible-nodepack-".`);
+      }
+
       return new NodePack({
         name: nodePackName,
         version: packageJson.version,
