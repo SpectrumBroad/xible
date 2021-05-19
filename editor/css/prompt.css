@@ -30,3 +30,14 @@
   font-size: 1.2em;
   margin: 20px 0 20px 0;
 }
+
+.prompt ul.error {
+  border: 1px solid rgba(255, 0, 0, 0.6);
+  background-color: rgba(255, 0, 0, 0.2);
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.prompt ul.error:empty {
+  display: none;
+}

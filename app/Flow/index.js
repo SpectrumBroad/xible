@@ -301,7 +301,9 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       // only perform this filename check in master for performance reasons
       if (!XIBLE.child) {
         if (!Flow.validateId(json._id)) {
-          throw new Error('flow _id/name cannot contain reserved/unsave characters');
+          const err = new Error('flow _id/name cannot contain reserved/unsave characters');
+          err.code = 'ERR_FLOW_NAMING';
+          throw err;
         }
       }
 
@@ -780,7 +782,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       if (altName) {
         if (!Flow.validateId(altName)) {
           const err = new Error('flow _id/name cannot contain reserved/unsave characters');
-          err.code = 'ERR_NAMING';
+          err.code = 'ERR_FLOW_NAMING';
           throw err;
         }
         flowJson = { ...this.json };

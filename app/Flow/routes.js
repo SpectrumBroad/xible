@@ -101,7 +101,17 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
   // publish
   EXPRESS_APP.patch('/api/flows/:flowId/publish', async (req, res) => {
-    await req.locals.flow.publish();
+    let altName;
+    if (req.body != null && req.body.altName != null) {
+      altName = req.body.altName;
+    }
+
+    try {
+      await req.locals.flow.publish(altName);
+    } catch (err) {
+      res.status(400).json(err).end();
+    }
+
     res.end();
   });
 

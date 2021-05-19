@@ -30,22 +30,36 @@ function customPrompt(fragment, noAuto) {
   });
 
   if (!noAuto || typeof noAuto === 'string') {
-    const submitButton = form.appendChild(document.createElement('input'));
+    const submitButton = form.appendChild(document.createElement('button'));
     submitButton.setAttribute('type', 'submit');
-    submitButton.value = noAuto || 'Submit';
+    submitButton.innerHTML = noAuto || 'Submit';
 
-    const cancelButton = form.appendChild(document.createElement('input'));
+    const cancelButton = form.appendChild(document.createElement('button'));
     cancelButton.setAttribute('type', 'button');
-    cancelButton.value = 'Cancel';
+    cancelButton.innerHTML = 'Cancel';
     cancelButton.addEventListener('click', remove);
   }
+
+  const errors = {
+    list: [],
+    add: (err) => {
+      errors.list.push(err);
+      const errorLi = errorUl.appendChild(document.createElement('li'));
+      errorLi.appendChild(document.createTextNode(err));
+    }
+  }
+
+  const errorUl = form.appendChild(document.createElement('ul'));
+  errorUl.classList.add('error');
   document.body.appendChild(container);
 
   // auto focus first input element
-  const firstInput = container.querySelector('input, select');
+  const firstInput = container.querySelector('input, textarea, select, button');
   if (firstInput) {
     firstInput.focus();
   }
 
-  return { container, form, remove };
+  return {
+    container, form, remove, errors
+  };
 }

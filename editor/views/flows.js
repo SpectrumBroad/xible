@@ -288,6 +288,10 @@ View.routes['/flows'] = (EL) => {
     const actionTd = tr.appendChild(document.createElement('td'));
     actionTd.classList.add('actions');
 
+    const publishButton = actionTd.appendChild(document.createElement('button'));
+    publishButton.innerHTML = 'Publish';
+    publishButton.onclick = () => publishFlow(flow);
+
     const editButton = actionTd.appendChild(document.createElement('button'));
     editButton.innerHTML = 'Edit';
     editButton.onclick = () => {

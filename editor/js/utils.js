@@ -181,3 +181,47 @@ function deleteFlow(flow) {
     flow.delete();
   });
 }
+
+function publishFlow(flow) {
+  const publishPrompt = customPrompt(`
+    <h1>Publish flow</h1>
+    <p>
+      You are about to publish flow &quot;<span style="font-weight: bold;"></span>&quot;.
+      Any information contained within your vault will not be published.
+    </p>
+    <section>
+      <h2>Publish information</h2>
+      <dl>
+        <dt>
+          <label>
+            Published name
+            <div>
+              You can specify the name of the flow when published here.
+            </div>
+          </label>
+        </dt>
+        <dd>
+          <input type="text" id="publishFlowAltName" />
+        </dd>
+      </dl>
+    </section>
+  `, 'Confirm');
+
+  publishPrompt.form.querySelector('span').appendChild(document.createTextNode(flow._id));
+  const publishFlowAltNameInput = document.getElementById('publishFlowAltName');
+  publishFlowAltNameInput.value = flow._id;
+
+  publishPrompt.form.addEventListener('submit', async () => {
+    const submitButton = publishPrompt.form.querySelector('button[type=submit]');
+    submitButton.classList.add('loading');
+    submitButton.disabled = true;
+
+    try {
+      await flow.publish(publishFlowAltNameInput.value || undefined);
+
+      publishPrompt.remove();
+    } catch (err) {
+      publishPrompt.errors.add(err);
+    }
+  });
+}

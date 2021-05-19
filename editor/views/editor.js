@@ -212,7 +212,7 @@ function editorView(EL) {
             </dd>
           </dl>
         </section>
-        <input type="button" value="Close" />
+        <button type="button">Close</button>
       `, true);
 
       for (const browserSupportItem in xibleEditor.browserSupportItems) {
@@ -225,7 +225,7 @@ function editorView(EL) {
         }
       }
 
-      detailPrompt.form.querySelector('input').addEventListener('click', () => {
+      detailPrompt.form.querySelector('button').addEventListener('click', () => {
         detailPrompt.remove();
       });
     });
