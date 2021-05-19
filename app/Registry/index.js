@@ -3,12 +3,15 @@
 const XibleRegistryWrapper = require('xible-registry-wrapper');
 const fsExtra = require('fs-extra');
 const os = require('os');
+const url = require('url');
 
 module.exports = (XIBLE, EXPRESS_APP) => {
   const registryUrl = XIBLE.Config.getValue('registry.url');
   if (!registryUrl) {
     throw new Error('"registry.url" not found in config');
   }
+
+  const rcPath = XIBLE.resolvePath(XIBLE.Config.getValue('rc.path') || '~/.xiblerc.json');
 
   const xibleRegistry = new XibleRegistryWrapper(registryUrl);
 
@@ -31,6 +34,50 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         resolve();
       });
     });
+  }
+
+  // determine the stripped registry url
+  function getStrippedRegistryUrl() {
+    const parsedRegistryUrl = url.parse(registryUrl);
+    delete parsedRegistryUrl.protocol;
+    delete parsedRegistryUrl.auth;
+    delete parsedRegistryUrl.query;
+    delete parsedRegistryUrl.search;
+    delete parsedRegistryUrl.hash;
+    return url.resolve(url.format(parsedRegistryUrl), '.');
+  }
+  xibleRegistry.getStrippedRegistryUrl = getStrippedRegistryUrl;
+
+  xibleRegistry.getUserToken = function getUserToken() {
+    const regUrl = getStrippedRegistryUrl();
+    try {
+      const rc = require(rcPath);
+      return rc[regUrl] && rc[regUrl].token;
+    } catch (err) {
+      return null;
+    }
+  };
+
+  xibleRegistry.setUserToken = async function setUserToken(token) {
+    const regUrl = getStrippedRegistryUrl();
+    let rc = {};
+    try {
+      rc = require(rcPath);
+    } catch (err) {
+      // doesn't exist
+    }
+
+    if (!rc[regUrl]) {
+      rc[regUrl] = {};
+    }
+    rc[regUrl].token = token;
+
+    fsExtra.writeFileSync(rcPath, JSON.stringify(rc, null, '\t'));
+  };
+
+  const userToken = xibleRegistry.getUserToken();
+  if (userToken) {
+    xibleRegistry.setToken(userToken);
   }
 
   /**

@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Whenever a nodepack is under development and the package.json name attribute does not start with 'xible-np-' or 'xible-nodepack-', a warning is thrown, indicating that the nodepack cannot be published to the registry.
 
+-   The CLI command `xiblepm flow delete <flowname>` has been added to delete a flow which is published to the registry. The [documentation](https://xible.io/docs/commandlinetools/xiblepm#flow.delete) has been updated.
+
 ### Fixed
 -   Calling [node.getData()](https://xible.io/docs/api/node#node.getData) on a node that has no [dataStructure](https://xible.io/docs/guides/nodes/data#structure), would throw.
 

@@ -766,6 +766,53 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return this;
     }
 
+    /**
+     * Publishes the flow to the registry.
+     */
+    async publish(altName) {
+      if (!XIBLE.Config.getValue('registry.flows.allowpublish')) {
+        const err = new Error('Your config does not allow to publish flows to the registry');
+        err.code = 'ERR_CONFIG';
+        throw err;
+      }
+
+      let flowJson = this.json;
+      if (altName) {
+        if (!Flow.validateId(altName)) {
+          const err = new Error('flow _id/name cannot contain reserved/unsave characters');
+          err.code = 'ERR_NAMING';
+          throw err;
+        }
+        flowJson = { ...this.json };
+        flowJson._id = altName;
+        flowJson.name = altName;
+      }
+
+      // verify that we have a token
+      const token = XIBLE.Registry.getUserToken();
+      if (!token) {
+        const err = new Error('Not logged in.');
+        err.code = 'ERR_REGISTRY_NOT_LOGGED_IN';
+        throw err;
+      }
+
+      // verify that we're logged in
+      return XIBLE.Registry.User
+        .getByToken(token)
+        .catch((getUserErr) => Promise.reject(new Error(`Failed to get user from token: ${getUserErr}`)))
+        .then((user) => {
+          if (!user) {
+            const err = new Error('User could not be verified. Please login using "xiblepm user login".');
+            err.code = 'ERR_REGISTRY_NOT_LOGGED_IN';
+            return Promise.reject(err);
+          }
+
+          // publish
+          return XIBLE.Registry.Flow
+            .publish(flowJson);
+        });
+    }
+
     emit(eventName, obj) {
       super.emit(eventName, obj);
 

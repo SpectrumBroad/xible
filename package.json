@@ -75,7 +75,7 @@
     "xible-np-object": "^0.2.0",
     "xible-np-string": "*",
     "xible-np-xible": "^0.2.0",
-    "xible-registry-wrapper": "^0.7.0",
+    "xible-registry-wrapper": "^0.8.0",
     "xible-wrapper": "^0.14.0"
   },
   "devDependencies": {

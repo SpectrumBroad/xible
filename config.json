@@ -6,6 +6,10 @@
     }
   },
 
+  "rc": {
+    "path": "~/.xiblerc.json"
+  },
+
   "nodes": {
     "path": "~/.xible/nodes"
   },

@@ -21,9 +21,7 @@ if (typeof WScript !== 'undefined') {
 process.title = 'xible package manager';
 
 // basic requires
-const os = require('os');
 const fs = require('fs');
-const url = require('url');
 const readline = require('readline');
 const nopt = require('nopt');
 const { Writable } = require('stream');
@@ -63,45 +61,6 @@ const {
   log,
   logError
 } = require('./log');
-
-// determine the stripped registry url
-function getStrippedRegistryUrl() {
-  const registryUrl = xible.Config.getValue('registry.url');
-  const parsedRegistryUrl = url.parse(registryUrl);
-  delete parsedRegistryUrl.protocol;
-  delete parsedRegistryUrl.auth;
-  delete parsedRegistryUrl.query;
-  delete parsedRegistryUrl.search;
-  delete parsedRegistryUrl.hash;
-  return url.resolve(url.format(parsedRegistryUrl), '.');
-}
-
-function getUserToken() {
-  const regUrl = getStrippedRegistryUrl();
-  try {
-    const rc = require(`${os.homedir()}/.xiblerc.json`);
-    return rc[regUrl] && rc[regUrl].token;
-  } catch (err) {
-    return null;
-  }
-}
-
-function setUserToken(token) {
-  const regUrl = getStrippedRegistryUrl();
-  let rc = {};
-  try {
-    rc = require(`${os.homedir()}/.xiblerc.json`);
-  } catch (err) {
-    // doesn't exist
-  }
-
-  if (!rc[regUrl]) {
-    rc[regUrl] = {};
-  }
-  rc[regUrl].token = token;
-
-  fs.writeFileSync(`${os.homedir()}/.xiblerc.json`, JSON.stringify(rc, null, '\t'));
-}
 
 class MutableWritable extends Writable {
   constructor(...args) {
@@ -151,22 +110,12 @@ function getUserInput(question, pwd) {
   });
 }
 
-// set the user token if there is one
-const userToken = getUserToken();
-if (userToken) {
-  xible.Registry.setToken(userToken);
-}
-
 // cli context and commands
 const cli = {
   flow: {
     async publish(flowName) {
       if (!flowName) {
-        throw 'The flow name must be provided';
-      }
-
-      if (!xible.Config.getValue('registry.flows.allowpublish')) {
-        throw 'Your config does not allow to publish flows to the registry';
+        throw 'The flow name must be provided.';
       }
 
       let flowPath = xible.Config.getValue('flows.path');
@@ -180,47 +129,42 @@ const cli = {
         throw `No such flow "${flowName}"`;
       }
 
-      let flowJson = flow.json;
-      const altFlowId = opts.altname;
-      if (altFlowId) {
-        if (!xible.Flow.validateId(altFlowId)) {
-          throw 'flow _id/name cannot contain reserved/unsave characters';
+      try {
+        const publishedFlow = await flow.publish(opts.altname || opts['alt-name']);
+        log(`Published flow "${publishedFlow.name}".`);
+      } catch (err) {
+        if (err.code === 'ERR_REGISTRY_NOT_LOGGED_IN') {
+          throw 'You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.';
         }
-        flowJson = { ...flowJson };
-        flowJson._id = altFlowId;
-        flowJson.name = altFlowId;
+
+        throw err;
+      }
+    },
+    async delete(flowName) {
+      if (!flowName) {
+        throw 'The flow name must be provided.';
       }
 
-      // verify that we have a token
-      const token = getUserToken();
+      const token = xible.Registry.getUserToken();
       if (!token) {
         throw 'You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.';
       }
 
-      // verify that we're logged in
-      return xible.Registry.User
-        .getByToken(token)
-        .catch((getUserErr) => Promise.reject(`Failed to get user from token: ${getUserErr}`))
-        .then((user) => {
-          if (!user) {
-            return Promise.reject('User could not be verified. Please login using "xiblepm user login".');
-          }
+      const regUser = await xible.Registry.User.getByToken(token);
 
-          // publish
-          return xible.Registry.Flow
-            .publish(flowJson)
-            .then((publishedFlow) => {
-              log(`Published flow "${publishedFlow.name}".`);
-            });
-        });
+      await regUser.deleteFlowByName(
+        flowName
+      );
+
+      log(`Deleted flow "${flowName}".`);
     },
     async install(flowName) {
       if (!flowName) {
-        throw 'The flow name must be provided';
+        throw 'The flow name must be provided.';
       }
 
       if (!xible.Config.getValue('registry.flows.allowinstall')) {
-        throw 'Your config does not allow to install flows from the registry';
+        throw 'Your config does not allow to install flows from the registry.';
       }
 
       // split the publishUserName from the flowName
@@ -235,17 +179,17 @@ const cli = {
           || opts['publish-user'];
       }
       if (!publishUserName) {
-        throw 'A --publish-user-name must be provided';
+        throw 'A --publish-user-name must be provided.';
       }
 
       const altFlowName = opts.altname || opts['alt-name'];
       if (altFlowName && !xible.Flow.validateId(altFlowName)) {
-        throw 'flow _id/name cannot contain reserved/unsave characters';
+        throw 'flow _id/name cannot contain reserved/unsave characters.';
       }
 
       let flowPath = xible.Config.getValue('flows.path');
       if (!flowPath) {
-        throw 'no "flows.path" configured';
+        throw 'no "flows.path" configured.';
       }
       flowPath = xible.resolvePath(flowPath);
       await xible.Flow.initFromPath(flowPath);
@@ -256,7 +200,7 @@ const cli = {
         flowName
       );
       if (!registryFlow) {
-        throw `Flow "${flowName}" does not exist`;
+        throw `Flow "${flowName}" does not exist.`;
       }
 
       // check if the flow already exists
@@ -271,7 +215,7 @@ const cli = {
         altFlowName
       });
 
-      log(`Installed flow "${altFlowName || registryFlow.name}"`);
+      log(`Installed flow "${altFlowName || registryFlow.name}".`);
     },
     search(str) {
       if (!str) {
@@ -328,7 +272,7 @@ const cli = {
           }
 
           // verify that we have a token
-          const token = getUserToken();
+          const token = xible.Registry.getUserToken();
           if (!token) {
             reject('You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.');
             return;
@@ -526,7 +470,7 @@ module.exports = (NODE) => {
       return this.whoami();
     },
     async whoami() {
-      const token = getUserToken();
+      const token = xible.Registry.getUserToken();
 
       if (!token) {
         log('Not logged in.');
@@ -542,7 +486,7 @@ module.exports = (NODE) => {
       log(user.name);
     },
     async logout() {
-      const token = getUserToken();
+      const token = xible.Registry.getUserToken();
       if (!token) {
         throw 'You are not logged in. Run "xiblepm user login" or "xiblepm user add" to create a new user.';
       }
@@ -552,10 +496,10 @@ module.exports = (NODE) => {
         await regUser.deleteToken(token);
       }
 
-      setUserToken(null);
+      await xible.Registry.setUserToken(null);
     },
     async login() {
-      const oldToken = getUserToken();
+      const oldToken = xible.Registry.getUserToken();
 
       const user = new xible.Registry.User();
 
@@ -584,9 +528,9 @@ module.exports = (NODE) => {
         }
       }
 
-      await setUserToken(token);
+      await xible.Registry.setUserToken(token);
 
-      const strippedRegUrl = getStrippedRegistryUrl();
+      const strippedRegUrl = xible.Registry.getStrippedRegistryUrl();
       log(`Logged in as "${userName}" on "${strippedRegUrl}".`);
     },
     create() {
@@ -665,9 +609,9 @@ module.exports = (NODE) => {
         throw 'No token returned.';
       }
 
-      await setUserToken(token);
+      await xible.Registry.setUserToken(token);
 
-      const strippedRegUrl = getStrippedRegistryUrl();
+      const strippedRegUrl = xible.Registry.getStrippedRegistryUrl();
       log(`Logged in as "${userName}" on "${strippedRegUrl}".`);
     }
   }

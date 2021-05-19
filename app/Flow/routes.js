@@ -99,6 +99,12 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     res.end();
   });
 
+  // publish
+  EXPRESS_APP.patch('/api/flows/:flowId/publish', async (req, res) => {
+    await req.locals.flow.publish();
+    res.end();
+  });
+
   // stop all instances
   EXPRESS_APP.patch('/api/flows/:flowId/stop', async (req, res) => {
     await req.locals.flow.stopAllInstances();
