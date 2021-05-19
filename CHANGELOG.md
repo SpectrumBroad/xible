@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.26.0][] - 2021-05-19
 ### Added
 -   It is now possible to `xiblepm flow install <user>/<flow>` instead of `xiblepm flow install <flow> --publish-user-name=<user>`. `xiblepm flow search` returns a list in the same format.
 
@@ -468,7 +471,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.25.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.26.0...HEAD
+[0.26.0]: https://github.com/SpectrumBroad/xible/compare/v0.25.0...v0.26.0
 [0.25.0]: https://github.com/SpectrumBroad/xible/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/SpectrumBroad/xible/compare/v0.23.2...v0.24.0
 [0.23.2]: https://github.com/SpectrumBroad/xible/compare/v0.23.1...v0.23.2
