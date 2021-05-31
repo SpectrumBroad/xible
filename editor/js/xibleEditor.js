@@ -660,6 +660,8 @@ class XibleEditor extends EventEmitter {
   transform() {
     this.editorElement.style.transform = `translate(${this.left}px, ${this.top}px) scale(${this.zoom})`;
     this.element.style.backgroundPosition = `${this.backgroundLeft}px ${this.backgroundTop}px`;
+
+    this.emit('transform');
   }
 
   /**
