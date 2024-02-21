@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
-Nothing notable at the moment.
+### Changed
+- Upgrade Cypress for E2E testing.
 
 ## [0.26.0][] - 2021-05-19
 ### Added
