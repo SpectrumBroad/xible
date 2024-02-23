@@ -692,7 +692,7 @@ function editorView(EL) {
             </label>
           </dt>
           <dd>
-            <input type="text" id="newFlowName" required="required" pattern="^[^_/\\\\:?&lt;&gt;&quot;&apos;][^/\\\\:?&lt;&gt;&quot;&apos;]+$" />
+            <input type="text" id="newFlowName" required="required" pattern="^[^_\\/\\\\:?&lt;&gt;&quot;&apos;][^\\/\\\\:?&lt;&gt;&quot;&apos;]+$" />
           </dd>
         </dl>
       </section>

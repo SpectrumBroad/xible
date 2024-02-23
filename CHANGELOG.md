@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Updated minumum Node.JS version to 20.
 
+### Fixed
+- The pattern validation for the name of a new flow in the browser was not escaped properly.
+
 ## [0.26.0][] - 2021-05-19
 ### Added
 -   It is now possible to `xiblepm flow install <user>/<flow>` instead of `xiblepm flow install <flow> --publish-user-name=<user>`. `xiblepm flow search` returns a list in the same format.
