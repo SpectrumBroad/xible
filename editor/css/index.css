@@ -94,7 +94,7 @@ nav>ul {
   padding: 0;
   background-color: #eee;
   color: #666;
-  width: 100px;
+  width: 60px;
   height: 100%;
   position: relative;
 }
@@ -111,7 +111,7 @@ nav>ul::before {
 }
 
 nav>ul>li {
-  height: 100px;
+  height: 60px;
   width: 100%;
   font-weight: bold;
   position: relative;
@@ -147,7 +147,7 @@ nav>ul>li>a:focus, nav>ul>li>a:target, nav>ul>li>a.view {
 
 nav>ul>li>a>span {
   font-weight: normal;
-  font-size: 2.8em;
+  font-size: 1.6em;
   font-family: dripicons;
   margin-bottom: 6px;
 }
@@ -158,7 +158,7 @@ nav>ul>li.editor>a>span {
 
 @media (max-width: 1279px) and (min-height: 1px) {
   nav>ul {
-    width: 28px;
+    width: 24px;
   }
 
   nav>ul>li {
