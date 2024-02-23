@@ -1,12 +1,13 @@
 {
   "parserOptions": {
-    "sourceType": "script"
+    "sourceType": "script",
+    "ecmaVersion": 13
   },
   "extends": "airbnb-base",
   "env": {
     "browser": false,
     "node": true,
-    "es2020": true
+    "es2022": true
   },
   "rules": {
     "global-require": "off",
@@ -16,7 +17,6 @@
     "no-mixed-operators": "off",
     "no-multi-assign": "warn",
     "default-case": "off",
-    "strict": ["error", "global"],
     "no-console": "off",
     "no-continue": "off",
     "guard-for-in": "off",
