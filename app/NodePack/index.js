@@ -179,7 +179,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
      * Fetches a nodePack by the given name,
      * @param {String} name
-     * @returns {Promise.<NodePack|null>}
+     * @returns {Promise<NodePack|null>}
      */
     static async getByName(name) {
       const nodePacks = await this.getAll();
@@ -278,7 +278,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
      * Removes the nodePack from the XIBLE installation.
-     * @returns {Promise.<NodePack>} Returns the nodePack itself.
+     * @returns {Promise<NodePack>} Returns the nodePack itself.
      * The path parameter will be set to null.
      */
     async remove() {

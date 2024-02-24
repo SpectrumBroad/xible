@@ -28,6 +28,8 @@ const Xible = require('../index.js');
 
 // option parsing
 const knownOpts = {
+  'flow-store-type': String,
+  'connection-string': String,
   config: String,
   user: String,
   group: String,
@@ -47,9 +49,13 @@ const context = remain.shift() || 'help';
 const command = remain.shift();
 
 // get a xible instance
+const FLOW_STORE_TYPE = opts['flow-store-type'] || 'FileStore';
 const CONFIG_PATH = opts.config || '~/.xible/config.json';
+const CONNECTION_STRING = opts['connection-string'];
 const xible = new Xible({
-  configPath: CONFIG_PATH
+  flowStoreType: FLOW_STORE_TYPE,
+  configPath: CONFIG_PATH,
+  connectionString: CONNECTION_STRING
 });
 
 const {
@@ -81,7 +87,7 @@ async function loadNodes() {
  * Returns the found node by the given nodeId,
  * or null if not found.
  * @param {String} nodeId
- * @returns {Promise.<XIBLE.Node>}
+ * @returns {Promise<XIBLE.Node>}
  */
 async function getNodeById(nodeId) {
   const flows = await getFlows();
@@ -115,7 +121,7 @@ async function loadFlows() {
 /**
 * Returns a flow by the given id/name.
 * Rejects if no flows.path is configured in the xible instance.
-* @returns {Promise.<XIBLE.Flow[]>}
+* @returns {Promise<XIBLE.Flow[]>}
 */
 async function getFlows() {
   await loadFlows();
@@ -125,7 +131,7 @@ async function getFlows() {
 /**
 * Returns a flow by the given id/name.
 * Rejects if no flows.path is configured in the xible instance.
-* @returns {Promise.<XIBLE.Flow>}
+* @returns {Promise<XIBLE.Flow>}
 */
 async function getFlowById(flowId) {
   if (!flowId) {
@@ -226,7 +232,7 @@ const cli = {
       // store the value in either the flow or vault
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
-        node.vault.set(Object.assign(node.vault.get() || {}, {
+        await node.vault.set(Object.assign((await node.vault.get()) || {}, {
           [arg]: value
         }));
       } else {
@@ -262,14 +268,14 @@ const cli = {
       // delete the value from either the flow or vault
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
-        const vaultObj = node.vault.get() || {};
+        const vaultObj = (await node.vault.get()) || {};
         delete vaultObj[arg];
-        node.vault.set(vaultObj);
+        await node.vault.set(vaultObj);
       } else {
         delete node.data[arg];
 
         // save the flow
-        node.flow.save();
+        await node.flow.save();
       }
     },
     async get(arg) {
@@ -299,7 +305,7 @@ const cli = {
       let dataValue = '';
       const nodeVaultKeys = nodeConstr.vault;
       if (nodeVaultKeys && Array.isArray(nodeVaultKeys) && nodeVaultKeys.includes(arg)) {
-        dataValue = (node.vault.get() || {})[arg];
+        dataValue = ((await node.vault.get()) || {})[arg];
       } else {
         dataValue = node.data[arg];
       }

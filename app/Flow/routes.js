@@ -22,7 +22,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
     try {
       const flow = new FLOW();
-      flow.initJson(req.body, true);
+      await flow.initJson(req.body, true);
       await flow.save();
 
       res.json({
@@ -79,7 +79,7 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
 
     // init the newly provided json over the existing flow
     try {
-      flow.initJson(req.body, true);
+      await flow.initJson(req.body, true);
     } catch (err) {
       console.error(err);
     }

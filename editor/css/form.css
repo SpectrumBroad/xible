@@ -31,15 +31,15 @@ select::-ms-expand {
   display: none;
 }
 
-input, button {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
 input:focus, select:focus {
   outline: none;
   border: 2px solid #45679E;
   padding: 2px;
+}
+
+input:disabled,
+textarea:disabled {
+  color: #999;
 }
 
 /*
@@ -48,9 +48,7 @@ input:invalid {
 }
 */
 
-button,
-input[type="button"],
-input[type="submit"] {
+button {
   padding: 3px;
   border: 2px solid #000;
   border-width: 0 0 2px 0;
@@ -61,27 +59,19 @@ input[type="submit"] {
 }
 
 button:hover,
-input[type="button"]:hover,
-input[type="submit"]:hover,
-button:focus,
-input[type="button"]:focus,
-input[type="submit"]:focus {
+button:focus {
   outline: none;
   background-color: #5b7cb3;
 }
 
-button:active,
-input[type="button"]:active,
-input[type="submit"]:active {
+button:active {
   outline: none;
   border-width: 2px 0 0 0;
   border-color: rgb(30, 30, 30);
   background-color: #31599b;
 }
 
-button:disabled,
-input[type="button"]:disabled,
-input[type="submit"]:disabled {
+button:disabled {
   outline: none;
   border-width: 2px 0 0 0;
   border-color: rgb(30, 30, 30);

@@ -2,8 +2,6 @@
 
 const { EventEmitter } = require('events');
 const debug = require('debug');
-const fs = require('fs');
-const path = require('path');
 
 // lazy requires
 let sanitizePath;
@@ -68,44 +66,24 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Init flows from a given path.
     * This will parse all json files except for _status.json into flows.
     * Note that a path cannot be initiated twice because it is used for saveStatuses()
-    * @param {String} flowPath The path to the directory containing the flows.
     * @param {Boolean} cleanVault Indicates whether the json data from each flow
     * needs vault sanitizing.
-    * @return {Promise.<Object.<String, Flow>>} List of flows by their _id.
+    * @return {Promise<Object<String, Flow>>} List of flows by their _id.
     */
-    static async initFromPath(flowPath, cleanVault) {
-      flowDebug(`init flows from "${flowPath}"`);
-      if (this.flowPath) {
-        throw new Error(`cannot init multiple flow paths. "${this.flowPath}" already init`);
-      }
-      this.flowPath = flowPath;
+    static async getFlows(cleanVault) {
+      flowDebug('init flows');
 
-      // check that flowPath exists
-      if (!fs.existsSync(flowPath)) {
-        flowDebug(`creating "${flowPath}"`);
-        fs.mkdirSync(flowPath);
-      }
+      const flowJsons = await XIBLE.activeFlowStore.getFlowJsons();
 
       // will hold the flows by their _id
       const flows = {};
-
-      // get the files in the flowPath
-      let files;
-      try {
-        files = fs.readdirSync(flowPath);
-      } catch (err) {
-        flowDebug(`could not readdir "${flowPath}": ${err}`);
-        files = [];
-      }
-
-      await Promise.all(files.map(async (file) => {
+      await Promise.all(flowJsons.map(async (flowJson) => {
         try {
-          const flow = await this.initOneFromPath(flowPath, file, cleanVault);
-          if (flow) {
-            flows[flow._id] = flow;
-          }
+          const flow = new Flow();
+          await flow.initJson(flowJson, cleanVault);
+          flows[flow._id] = flow;
         } catch (err) {
-          flowDebug(`could not init "${file}": ${err.stack}`);
+          flowDebug(`could not init flow: ${err.stack}`);
         }
       }));
 
@@ -113,69 +91,36 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     }
 
     /**
-     * Init a single flow from a given path and filename.
-     * This will parse the json file into a flows.
-     * @param {String} flowPath The path to the directory containing the fileName.
-     * @param {String} fileName The name of the file to to parse.
-     * @param {Boolean} cleanVault Indicates whether the json data from each flow
+     * Init a single flow by its given name.
+     * @param {String} flowName The name of the flow.
+     * @param {Boolean} cleanVault Indicates whether the json data from each flow.
      * needs vault sanitizing.
-     * @returns {Promise.<Flow>} A single Flow object.
+     * @returns {Promise<Flow>} A single Flow object.
      * @since 0.16.0
      */
-    static initOneFromPath(flowPath, fileName, cleanVault) {
-      return new Promise((resolve, reject) => {
-        if (flowPath !== this.flowPath) {
-          reject(new Error(`flowPath "${this.flowPath}" already initialized and differs from "${flowPath}"`));
-          return;
-        }
+    static async getOneFlow(flowName, cleanVault) {
+      const flowJson = await XIBLE.activeFlowStore.getFlowJson(flowName);
 
-        const filePath = `${flowPath}/${fileName}`;
+      const flow = new Flow();
+      await flow.initJson(flowJson, cleanVault);
 
-        if (
-          fileName.substring(0, 1) !== '_'
-          && fileName.substring(0, 1) !== '.'
-          && fs.statSync(filePath).isFile()
-          && path.extname(filePath) === '.json'
-        ) {
-          fs.readFile(filePath, { encoding: 'utf8' }, (err, data) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-
-            try {
-              const json = JSON.parse(data);
-              if (json._id) {
-                const flow = new Flow();
-                flow.initJson(json, cleanVault);
-                resolve(flow);
-              }
-            } catch (flowParseErr) {
-              reject(flowParseErr);
-            }
-          });
-        } else {
-          resolve();
-        }
-      });
+      return flow;
     }
 
     /**
     * Initializes all flows from a given path, by running them through initFromPath().
     * Processes the related flow statuses and starts/inits where necessary.
-    * @param {String} flowPath The path to the directory containing the flows.
-    * @returns {Promise.<Object.<String, Flow>>} List of flows by their _id.
+    * @returns {Promise<Object<String, Flow>>} List of flows by their _id.
     * @since 0.5.0
     */
-    static async init(flowPath) {
-      const flows = await this.initFromPath(flowPath);
+    static async init() {
+      const flows = await this.getFlows();
 
       // start all flows which had status running before
-      // also do some cleaning while we're at it
-      const statuses = this.getStatuses();
+      const statuses = await XIBLE.activeFlowStore.getFlowInstanceStatuses();
       const preStatusesLength = Object.keys(statuses).length;
       for (const flowId in statuses) {
-        // if a flow doesn't exist anymore, remove it from the statuses
+        // ignore flows that don't exist anymore
         if (
           !flows[flowId]
           || !Array.isArray(statuses[flowId])
@@ -185,14 +130,16 @@ module.exports = (XIBLE, EXPRESS_APP) => {
         }
 
         statuses[flowId].forEach(async (instanceStatus) => {
-          if (instanceStatus.state === XIBLE.FlowInstance.STATE_STARTED) {
-            try {
-              const instance = flows[flowId].createInstance({ params: instanceStatus.params });
-              instance._id = instanceStatus._id;
-              await instance.forceStart();
-            } catch (err) {
-              flowDebug(`failed to start "${flowId}": ${err}`);
-            }
+          if (instanceStatus.state !== XIBLE.FlowInstance.STATE_STARTED) {
+            return;
+          }
+
+          try {
+            const instance = flows[flowId].createInstance({ params: instanceStatus.params });
+            instance._id = instanceStatus._id;
+            await instance.forceStart();
+          } catch (err) {
+            flowDebug(`failed to start "${flowId}": ${err}`);
           }
         });
       }
@@ -204,69 +151,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
     * Validates if writing to the flow path is possible/allowed
-    * @returns {Promise.<Boolean>} true or false
+    * @returns {Promise<Boolean>} true or false
     */
     static validatePermissions() {
-      return new Promise((resolve) => {
-        if (!this.flowPath) {
-          resolve(false);
-        }
-
-        // check if we can write
-        fs.access(this.flowPath, fs.W_OK, (err) => {
-          if (err) {
-            resolve(false);
-            return;
-          }
-
-          resolve(true);
-        });
-      });
-    }
-
-    /**
-    * Get all flow statuses.
-    * @return {Object.<String, Boolean>} The statuses per flow name.
-    */
-    static getStatuses() {
-      if (!this.flowPath) {
-        throw new Error('Cannot get statuses; flows have not been loaded from path');
-      }
-
-      if (this._statuses) {
-        return this._statuses;
-      }
-
-      let statuses = {};
-
-      try {
-        statuses = JSON.parse(fs.readFileSync(`${this.flowPath}/_status.json`));
-        flowDebug(`found ${Object.keys(statuses).length} statuses`);
-      } catch (err) {
-        flowDebug(`"${this.flowPath}/_status.json" cannot be opened: ${err}`);
-      }
-
-      this._statuses = statuses;
-
-      return statuses;
-    }
-
-    /**
-    * Save the given statuses to the filesystem.
-    * @param {Object.<String, Boolean>} statuses
-    */
-    static saveStatuses(statuses) {
-      if (!this.flowPath) {
-        return;
-      }
-
-      this._statuses = statuses;
-
-      try {
-        fs.writeFileSync(`${this.flowPath}/_status.json`, JSON.stringify(statuses));
-      } catch (err) {
-        flowDebug(`error saving status to "${this.flowPath}/_status.json": ${err}`);
-      }
+      return XIBLE.activeFlowStore.validateFlowPermissions();
     }
 
     /**
@@ -291,7 +179,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * @param {Array} json.connectors
     * @param {Boolean} cleanVault Indicates whether the json data needs vault sanitizing.
     */
-    initJson(json, cleanVault) {
+    async initJson(json, cleanVault) {
       flowDebug(`initJson on "${json._id}"`);
 
       if (!json || !json._id) {
@@ -361,10 +249,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
             }
 
             if (Object.keys(nodeVaultData).length) {
-              xibleNode.vault.set(Object.assign(xibleNode.vault.get() || {}, nodeVaultData));
+              await xibleNode.vault.set(
+                Object.assign(await xibleNode.vault.get() || {}, nodeVaultData)
+              );
             }
           } else if (xibleNode.vault) {
-            Object.assign(xibleNode.data, xibleNode.vault.get());
+            Object.assign(xibleNode.data, await xibleNode.vault.get());
           }
 
           // host routes
@@ -463,57 +353,46 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     /**
     * Saves a flow to the configured flows directory.
     * Rejects if this is not the master thread.
-    * @return {Promise.<Flow>}
+    * @return {Promise<Flow>}
     */
-    save() {
-      return new Promise((resolve, reject) => {
-        if (XIBLE.child || !this._id || !Flow.flowPath) {
-          reject('not master, no _id or no flowPath specified');
-          return;
-        }
+    async save() {
+      if (XIBLE.child || !this._id) {
+        throw new Error('not master or no flow._id');
+      }
 
-        flowDebug(`saving "${this._id}"`);
-        fs.writeFile(`${Flow.flowPath}/${this._id}.json`, JSON.stringify(this.json, null, '\t'), () => {
-          this.emit('save');
-          resolve(this);
-        });
-      });
+      await XIBLE.activeFlowStore.saveFlow(this);
+      this.emit('save');
+
+      return this;
     }
 
     /**
     * Deletes a flow from the configured flows directory.
     * Stops all instances first.
     * Rejects if this is not the master thread.
-    * @return {Promise.<Flow>}
+    * @return {Promise<Flow>}
     */
-    delete() {
-      return new Promise(async (resolve, reject) => {
-        if (XIBLE.child || !this._id || !Flow.flowPath) {
-          reject('not master, no _id or no flowPath specified');
-          return;
-        }
+    async delete() {
+      if (XIBLE.child || !this._id) {
+        throw new Error('not master or no flow._id');
+      }
 
-        this._deleted = true;
+      this._deleted = true;
 
-        // stop all instances
-        await this.deleteAllInstances();
-        this.instances = [];
+      // stop all instances
+      await this.deleteAllInstances();
+      this.instances = [];
 
-        flowDebug(`deleting "${this._id}"`);
-        fs.unlink(`${Flow.flowPath}/${this._id}.json`, () => {
-          resolve(this);
-        });
+      flowDebug(`deleting "${this._id}"`);
 
-        // update status
-        this.saveStatus();
+      await XIBLE.activeFlowStore.deleteFlow(this);
 
-        // remove from Xible instance
-        if (XIBLE) {
-          delete XIBLE.flows[this._id];
-        }
+      // remove from Xible instance
+      if (XIBLE) {
+        delete XIBLE.flows[this._id];
+      }
 
-        this.emit('delete');
-      });
+      this.emit('delete');
     }
 
     /**
@@ -610,40 +489,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       }
 
       return outputs;
-    }
-
-    /**
-    * Saves the status for this flow by calling Flow.saveStatuses().
-    */
-    saveStatus() {
-      if (XIBLE.stopping) {
-        return;
-      }
-
-      const statuses = Flow.getStatuses();
-      const startedInstances = this.instances
-        .filter(
-          (instance) => instance.state === XIBLE.FlowInstance.STATE_STARTED && !instance.directed
-        );
-
-      if (!startedInstances.length) {
-        delete statuses[this._id];
-      } else {
-        statuses[this._id] = startedInstances.map((instance) => {
-          const status = {
-            _id: instance._id,
-            state: instance.state
-          };
-
-          if (instance.params && Object.keys(instance.params).length) {
-            status.params = instance.params;
-          }
-
-          return status;
-        });
-      }
-
-      Flow.saveStatuses(statuses);
     }
 
     createEmptyInitInstance() {
@@ -745,7 +590,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
      * Stops all instances for this flow.
-     * @returns {Promise.<Flow>} Returns the current flow for daisy chaining.
+     * @returns {Promise<Flow>} Returns the current flow for daisy chaining.
      */
     async stopAllInstances() {
       await Promise.all(
@@ -761,7 +606,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
     /**
      * Deletes all instances for this flow.
-     * @returns {Promise.<Flow>} Returns the current flow for daisy chaining.
+     * @returns {Promise<Flow>} Returns the current flow for daisy chaining.
      */
     async deleteAllInstances() {
       await Promise.all(this.instances.slice().map((instance) => instance.delete()));

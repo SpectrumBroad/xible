@@ -51,7 +51,7 @@ View.routes['/settings'] = (EL) => {
 
   const settingsViewHolder = new ViewHolder(document.getElementById('settingsContent'), '/settings');
   window.settingsViewHolder = settingsViewHolder;
-  settingsViewHolder.on('load', (view) => {
+  settingsViewHolder.on('load', async (view) => {
     // unselect all buttons from #sub
     Array.from(document.querySelectorAll('#sub ul a'))
       .forEach((a) => a.classList.remove('view'));
@@ -94,25 +94,32 @@ View.routes['/settings'] = (EL) => {
       });
 
     // disable if necessary
-    xibleWrapper.Config.getValue('editor.settings.allowchange')
-      .then((allowChange) => {
-        Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
-          .forEach((input) => {
-            input.disabled = !allowChange;
-          });
+    const allowChange = await xibleWrapper.Config.getValue('editor.settings.allowchange');
+    Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
+      .forEach((input) => {
+        input.disabled = !allowChange;
       });
 
+    // disable flow/vault path configs if FileStore is not used
+    const activeFlowStoreType = await xibleWrapper.getActiveFlowStoreType();
+
+    const FILE_STORE_CONFIGURABLE_ONLY_IDS = ['settingsGeneralFlowsPath', 'settingsGeneralVaultPath'];
+
     // set the right data in the data-configpath fields
-    xibleWrapper.Config.getAll()
-      .then((config) => {
-        Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
-          .forEach((input) => {
-            if (input.getAttribute('type') === 'checkbox') {
-              input.checked = !!xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
-            } else {
-              input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
-            }
-          });
+    const config = await xibleWrapper.Config.getAll();
+    Array.from(document.querySelectorAll('input[data-configpath], select[data-configpath]'))
+      .forEach((input) => {
+        const configurable = !FILE_STORE_CONFIGURABLE_ONLY_IDS.includes(input.getAttribute('id'))
+          || activeFlowStoreType === 'FileStore';
+        if (!configurable) {
+          input.disabled = !configurable;
+        }
+
+        if (input.getAttribute('type') === 'checkbox') {
+          input.checked = !!xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+        } else {
+          input.value = xibleWrapper.Config.getObjectValueOnPath(config, input.getAttribute('data-configpath'));
+        }
       });
   });
   settingsViewHolder.hookNavHandler();

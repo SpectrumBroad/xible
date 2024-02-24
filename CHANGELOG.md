@@ -5,10 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.27.0][] - 2024-02-24
 ### Changed
 - Upgrade Cypress for E2E testing.
 
 - Updated minumum Node.JS version to 20.
+
+- Support for different stores. This makes it possible to store flows, flow-states, and the vault outside the filesystem. The first supported store besides `FileStore` is `PgStore` for PostgreSQL. You can use the store by providing `--flow-store-type=PgStore` and `--connection-string=<connection-string>` parameters when starting XIBLE. ([#94](https://github.com/SpectrumBroad/xible/issues/94))
 
 ### Fixed
 - The pattern validation for the name of a new flow in the browser was not escaped properly.

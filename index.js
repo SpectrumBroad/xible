@@ -30,8 +30,36 @@ function handleBroadcastWebSocketError(err) {
 
 let broadcastWebSocketMessagesThrottle = [];
 
+function validateStoreMethodExistance(targetName, target, functionName) {
+  if (typeof target?.[functionName] !== 'function') {
+    throw new Error(`${targetName} store must implement ${functionName}().`);
+  }
+}
+
 class Xible extends EventEmitter {
-  constructor({ configPath, configTmp, child }, configObj) {
+  static STORE_TARGET = {
+    Config: 'Config',
+    Flow: 'Flow',
+    Vault: 'Vault'
+  };
+
+  /**
+   * @param {String} param0.storeType - Type of store from app/Store.
+   * @param {String} param0.configPath - Path to the store.
+   * @param {Object} param0.configTmp - Default temporary config.
+   * Values stored here are not persisted to store.
+   * @param {Boolean} param0.child - Indicates that this is a worker Xible instance.
+   * @param {Object} configObj - Inject a config value,
+   * instead of loading it using Store.loadConfig().
+   */
+  constructor({
+    flowStoreType = 'FileStore',
+    vaultStoreType = 'FileStore',
+    configPath,
+    configTmp,
+    connectionString,
+    child
+  }, configObj) {
     super();
 
     this.nodes = {};
@@ -40,6 +68,8 @@ class Xible extends EventEmitter {
     if (typeof configPath === 'string') {
       this.configPath = this.resolvePath(configPath);
     }
+
+    this.connectionString = connectionString;
 
     this.child = false;
     if (child) {
@@ -55,9 +85,17 @@ class Xible extends EventEmitter {
     this.webSslPortNumber = null;
     this.plainWebServer = null;
     this.secureWebServer = null;
+    this.activeConfigStore = null;
+    this.activeFlowStoreType = flowStoreType;
+    this.activeFlowStore = null;
+    this.activeVaultStore = null;
 
     // tracks whether this XIBLE instance is stopping.
     this.stopping = false;
+
+    this.initStore('Config', 'FileStore');
+    this.initStore('Flow', flowStoreType);
+    this.initStore('Vault', vaultStoreType);
 
     let appNames;
     if (this.child) {
@@ -69,9 +107,61 @@ class Xible extends EventEmitter {
     }
 
     this.Config = require('./app/Config/index.js')(this, this.expressApp, configObj, configTmp).Config;
+
+    this.activeConfigStore.init();
+    this.activeFlowStore.init();
+    this.activeVaultStore.init();
+
     for (let i = 0; i < appNames.length; i += 1) {
       Object.assign(this, require(`./app/${appNames[i]}/index.js`)(this, this.expressApp));
     }
+  }
+
+  /**
+   * Inits the store.
+   */
+  initStore(storeTarget, storeType) {
+    if (!/^\w+$/.test(storeType)) {
+      throw new Error('Store type must consist of word-characters only.');
+    }
+
+    if (!(storeTarget in Xible.STORE_TARGET)) {
+      throw new Error('Store target must be valid.');
+    }
+
+    Object.assign(this, require(`./app/Store/${storeType}.js`)(this));
+    this[`active${storeTarget}Store`] = this[storeType];
+
+    this[`validate${storeTarget}Store`]();
+  }
+
+  validateConfigStore() {
+    const methodNames = [
+      'init', 'loadConfig', 'saveConfig', 'validateConfigPermissions'
+    ];
+    methodNames.forEach((methodName) => {
+      validateStoreMethodExistance('Config', this.activeConfigStore, methodName);
+    });
+  }
+
+  validateFlowStore() {
+    const methodNames = [
+      'init', 'validateFlowPermissions',
+      'getFlowJsons', 'saveFlow', 'deleteFlow',
+      'getFlowInstanceStatuses', 'saveFlowInstanceStatus', 'deleteFlowInstanceStatus'
+    ];
+    methodNames.forEach((methodName) => {
+      validateStoreMethodExistance('Flow', this.activeFlowStore, methodName);
+    });
+  }
+
+  validateVaultStore() {
+    const methodNames = [
+      'init', 'getVaultContents', 'saveVault'
+    ];
+    methodNames.forEach((methodName) => {
+      validateStoreMethodExistance('Vault', this.activeVaultStore, methodName);
+    });
   }
 
   /**
@@ -109,7 +199,7 @@ class Xible extends EventEmitter {
 
   /**
    * Verifies whether a XIBLE instance is running on the PID file.
-   * @returns {Promise.<Boolean>}
+   * @returns {Promise<Boolean>}
    */
   verifyPidIsRunning() {
     return new Promise((resolve) => {

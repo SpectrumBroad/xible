@@ -202,7 +202,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     * Tries to fetch the structure.json from a directory.
     * Also checks for editor contents and typedef.json.
     * @param {String} dirPath Path to the directory containting the structure.json.
-    * @returns {Promise.<Object>} Promise which resolves after the structure is complete,
+    * @returns {Promise<Object>} Promise which resolves after the structure is complete,
     * or cannot be found.
     * @private
     */
@@ -389,7 +389,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * Fetches all input values for this input.
      * @param {String} dataName - The data name to fetch the values for.
      * @param {FlowState} state - The flowstate at the time of calling.
-     * @returns {Promise.<Array>} An array of all values related to this data field.
+     * @returns {Promise<Array>} An array of all values related to this data field.
      * This includes the form field (first value), and data fetched from a related input.
      * If a related input is configured, the input data is added to the returned array,
      * unless 'replaces' is configured to true on the input configuration.
@@ -885,7 +885,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
      * Fetches all input values for this input.
      * @param {FlowState} state - The flowstate at the time of calling.
      * @fires NodeOutput#trigger
-     * @returns {Promise.<Array>} - An array of all values
+     * @returns {Promise<Array>} - An array of all values
      * as returned by the outputs on the other ends of connected connectors or globals.
      * If any of the outputs returns an array,
      * it will be concatened to the return array, instead of pushed.
@@ -1023,7 +1023,6 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   }
 
   // TODO: encryption on the vault
-  const vaultDebug = debug('xible:vault');
   let vault;
   let vaultPath = XIBLE.Config.getValue('vault.path');
   if (!vaultPath) {
@@ -1032,54 +1031,36 @@ module.exports = (XIBLE, EXPRESS_APP) => {
   vaultPath = XIBLE.resolvePath(vaultPath);
 
   class MainVault {
-    static init() {
-      // create the vault if it doesn't exist
-      if (!fs.existsSync(vaultPath)) {
-        vaultDebug('creating new');
-        fs.writeFileSync(vaultPath, '{}', {
-          mode: 0o600
-        });
-      }
-
-      try {
-        vault = JSON.parse(fs.readFileSync(vaultPath));
-      } catch (err) {
-        vaultDebug(`could not open "${vaultPath}"\n`, err);
-      }
+    static async init() {
+      vault = await XIBLE.activeVaultStore.getVaultContents();
     }
 
-    static save() {
-      try {
-        fs.writeFileSync(vaultPath, JSON.stringify(vault), {
-          mode: 0o600
-        });
-      } catch (err) {
-        vaultDebug(`could not save "${vaultPath}"\n`, err);
-      }
+    static async save() {
+      await XIBLE.activeVaultStore.saveVault(vault);
     }
 
-    static get(node) {
+    static async get(node) {
       if (!node || !node._id) {
         return null;
       }
 
       if (!vault) {
-        this.init();
+        await this.init();
       }
 
       return vault[node._id];
     }
 
-    static set(node, obj) {
+    static async set(node, obj) {
       if (!node || !node._id) {
         return;
       }
 
       // always get fresh contents
-      this.init();
+      await this.init();
 
       vault[node._id] = obj;
-      this.save();
+      await this.save();
     }
   }
 

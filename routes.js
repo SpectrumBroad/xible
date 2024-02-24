@@ -10,6 +10,10 @@ module.exports = (XIBLE, EXPRESS_APP) => {
     res.json(Date.now());
   });
 
+  EXPRESS_APP.get('/api/activeFlowStoreType', (req, res) => {
+    res.json(XIBLE.activeFlowStoreType);
+  });
+
   // send out any existing statuses
   EXPRESS_APP.get('/api/persistentWebSocketMessages', (req, res) => {
     res.json(XIBLE.persistentWebSocketMessages);

@@ -219,12 +219,14 @@ module.exports = (XIBLE) => {
           }
         });
 
-        this.worker.on('exit', () => {
+        this.worker.on('exit', async () => {
           this.state = FlowInstance.STATE_STOPPED;
           this.worker = null;
           this.usage = null;
 
-          this.flow.saveStatus();
+          if (!XIBLE.stopping) {
+            await XIBLE.activeFlowStore.deleteFlowInstanceStatus(this.flow._id, this._id);
+          }
 
           this.emit('stopped');
           flowInstanceDebug('worker exited');
@@ -275,7 +277,7 @@ module.exports = (XIBLE) => {
         flowInstanceDebug('starting flowInstance from master');
 
         if (this.worker && this.worker.connected) {
-          this.worker.on('message', (message) => {
+          this.worker.on('message', async (message) => {
             switch (message.method) {
               case 'started': {
                 this.timing.startEnd = process.hrtime();
@@ -283,7 +285,18 @@ module.exports = (XIBLE) => {
                 flowInstanceDebug(`flowInstance/worker started in ${(startedDiff[0] * 1000) + (startedDiff[1] / 1e6)}ms`);
 
                 if (!this.directed) {
-                  this.flow.saveStatus();
+                  await XIBLE.activeFlowStore.saveFlowInstanceStatus(
+                    this.flow._id,
+                    this._id,
+                    {
+                      _id: this._id,
+                      state: this.state,
+                      ...(this.params
+                        && Object.keys(this.params).length > -1
+                        && { params: this.params }
+                      )
+                    }
+                  );
                 }
                 resolve(this);
                 break;
@@ -306,7 +319,7 @@ module.exports = (XIBLE) => {
      * @private
      * @fires Node#trigger
      * @fires Node#init
-     * @returns {Promise.<FlowInstance>} The current flow instance is returned upon completion.
+     * @returns {Promise<FlowInstance>} The current flow instance is returned upon completion.
      */
     async startChild() {
       flowInstanceDebug('starting flowInstance from worker');
@@ -345,7 +358,7 @@ module.exports = (XIBLE) => {
      * Starts a flow in direct mode, on a given set of nodes.
      * @param {Node[]} nodes Array of nodes to direct. Any node outside this array will be ignored.
      * @throws {Error} Will throw if called from a child/worker.
-     * @returns {Promise.<FlowInstance>} The current flow instance is returned upon completion.
+     * @returns {Promise<FlowInstance>} The current flow instance is returned upon completion.
      */
     async direct(nodes) {
       if (XIBLE.child) {
@@ -370,7 +383,7 @@ module.exports = (XIBLE) => {
      * Directs the flowInstance from the worker.
      * @private
      * @throws {Error} Will throw if called from master.
-     * @returns {Promise.<FlowInstance>} The current flow instance is returned upon completion.
+     * @returns {Promise<FlowInstance>} The current flow instance is returned upon completion.
      */
     async directChild(nodes) {
       if (!XIBLE.child) {
@@ -491,7 +504,7 @@ module.exports = (XIBLE) => {
      * @param {Boolean} [deleteInstance=true] Delete the instance when the flow has stopped.
      * @return {Promise}
      */
-    stop(deleteInstance = true) {
+    async stop(deleteInstance = true) {
       if (XIBLE.child) {
         return this.stopChild();
         // return Promise.reject(new Error('should not be called from child'));
@@ -505,7 +518,9 @@ module.exports = (XIBLE) => {
       }
       this.state = FlowInstance.STATE_STOPPING;
 
-      this.flow.saveStatus();
+      if (!XIBLE.stopping) {
+        await XIBLE.activeFlowStore.deleteFlowInstanceStatus(this.flow._id, this._id);
+      }
 
       if (deleteInstance) {
         this.on('stopped', () => {

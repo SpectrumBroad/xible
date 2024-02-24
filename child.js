@@ -104,7 +104,7 @@ process.on('message', async (message) => {
         }
 
         flow = new xible.Flow();
-        flow.initJson(message.flow);
+        await flow.initJson(message.flow);
 
         flowInstance = flow.createInstance();
         flowInstance._id = message.flowInstanceId;

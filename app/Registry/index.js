@@ -118,7 +118,7 @@ module.exports = (XIBLE, EXPRESS_APP) => {
           return;
         }
 
-        resolve(XIBLE.Flow.initOneFromPath(flowPath, `${this.name}.json`, true));
+        resolve(XIBLE.Flow.getOneFlow(this.name, true));
       });
     });
   };
@@ -200,12 +200,12 @@ module.exports = (XIBLE, EXPRESS_APP) => {
 
                     return nodePack.initNodes()
                       .then(() => cleanUp(tmpRegDir))
-                      .then(() => {
+                      .then(async () => {
                         // see if we can/need to reinit flows that are not runnable
                         const flows = XIBLE.getFlows();
                         for (const flowId in flows) {
                           if (!flows[flowId].runnable) {
-                            flows[flowId].initJson(flows[flowId].json);
+                            await flows[flowId].initJson(flows[flowId].json);
                           }
                         }
                       })

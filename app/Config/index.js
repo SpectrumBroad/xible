@@ -1,70 +1,17 @@
 'use strict';
 
-const {EventEmitter} = require('events');
+const { EventEmitter } = require('events');
 const debug = require('debug');
-const fs = require('fs');
-
-// lazy requires
-let fsExtra;
 
 const configDebug = debug('xible:config');
 
-const DEFAULT_PATH = `${__dirname}/../../config.json`;
-
 module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
-  function createConfig(path) {
-    configDebug(`creating "${path}"`);
-
-    if (!fsExtra) {
-      fsExtra = require('fs-extra');
-    }
-
-    try {
-      fsExtra.copySync(DEFAULT_PATH, path);
-      fs.chmodSync(path, 0o600);
-      return true;
-    } catch (err) {
-      configDebug(`could not create "${path}": ${err}`);
-    }
-
-    return false;
+  function saveConfig(configContents) {
+    return XIBLE.activeConfigStore.saveConfig(configContents);
   }
 
-  function saveConfig(path, configContents) {
-    configContents = JSON.stringify(configContents, null, '\t');
-
-    try {
-      fs.writeFileSync(path, configContents, {
-        mode: 0o600
-      });
-    } catch (err) {
-      configDebug(`failed to write config to "${path}": ${err}`);
-      throw new Error(`failed to write config to "${path}": ${err}`);
-    }
-  }
-
-  let loadTries = -1;
-
-  function loadConfig(path) {
-    configDebug(`loading "${path}"`);
-
-    loadTries += 1;
-
-    let configContents;
-    try {
-      configContents = fs.readFileSync(path, {
-        encoding: 'utf8'
-      });
-    } catch (err) {
-      configDebug(`error reading "${path}": ${err}`);
-
-      if (!loadTries && createConfig(path)) {
-        return loadConfig(path);
-      }
-      throw new Error(`failed to load config: ${err}`);
-    }
-
-    return JSON.parse(configContents);
+  function loadConfig() {
+    return XIBLE.activeConfigStore.loadConfig();
   }
 
   /**
@@ -77,7 +24,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
   function objectAssignDeep(target, ...objs) {
     for (let i = 0; i < objs.length; i += 1) {
       const keys = Object.keys(target);
-      const objDelete = { ...objs[i]};
+      const objDelete = { ...objs[i] };
       for (const key of keys) {
         if (typeof target[key] === 'object' && target[key] !== null && objs[i][key]) {
           delete objDelete[key];
@@ -98,7 +45,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
     config = CONFIG_OBJ;
   } else if (XIBLE.configPath) {
     configPath = XIBLE.configPath;
-    config = loadConfig(XIBLE.configPath);
+    config = loadConfig();
   } else {
     throw new Error('need a configPath');
   }
@@ -112,17 +59,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
     * @returns {Promise} true or false
     */
     static validatePermissions() {
-      return new Promise((resolve) => {
-        // check if we can write
-        fs.access(XIBLE.configPath, fs.W_OK, (err) => {
-          if (err) {
-            resolve(false);
-            return;
-          }
-
-          resolve(true);
-        });
-      });
+      return XIBLE.activeConfigStore.validateConfigPermissions();
     }
 
     /**
@@ -154,7 +91,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
       });
 
       if (configPath) {
-        saveConfig(configPath, config);
+        saveConfig(config);
       }
 
       return true;
@@ -224,7 +161,7 @@ module.exports = (XIBLE, EXPRESS_APP, CONFIG_OBJ, CONFIG_TMP) => {
       });
 
       if (configPath) {
-        saveConfig(configPath, config);
+        saveConfig(config);
       }
     }
 
