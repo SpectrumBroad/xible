@@ -1,18 +1,18 @@
 # syntax=docker/dockerfile:1
 
-FROM node:14
+FROM node:20
 
 EXPOSE 9600
 
 # copy
 WORKDIR /app
-COPY ["package.json", "npm-shrinkwrap.json", "routes.js", "index.js", "config.json", "child.js", "./"]
+COPY ["package.json", "package-lock.json", "routes.js", "index.js", "config.json", "child.js", "./"]
 COPY ["./app", "./app"]
 COPY ["./bin", "./bin"]
 COPY ["./editor", "./editor"]
 
 # install
-RUN npm install --production
+RUN npm ci --omit=dev
 
 # run
-CMD [ "node", "./bin/xible.js", "server", "start" ]
+ENTRYPOINT [ "node", "./bin/xible.js", "server", "start" ]

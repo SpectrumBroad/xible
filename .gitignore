@@ -1,9 +1,7 @@
 node_modules
-npm-shrinkwrap.json
 nodes/*
 ssl
 docs
-package-lock.json
 .nyc_output
 cypress/*
 !cypress/integration

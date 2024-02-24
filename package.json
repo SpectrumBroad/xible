@@ -36,7 +36,6 @@
     "debug": "cross-env DEBUG=\"xible*\" ./node_modules/.bin/nodemon ./bin/xible.js server start",
     "inspect": "cross-env DEBUG=\"xible*\" ./node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/xible.js server start",
     "inspect-brk": "cross-env DEBUG=\"xible*\" ./node_modules/.bin/nodemon --inspect-brk=0.0.0.0:9229 ./bin/xible.js server start",
-    "prepublishOnly": "npm shrinkwrap --only=prod",
     "test": "cross-env npm run test:integration",
     "test:integration": "cross-env ./node_modules/.bin/mocha",
     "test:integration:coverage": "cross-env ./node_modules/.bin/nyc ./node_modules/.bin/mocha",
