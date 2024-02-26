@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
-## [0.27.0][] - 2024-02-24
+## [0.27.0][] - 2024-02-26
 ### Changed
 - Upgrade Cypress for E2E testing.
 
