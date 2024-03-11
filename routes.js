@@ -1,5 +1,23 @@
 'use strict';
 
+const fs = require('fs');
+
+const htmlMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;'
+};
+
+// TODO: once proper imports are used, deduplicate from editor/js/utilts.js
+function escapeHtml(str) {
+  if (!str) {
+    return '';
+  }
+
+  return str.replace(/[&<>"]/g, (tag) => htmlMap[tag] || tag);
+}
+
 module.exports = (XIBLE, EXPRESS_APP) => {
   EXPRESS_APP.get('/api/validateFlowPermissions', async (req, res) => {
     const permissionsResult = await XIBLE.Flow.validatePermissions();
@@ -43,6 +61,21 @@ module.exports = (XIBLE, EXPRESS_APP) => {
       return;
     }
 
-    res.sendFile(`${__dirname}/editor/index.htm`);
+    // inject the correct base URL
+    fs.readFile(`${__dirname}/editor/index.htm`, (err, data) => {
+      if (err) {
+        res.status(500).end();
+      }
+
+      const basePath = process.env.BASE_HREF || '/';
+
+      const transformedBaseHrefData = data.toString().replace(
+        /<base href="[^"]*">/,
+        `<base href="${escapeHtml(basePath)}">`
+      );
+
+      res.contentType('html');
+      res.send(transformedBaseHrefData);
+    });
   });
 };

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.28.0][] - 2024-03-11
+### Added
+-   Support for different base href's. This allows XIBLE to be hosted from subpaths behind a reverse proxy for example. Set the `BASE_HREF` environment variable accordingly to ensure XIBLE correctly handles the base path.
+
 ## [0.27.0][] - 2024-02-26
 ### Added
 -   Support for different stores. This makes it possible to store flows, flow-states, and the vault outside the filesystem. The first supported store besides `FileStore` is `PgStore` for PostgreSQL. You can use the store by providing `--flow-store-type=PgStore` and `--connection-string=<connection-string>` parameters when starting XIBLE. ([#94](https://github.com/SpectrumBroad/xible/issues/94))
@@ -483,7 +487,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.27.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.28.0...HEAD
+[0.28.0]: https://github.com/SpectrumBroad/xible/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/SpectrumBroad/xible/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/SpectrumBroad/xible/compare/v0.25.0...v0.26.0
 [0.25.0]: https://github.com/SpectrumBroad/xible/compare/v0.24.0...v0.25.0

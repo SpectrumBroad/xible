@@ -567,7 +567,7 @@ class XibleEditorNodeSelector {
     this.nodesUl.innerHTML = '';
 
     // get the installed nodes
-    const nodes = await this.xibleEditor.xibleWrapper.http.request('GET', '/api/nodes')
+    const nodes = await this.xibleEditor.xibleWrapper.http.request('GET', 'api/nodes')
       .toJson();
     this.nodes = nodes;
 

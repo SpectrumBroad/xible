@@ -53,7 +53,7 @@
     if (locationPort) {
       locationPort = `:${locationPort}`;
     }
-    xibleWrapper = new XibleWrapper(`${window.location.protocol}//${window.location.hostname}${locationPort}`);
+    xibleWrapper = new XibleWrapper(`${window.location.protocol}//${window.location.hostname}${locationPort}${getBaseHref()}`);
     xibleWrapper.on('error', (err) => {
       console.log(err);
     });

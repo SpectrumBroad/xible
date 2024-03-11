@@ -7,6 +7,7 @@ const htmlMap = {
   '"': '&quot;'
 };
 
+// TODO: once proper imports are used, deduplicate from /routes.js
 function escapeHtml(str) {
   if (!str) {
     return '';

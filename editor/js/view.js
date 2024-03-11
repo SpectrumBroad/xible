@@ -1,5 +1,23 @@
 'use strict';
 
+function getBaseHref() {
+  return document.querySelector('base')?.getAttribute('href') ?? '';
+}
+
+function buildUrl(href) {
+  if (href.at(0) === '/') {
+    href = href.substring(1);
+  }
+
+  let baseHref = getBaseHref();
+
+  if (baseHref.length > 0 && baseHref.at(-1) === '/') {
+    baseHref = baseHref.substring(0, baseHref.length - 1);
+  }
+
+  return `${baseHref}/${href}`;
+}
+
 class View {
   constructor(viewName, props) {
     if (viewName.substring(0, 1) !== '/') {
@@ -20,7 +38,7 @@ class View {
     return new Promise((resolve, reject) => {
       if (!View.routes[this.name]) {
         // get the complete view url
-        const url = `/views${this.name}.js`;
+        const url = buildUrl(`/views${this.name}.js`);
 
         // check if the view actually exists using HttpRequest, so we have error handling
         const req = new XMLHttpRequest();
@@ -74,14 +92,17 @@ class ViewHolder extends EventEmitter {
 
   static splitPath(path) {
     const paths = path.split('/');
-    if (paths[paths.length - 1] === '') {
+    if (paths.at(0) === '') {
+      paths.shift();
+    }
+    if (paths.at(-1) === '') {
       paths.pop();
     }
     return paths;
   }
 
   navigate(path, nonav) {
-    history.pushState(null, path, path);
+    history.pushState(null, path, buildUrl(path));
 
     if (nonav) {
       return Promise.resolve(this);
@@ -130,7 +151,9 @@ class ViewHolder extends EventEmitter {
   }
 
   loadNav() {
-    const path = window.location.pathname || '';
+    let path = window.location.pathname || '';
+    path = path.substring(getBaseHref().length);
+
     const paths = ViewHolder.splitPath(path);
 
     if (paths.length === this.rootPaths.length) {

@@ -308,7 +308,7 @@ class XibleEditor extends EventEmitter {
   * Gets the flows from the Xible API
   */
   getFlows() {
-    const req = this.xibleWrapper.http.request('GET', '/api/flows');
+    const req = this.xibleWrapper.http.request('GET', 'api/flows');
     return req.toObject(Object)
       .then((flows) => {
         this.flows = {};
