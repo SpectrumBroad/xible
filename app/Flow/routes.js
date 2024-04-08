@@ -157,6 +157,10 @@ module.exports = (FLOW, XIBLE, EXPRESS_APP) => {
     next();
   });
 
+  EXPRESS_APP.get('/api/flows/:flowId/instances/:flowInstanceId', async (req, res) => {
+    res.json(req.locals.flowInstance);
+  });
+
   EXPRESS_APP.delete('/api/flows/:flowId/instances/:flowInstanceId', async (req, res) => {
     try {
       await req.locals.flowInstance.delete();
