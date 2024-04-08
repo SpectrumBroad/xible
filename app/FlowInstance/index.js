@@ -80,6 +80,10 @@ module.exports = (XIBLE) => {
           execArgv
         });
 
+        this.worker.on('error', (err) => {
+          flowInstanceDebug('flowInstance reported error', err);
+        });
+
         this.worker.on('message', (message) => {
           switch (message.method) {
             case 'initializing':
@@ -557,6 +561,8 @@ module.exports = (XIBLE) => {
           if (this.worker.connected) {
             this.worker.send({
               method: 'stop'
+            }, (err) => {
+              flowInstanceDebug('failed to send worker stop signal', err);
             });
 
             this.worker.disconnect();
