@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][]
+Nothing notable at the moment.
+
+## [0.29.0][] - 2024-04-08
 ### Added
 -   Introduced `/api/flows/<flow-name>/instances/<flow-instance-id>` endpoint to get statuses of a specific flow instance.
 
@@ -33,9 +36,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Whenever a nodepack is under development and the package.json name attribute does not start with 'xible-np-' or 'xible-nodepack-', a warning is thrown, indicating that the nodepack cannot be published to the registry.
 
--   The CLI command `xiblepm flow delete <flowname>` has been added to delete a flow which is published to the registry. The [documentation](https://xible.io/docs/commandlinetools/xiblepm#flow.delete) has been updated.
+-   The CLI command `xiblepm flow delete <flow-name>` has been added to delete a flow which is published to the registry. The [documentation](https://xible.io/docs/commandlinetools/xiblepm#flow.delete) has been updated.
 
--   The UI has an option to publish flows from the 'Flows' page. This acts similarly as the command line [`xiblepm flow publish <flowname>`](https://xible.io/docs/commandlinetools/xiblepm#flow.publish).
+-   The UI has an option to publish flows from the 'Flows' page. This acts similarly as the command line [`xiblepm flow publish <flow-name>`](https://xible.io/docs/commandlinetools/xiblepm#flow.publish).
 
 -   It is now possible to navigate the node selector within the editor using the up and down keys to select different nodes, and the space key to insert a node.
 
@@ -491,7 +494,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.28.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/SpectrumBroad/xible/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/SpectrumBroad/xible/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/SpectrumBroad/xible/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/SpectrumBroad/xible/compare/v0.25.0...v0.26.0
