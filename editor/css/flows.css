@@ -84,7 +84,7 @@
 
 #flowsTable ul.instances:empty::before {
   display: block;
-  content: "Nothing running here. Click\"Start\" to start a new instance of this flow.";
+  content: "Nothing running here. Click \"Start\" to start a new instance of this flow.";
   padding-bottom: 16px;
 }
 
