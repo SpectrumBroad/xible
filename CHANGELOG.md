@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.29.2][] - 2024-07-20
+
+### Fixed
+-   Rolled back `strip-ansi` package to version 6 for CommonJS require() compatibility.
+
 ## [0.29.1][] - 2024-07-20
 
 ### Changed
@@ -504,7 +509,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.29.1...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.29.2...HEAD
+[0.29.2]: https://github.com/SpectrumBroad/xible/compare/v0.29.1...v0.29.2
 [0.29.1]: https://github.com/SpectrumBroad/xible/compare/v0.29.0...v0.29.1
 [0.29.0]: https://github.com/SpectrumBroad/xible/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/SpectrumBroad/xible/compare/v0.27.0...v0.28.0

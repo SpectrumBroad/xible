@@ -59,7 +59,7 @@
     "pg": "^8.11.3",
     "sanitize-filename": "^1.6.3",
     "spdy": "^4.0.2",
-    "strip-ansi": "^7.1.0",
+    "strip-ansi": "^6.0.1",
     "ws": "^8.18.0",
     "xible-nodepack-filesystem": "^0.4.1",
     "xible-nodepack-function": "^0.3.0",
