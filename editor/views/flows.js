@@ -288,29 +288,37 @@ View.routes['/flows'] = (EL) => {
     const actionTd = tr.appendChild(document.createElement('td'));
     actionTd.classList.add('actions');
 
-    const publishButton = actionTd.appendChild(document.createElement('button'));
-    publishButton.innerHTML = 'Publish';
-    publishButton.onclick = () => publishFlow(flow);
+    // Add buttons to manage flow.
+    // Some depend on some settings, so fetch those first.
+    xibleWrapper.Config
+      .getValue('registry.flows.allowpublish')
+      .then((allowPublish) => {
+        if (allowPublish === true) {
+          const publishButton = actionTd.appendChild(document.createElement('button'));
+          publishButton.innerHTML = 'Publish';
+          publishButton.onclick = () => publishFlow(flow);
+        }
 
-    const editButton = actionTd.appendChild(document.createElement('button'));
-    editButton.innerHTML = 'Edit';
-    editButton.onclick = () => {
-      mainViewHolder.navigate(`/editor/${encodeURIComponent(flow._id)}`);
-    };
+        const editButton = actionTd.appendChild(document.createElement('button'));
+        editButton.innerHTML = 'Edit';
+        editButton.onclick = () => {
+          mainViewHolder.navigate(`/editor/${encodeURIComponent(flow._id)}`);
+        };
 
-    const startButton = actionTd.appendChild(document.createElement('button'));
-    startButton.innerHTML = 'Start';
-    startButton.onclick = () => startFlow(flow);
+        const startButton = actionTd.appendChild(document.createElement('button'));
+        startButton.innerHTML = 'Start';
+        startButton.onclick = () => startFlow(flow);
 
-    const stopButton = actionTd.appendChild(document.createElement('button'));
-    stopButton.innerHTML = 'Stop all';
-    stopButton.onclick = () => {
-      flow.deleteAllInstances();
-    };
+        const stopAllButton = actionTd.appendChild(document.createElement('button'));
+        stopAllButton.innerHTML = 'Stop all';
+        stopAllButton.onclick = () => {
+          flow.deleteAllInstances();
+        };
 
-    const deleteButton = actionTd.appendChild(document.createElement('button'));
-    deleteButton.innerHTML = 'Delete';
-    deleteButton.onclick = () => deleteFlow(flow);
+        const deleteButton = actionTd.appendChild(document.createElement('button'));
+        deleteButton.innerHTML = 'Delete';
+        deleteButton.onclick = () => deleteFlow(flow);
+      });
 
     function flowOnDeleteInstance({ flowInstance }) {
       instanceLength -= 1;
