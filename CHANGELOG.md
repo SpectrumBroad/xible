@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.29.1][] - 2024-07-20
+
+### Changed
+-   Bumped versions on several nodepacks which XIBLE ships with by default.
+
+-   Bumped versions on several NPM dependencies.
+
+### Fixed
+-   The publish-flow button was visible and clickable even though the setting to allow publishing flows was disabled.
+
 ## [0.29.0][] - 2024-04-08
 ### Added
 -   Introduced `/api/flows/<flow-name>/instances/<flow-instance-id>` endpoint to get statuses of a specific flow instance.
@@ -494,7 +504,8 @@ You can use this to deviate from the default registry stored in your config file
 ### Fixed
 -   Config module failed to create new config.json upon fresh installation.
 
-[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.29.0...HEAD
+[Unreleased]: https://github.com/SpectrumBroad/xible/compare/v0.29.1...HEAD
+[0.29.1]: https://github.com/SpectrumBroad/xible/compare/v0.29.0...v0.29.1
 [0.29.0]: https://github.com/SpectrumBroad/xible/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/SpectrumBroad/xible/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/SpectrumBroad/xible/compare/v0.26.0...v0.27.0
