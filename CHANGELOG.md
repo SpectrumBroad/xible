@@ -8,12 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 Nothing notable at the moment.
 
 ## [0.29.2][] - 2024-07-20
-
 ### Fixed
 -   Rolled back `strip-ansi` package to version 6 for CommonJS require() compatibility.
 
 ## [0.29.1][] - 2024-07-20
-
 ### Changed
 -   Bumped versions on several nodepacks which XIBLE ships with by default.
 
