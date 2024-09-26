@@ -1,6 +1,6 @@
 {
   "name": "xible",
-  "version": "0.29.2",
+  "version": "0.29.3",
   "description": "xible",
   "license": "MIT",
   "homepage": "https://xible.io",
@@ -50,10 +50,10 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.3",
     "chart.js": "^2.9.0",
     "debug": "^4.3.5",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "fs-extra": "^11.2.0",
     "nopt": "^7.2.1",
     "pg": "^8.11.3",
@@ -63,7 +63,7 @@
     "ws": "^8.18.0",
     "xible-nodepack-filesystem": "^0.4.1",
     "xible-nodepack-function": "^0.3.0",
-    "xible-nodepack-http": "^0.4.1",
+    "xible-nodepack-http": "^0.4.2",
     "xible-nodepack-math": "^0.4.0",
     "xible-nodepack-process": "*",
     "xible-nodepack-stream": "*",

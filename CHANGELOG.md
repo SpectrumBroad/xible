@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][]
 Nothing notable at the moment.
 
+## [0.29.3][] - 2024-09-26
+### Fixed
+-   Bumped version on ['http' nodepack](https://xible.io/nodes?search=http) which XIBLE ships with by default.
+
+-   Bumped versions on several express related NPM dependencies to fix security vulnerabilities.
+
 ## [0.29.2][] - 2024-07-20
 ### Fixed
 -   Rolled back `strip-ansi` package to version 6 for CommonJS require() compatibility.
